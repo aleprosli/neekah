@@ -66,6 +66,7 @@ Route::middleware(['auth', 'role:vendor'])->prefix('vendor')->name('vendor.')->g
 
 Route::middleware('auth')->group(function (): void {
     Route::post('/logout', [LoginController::class, 'destroy'])->name('logout');
+    Route::post('/impersonate/stop', [AdminArea\ImpersonationController::class, 'destroy'])->name('impersonate.stop');
 
     Route::post('/vendors/{vendor}/bookings', [BookingController::class, 'store'])->name('vendors.bookings.store');
     Route::get('/bookings', [BookingController::class, 'index'])->name('bookings.index');
@@ -105,6 +106,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/bookings', [AdminArea\BookingController::class, 'index'])->name('bookings.index');
     Route::get('/bookings/{booking}', [AdminArea\BookingController::class, 'show'])->name('bookings.show');
     Route::get('/transactions', [AdminArea\TransactionController::class, 'index'])->name('transactions.index');
+    Route::post('/users/{user}/impersonate', [AdminArea\ImpersonationController::class, 'store'])->name('users.impersonate');
     Route::get('/violations', [AdminArea\ViolationController::class, 'index'])->name('violations.index');
     Route::get('/violations/{violation}', [AdminArea\ViolationController::class, 'show'])->name('violations.show');
     Route::put('/violations/{violation}', [AdminArea\ViolationController::class, 'update'])->name('violations.update');

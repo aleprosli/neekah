@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Booking;
 use App\Models\Payment;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 
@@ -18,9 +19,13 @@ use Illuminate\Support\Str;
  */
 class PaymentController extends Controller
 {
-    public function store(Booking $booking, Payment $payment, RecordSuccessfulPayment $recordPayment): RedirectResponse
+    public function store(Request $request, Booking $booking, Payment $payment, RecordSuccessfulPayment $recordPayment): RedirectResponse
     {
         Gate::authorize('pay', $booking);
+
+        if ($request->user()->isImpersonated()) {
+            return back()->withErrors(['payment' => 'Pembayaran dimatikan semasa mod impersonate.']);
+        }
 
         if ($payment->status !== PaymentStatus::Pending) {
             return back()->with('status', 'Bayaran ini telah diselesaikan.');

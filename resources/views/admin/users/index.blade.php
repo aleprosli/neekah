@@ -26,6 +26,7 @@
                     <th class="px-4 py-3 font-semibold">Peranan</th>
                     <th class="px-4 py-3 text-right font-semibold">Tempahan</th>
                     <th class="px-4 py-3 font-semibold">Daftar</th>
+                    <th class="px-4 py-3"></th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-line">
@@ -36,6 +37,14 @@
                         <td class="px-4 py-3 whitespace-nowrap">{{ $user->role->label() }}</td>
                         <td class="px-4 py-3 text-right">{{ $user->bookings_count }}</td>
                         <td class="px-4 py-3 whitespace-nowrap text-ink-muted">{{ $user->created_at->translatedFormat('j M Y') }}</td>
+                        <td class="px-4 py-3 text-right">
+                            @if ($user->canBeImpersonated())
+                                <form method="POST" action="{{ route('admin.users.impersonate', $user) }}" onsubmit="return confirm('Log masuk sebagai {{ $user->name }}? Tindakan ini direkod dalam log.')">
+                                    @csrf
+                                    <button type="submit" class="rounded-full border border-line px-3 py-1.5 text-xs font-medium whitespace-nowrap transition hover:border-brand-400 hover:text-brand-700">Impersonate</button>
+                                </form>
+                            @endif
+                        </td>
                     </tr>
                 @endforeach
             </tbody>

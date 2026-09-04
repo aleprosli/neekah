@@ -12,13 +12,14 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Lab404\Impersonate\Models\Impersonate;
 
 #[Fillable(['name', 'email', 'password', 'role', 'phone', 'google_id', 'avatar_url'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, Impersonate, Notifiable;
 
     /**
      * @return array<string, string>
@@ -80,6 +81,22 @@ class User extends Authenticatable
     public function isCustomer(): bool
     {
         return $this->role === UserRole::Customer;
+    }
+
+    /**
+     * Only admins impersonate, so support can reproduce a complaint.
+     */
+    public function canImpersonate(): bool
+    {
+        return $this->isAdmin();
+    }
+
+    /**
+     * Admins are never impersonated, so one admin cannot borrow another's access.
+     */
+    public function canBeImpersonated(): bool
+    {
+        return ! $this->isAdmin();
     }
 
     /**

@@ -5,6 +5,10 @@
         @if ($vendor->isApproved())
             <a href="{{ route('vendors.show', $vendor) }}" class="rounded-full border border-line px-4 py-2 text-sm font-medium transition hover:border-brand-400">Lihat profil awam</a>
         @endif
+        <form method="POST" action="{{ route('admin.users.impersonate', $vendor->user) }}" onsubmit="return confirm('Log masuk sebagai {{ $vendor->user->name }}? Tindakan ini direkod dalam log.')">
+            @csrf
+            <button type="submit" class="rounded-full border border-line px-4 py-2 text-sm font-medium transition hover:border-brand-400 hover:text-brand-700">Impersonate pemilik</button>
+        </form>
     </x-slot:actions>
 
     <div class="grid gap-6 lg:grid-cols-[1fr_320px]">

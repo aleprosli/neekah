@@ -11,6 +11,7 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="min-h-screen bg-surface font-sans text-ink">
+        <x-impersonation-banner />
         {{ $slot }}
     </body>
 </html>
