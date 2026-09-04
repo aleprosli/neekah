@@ -19,7 +19,20 @@ class VendorStatusChanged extends Notification
      */
     public function via(object $notifiable): array
     {
-        return ['mail'];
+        return ['mail', 'database'];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function toDatabase(object $notifiable): array
+    {
+        return [
+            'icon' => '🏪',
+            'title' => "Status vendor: {$this->vendor->status->label()}",
+            'body' => "{$this->vendor->name} kini {$this->vendor->status->label()}.",
+            'url' => route('vendor.dashboard'),
+        ];
     }
 
     public function toMail(object $notifiable): MailMessage

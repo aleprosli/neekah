@@ -19,7 +19,20 @@ class VendorViolationRecorded extends Notification
      */
     public function via(object $notifiable): array
     {
-        return ['mail'];
+        return ['mail', 'database'];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function toDatabase(object $notifiable): array
+    {
+        return [
+            'icon' => '⚠️',
+            'title' => "Pelanggaran disahkan: {$this->violation->action->label()}",
+            'body' => "{$this->violation->type->label()} · pelanggaran ke-{$this->violation->offence_number}.",
+            'url' => route('vendor.dashboard'),
+        ];
     }
 
     public function toMail(object $notifiable): MailMessage

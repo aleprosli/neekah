@@ -13,6 +13,7 @@
 
         <div class="flex items-center gap-1">
             @auth
+                <x-notification-bell />
                 @if (auth()->user()->isAdmin())
                     <a href="{{ route('admin.dashboard') }}" @class(['hidden rounded-full px-4 py-2 text-sm font-medium transition hover:bg-surface-muted sm:inline', 'bg-surface-muted text-brand-700' => request()->routeIs('admin.*')])>Admin</a>
                 @elseif (auth()->user()->isVendor())

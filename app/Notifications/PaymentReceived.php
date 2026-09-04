@@ -18,7 +18,20 @@ class PaymentReceived extends Notification
      */
     public function via(object $notifiable): array
     {
-        return ['mail'];
+        return ['mail', 'database'];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function toDatabase(object $notifiable): array
+    {
+        return [
+            'icon' => '💰',
+            'title' => "{$this->payment->type->label()} diterima",
+            'body' => "Booking {$this->payment->booking->reference} dikemas kini.",
+            'url' => route('bookings.show', $this->payment->booking),
+        ];
     }
 
     public function toMail(object $notifiable): MailMessage

@@ -18,7 +18,20 @@ class BookingCompleted extends Notification
      */
     public function via(object $notifiable): array
     {
-        return ['mail'];
+        return ['mail', 'database'];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function toDatabase(object $notifiable): array
+    {
+        return [
+            'icon' => '⭐',
+            'title' => "Majlis dengan {$this->booking->vendor->name} selesai",
+            'body' => 'Kongsi pengalaman anda dengan memberi review.',
+            'url' => route('bookings.show', $this->booking),
+        ];
     }
 
     public function toMail(object $notifiable): MailMessage

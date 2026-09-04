@@ -11,6 +11,7 @@ use App\Http\Controllers\Customer\BookingController;
 use App\Http\Controllers\Customer\PaymentController;
 use App\Http\Controllers\InvitationAcceptanceController;
 use App\Http\Controllers\LandingController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ReportVendorController;
 use App\Http\Controllers\Vendor as VendorArea;
 use App\Http\Controllers\VendorComparisonController;
@@ -69,6 +70,9 @@ Route::middleware(['auth', 'role:vendor'])->prefix('vendor')->name('vendor.')->g
 
 Route::middleware('auth')->group(function (): void {
     Route::post('/logout', [LoginController::class, 'destroy'])->name('logout');
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::get('/notifications/{notification}', [NotificationController::class, 'show'])->name('notifications.show');
+    Route::put('/notifications', [NotificationController::class, 'update'])->name('notifications.read');
     Route::post('/impersonate/stop', [AdminArea\ImpersonationController::class, 'destroy'])->name('impersonate.stop');
 
     Route::post('/vendors/{vendor}/bookings', [BookingController::class, 'store'])->name('vendors.bookings.store');

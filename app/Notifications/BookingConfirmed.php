@@ -18,7 +18,20 @@ class BookingConfirmed extends Notification
      */
     public function via(object $notifiable): array
     {
-        return ['mail'];
+        return ['mail', 'database'];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function toDatabase(object $notifiable): array
+    {
+        return [
+            'icon' => '✅',
+            'title' => "Booking {$this->booking->reference} disahkan",
+            'body' => "Tarikh majlis {$this->booking->event_date->translatedFormat('j M Y')} kini terjamin.",
+            'url' => $notifiable->isVendor() ? route('vendor.bookings.show', $this->booking) : route('bookings.show', $this->booking),
+        ];
     }
 
     public function toMail(object $notifiable): MailMessage

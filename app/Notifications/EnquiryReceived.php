@@ -18,7 +18,20 @@ class EnquiryReceived extends Notification
      */
     public function via(object $notifiable): array
     {
-        return ['mail'];
+        return ['mail', 'database'];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function toDatabase(object $notifiable): array
+    {
+        return [
+            'icon' => '💬',
+            'title' => "Enquiry baharu daripada {$this->enquiry->user->name}",
+            'body' => 'Balas dalam 24 jam untuk mengekalkan response rate anda.',
+            'url' => route('vendor.enquiries.show', $this->enquiry),
+        ];
     }
 
     public function toMail(object $notifiable): MailMessage

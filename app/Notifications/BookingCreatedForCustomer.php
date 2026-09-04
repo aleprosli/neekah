@@ -18,7 +18,20 @@ class BookingCreatedForCustomer extends Notification
      */
     public function via(object $notifiable): array
     {
-        return ['mail'];
+        return ['mail', 'database'];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function toDatabase(object $notifiable): array
+    {
+        return [
+            'icon' => '🧾',
+            'title' => "Booking {$this->booking->reference} dibuat",
+            'body' => "Bayar deposit untuk mengesahkan tempahan dengan {$this->booking->vendor->name}.",
+            'url' => route('bookings.show', $this->booking),
+        ];
     }
 
     public function toMail(object $notifiable): MailMessage

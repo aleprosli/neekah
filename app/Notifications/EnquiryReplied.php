@@ -18,7 +18,20 @@ class EnquiryReplied extends Notification
      */
     public function via(object $notifiable): array
     {
-        return ['mail'];
+        return ['mail', 'database'];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function toDatabase(object $notifiable): array
+    {
+        return [
+            'icon' => '💬',
+            'title' => "{$this->enquiry->vendor->name} membalas enquiry anda",
+            'body' => 'Lihat balasan dan teruskan ke tempahan.',
+            'url' => route('enquiries.show', $this->enquiry),
+        ];
     }
 
     public function toMail(object $notifiable): MailMessage
