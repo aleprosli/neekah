@@ -23,6 +23,25 @@
                 @endif
             </dl>
 
+            @if ($timelineItems->isNotEmpty())
+                <section class="rounded-2xl border border-line p-5">
+                    <p class="text-xs font-semibold tracking-wide text-ink-muted uppercase">Slot anda pada hari majlis</p>
+                    <ol class="mt-3 flex flex-col gap-3">
+                        @foreach ($timelineItems as $item)
+                            <li class="flex gap-4 text-sm">
+                                <span class="w-24 shrink-0 font-display font-semibold">{{ $item->startsAtLabel() }}</span>
+                                <div class="min-w-0">
+                                    <p class="font-medium">{{ $item->title }}</p>
+                                    @if ($item->location)<p class="text-xs text-ink-muted">📍 {{ $item->location }}</p>@endif
+                                    @if ($item->notes)<p class="text-xs text-ink-muted">{{ $item->notes }}</p>@endif
+                                </div>
+                            </li>
+                        @endforeach
+                    </ol>
+                    <p class="mt-3 border-t border-line pt-3 text-xs text-ink-muted">Anda hanya melihat slot yang ditugaskan kepada anda. Pengantin menguruskan timeline penuh.</p>
+                </section>
+            @endif
+
             @if ($booking->review)
                 <div class="rounded-2xl border border-line p-5">
                     <p class="text-xs font-semibold tracking-wide text-ink-muted uppercase">Review pelanggan</p>

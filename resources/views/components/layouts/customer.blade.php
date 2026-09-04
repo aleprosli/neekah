@@ -8,6 +8,7 @@
     $nav = [
         ['label' => 'Majlis saya', 'icon' => '💍', 'href' => route('dashboard'), 'active' => request()->routeIs('dashboard', 'weddings.*')],
         ['label' => 'Checklist', 'icon' => '✅', 'href' => route('checklist.index'), 'active' => request()->routeIs('checklist.*'), 'badge' => $outstandingTasks ?: null],
+        ['label' => 'Timeline', 'icon' => '🗓️', 'href' => route('timeline.index'), 'active' => request()->routeIs('timeline.*')],
         ['label' => 'Bajet', 'icon' => '💰', 'href' => route('budget.index'), 'active' => request()->routeIs('budget.*')],
         ['label' => 'Tempahan', 'icon' => '🧾', 'href' => route('bookings.index'), 'active' => request()->routeIs('bookings.*')],
         ['label' => 'Enquiry', 'icon' => '💬', 'href' => route('enquiries.index'), 'active' => request()->routeIs('enquiries.*'), 'badge' => $repliedEnquiries ?: null],

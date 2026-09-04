@@ -66,6 +66,12 @@ class BookingController extends Controller
 
         $booking->load(['user', 'package', 'payments', 'review']);
 
-        return view('vendor.bookings.show', ['booking' => $booking]);
+        return view('vendor.bookings.show', [
+            'booking' => $booking,
+            // Vendors see only the timeline slots assigned to them, as the kertas kerja specifies.
+            'timelineItems' => $booking->wedding_id
+                ? $booking->wedding->timelineItems()->where('vendor_id', $booking->vendor_id)->get()
+                : collect(),
+        ]);
     }
 }

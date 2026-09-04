@@ -210,6 +210,38 @@ class DemoSeeder extends Seeder
         ]);
         Payment::factory()->paid()->create(['booking_id' => $booking->id, 'type' => PaymentType::Deposit, 'amount' => $booking->deposit_amount]);
         Payment::factory()->create(['booking_id' => $booking->id, 'type' => PaymentType::Balance, 'amount' => $booking->balanceAmount(), 'status' => PaymentStatus::Pending]);
+
+        $this->seedTimeline($wedding, $vendor);
+    }
+
+    /**
+     * The wedding day from the kertas kerja, with the photographer slot assigned
+     * so the vendor side has something to show.
+     */
+    private function seedTimeline(Wedding $wedding, Vendor $photographer): void
+    {
+        $day = [
+            ['08:00', '10:00', 'Makeup', null, 'Rumah pengantin'],
+            ['10:00', '16:00', 'Photographer arrives', $photographer->id, 'Rumah pengantin'],
+            ['10:30', null, 'Videographer arrives', null, 'Rumah pengantin'],
+            ['11:00', null, 'Bride preparation', null, 'Rumah pengantin'],
+            ['12:30', null, 'Guest arrival', null, 'Dewan'],
+            ['13:00', '14:00', 'Akad Nikah', null, 'Masjid'],
+            ['14:00', null, 'Bersanding', null, 'Dewan'],
+            ['14:30', '16:00', 'Photography session', $photographer->id, 'Dewan'],
+            ['16:00', '17:00', 'Outdoor session', $photographer->id, 'Taman'],
+            ['17:00', null, 'Majlis tamat', null, 'Dewan'],
+        ];
+
+        foreach ($day as [$start, $end, $title, $vendorId, $location]) {
+            $wedding->timelineItems()->create([
+                'starts_at' => $start,
+                'ends_at' => $end,
+                'title' => $title,
+                'vendor_id' => $vendorId,
+                'location' => $location,
+            ]);
+        }
     }
 
     /**

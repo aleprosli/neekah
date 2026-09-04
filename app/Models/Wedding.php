@@ -95,4 +95,9 @@ class Wedding extends Model
     {
         return $this->hasMany(WeddingBudgetItem::class);
     }
+
+    public function timelineItems(): HasMany
+    {
+        return $this->hasMany(WeddingTimelineItem::class)->orderBy('starts_at');
+    }
 }
