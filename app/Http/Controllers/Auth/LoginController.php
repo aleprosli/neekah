@@ -21,7 +21,7 @@ class LoginController extends Controller
         $request->authenticate();
         $request->session()->regenerate();
 
-        return redirect()->intended(route('vendors.index'));
+        return redirect()->intended($request->user()->homeRoute());
     }
 
     public function destroy(Request $request): RedirectResponse

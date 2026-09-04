@@ -70,4 +70,16 @@ class User extends Authenticatable
     {
         return $this->role === UserRole::Customer;
     }
+
+    /**
+     * The dashboard this user lands on after signing in.
+     */
+    public function homeRoute(): string
+    {
+        return match (true) {
+            $this->isAdmin() => route('admin.dashboard'),
+            $this->isVendor() => route('vendor.dashboard'),
+            default => route('dashboard'),
+        };
+    }
 }

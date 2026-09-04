@@ -28,7 +28,7 @@ class RegisterController extends Controller
         $request->session()->regenerate();
 
         return redirect()
-            ->intended(route('vendors.index'))
+            ->intended($user->homeRoute())
             ->with('status', 'Selamat datang ke Neekah, '.$user->name.'!');
     }
 }

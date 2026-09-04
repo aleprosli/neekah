@@ -63,15 +63,6 @@ class GoogleController extends Controller
         Auth::login($user, true);
         request()->session()->regenerate();
 
-        return redirect()->intended($this->homeFor($user));
-    }
-
-    private function homeFor(User $user): string
-    {
-        return match (true) {
-            $user->isAdmin() => route('admin.dashboard'),
-            $user->isVendor() => route('vendor.dashboard'),
-            default => route('dashboard'),
-        };
+        return redirect()->intended($user->homeRoute());
     }
 }
