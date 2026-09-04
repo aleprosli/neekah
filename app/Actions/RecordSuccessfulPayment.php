@@ -5,6 +5,7 @@ namespace App\Actions;
 use App\Enums\BookingStatus;
 use App\Enums\PaymentStatus;
 use App\Enums\PaymentType;
+use App\Enums\PointReason;
 use App\Models\Payment;
 use App\Notifications\BookingConfirmed;
 use App\Notifications\PaymentReceived;
@@ -12,6 +13,8 @@ use Illuminate\Support\Facades\DB;
 
 class RecordSuccessfulPayment
 {
+    public function __construct(private AwardVendorPoints $awardPoints) {}
+
     /**
      * Mark a payment as paid and confirm the booking when the deposit is settled.
      */
@@ -26,6 +29,16 @@ class RecordSuccessfulPayment
 
             $booking = $payment->booking;
 
+            $vendor = $booking->vendor;
+
+            if ($payment->type === PaymentType::Deposit) {
+                $this->awardPoints->award($vendor, PointReason::DepositPaid, $booking);
+            }
+
+            if ($booking->fresh()->isFullyPaid()) {
+                $this->awardPoints->award($vendor, PointReason::FullPayment, $booking);
+            }
+
             $booking->user->notify(new PaymentReceived($payment));
 
             if ($payment->type === PaymentType::Deposit && $booking->status === BookingStatus::PendingPayment) {
@@ -35,7 +48,7 @@ class RecordSuccessfulPayment
                 ]);
 
                 $booking->user->notify(new BookingConfirmed($booking));
-                $booking->vendor->user->notify(new BookingConfirmed($booking));
+                $vendor->user->notify(new BookingConfirmed($booking));
             }
 
             return $payment;

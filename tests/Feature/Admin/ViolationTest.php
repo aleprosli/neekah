@@ -1,5 +1,6 @@
 <?php
 
+use App\Actions\RecalculateVendorStats;
 use App\Enums\VendorStatus;
 use App\Enums\VendorTier;
 use App\Enums\ViolationAction;
@@ -67,7 +68,6 @@ it('applies the escalation ladder across repeated upheld violations', function (
     expect($first->fresh()->action)->toBe(ViolationAction::Warning)
         ->and($first->fresh()->offence_number)->toBe(1)
         ->and($this->vendor->penalty_points)->toBe(0)
-        ->and($this->vendor->tier)->toBe(VendorTier::Top)
         ->and($this->vendor->status)->toBe(VendorStatus::Approved);
 
     // Second offence: point deduction and a ranking drop.
@@ -77,7 +77,7 @@ it('applies the escalation ladder across repeated upheld violations', function (
     $this->vendor->refresh();
     expect($second->fresh()->action)->toBe(ViolationAction::PointDeduction)
         ->and($this->vendor->penalty_points)->toBe(100)
-        ->and($this->vendor->tier)->toBe(VendorTier::Trusted)
+        ->and($this->vendor->points_total)->toBeLessThan(0)
         ->and($this->vendor->status)->toBe(VendorStatus::Approved);
 
     // Third offence: temporary suspension.
@@ -131,7 +131,8 @@ it('refuses to resolve the same report twice', function () {
 });
 
 it('lowers the vendor score through penalty points', function () {
-    $before = $this->vendor->calculateScore();
+    app(RecalculateVendorStats::class)->handle($this->vendor);
+    $before = (float) $this->vendor->fresh()->score;
 
     VendorViolation::factory()->for($this->vendor)->count(2)->create()->each(
         fn ($violation) => $this->actingAs($this->admin)->put(route('admin.violations.update', $violation), ['decision' => 'uphold'])

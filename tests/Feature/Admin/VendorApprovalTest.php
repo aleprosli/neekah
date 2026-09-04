@@ -55,18 +55,31 @@ it('rejects an unknown status value', function () {
     expect($vendor->fresh()->status)->toBe(VendorStatus::Pending);
 });
 
-it('sets the vendor tier and recalculates the score', function () {
+it('pins a tier the admin locks and recalculates the score', function () {
     $vendor = Vendor::factory()->for(Category::first())->create(['response_rate' => 80]);
 
     $this->actingAs($this->admin)
-        ->put(route('admin.vendors.tier', $vendor), ['tier' => 'recommended', 'response_rate' => 100])
+        ->put(route('admin.vendors.tier', $vendor), ['tier' => 'recommended', 'response_rate' => 100, 'tier_locked' => 1])
         ->assertRedirect();
 
     $vendor->refresh();
 
     expect($vendor->tier)->toBe(VendorTier::Recommended)
+        ->and($vendor->tier_locked)->toBeTrue()
         ->and($vendor->response_rate)->toBe(100)
         ->and((float) $vendor->score)->toBe($vendor->calculateScore());
+});
+
+it('recomputes an unlocked tier from the vendor metrics instead of trusting the form', function () {
+    $vendor = Vendor::factory()->for(Category::first())->create();
+
+    $this->actingAs($this->admin)
+        ->put(route('admin.vendors.tier', $vendor), ['tier' => 'recommended'])
+        ->assertRedirect();
+
+    // No completed bookings or reviews yet, so the engine puts them back at Verified.
+    expect($vendor->fresh()->tier)->toBe(VendorTier::Verified)
+        ->and($vendor->fresh()->tier_locked)->toBeFalse();
 });
 
 it('shows a vendor detail page with owner, packages and controls', function () {

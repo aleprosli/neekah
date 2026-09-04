@@ -11,6 +11,7 @@
         ['label' => 'Kalendar', 'icon' => '🗓️', 'href' => route('vendor.availability.index'), 'active' => request()->routeIs('vendor.availability.*')],
         ['label' => 'Tempahan', 'icon' => '🧾', 'href' => route('vendor.bookings.index'), 'active' => request()->routeIs('vendor.bookings.*')],
         ['label' => 'Enquiry', 'icon' => '💬', 'href' => route('vendor.enquiries.index'), 'active' => request()->routeIs('vendor.enquiries.*'), 'badge' => $openEnquiries ?: null],
+        ['label' => 'Point & Ranking', 'icon' => '🏆', 'href' => route('vendor.points.index'), 'active' => request()->routeIs('vendor.points.*')],
     ];
 @endphp
 

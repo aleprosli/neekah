@@ -22,7 +22,9 @@
                 <div><dt class="text-ink-muted">Rating</dt><dd class="font-semibold">★ {{ number_format($vendor->rating_avg, 2) }} ({{ $vendor->reviews_count }} review)</dd></div>
                 <div><dt class="text-ink-muted">Booking</dt><dd class="font-semibold">{{ $bookingCount }} jumlah · {{ $vendor->completed_bookings_count }} selesai</dd></div>
                 <div><dt class="text-ink-muted">Harga bermula</dt><dd class="font-semibold">RM{{ number_format((float) $vendor->price_from, 2) }} / {{ $vendor->price_unit->label() }}</dd></div>
-                <div><dt class="text-ink-muted">Vendor Score</dt><dd class="font-semibold">{{ number_format((float) $vendor->score, 2) }}</dd></div>
+                <div><dt class="text-ink-muted">Vendor Score</dt><dd class="font-semibold">{{ number_format((float) $vendor->score, 2) }} @if ($vendor->tier_locked)<span class="text-xs font-normal text-ink-muted">· tahap dikunci</span>@endif</dd></div>
+                <div><dt class="text-ink-muted">Performance points</dt><dd class="font-semibold">{{ number_format($vendor->points_total) }} @if ($vendor->penalty_points)<span class="text-xs font-normal text-red-600">− {{ $vendor->penalty_points }} penalti</span>@endif</dd></div>
+                <div><dt class="text-ink-muted">Completion rate</dt><dd class="font-semibold">{{ $vendor->completion_rate }}% · response {{ $vendor->response_rate }}%</dd></div>
                 @if ($vendor->tagline)
                     <div class="sm:col-span-2"><dt class="text-ink-muted">Tagline</dt><dd>{{ $vendor->tagline }}</dd></div>
                 @endif
@@ -86,8 +88,13 @@
                     @endforeach
                 </x-form.select>
                 <x-form.field label="Response rate (%)" name="response_rate" type="number" min="0" max="100" :value="$vendor->response_rate" />
+                <label class="flex items-start gap-2 text-sm">
+                    <input type="hidden" name="tier_locked" value="0">
+                    <input type="checkbox" name="tier_locked" value="1" class="mt-0.5 accent-brand-600" @checked($vendor->tier_locked)>
+                    <span>Kunci tahap ini<span class="block text-xs text-ink-muted">Pengiraan automatik tidak akan menaik atau menurunkan tahap vendor ini.</span></span>
+                </label>
                 <button type="submit" class="rounded-full bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700">Simpan ranking</button>
-                <p class="text-xs text-ink-muted">Vendor Score dikira semula: rating 30%, booking selesai 20%, response rate 15%, tahap 35%.</p>
+                <p class="text-xs text-ink-muted">Vendor Score: rating 30%, booking selesai 20%, completion rate 15%, response rate 15%, transaksi platform 10%, kualiti profil 10%.</p>
             </form>
         </aside>
     </div>

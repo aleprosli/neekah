@@ -2,8 +2,8 @@
 
 namespace App\Actions;
 
+use App\Enums\PointReason;
 use App\Enums\VendorStatus;
-use App\Enums\VendorTier;
 use App\Enums\ViolationAction;
 use App\Enums\ViolationStatus;
 use App\Models\User;
@@ -13,7 +13,10 @@ use Illuminate\Support\Facades\DB;
 
 class ApplyViolationAction
 {
-    public function __construct(private RecalculateVendorStats $recalculateStats) {}
+    public function __construct(
+        private RecalculateVendorStats $recalculateStats,
+        private AwardVendorPoints $awardPoints,
+    ) {}
 
     /**
      * Uphold a violation and apply the escalation step for the vendor's offence count.
@@ -38,21 +41,23 @@ class ApplyViolationAction
             $vendor->penalty_points += $action->penaltyPoints();
             $vendor->violations_count = $offenceNumber;
 
-            if ($action === ViolationAction::PointDeduction) {
-                $vendor->tier = $this->demote($vendor->tier);
-            }
-
+            // The ranking engine applies the tier drop from the violation count,
+            // so it is not undone by the next recalculation.
             if ($action === ViolationAction::Suspension) {
-                $vendor->tier = $this->demote($vendor->tier);
                 $vendor->status = VendorStatus::Suspended;
             }
 
             if ($action === ViolationAction::Removal) {
-                $vendor->tier = VendorTier::New;
                 $vendor->status = VendorStatus::Rejected;
             }
 
+            $vendor->tier_locked = false;
             $vendor->save();
+
+            if ($action->penaltyPoints() > 0) {
+                $this->awardPoints->award($vendor, PointReason::ViolationPenalty, $violation, -$action->penaltyPoints());
+            }
+
             $this->recalculateStats->handle($vendor);
 
             $vendor->user->notify(new VendorViolationRecorded($violation->fresh()));
@@ -71,15 +76,5 @@ class ApplyViolationAction
         ]);
 
         return $violation;
-    }
-
-    private function demote(VendorTier $tier): VendorTier
-    {
-        return match ($tier) {
-            VendorTier::Recommended => VendorTier::Top,
-            VendorTier::Top => VendorTier::Trusted,
-            VendorTier::Trusted => VendorTier::Verified,
-            default => VendorTier::New,
-        };
     }
 }

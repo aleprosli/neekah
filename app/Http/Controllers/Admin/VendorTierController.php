@@ -20,9 +20,11 @@ class VendorTierController extends Controller
         $validated = $request->validate([
             'tier' => ['required', Rule::enum(VendorTier::class)],
             'response_rate' => ['nullable', 'integer', 'between:0,100'],
+            'tier_locked' => ['nullable', 'boolean'],
         ]);
 
         $vendor->tier = VendorTier::from($validated['tier']);
+        $vendor->tier_locked = $request->boolean('tier_locked');
 
         if (isset($validated['response_rate'])) {
             $vendor->response_rate = $validated['response_rate'];
@@ -31,6 +33,8 @@ class VendorTierController extends Controller
         $vendor->save();
         $recalculateStats->handle($vendor);
 
-        return back()->with('status', $vendor->name.' kini '.$vendor->tier->label().' Vendor (score '.number_format((float) $vendor->score, 2).').');
+        $note = $vendor->tier_locked ? ' Tahap dikunci, pengiraan automatik tidak akan mengubahnya.' : '';
+
+        return back()->with('status', $vendor->name.' kini '.$vendor->fresh()->tier->label().' Vendor (score '.number_format((float) $vendor->fresh()->score, 2).').'.$note);
     }
 }

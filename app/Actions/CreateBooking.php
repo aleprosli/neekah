@@ -5,6 +5,7 @@ namespace App\Actions;
 use App\Enums\BookingStatus;
 use App\Enums\PaymentStatus;
 use App\Enums\PaymentType;
+use App\Enums\PointReason;
 use App\Models\Booking;
 use App\Models\Package;
 use App\Models\Payment;
@@ -16,6 +17,8 @@ use Illuminate\Support\Facades\DB;
 
 class CreateBooking
 {
+    public function __construct(private AwardVendorPoints $awardPoints) {}
+
     /**
      * Create a pending booking for a package and its deposit payment record.
      *
@@ -63,6 +66,8 @@ class CreateBooking
 
             $booking->setRelation('vendor', $vendor);
             $booking->setRelation('user', $customer);
+
+            $this->awardPoints->award($vendor, PointReason::PlatformBooking, $booking);
 
             $customer->notify(new BookingCreatedForCustomer($booking));
             $vendor->user->notify(new BookingCreatedForVendor($booking));

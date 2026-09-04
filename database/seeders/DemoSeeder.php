@@ -2,8 +2,11 @@
 
 namespace Database\Seeders;
 
+use App\Actions\AwardVendorPoints;
+use App\Actions\RecalculateVendorStats;
 use App\Enums\PaymentStatus;
 use App\Enums\PaymentType;
+use App\Enums\PointReason;
 use App\Enums\PriceUnit;
 use App\Enums\VendorStatus;
 use App\Enums\VendorTier;
@@ -76,9 +79,10 @@ class DemoSeeder extends Seeder
 
         $this->seedHistory($couple, $wedding, $vendors);
 
-        $vendors->each(function (Vendor $vendor): void {
-            $vendor->refresh();
-            $vendor->update(['score' => $vendor->calculateScore()]);
+        $recalculate = app(RecalculateVendorStats::class);
+
+        $vendors->each(function (Vendor $vendor) use ($recalculate): void {
+            $recalculate->handle($vendor->refresh());
         });
     }
 
@@ -128,9 +132,18 @@ class DemoSeeder extends Seeder
 
         foreach ($vendors as $vendor) {
             $package = $vendor->packages()->first();
-            $reviewCount = min(5, max(2, intdiv($vendor->reviews_count, 40)));
+            $award = app(AwardVendorPoints::class);
 
-            for ($i = 0; $i < $reviewCount; $i++) {
+            // Scale the seeded history off the headline review count so the ranking
+            // ladder is visible in the demo without hand-setting any tier.
+            $declaredRating = (float) $vendor->rating_avg;
+            $reviewCount = min(16, max(2, intdiv($vendor->reviews_count, 8)));
+            $completedCount = min(40, max($reviewCount, intdiv($vendor->reviews_count, 4)));
+
+            // Ratings are only 4 or 5, so the count of fives lands the average on the headline figure.
+            $fives = (int) round(max(0, min(1, $declaredRating - 4)) * $reviewCount);
+
+            for ($i = 0; $i < $completedCount; $i++) {
                 $customer = $reviewers[$i % $reviewers->count()];
                 $booking = Booking::factory()->completed()->create([
                     'user_id' => $customer->id,
@@ -151,20 +164,25 @@ class DemoSeeder extends Seeder
                     ]);
                 }
 
-                $rating = $i % 3 === 2 ? (int) floor($vendor->rating_avg) : (int) ceil($vendor->rating_avg);
-                Review::factory()->create([
+                $award->award($vendor, PointReason::PlatformBooking, $booking);
+                $award->award($vendor, PointReason::DepositPaid, $booking);
+                $award->award($vendor, PointReason::FullPayment, $booking);
+                $award->award($vendor, PointReason::BookingCompleted, $booking);
+
+                if ($i >= $reviewCount) {
+                    continue;
+                }
+
+                $review = Review::factory()->create([
                     'booking_id' => $booking->id,
                     'user_id' => $customer->id,
                     'vendor_id' => $vendor->id,
-                    'rating' => $rating,
+                    'rating' => $i < $fives ? 5 : 4,
                     'comment' => $comments[($i + $vendor->id) % count($comments)],
                 ]);
-            }
 
-            $vendor->update([
-                'rating_avg' => round($vendor->reviews()->avg('rating'), 2),
-                'reviews_count' => $vendor->reviews()->count(),
-            ]);
+                $award->award($vendor, PointReason::PositiveReview, $review);
+            }
         }
 
         // A live, confirmed booking for the demo couple with the first vendor.

@@ -59,6 +59,7 @@ Route::middleware(['auth', 'role:vendor'])->prefix('vendor')->name('vendor.')->g
     Route::post('/bookings', [VendorArea\BookingController::class, 'store'])->name('bookings.store');
     Route::get('/bookings/{booking}', [VendorArea\BookingController::class, 'show'])->name('bookings.show');
     Route::post('/bookings/{booking}/complete', [VendorArea\BookingCompletionController::class, 'store'])->name('bookings.complete');
+    Route::get('/points', [VendorArea\PointController::class, 'index'])->name('points.index');
     Route::get('/enquiries', [VendorArea\EnquiryController::class, 'index'])->name('enquiries.index');
     Route::get('/enquiries/{enquiry}', [VendorArea\EnquiryController::class, 'show'])->name('enquiries.show');
     Route::put('/enquiries/{enquiry}', [VendorArea\EnquiryController::class, 'update'])->name('enquiries.update');

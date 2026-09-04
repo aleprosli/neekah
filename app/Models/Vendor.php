@@ -20,7 +20,7 @@ use Illuminate\Support\Carbon;
     'user_id', 'category_id', 'name', 'slug', 'tagline', 'description', 'city', 'state',
     'phone', 'whatsapp', 'price_from', 'price_unit', 'cover_image', 'cover_tone',
     'status', 'tier', 'rating_avg', 'reviews_count', 'completed_bookings_count',
-    'response_rate', 'score', 'penalty_points', 'violations_count', 'approved_at',
+    'response_rate', 'completion_rate', 'score', 'points_total', 'tier_locked', 'penalty_points', 'violations_count', 'approved_at',
 ])]
 class Vendor extends Model
 {
@@ -44,6 +44,7 @@ class Vendor extends Model
             'tier' => VendorTier::class,
             'rating_avg' => 'decimal:2',
             'score' => 'decimal:2',
+            'tier_locked' => 'boolean',
             'approved_at' => 'datetime',
         ];
     }
@@ -98,6 +99,31 @@ class Vendor extends Model
         return $this->hasMany(VendorViolation::class);
     }
 
+    public function points(): HasMany
+    {
+        return $this->hasMany(VendorPoint::class);
+    }
+
+    /**
+     * A profile counts as complete once a couple has everything they need to judge it.
+     */
+    public function hasCompleteProfile(): bool
+    {
+        return filled($this->tagline)
+            && filled($this->description)
+            && filled($this->phone)
+            && (float) $this->price_from > 0;
+    }
+
+    /**
+     * A catalogue counts as complete with at least one active package and three portfolio images.
+     */
+    public function hasCompleteCatalogue(): bool
+    {
+        return $this->packages()->where('is_active', true)->exists()
+            && $this->portfolioItems()->count() >= 3;
+    }
+
     #[Scope]
     protected function approved(Builder $query): Builder
     {
@@ -115,19 +141,40 @@ class Vendor extends Model
     }
 
     /**
-     * Recommended Vendor score using the kertas kerja weights.
-     * Platform-transaction and profile-quality components are approximated by tier until Phase 2.
+     * Vendor Score using the kertas kerja weights: customer rating 30%, completed
+     * bookings 20%, completion rate 15%, response rate 15%, platform transactions
+     * 10%, profile and catalogue quality 10%. Penalty points subtract from the total.
      */
     public function calculateScore(): float
     {
+        $quality = ($this->hasCompleteProfile() ? 5 : 0) + ($this->hasCompleteCatalogue() ? 5 : 0);
+
         return max(0, round(
             ((float) $this->rating_avg / 5 * 30)
-            + (min($this->completed_bookings_count, 300) / 300 * 20)
+            + (min($this->completed_bookings_count, 50) / 50 * 20)
+            + ($this->completion_rate / 100 * 15)
             + ($this->response_rate / 100 * 15)
-            + ($this->tier->rank() / 4 * 35)
+            + (min($this->points_total, 2000) / 2000 * 10)
+            + $quality
             - ($this->penalty_points / 10),
             2
         ));
+    }
+
+    /**
+     * Share of non-cancelled bookings that reached completion, as a percentage.
+     */
+    public function calculateCompletionRate(): int
+    {
+        $settled = $this->bookings()
+            ->whereIn('status', [BookingStatus::Completed, BookingStatus::Cancelled])
+            ->count();
+
+        if ($settled === 0) {
+            return 100;
+        }
+
+        return (int) round($this->bookings()->where('status', BookingStatus::Completed)->count() / $settled * 100);
     }
 
     /**

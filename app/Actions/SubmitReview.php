@@ -2,6 +2,7 @@
 
 namespace App\Actions;
 
+use App\Enums\PointReason;
 use App\Models\Booking;
 use App\Models\Review;
 use Illuminate\Support\Facades\DB;
@@ -9,7 +10,10 @@ use InvalidArgumentException;
 
 class SubmitReview
 {
-    public function __construct(private RecalculateVendorStats $recalculateStats) {}
+    public function __construct(
+        private RecalculateVendorStats $recalculateStats,
+        private AwardVendorPoints $awardPoints,
+    ) {}
 
     /**
      * Store a verified review for a completed booking and refresh the vendor's rating.
@@ -29,6 +33,10 @@ class SubmitReview
                 'user_id' => $booking->user_id,
                 'vendor_id' => $booking->vendor_id,
             ]);
+
+            if ($review->rating >= 4) {
+                $this->awardPoints->award($booking->vendor, PointReason::PositiveReview, $review);
+            }
 
             $this->recalculateStats->handle($booking->vendor);
 
