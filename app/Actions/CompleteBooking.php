@@ -4,6 +4,7 @@ namespace App\Actions;
 
 use App\Enums\BookingStatus;
 use App\Models\Booking;
+use App\Notifications\BookingCompleted;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
 
@@ -27,6 +28,8 @@ class CompleteBooking
             ]);
 
             $this->recalculateStats->handle($booking->vendor);
+
+            $booking->user->notify(new BookingCompleted($booking));
 
             return $booking;
         });

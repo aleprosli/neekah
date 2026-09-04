@@ -35,11 +35,11 @@
                 @endif
 
                 @if (session('status'))
-                    <div class="mb-6 rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm text-emerald-900 dark:border-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-100">{{ session('status') }}</div>
+                    <div class="mb-6 rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm text-emerald-900">{{ session('status') }}</div>
                 @endif
 
                 @if ($errors->any())
-                    <ul class="mb-6 flex flex-col gap-1 rounded-2xl bg-brand-50 p-4 text-sm text-brand-800 dark:bg-brand-900/40 dark:text-brand-100">
+                    <ul class="mb-6 flex flex-col gap-1 rounded-2xl bg-brand-50 p-4 text-sm text-brand-800">
                         @foreach ($errors->all() as $error)
                             <li>{{ $error }}</li>
                         @endforeach

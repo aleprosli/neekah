@@ -1,12 +1,16 @@
 <?php
 
 use App\Http\Controllers\Admin as AdminArea;
+use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\NewPasswordController;
+use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Customer as CustomerArea;
 use App\Http\Controllers\Customer\BookingController;
 use App\Http\Controllers\Customer\PaymentController;
 use App\Http\Controllers\LandingController;
+use App\Http\Controllers\ReportVendorController;
 use App\Http\Controllers\Vendor as VendorArea;
 use App\Http\Controllers\VendorController;
 use Illuminate\Support\Facades\Route;
@@ -26,6 +30,14 @@ Route::middleware('guest')->group(function (): void {
     Route::post('/login', [LoginController::class, 'store'])->middleware('throttle:10,1');
     Route::get('/vendor/register', [VendorArea\RegisterController::class, 'create'])->name('vendor.register');
     Route::post('/vendor/register', [VendorArea\RegisterController::class, 'store']);
+
+    Route::get('/forgot-password', [PasswordResetLinkController::class, 'create'])->name('password.request');
+    Route::post('/forgot-password', [PasswordResetLinkController::class, 'store'])->middleware('throttle:6,1')->name('password.email');
+    Route::get('/reset-password/{token}', [NewPasswordController::class, 'create'])->name('password.reset');
+    Route::post('/reset-password', [NewPasswordController::class, 'store'])->name('password.store');
+
+    Route::get('/auth/google', [GoogleController::class, 'redirect'])->name('auth.google');
+    Route::get('/auth/google/callback', [GoogleController::class, 'callback'])->name('auth.google.callback');
 });
 
 Route::middleware(['auth', 'role:vendor'])->prefix('vendor')->name('vendor.')->group(function (): void {
@@ -67,6 +79,9 @@ Route::middleware('auth')->group(function (): void {
     Route::get('/enquiries', [CustomerArea\EnquiryController::class, 'index'])->name('enquiries.index');
     Route::get('/enquiries/{enquiry}', [CustomerArea\EnquiryController::class, 'show'])->name('enquiries.show');
     Route::post('/vendors/{vendor}/enquiries', [CustomerArea\EnquiryController::class, 'store'])->name('vendors.enquiries.store');
+
+    Route::get('/vendors/{vendor}/report', [ReportVendorController::class, 'create'])->name('vendors.report.create');
+    Route::post('/vendors/{vendor}/report', [ReportVendorController::class, 'store'])->name('vendors.report.store');
 });
 
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function (): void {
@@ -83,4 +98,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/bookings', [AdminArea\BookingController::class, 'index'])->name('bookings.index');
     Route::get('/bookings/{booking}', [AdminArea\BookingController::class, 'show'])->name('bookings.show');
     Route::get('/transactions', [AdminArea\TransactionController::class, 'index'])->name('transactions.index');
+    Route::get('/violations', [AdminArea\ViolationController::class, 'index'])->name('violations.index');
+    Route::get('/violations/{violation}', [AdminArea\ViolationController::class, 'show'])->name('violations.show');
+    Route::put('/violations/{violation}', [AdminArea\ViolationController::class, 'update'])->name('violations.update');
 });

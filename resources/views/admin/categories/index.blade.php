@@ -31,7 +31,7 @@
                             </td>
                             <td class="px-4 py-3 text-right">{{ $category->vendors_count }}</td>
                             <td class="px-4 py-3">
-                                <span @class(['inline-flex rounded-full px-2.5 py-1 text-xs font-semibold', 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-200' => $category->is_active, 'bg-surface-muted text-ink-muted' => ! $category->is_active])>{{ $category->is_active ? 'Aktif' : 'Tidak aktif' }}</span>
+                                <span @class(['inline-flex rounded-full px-2.5 py-1 text-xs font-semibold', 'bg-emerald-100 text-emerald-800' => $category->is_active, 'bg-surface-muted text-ink-muted' => ! $category->is_active])>{{ $category->is_active ? 'Aktif' : 'Tidak aktif' }}</span>
                             </td>
                             <td class="px-4 py-3 text-right">
                                 @if ($category->vendors_count === 0)

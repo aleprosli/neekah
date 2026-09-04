@@ -20,7 +20,7 @@ use Illuminate\Support\Carbon;
     'user_id', 'category_id', 'name', 'slug', 'tagline', 'description', 'city', 'state',
     'phone', 'whatsapp', 'price_from', 'price_unit', 'cover_image', 'cover_tone',
     'status', 'tier', 'rating_avg', 'reviews_count', 'completed_bookings_count',
-    'response_rate', 'score', 'approved_at',
+    'response_rate', 'score', 'penalty_points', 'violations_count', 'approved_at',
 ])]
 class Vendor extends Model
 {
@@ -93,6 +93,11 @@ class Vendor extends Model
         return $this->hasMany(Review::class);
     }
 
+    public function violations(): HasMany
+    {
+        return $this->hasMany(VendorViolation::class);
+    }
+
     #[Scope]
     protected function approved(Builder $query): Builder
     {
@@ -115,13 +120,14 @@ class Vendor extends Model
      */
     public function calculateScore(): float
     {
-        return round(
+        return max(0, round(
             ((float) $this->rating_avg / 5 * 30)
             + (min($this->completed_bookings_count, 300) / 300 * 20)
             + ($this->response_rate / 100 * 15)
-            + ($this->tier->rank() / 4 * 35),
+            + ($this->tier->rank() / 4 * 35)
+            - ($this->penalty_points / 10),
             2
-        );
+        ));
     }
 
     /**

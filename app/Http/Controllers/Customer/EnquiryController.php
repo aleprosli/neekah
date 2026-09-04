@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreEnquiryRequest;
 use App\Models\Enquiry;
 use App\Models\Vendor;
+use App\Notifications\EnquiryReceived;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -37,6 +38,9 @@ class EnquiryController extends Controller
                 : $request->user()->weddings()->latest('event_date')->value('id'),
             'status' => EnquiryStatus::Open,
         ]);
+
+        $enquiry->setRelation('user', $request->user());
+        $vendor->user->notify(new EnquiryReceived($enquiry));
 
         return redirect()
             ->route('enquiries.show', $enquiry)

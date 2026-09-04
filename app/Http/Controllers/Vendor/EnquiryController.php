@@ -6,6 +6,7 @@ use App\Enums\EnquiryStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ReplyEnquiryRequest;
 use App\Models\Enquiry;
+use App\Notifications\EnquiryReplied;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -41,6 +42,8 @@ class EnquiryController extends Controller
             'replied_at' => now(),
             'status' => EnquiryStatus::Replied,
         ]);
+
+        $enquiry->user->notify(new EnquiryReplied($enquiry->fresh(['vendor'])));
 
         return redirect()->route('vendor.enquiries.show', $enquiry)->with('status', 'Balasan dihantar kepada pelanggan.');
     }

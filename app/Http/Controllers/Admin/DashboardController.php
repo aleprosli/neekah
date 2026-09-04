@@ -6,11 +6,13 @@ use App\Enums\BookingStatus;
 use App\Enums\PaymentStatus;
 use App\Enums\UserRole;
 use App\Enums\VendorStatus;
+use App\Enums\ViolationStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
 use App\Models\Payment;
 use App\Models\User;
 use App\Models\Vendor;
+use App\Models\VendorViolation;
 use Illuminate\Contracts\View\View;
 
 class DashboardController extends Controller
@@ -32,6 +34,7 @@ class DashboardController extends Controller
                 'completed_bookings' => Booking::where('status', BookingStatus::Completed)->count(),
                 'gross' => (float) $paidPayments->clone()->sum('amount'),
                 'commission' => (float) Booking::whereIn('status', [BookingStatus::Confirmed, BookingStatus::Completed])->sum('commission_amount'),
+                'open_violations' => VendorViolation::where('status', ViolationStatus::Open)->count(),
             ],
             'pendingVendors' => Vendor::with(['category', 'user'])->where('status', VendorStatus::Pending)->latest()->limit(5)->get(),
             'recentBookings' => Booking::with(['vendor', 'user'])->latest()->orderByDesc('id')->limit(8)->get(),

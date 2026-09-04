@@ -5,7 +5,7 @@
 
     <main class="mx-auto max-w-6xl px-4 pt-24 pb-28 sm:px-6 lg:px-10 lg:pt-28 lg:pb-16">
         @if (session('status'))
-            <div class="mb-4 rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm text-emerald-900 dark:border-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-100">
+            <div class="mb-4 rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm text-emerald-900">
                 {{ session('status') }}
             </div>
         @endif
@@ -139,7 +139,7 @@
                     <p class="text-sm text-ink-muted">Dari <span class="font-display text-2xl font-semibold text-ink">RM{{ number_format($vendor->price_from) }}</span> / {{ $vendor->price_unit->label() }}</p>
 
                     @if ($errors->any())
-                        <ul class="flex flex-col gap-1 rounded-xl bg-brand-50 p-3 text-xs text-brand-800 dark:bg-brand-900/40 dark:text-brand-100">
+                        <ul class="flex flex-col gap-1 rounded-xl bg-brand-50 p-3 text-xs text-brand-800">
                             @foreach ($errors->all() as $error)
                                 <li>{{ $error }}</li>
                             @endforeach
@@ -173,7 +173,7 @@
                     <dl class="flex flex-col gap-2 text-sm">
                         <div class="flex justify-between"><dt class="underline underline-offset-4">Deposit semasa tempah</dt><dd>40%</dd></div>
                         <div class="flex justify-between"><dt class="underline underline-offset-4">Baki sebelum majlis</dt><dd>60%</dd></div>
-                        <div class="flex justify-between border-t border-line pt-3 font-semibold"><dt>Status selepas deposit</dt><dd class="text-emerald-600 dark:text-emerald-400">Confirmed</dd></div>
+                        <div class="flex justify-between border-t border-line pt-3 font-semibold"><dt>Status selepas deposit</dt><dd class="text-emerald-600">Confirmed</dd></div>
                     </dl>
                 </form>
 
@@ -187,12 +187,21 @@
                             @csrf
                             <textarea name="message" rows="4" required placeholder="Contoh: Masih ada slot untuk 20 Disember? Boleh kongsi pakej untuk 500 tetamu?" class="rounded-xl border border-line bg-surface px-4 py-2.5 text-sm focus:border-brand-400 focus:outline-none">{{ old('message') }}</textarea>
                             <input type="date" name="event_date" value="{{ old('event_date', $defaultEventDate ?? '') }}" min="{{ now()->addDay()->toDateString() }}" class="rounded-xl border border-line bg-surface px-4 py-2.5 text-sm focus:border-brand-400 focus:outline-none">
-                            <button type="submit" class="rounded-full border border-brand-600 py-2.5 text-sm font-semibold text-brand-700 transition hover:bg-brand-50 dark:hover:bg-brand-900/40">Hantar enquiry</button>
+                            <button type="submit" class="rounded-full border border-brand-600 py-2.5 text-sm font-semibold text-brand-700 transition hover:bg-brand-50">Hantar enquiry</button>
                         </form>
                     @else
                         <p class="mt-3 text-sm text-ink-muted"><a href="{{ route('login') }}" class="font-medium text-brand-600 underline underline-offset-4">Log masuk</a> untuk menghantar enquiry kepada vendor ini.</p>
                     @endauth
                 </details>
+
+                @auth
+                    @if (auth()->user()->isCustomer())
+                        <p class="mt-3 text-center text-xs text-ink-muted">
+                            Ada masalah dengan vendor ini?
+                            <a href="{{ route('vendors.report.create', $vendor) }}" class="font-medium underline underline-offset-4 hover:text-ink">Laporkan vendor</a>
+                        </p>
+                    @endif
+                @endauth
             </aside>
         </div>
 

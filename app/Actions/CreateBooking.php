@@ -10,6 +10,8 @@ use App\Models\Package;
 use App\Models\Payment;
 use App\Models\User;
 use App\Models\Vendor;
+use App\Notifications\BookingCreatedForCustomer;
+use App\Notifications\BookingCreatedForVendor;
 use Illuminate\Support\Facades\DB;
 
 class CreateBooking
@@ -58,6 +60,12 @@ class CreateBooking
                 'status' => PaymentStatus::Pending,
                 'gateway' => 'sandbox',
             ]);
+
+            $booking->setRelation('vendor', $vendor);
+            $booking->setRelation('user', $customer);
+
+            $customer->notify(new BookingCreatedForCustomer($booking));
+            $vendor->user->notify(new BookingCreatedForVendor($booking));
 
             return $booking;
         });

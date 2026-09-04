@@ -16,8 +16,8 @@
         </div>
 
         @if ($enquiry->reply)
-            <div class="rounded-2xl border border-emerald-200 bg-emerald-50 p-5 dark:border-emerald-800 dark:bg-emerald-900/30">
-                <p class="text-xs font-semibold tracking-wide text-emerald-800 uppercase dark:text-emerald-200">Balasan {{ $enquiry->vendor->name }} · {{ $enquiry->replied_at->translatedFormat('j M Y, g:i A') }}</p>
+            <div class="rounded-2xl border border-emerald-200 bg-emerald-50 p-5">
+                <p class="text-xs font-semibold tracking-wide text-emerald-800 uppercase">Balasan {{ $enquiry->vendor->name }} · {{ $enquiry->replied_at->translatedFormat('j M Y, g:i A') }}</p>
                 <p class="mt-2 text-sm leading-relaxed whitespace-pre-line">{{ $enquiry->reply }}</p>
             </div>
             <a href="{{ route('vendors.show', $enquiry->vendor) }}#tempah" class="w-fit rounded-full bg-brand-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-brand-700">Tempah vendor ini</a>

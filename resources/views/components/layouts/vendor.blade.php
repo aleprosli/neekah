@@ -20,7 +20,7 @@
     @endisset
 
     @if ($vendor && ! $vendor->isApproved())
-        <div class="mb-6 rounded-2xl border border-amber-200 bg-amber-50 px-5 py-4 text-sm text-amber-900 dark:border-amber-800 dark:bg-amber-900/30 dark:text-amber-100">
+        <div class="mb-6 rounded-2xl border border-amber-200 bg-amber-50 px-5 py-4 text-sm text-amber-900">
             <p class="font-semibold">Status: {{ $vendor->status->label() }}</p>
             <p class="mt-1">Profil anda belum dipaparkan di marketplace. Lengkapkan profil, pakej dan portfolio sementara menunggu semakan admin.</p>
         </div>

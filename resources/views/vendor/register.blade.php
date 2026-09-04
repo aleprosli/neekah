@@ -12,7 +12,7 @@
             @csrf
 
             @if ($errors->any())
-                <ul class="flex flex-col gap-1 rounded-2xl bg-brand-50 p-4 text-sm text-brand-800 dark:bg-brand-900/40 dark:text-brand-100">
+                <ul class="flex flex-col gap-1 rounded-2xl bg-brand-50 p-4 text-sm text-brand-800">
                     @foreach ($errors->all() as $error)
                         <li>{{ $error }}</li>
                     @endforeach

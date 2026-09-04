@@ -40,7 +40,7 @@
                             <td class="px-4 py-3">{{ $payment->type->label() }}</td>
                             <td class="px-4 py-3 text-right whitespace-nowrap">RM{{ number_format((float) $payment->amount, 2) }}</td>
                             <td class="px-4 py-3">
-                                <span @class(['inline-flex rounded-full px-2.5 py-1 text-xs font-semibold', 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-200' => $payment->isPaid(), 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-200' => $payment->status === PaymentStatus::Pending, 'bg-surface-muted text-ink-muted' => in_array($payment->status, [PaymentStatus::Failed, PaymentStatus::Refunded], true)])>{{ $payment->status->label() }}</span>
+                                <span @class(['inline-flex rounded-full px-2.5 py-1 text-xs font-semibold', 'bg-emerald-100 text-emerald-800' => $payment->isPaid(), 'bg-amber-100 text-amber-800' => $payment->status === PaymentStatus::Pending, 'bg-surface-muted text-ink-muted' => in_array($payment->status, [PaymentStatus::Failed, PaymentStatus::Refunded], true)])>{{ $payment->status->label() }}</span>
                             </td>
                             <td class="px-4 py-3 whitespace-nowrap text-ink-muted">{{ ($payment->paid_at ?? $payment->created_at)->translatedFormat('j M Y') }}</td>
                         </tr>

@@ -6,6 +6,13 @@
         <x-stat-card label="Komisen platform" :value="'RM'.number_format($stats['commission'], 2)" :hint="'GTV RM'.number_format($stats['gross'], 2)" :href="route('admin.transactions.index')" />
     </div>
 
+    @if ($stats['open_violations'])
+        <a href="{{ route('admin.violations.index', ['status' => 'open']) }}" class="mt-4 flex items-center gap-3 rounded-2xl border border-amber-200 bg-amber-50 px-5 py-4 text-sm text-amber-900 transition hover:border-amber-400">
+            <span class="text-lg">⚠️</span>
+            <span><strong>{{ $stats['open_violations'] }}</strong> laporan vendor menunggu semakan anda.</span>
+        </a>
+    @endif
+
     <div class="mt-8 grid gap-8 lg:grid-cols-2">
         <section class="flex flex-col gap-4">
             <div class="flex items-center justify-between">

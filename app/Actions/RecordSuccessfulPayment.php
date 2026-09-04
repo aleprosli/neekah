@@ -6,6 +6,8 @@ use App\Enums\BookingStatus;
 use App\Enums\PaymentStatus;
 use App\Enums\PaymentType;
 use App\Models\Payment;
+use App\Notifications\BookingConfirmed;
+use App\Notifications\PaymentReceived;
 use Illuminate\Support\Facades\DB;
 
 class RecordSuccessfulPayment
@@ -24,11 +26,16 @@ class RecordSuccessfulPayment
 
             $booking = $payment->booking;
 
+            $booking->user->notify(new PaymentReceived($payment));
+
             if ($payment->type === PaymentType::Deposit && $booking->status === BookingStatus::PendingPayment) {
                 $booking->update([
                     'status' => BookingStatus::Confirmed,
                     'confirmed_at' => now(),
                 ]);
+
+                $booking->user->notify(new BookingConfirmed($booking));
+                $booking->vendor->user->notify(new BookingConfirmed($booking));
             }
 
             return $payment;

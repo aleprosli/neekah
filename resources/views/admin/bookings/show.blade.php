@@ -31,7 +31,7 @@
                         <span>{{ $payment->type->label() }}<span class="block text-xs text-ink-muted">{{ $payment->reference }}</span></span>
                         <span class="text-right">
                             <span class="font-medium">RM{{ number_format((float) $payment->amount, 2) }}</span>
-                            <span @class(['block text-xs', 'text-emerald-600 dark:text-emerald-400' => $payment->isPaid(), 'text-ink-muted' => ! $payment->isPaid()])>{{ $payment->status->label() }}</span>
+                            <span @class(['block text-xs', 'text-emerald-600' => $payment->isPaid(), 'text-ink-muted' => ! $payment->isPaid()])>{{ $payment->status->label() }}</span>
                         </span>
                     </li>
                 @endforeach

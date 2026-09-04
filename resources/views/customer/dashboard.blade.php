@@ -40,7 +40,7 @@
                 <div @class(['h-full rounded-full transition-all', 'bg-brand-600' => $committed <= $budget, 'bg-amber-500' => $committed > $budget]) style="width: {{ $used }}%"></div>
             </div>
             @if ($committed > $budget)
-                <p class="mt-2 text-xs text-amber-700 dark:text-amber-300">Anda telah melebihi bajet sebanyak RM{{ number_format($committed - $budget, 0) }}.</p>
+                <p class="mt-2 text-xs text-amber-700">Anda telah melebihi bajet sebanyak RM{{ number_format($committed - $budget, 0) }}.</p>
             @endif
         </div>
 

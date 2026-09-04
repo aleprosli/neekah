@@ -18,7 +18,7 @@
                             <div class="flex items-center gap-2">
                                 <p class="truncate font-medium">{{ $enquiry->vendor->name }}</p>
                                 @if ($enquiry->status === EnquiryStatus::Replied)
-                                    <span class="rounded-full bg-emerald-100 px-2 py-0.5 text-[11px] font-semibold text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-200">Dibalas</span>
+                                    <span class="rounded-full bg-emerald-100 px-2 py-0.5 text-[11px] font-semibold text-emerald-800">Dibalas</span>
                                 @endif
                             </div>
                             <p class="truncate text-sm text-ink-muted">{{ $enquiry->message }}</p>

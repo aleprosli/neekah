@@ -4,11 +4,11 @@
     <main>
         {{-- Hero --}}
         <section class="relative overflow-hidden">
-            <div class="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top_left,var(--color-brand-100),transparent_55%),radial-gradient(ellipse_at_bottom_right,var(--color-gold-300),transparent_50%)] opacity-70 dark:opacity-25"></div>
+            <div class="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top_left,var(--color-brand-100),transparent_55%),radial-gradient(ellipse_at_bottom_right,var(--color-gold-300),transparent_50%)] opacity-70"></div>
 
             <div class="mx-auto grid max-w-7xl items-center gap-12 px-4 pt-28 pb-16 sm:px-6 lg:grid-cols-2 lg:px-8 lg:pt-36 lg:pb-24">
                 <div class="flex flex-col gap-6">
-                    <span class="inline-flex w-fit items-center gap-2 rounded-full border border-brand-200 bg-brand-50 px-3 py-1 text-xs font-semibold tracking-wide text-brand-700 uppercase dark:border-brand-800 dark:bg-brand-900/40 dark:text-brand-200">
+                    <span class="inline-flex w-fit items-center gap-2 rounded-full border border-brand-200 bg-brand-50 px-3 py-1 text-xs font-semibold tracking-wide text-brand-700 uppercase">
                         <span class="size-1.5 rounded-full bg-brand-500"></span>
                         Wedding Operating System untuk Malaysia
                     </span>
@@ -63,7 +63,7 @@
                                 <h2 class="mt-1 font-display text-2xl font-semibold">Aina & Hakim</h2>
                                 <p class="mt-1 text-sm text-ink-muted">20 Disember 2026 · Alor Setar</p>
                             </div>
-                            <div class="rounded-full bg-gold-300/60 px-3 py-1 text-xs font-semibold text-brand-900 dark:bg-gold-500/30 dark:text-gold-300">82% siap</div>
+                            <div class="rounded-full bg-gold-300/60 px-3 py-1 text-xs font-semibold text-brand-900">82% siap</div>
                         </div>
 
                         <dl class="mt-6 grid grid-cols-2 gap-3 text-sm">
@@ -81,7 +81,7 @@
                             </div>
                             <div class="rounded-2xl bg-surface-muted p-4">
                                 <dt class="text-ink-muted">Baki bajet</dt>
-                                <dd class="mt-1 font-semibold text-emerald-600 dark:text-emerald-400">RM1,800</dd>
+                                <dd class="mt-1 font-semibold text-emerald-600">RM1,800</dd>
                             </div>
                         </dl>
 
@@ -90,15 +90,15 @@
                             <ul class="mt-3 flex flex-col gap-2 text-sm">
                                 <li class="flex items-center justify-between rounded-xl border border-line px-3 py-2">
                                     <span>📸 Photographer</span>
-                                    <span class="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-semibold text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300">Confirmed</span>
+                                    <span class="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-semibold text-emerald-700">Confirmed</span>
                                 </li>
                                 <li class="flex items-center justify-between rounded-xl border border-line px-3 py-2">
                                     <span>🍽️ Catering</span>
-                                    <span class="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-semibold text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300">Confirmed</span>
+                                    <span class="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-semibold text-emerald-700">Confirmed</span>
                                 </li>
                                 <li class="flex items-center justify-between rounded-xl border border-line px-3 py-2">
                                     <span>💄 Makeup</span>
-                                    <span class="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">Pending</span>
+                                    <span class="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-700">Pending</span>
                                 </li>
                             </ul>
                         </div>
@@ -133,7 +133,7 @@
             <div class="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 @foreach ($features as $feature)
                     <article class="flex flex-col gap-3 rounded-3xl border border-line bg-surface-raised p-6 transition hover:border-brand-300 hover:shadow-lg hover:shadow-brand-900/5">
-                        <span class="flex size-11 items-center justify-center rounded-2xl bg-brand-50 text-2xl dark:bg-brand-900/40">{{ $feature['icon'] }}</span>
+                        <span class="flex size-11 items-center justify-center rounded-2xl bg-brand-50 text-2xl">{{ $feature['icon'] }}</span>
                         <h3 class="text-lg font-semibold">{{ $feature['title'] }}</h3>
                         <p class="text-sm text-ink-muted">{{ $feature['description'] }}</p>
                     </article>
@@ -207,10 +207,10 @@
                 <ol class="flex flex-col gap-3 text-sm">
                     @foreach (['Enquiry', 'Discussion', 'Quotation', 'Booking', 'Deposit Payment', 'Booking Confirmed', 'Balance Payment', 'Wedding Completed', 'Review'] as $index => $stage)
                         <li class="flex items-center gap-3">
-                            <span class="flex size-7 shrink-0 items-center justify-center rounded-full bg-brand-50 text-xs font-semibold text-brand-700 dark:bg-brand-900/40 dark:text-brand-200">{{ $index + 1 }}</span>
+                            <span class="flex size-7 shrink-0 items-center justify-center rounded-full bg-brand-50 text-xs font-semibold text-brand-700">{{ $index + 1 }}</span>
                             <span class="font-medium">{{ $stage }}</span>
                             @if ($index === 5)
-                                <span class="ml-auto rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-semibold text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300">🟢 Confirmed</span>
+                                <span class="ml-auto rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-semibold text-emerald-700">🟢 Confirmed</span>
                             @endif
                         </li>
                     @endforeach
@@ -255,7 +255,7 @@
         {{-- CTA --}}
         <section id="cta" class="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
             <div class="relative overflow-hidden rounded-3xl border border-line bg-surface-raised px-6 py-14 text-center sm:px-12">
-                <div class="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_center,var(--color-brand-100),transparent_65%)] opacity-70 dark:opacity-20"></div>
+                <div class="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_center,var(--color-brand-100),transparent_65%)] opacity-70"></div>
                 <h2 class="font-display text-3xl font-semibold tracking-tight text-balance sm:text-4xl">Sedia untuk merancang majlis anda?</h2>
                 <p class="mx-auto mt-4 max-w-xl text-lg text-ink-muted">Neekah sedang dibangunkan. Daftar minat anda dan jadi antara pasangan serta vendor pertama di platform.</p>
                 <form class="mx-auto mt-8 flex max-w-md flex-col gap-3 sm:flex-row" action="#cta">

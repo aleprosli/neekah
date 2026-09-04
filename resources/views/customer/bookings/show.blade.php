@@ -7,7 +7,7 @@
     </x-slot:actions>
 
     @error('payment')
-        <div class="mb-6 rounded-2xl bg-brand-50 px-5 py-4 text-sm text-brand-800 dark:bg-brand-900/40 dark:text-brand-100">{{ $message }}</div>
+        <div class="mb-6 rounded-2xl bg-brand-50 px-5 py-4 text-sm text-brand-800">{{ $message }}</div>
     @enderror
 
     <div class="grid gap-8 lg:grid-cols-[1fr_340px]">
@@ -50,7 +50,7 @@
                     <p class="mt-2 text-sm leading-relaxed">{{ $booking->review->comment }}</p>
                 </section>
             @elseif ($booking->canBeReviewed())
-                <section class="flex flex-col gap-4 rounded-2xl border border-brand-200 bg-brand-50/50 p-5 dark:border-brand-800 dark:bg-brand-900/20">
+                <section class="flex flex-col gap-4 rounded-2xl border border-brand-200 bg-brand-50/50 p-5">
                     <div>
                         <h2 class="font-display text-lg font-semibold">Beri review</h2>
                         <p class="text-sm text-ink-muted">Majlis anda telah selesai. Kongsi pengalaman anda dengan pengantin lain.</p>
@@ -93,7 +93,7 @@
                             <span class="font-semibold">RM{{ number_format((float) $payment->amount, 2) }}</span>
                         </div>
                         @if ($payment->isPaid())
-                            <p class="text-xs text-emerald-700 dark:text-emerald-300">✓ Dibayar {{ $payment->paid_at->translatedFormat('j M Y') }} · {{ $payment->gateway_reference }}</p>
+                            <p class="text-xs text-emerald-700">✓ Dibayar {{ $payment->paid_at->translatedFormat('j M Y') }} · {{ $payment->gateway_reference }}</p>
                         @elseif ($booking->status === BookingStatus::Cancelled)
                             <p class="text-xs text-ink-muted">Dibatalkan</p>
                         @elseif ($payment->type === PaymentType::Balance && ! $booking->depositPayment?->isPaid())

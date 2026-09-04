@@ -45,7 +45,7 @@
                             <td class="px-4 py-3 whitespace-nowrap">{{ $vendor->tier->label() }}</td>
                             <td class="px-4 py-3 text-right">{{ number_format((float) $vendor->score, 1) }}</td>
                             <td class="px-4 py-3">
-                                <span @class(['inline-flex rounded-full px-2.5 py-1 text-xs font-semibold', 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-200' => $vendor->status === VendorStatus::Approved, 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-200' => $vendor->status === VendorStatus::Pending, 'bg-surface-muted text-ink-muted' => in_array($vendor->status, [VendorStatus::Rejected, VendorStatus::Suspended], true)])>{{ $vendor->status->label() }}</span>
+                                <span @class(['inline-flex rounded-full px-2.5 py-1 text-xs font-semibold', 'bg-emerald-100 text-emerald-800' => $vendor->status === VendorStatus::Approved, 'bg-amber-100 text-amber-800' => $vendor->status === VendorStatus::Pending, 'bg-surface-muted text-ink-muted' => in_array($vendor->status, [VendorStatus::Rejected, VendorStatus::Suspended], true)])>{{ $vendor->status->label() }}</span>
                             </td>
                             <td class="px-4 py-3 text-right whitespace-nowrap">
                                 @if ($vendor->status !== VendorStatus::Approved)

@@ -6,6 +6,7 @@ use App\Enums\VendorStatus;
 use App\Enums\VendorTier;
 use App\Http\Controllers\Controller;
 use App\Models\Vendor;
+use App\Notifications\VendorStatusChanged;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -35,6 +36,8 @@ class VendorApprovalController extends Controller
 
         $vendor->update($attributes);
         $vendor->update(['score' => $vendor->calculateScore()]);
+
+        $vendor->user->notify(new VendorStatusChanged($vendor->fresh()));
 
         return back()->with('status', $vendor->name.' kini '.$status->label().'.');
     }

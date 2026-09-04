@@ -11,7 +11,7 @@
     $summary = collect([$activeCategory?->name, $current['state'], $budgets[(int) $current['max_price']] ?? null])->filter();
 @endphp
 
-<section class="relative overflow-hidden bg-[radial-gradient(ellipse_at_top_left,var(--color-brand-100),transparent_60%),radial-gradient(ellipse_at_bottom_right,var(--color-gold-300),transparent_55%)] pt-24 pb-8 dark:bg-[radial-gradient(ellipse_at_top_left,var(--color-brand-900),transparent_60%)] md:pt-28 md:pb-12">
+<section class="relative overflow-hidden bg-[radial-gradient(ellipse_at_top_left,var(--color-brand-100),transparent_60%),radial-gradient(ellipse_at_bottom_right,var(--color-gold-300),transparent_55%)] pt-24 pb-8 md:pt-28 md:pb-12">
     <div class="mx-auto flex max-w-[1760px] flex-col gap-5 px-4 sm:px-6 md:items-center md:gap-7 md:text-center lg:px-10">
         <div class="max-w-2xl">
             <h1 class="font-display text-2xl font-semibold tracking-tight sm:text-3xl md:text-4xl">Cari vendor majlis anda</h1>

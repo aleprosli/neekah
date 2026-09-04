@@ -10,6 +10,8 @@
         <button type="submit" class="rounded-full bg-brand-600 py-3 text-sm font-semibold text-white transition hover:bg-brand-700">Daftar</button>
     </form>
 
+    <div class="mt-6"><x-google-button /></div>
+
     <p class="mt-6 text-center text-sm text-ink-muted">
         Sudah ada akaun? <a href="{{ route('login') }}" class="font-medium text-brand-600 underline underline-offset-4">Log masuk</a>
     </p>

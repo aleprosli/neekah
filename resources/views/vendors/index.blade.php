@@ -122,14 +122,14 @@
                     <span class="font-display text-lg font-semibold text-ink">{{ $vendors->total() }} vendor</span>
                     @if ($activeCategory) · {{ $activeCategory->name }} @endif
                     @if ($filters['q']) · "{{ $filters['q'] }}" @endif
-                    <span class="ml-1 rounded-full bg-gold-300/50 px-2 py-0.5 text-[11px] font-medium text-brand-900 dark:bg-gold-500/20 dark:text-gold-300">Data demo</span>
+                    <span class="ml-1 rounded-full bg-gold-300/50 px-2 py-0.5 text-[11px] font-medium text-brand-900">Data demo</span>
                 </p>
 
                 <x-filter-popover :label="'Susun: '.$sorts[$filters['sort']]" align="right" width="w-60">
                     <form method="GET" action="{{ route('vendors.index') }}" class="flex flex-col gap-1">
                         <x-filter-hidden :filters="$filters" except="sort" />
                         @foreach ($sorts as $value => $label)
-                            <label class="flex cursor-pointer items-center gap-2 rounded-xl px-3 py-2 text-sm transition has-checked:bg-brand-50 has-checked:font-semibold has-checked:text-brand-700 hover:bg-surface-muted dark:has-checked:bg-brand-900/40 dark:has-checked:text-brand-200">
+                            <label class="flex cursor-pointer items-center gap-2 rounded-xl px-3 py-2 text-sm transition has-checked:bg-brand-50 has-checked:font-semibold has-checked:text-brand-700 hover:bg-surface-muted">
                                 <input type="radio" name="sort" value="{{ $value }}" class="accent-brand-600" onchange="this.form.requestSubmit()" @checked($filters['sort'] === $value)>
                                 {{ $label }}
                             </label>
