@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Actions\AwardVendorPoints;
 use App\Actions\RecalculateVendorStats;
+use App\Actions\SeedWeddingChecklist;
 use App\Enums\PaymentStatus;
 use App\Enums\PaymentType;
 use App\Enums\PointReason;
@@ -39,6 +40,14 @@ class DemoSeeder extends Seeder
             'state' => 'Kedah',
             'budget' => 30000,
         ]);
+
+        app(SeedWeddingChecklist::class)->handle($wedding);
+
+        // A couple mid-planning: the early tasks are already ticked off.
+        $wedding->tasks()->limit(5)->get()->each(fn ($task) => $task->update([
+            'completed_at' => now()->subWeeks(rand(1, 8)),
+            'completed_by' => $couple->id,
+        ]));
 
         $categories = Category::all()->keyBy('slug');
         $vendors = collect();

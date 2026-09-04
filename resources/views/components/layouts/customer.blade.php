@@ -3,8 +3,12 @@
 @php
     $user = auth()->user();
     $repliedEnquiries = $user->enquiries()->where('status', \App\Enums\EnquiryStatus::Replied)->count();
+    $wedding = $user->weddings()->latest('event_date')->first();
+    $outstandingTasks = $wedding?->tasks()->outstanding()->whereNotNull('due_date')->whereDate('due_date', '<=', today())->count();
     $nav = [
         ['label' => 'Majlis saya', 'icon' => '💍', 'href' => route('dashboard'), 'active' => request()->routeIs('dashboard', 'weddings.*')],
+        ['label' => 'Checklist', 'icon' => '✅', 'href' => route('checklist.index'), 'active' => request()->routeIs('checklist.*'), 'badge' => $outstandingTasks ?: null],
+        ['label' => 'Bajet', 'icon' => '💰', 'href' => route('budget.index'), 'active' => request()->routeIs('budget.*')],
         ['label' => 'Tempahan', 'icon' => '🧾', 'href' => route('bookings.index'), 'active' => request()->routeIs('bookings.*')],
         ['label' => 'Enquiry', 'icon' => '💬', 'href' => route('enquiries.index'), 'active' => request()->routeIs('enquiries.*'), 'badge' => $repliedEnquiries ?: null],
         ['label' => 'Cari vendor', 'icon' => '🔍', 'href' => route('vendors.index'), 'active' => false],

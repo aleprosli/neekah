@@ -85,6 +85,14 @@ Route::middleware('auth')->group(function (): void {
     Route::delete('/weddings/{wedding}/members/{member}', [CustomerArea\WeddingMemberController::class, 'destroy'])->name('weddings.members.destroy');
     Route::post('/invitations/{invitation}', [InvitationAcceptanceController::class, 'store'])->name('invitations.accept');
 
+    Route::get('/checklist', [CustomerArea\WeddingTaskController::class, 'index'])->name('checklist.index');
+    Route::post('/weddings/{wedding}/tasks', [CustomerArea\WeddingTaskController::class, 'store'])->name('weddings.tasks.store');
+    Route::put('/weddings/{wedding}/tasks/{task}', [CustomerArea\WeddingTaskController::class, 'update'])->name('weddings.tasks.update');
+    Route::delete('/weddings/{wedding}/tasks/{task}', [CustomerArea\WeddingTaskController::class, 'destroy'])->name('weddings.tasks.destroy');
+
+    Route::get('/budget', [CustomerArea\WeddingBudgetController::class, 'index'])->name('budget.index');
+    Route::put('/weddings/{wedding}/budget', [CustomerArea\WeddingBudgetController::class, 'update'])->name('weddings.budget.update');
+
     Route::get('/enquiries', [CustomerArea\EnquiryController::class, 'index'])->name('enquiries.index');
     Route::get('/enquiries/{enquiry}', [CustomerArea\EnquiryController::class, 'show'])->name('enquiries.show');
     Route::post('/vendors/{vendor}/enquiries', [CustomerArea\EnquiryController::class, 'store'])->name('vendors.enquiries.store');

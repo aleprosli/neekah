@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Customer;
 
+use App\Actions\SeedWeddingChecklist;
 use App\Enums\WeddingRole;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreWeddingRequest;
@@ -18,12 +19,13 @@ class WeddingController extends Controller
         return view('customer.weddings.form', ['wedding' => new Wedding, 'states' => Vendor::STATES]);
     }
 
-    public function store(StoreWeddingRequest $request): RedirectResponse
+    public function store(StoreWeddingRequest $request, SeedWeddingChecklist $seedChecklist): RedirectResponse
     {
         $wedding = $request->user()->createdWeddings()->create($request->validated());
         $wedding->addMember($request->user(), WeddingRole::Owner);
+        $seedChecklist->handle($wedding);
 
-        return redirect()->route('dashboard')->with('status', 'Wedding project dicipta. Mari cari vendor untuk majlis anda.');
+        return redirect()->route('dashboard')->with('status', 'Wedding project dicipta, lengkap dengan checklist dan cadangan bajet.');
     }
 
     public function edit(Wedding $wedding): View

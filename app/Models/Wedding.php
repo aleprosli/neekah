@@ -85,4 +85,14 @@ class Wedding extends Model
     {
         return $this->hasMany(Enquiry::class);
     }
+
+    public function tasks(): HasMany
+    {
+        return $this->hasMany(WeddingTask::class)->orderBy('sort_order')->orderBy('due_date');
+    }
+
+    public function budgetItems(): HasMany
+    {
+        return $this->hasMany(WeddingBudgetItem::class);
+    }
 }
