@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Actions\AcceptWeddingInvitation;
 use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
 use App\Models\User;
@@ -26,7 +27,7 @@ class GoogleController extends Controller
     /**
      * Link the Google account to an existing user by email, or register a new customer.
      */
-    public function callback(): RedirectResponse
+    public function callback(AcceptWeddingInvitation $accept): RedirectResponse
     {
         try {
             $googleUser = Socialite::driver('google')->user();
@@ -62,6 +63,12 @@ class GoogleController extends Controller
 
         Auth::login($user, true);
         request()->session()->regenerate();
+
+        if ($invitation = $accept->fromSession($user)) {
+            return redirect()
+                ->route('dashboard')
+                ->with('status', 'Anda kini menguruskan "'.$invitation->wedding->title.'" bersama '.$invitation->inviter->name.'.');
+        }
 
         return redirect()->intended($user->homeRoute());
     }

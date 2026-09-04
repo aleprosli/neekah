@@ -44,6 +44,8 @@
             @endif
         </div>
 
+        <x-wedding-couple :wedding="$wedding" class="mt-6" />
+
         <div class="mt-8 grid gap-8 lg:grid-cols-[1fr_320px]">
             {{-- Booked vendors --}}
             <section class="flex flex-col gap-4">
@@ -68,67 +70,6 @@
                             </li>
                         @endforeach
                     </ul>
-                @endif
-            </section>
-
-            {{-- Partner --}}
-            <section class="flex flex-col gap-4">
-                <h2 class="font-display text-xl font-semibold">Pasangan</h2>
-                @php
-                    $owner = $wedding->members->firstWhere('id', $wedding->user_id);
-                    $partner = $wedding->partner();
-                    $pendingInvite = $wedding->invitations->first();
-                    $isOwner = $wedding->isOwnedBy(auth()->user());
-                @endphp
-
-                <ul class="flex flex-col gap-2 rounded-2xl border border-line p-4">
-                    @foreach ($wedding->members as $member)
-                        <li class="flex items-center gap-3 text-sm">
-                            <span class="flex size-9 shrink-0 items-center justify-center rounded-full bg-brand-600 text-xs font-semibold text-white">{{ mb_substr($member->name, 0, 1) }}</span>
-                            <div class="min-w-0 flex-1">
-                                <p class="truncate font-medium">{{ $member->name }} @if ($member->id === auth()->id())<span class="text-ink-muted">(anda)</span>@endif</p>
-                                <p class="truncate text-xs text-ink-muted">{{ $member->id === $wedding->user_id ? 'Pemilik majlis' : 'Pasangan' }}</p>
-                            </div>
-                            @if ($isOwner && $member->id !== $wedding->user_id)
-                                <form method="POST" action="{{ route('weddings.members.destroy', [$wedding, $member]) }}" onsubmit="return confirm('Buang {{ $member->name }} daripada majlis ini?')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="text-xs font-medium text-ink-muted hover:text-brand-700">Buang</button>
-                                </form>
-                            @endif
-                        </li>
-                    @endforeach
-
-                    @if ($pendingInvite)
-                        <li class="flex items-center gap-3 border-t border-line pt-3 text-sm">
-                            <span class="flex size-9 shrink-0 items-center justify-center rounded-full border border-dashed border-line text-xs">?</span>
-                            <div class="min-w-0 flex-1">
-                                <p class="truncate font-medium text-ink-muted">{{ $pendingInvite->email }}</p>
-                                <p class="text-xs text-ink-muted">Menunggu jawapan · tamat {{ $pendingInvite->expires_at->translatedFormat('j M Y') }}</p>
-                            </div>
-                            @if ($isOwner)
-                                <form method="POST" action="{{ route('weddings.invitations.destroy', [$wedding, $pendingInvite]) }}">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="text-xs font-medium text-ink-muted hover:text-brand-700">Batal</button>
-                                </form>
-                            @endif
-                        </li>
-                    @endif
-                </ul>
-
-                @if ($isOwner && ! $partner && ! $pendingInvite)
-                    <form method="POST" action="{{ route('weddings.invitations.store', $wedding) }}" class="flex flex-col gap-3 rounded-2xl border border-dashed border-line p-4">
-                        @csrf
-                        <div>
-                            <p class="text-sm font-medium">Jemput pasangan anda</p>
-                            <p class="mt-0.5 text-xs text-ink-muted">Anda berdua akan berkongsi checklist, bajet, tempahan dan pembayaran yang sama.</p>
-                        </div>
-                        <input type="email" name="email" value="{{ old('email') }}" placeholder="emel pasangan anda" required class="rounded-xl border border-line bg-surface px-4 py-2.5 text-sm focus:border-brand-400 focus:outline-none">
-                        <button type="submit" class="rounded-full bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700">Hantar jemputan</button>
-                    </form>
-                @elseif (! $isOwner)
-                    <p class="text-xs text-ink-muted">Hanya pemilik majlis boleh menjemput atau membuang pasangan.</p>
                 @endif
             </section>
 

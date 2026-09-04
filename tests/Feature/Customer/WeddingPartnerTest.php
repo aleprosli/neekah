@@ -25,7 +25,10 @@ it('makes the creator the owner and the only member', function () {
         ->and($this->wedding->isOwnedBy($this->aina))->toBeTrue()
         ->and($this->wedding->partner())->toBeNull();
 
-    $this->actingAs($this->aina)->get(route('dashboard'))->assertOk()->assertSee('Jemput pasangan anda');
+    $this->actingAs($this->aina)->get(route('dashboard'))
+        ->assertOk()
+        ->assertSee('Belum terhubung')
+        ->assertSee('Jemput pasangan');
 });
 
 it('emails an invitation and lets the partner accept it', function () {
@@ -56,13 +59,53 @@ it('emails an invitation and lets the partner accept it', function () {
         ->and($invitation->fresh()->accepted_by)->toBe($this->hakim->id);
 });
 
-it('sends a guest to login first and returns them to the invitation', function () {
+it('sends a stranger with the link to register and joins them automatically', function () {
+    $invitation = WeddingInvitation::factory()->for($this->wedding)->create(['invited_by' => $this->aina->id, 'email' => 'baru@example.com']);
+
+    $this->get(route('invitations.show', $invitation))->assertRedirect(route('register'));
+
+    // The register page names the inviter and prefills the invited email.
+    $this->get(route('register'))->assertOk()->assertSee('Aina Zulkifli menjemput anda')->assertSee('baru@example.com');
+
+    $this->post(route('register'), [
+        'name' => 'Baru Sekali',
+        'email' => 'baru@example.com',
+        'password' => 'rahsia-kuat-123',
+        'password_confirmation' => 'rahsia-kuat-123',
+    ])->assertRedirect(route('dashboard'));
+
+    $this->wedding->refresh()->load('members');
+
+    expect($this->wedding->members)->toHaveCount(2)
+        ->and($this->wedding->partner()->email)->toBe('baru@example.com')
+        ->and($invitation->fresh()->accepted_at)->not->toBeNull();
+});
+
+it('joins an existing user automatically when they log in from the link', function () {
     $invitation = WeddingInvitation::factory()->for($this->wedding)->create(['invited_by' => $this->aina->id, 'email' => 'hakim@example.com']);
 
-    $this->get(route('invitations.show', $invitation))->assertRedirect(route('login'));
+    $this->get(route('invitations.show', $invitation))->assertRedirect(route('register'));
 
     $this->post(route('login'), ['email' => $this->hakim->email, 'password' => 'password'])
-        ->assertRedirect(route('invitations.show', $invitation));
+        ->assertRedirect(route('dashboard'));
+
+    expect($this->wedding->fresh()->hasMember($this->hakim))->toBeTrue();
+});
+
+it('shows the shareable link and connected state on the dashboard', function () {
+    $invitation = WeddingInvitation::factory()->for($this->wedding)->create(['invited_by' => $this->aina->id, 'email' => 'hakim@example.com']);
+
+    $this->actingAs($this->aina)->get(route('dashboard'))
+        ->assertOk()
+        ->assertSee('Menunggu jawapan')
+        ->assertSee(route('invitations.show', $invitation));
+
+    $this->wedding->addMember($this->hakim, WeddingRole::Partner);
+
+    $this->actingAs($this->aina)->get(route('dashboard'))
+        ->assertOk()
+        ->assertSee('Terhubung')
+        ->assertSee('Hakim Ismail');
 });
 
 it('shows both partners the same wedding, bookings and budget', function () {

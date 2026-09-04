@@ -40,3 +40,22 @@ document.addEventListener('click', (event) => {
         }
     });
 });
+
+document.addEventListener('click', async (event) => {
+    const button = event.target.closest('[data-copy]');
+    if (!button) {
+        return;
+    }
+
+    try {
+        await navigator.clipboard.writeText(button.dataset.copy);
+    } catch {
+        return;
+    }
+
+    const original = button.textContent;
+    button.textContent = 'Disalin!';
+    setTimeout(() => {
+        button.textContent = original;
+    }, 2000);
+});

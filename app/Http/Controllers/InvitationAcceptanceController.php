@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Enums\WeddingRole;
+use App\Actions\AcceptWeddingInvitation;
 use App\Models\WeddingInvitation;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
@@ -18,15 +18,17 @@ class InvitationAcceptanceController extends Controller
         $invitation->load(['wedding', 'inviter']);
 
         if (! $request->user()) {
+            $request->session()->put(AcceptWeddingInvitation::SESSION_KEY, $invitation->token);
             $request->session()->put('url.intended', route('invitations.show', $invitation));
 
-            return redirect()->route('login')->with('status', 'Log masuk atau daftar dengan emel '.$invitation->email.' untuk menerima jemputan ini.');
+            // A stranger with the link registers first; joining then happens automatically.
+            return redirect()->route('register');
         }
 
         return view('invitations.show', ['invitation' => $invitation]);
     }
 
-    public function store(Request $request, WeddingInvitation $invitation): RedirectResponse
+    public function store(Request $request, WeddingInvitation $invitation, AcceptWeddingInvitation $accept): RedirectResponse
     {
         $user = $request->user();
         $wedding = $invitation->wedding;
@@ -35,24 +37,11 @@ class InvitationAcceptanceController extends Controller
             return redirect()->route('dashboard')->with('status', 'Anda sudah menjadi ahli majlis ini.');
         }
 
-        if (! $invitation->isPending()) {
-            return redirect()->route('dashboard')->withErrors(['invitation' => 'Jemputan ini sudah tamat tempoh atau telah digunakan.']);
+        if (! $accept->handle($invitation, $user)) {
+            return redirect()->route('dashboard')->withErrors([
+                'invitation' => 'Jemputan ini tidak boleh digunakan lagi. Ia mungkin telah tamat tempoh, telah digunakan, atau majlis sudah ada dua ahli.',
+            ]);
         }
-
-        if ($wedding->isFull()) {
-            return redirect()->route('dashboard')->withErrors(['invitation' => 'Majlis ini sudah ada dua ahli.']);
-        }
-
-        if (! $user->isCustomer()) {
-            return redirect()->route('dashboard')->withErrors(['invitation' => 'Hanya akaun pengantin boleh menyertai wedding project.']);
-        }
-
-        $wedding->addMember($user, WeddingRole::Partner);
-
-        $invitation->update([
-            'accepted_at' => now(),
-            'accepted_by' => $user->id,
-        ]);
 
         return redirect()->route('dashboard')->with('status', 'Anda kini menguruskan "'.$wedding->title.'" bersama '.$invitation->inviter->name.'.');
     }
