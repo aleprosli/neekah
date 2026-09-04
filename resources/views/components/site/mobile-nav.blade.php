@@ -13,7 +13,7 @@
             </a>
         </li>
         <li>
-            <a href="{{ route('landing') }}#vendor" class="flex flex-col items-center gap-1 py-2 text-ink-muted">
+            <a href="{{ route('vendor.register') }}" class="flex flex-col items-center gap-1 py-2 text-ink-muted">
                 <svg class="size-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
                 Vendor
             </a>

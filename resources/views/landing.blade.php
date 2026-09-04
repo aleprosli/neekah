@@ -232,7 +232,7 @@
                         @endforeach
                     </ul>
 
-                    <a href="#cta" class="mt-4 inline-flex w-fit items-center rounded-full bg-gold-400 px-6 py-3 font-semibold text-brand-900 transition hover:bg-gold-300">Daftar sebagai vendor</a>
+                    <a href="{{ route('vendor.register') }}" class="mt-4 inline-flex w-fit items-center rounded-full bg-gold-400 px-6 py-3 font-semibold text-brand-900 transition hover:bg-gold-300">Daftar sebagai vendor</a>
                 </div>
 
                 <div class="rounded-3xl border border-brand-700 bg-brand-800/60 p-6 sm:p-8">

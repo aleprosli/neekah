@@ -8,12 +8,16 @@
         <nav class="hidden items-center gap-1 text-sm font-medium md:flex" aria-label="Utama">
             <a href="{{ route('vendors.index') }}" @class(['rounded-full px-4 py-2 transition hover:bg-surface-muted', 'bg-surface-muted text-brand-700' => request()->routeIs('vendors.*')])>Cari Vendor</a>
             <a href="{{ route('landing') }}#cara" class="rounded-full px-4 py-2 transition hover:bg-surface-muted">Cara Ia Berfungsi</a>
-            <a href="{{ route('landing') }}#vendor" class="rounded-full px-4 py-2 transition hover:bg-surface-muted">Untuk Vendor</a>
+            <a href="{{ route('vendor.register') }}" class="rounded-full px-4 py-2 transition hover:bg-surface-muted">Untuk Vendor</a>
         </nav>
 
         <div class="flex items-center gap-1">
             @auth
-                <a href="{{ route('bookings.index') }}" @class(['hidden rounded-full px-4 py-2 text-sm font-medium transition hover:bg-surface-muted sm:inline', 'bg-surface-muted text-brand-700' => request()->routeIs('bookings.*')])>Tempahan</a>
+                @if (auth()->user()->isVendor())
+                    <a href="{{ route('vendor.dashboard') }}" @class(['hidden rounded-full px-4 py-2 text-sm font-medium transition hover:bg-surface-muted sm:inline', 'bg-surface-muted text-brand-700' => request()->routeIs('vendor.*')])>Dashboard</a>
+                @else
+                    <a href="{{ route('bookings.index') }}" @class(['hidden rounded-full px-4 py-2 text-sm font-medium transition hover:bg-surface-muted sm:inline', 'bg-surface-muted text-brand-700' => request()->routeIs('bookings.*')])>Tempahan</a>
+                @endif
                 <details data-popover class="relative">
                     <summary class="flex cursor-pointer list-none items-center gap-2 rounded-full border border-line py-1 pr-1 pl-3 text-sm font-medium select-none hover:shadow-md [&::-webkit-details-marker]:hidden">
                         <span class="hidden max-w-32 truncate sm:inline">{{ auth()->user()->name }}</span>
@@ -21,7 +25,11 @@
                     </summary>
                     <div class="absolute top-full right-0 z-20 mt-2 w-56 rounded-2xl border border-line bg-surface-raised p-2 text-sm shadow-xl shadow-brand-900/10">
                         <p class="truncate px-3 py-2 text-xs text-ink-muted">{{ auth()->user()->email }}</p>
-                        <a href="{{ route('bookings.index') }}" class="block rounded-xl px-3 py-2 hover:bg-surface-muted">Tempahan saya</a>
+                        @if (auth()->user()->isVendor())
+                            <a href="{{ route('vendor.dashboard') }}" class="block rounded-xl px-3 py-2 hover:bg-surface-muted">Dashboard vendor</a>
+                        @else
+                            <a href="{{ route('bookings.index') }}" class="block rounded-xl px-3 py-2 hover:bg-surface-muted">Tempahan saya</a>
+                        @endif
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
                             <button type="submit" class="w-full rounded-xl px-3 py-2 text-left hover:bg-surface-muted">Log keluar</button>

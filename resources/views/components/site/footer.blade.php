@@ -4,7 +4,7 @@
         <div class="flex gap-6">
             <a href="{{ route('landing') }}" class="transition hover:text-ink">Tentang</a>
             <a href="{{ route('vendors.index') }}" class="transition hover:text-ink">Cari Vendor</a>
-            <a href="{{ route('landing') }}#vendor" class="transition hover:text-ink">Jadi Vendor</a>
+            <a href="{{ route('vendor.register') }}" class="transition hover:text-ink">Jadi Vendor</a>
         </div>
     </div>
 </footer>
