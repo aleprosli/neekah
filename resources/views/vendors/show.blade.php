@@ -176,6 +176,23 @@
                         <div class="flex justify-between border-t border-line pt-3 font-semibold"><dt>Status selepas deposit</dt><dd class="text-emerald-600 dark:text-emerald-400">Confirmed</dd></div>
                     </dl>
                 </form>
+
+                {{-- Enquiry --}}
+                <details class="mt-4 rounded-2xl border border-line bg-surface-raised p-5" @if ($errors->has('message')) open @endif>
+                    <summary class="cursor-pointer list-none text-sm font-semibold [&::-webkit-details-marker]:hidden">
+                        Ada soalan? Hantar enquiry dahulu →
+                    </summary>
+                    @auth
+                        <form method="POST" action="{{ route('vendors.enquiries.store', $vendor) }}" class="mt-4 flex flex-col gap-3">
+                            @csrf
+                            <textarea name="message" rows="4" required placeholder="Contoh: Masih ada slot untuk 20 Disember? Boleh kongsi pakej untuk 500 tetamu?" class="rounded-xl border border-line bg-surface px-4 py-2.5 text-sm focus:border-brand-400 focus:outline-none">{{ old('message') }}</textarea>
+                            <input type="date" name="event_date" value="{{ old('event_date', $defaultEventDate ?? '') }}" min="{{ now()->addDay()->toDateString() }}" class="rounded-xl border border-line bg-surface px-4 py-2.5 text-sm focus:border-brand-400 focus:outline-none">
+                            <button type="submit" class="rounded-full border border-brand-600 py-2.5 text-sm font-semibold text-brand-700 transition hover:bg-brand-50 dark:hover:bg-brand-900/40">Hantar enquiry</button>
+                        </form>
+                    @else
+                        <p class="mt-3 text-sm text-ink-muted"><a href="{{ route('login') }}" class="font-medium text-brand-600 underline underline-offset-4">Log masuk</a> untuk menghantar enquiry kepada vendor ini.</p>
+                    @endauth
+                </details>
             </aside>
         </div>
 

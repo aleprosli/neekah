@@ -43,9 +43,13 @@ class BookingController extends Controller
             ->with('status', 'Booking '.$booking->reference.' dibuat. Bayar deposit untuk sahkan tempahan anda.');
     }
 
-    public function show(Booking $booking): View
+    public function show(Request $request, Booking $booking): View|RedirectResponse
     {
         Gate::authorize('view', $booking);
+
+        if ($request->user()->isVendor()) {
+            return redirect()->route('vendor.bookings.show', $booking);
+        }
 
         $booking->load(['vendor.category', 'package', 'payments', 'review']);
 

@@ -16,7 +16,7 @@
                 @if (auth()->user()->isVendor())
                     <a href="{{ route('vendor.dashboard') }}" @class(['hidden rounded-full px-4 py-2 text-sm font-medium transition hover:bg-surface-muted sm:inline', 'bg-surface-muted text-brand-700' => request()->routeIs('vendor.*')])>Dashboard</a>
                 @else
-                    <a href="{{ route('bookings.index') }}" @class(['hidden rounded-full px-4 py-2 text-sm font-medium transition hover:bg-surface-muted sm:inline', 'bg-surface-muted text-brand-700' => request()->routeIs('bookings.*')])>Tempahan</a>
+                    <a href="{{ route('dashboard') }}" @class(['hidden rounded-full px-4 py-2 text-sm font-medium transition hover:bg-surface-muted sm:inline', 'bg-surface-muted text-brand-700' => request()->routeIs('dashboard', 'weddings.*', 'bookings.*', 'enquiries.*')])>Majlis saya</a>
                 @endif
                 <details data-popover class="relative">
                     <summary class="flex cursor-pointer list-none items-center gap-2 rounded-full border border-line py-1 pr-1 pl-3 text-sm font-medium select-none hover:shadow-md [&::-webkit-details-marker]:hidden">
@@ -28,7 +28,9 @@
                         @if (auth()->user()->isVendor())
                             <a href="{{ route('vendor.dashboard') }}" class="block rounded-xl px-3 py-2 hover:bg-surface-muted">Dashboard vendor</a>
                         @else
+                            <a href="{{ route('dashboard') }}" class="block rounded-xl px-3 py-2 hover:bg-surface-muted">Majlis saya</a>
                             <a href="{{ route('bookings.index') }}" class="block rounded-xl px-3 py-2 hover:bg-surface-muted">Tempahan saya</a>
+                            <a href="{{ route('enquiries.index') }}" class="block rounded-xl px-3 py-2 hover:bg-surface-muted">Enquiry</a>
                         @endif
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf

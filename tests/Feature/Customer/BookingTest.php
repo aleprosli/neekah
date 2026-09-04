@@ -122,6 +122,6 @@ it('only lets the owning customer or the vendor view a booking', function () {
 
     $this->actingAs($stranger)->get(route('bookings.show', $booking))->assertForbidden();
     $this->actingAs($stranger)->post(route('bookings.payments.store', [$booking, $booking->payments()->first()]))->assertForbidden();
-    $this->actingAs($this->vendor->user)->get(route('bookings.show', $booking))->assertOk()->assertSee('Menunggu bayaran pelanggan');
+    $this->actingAs($this->vendor->user)->get(route('bookings.show', $booking))->assertRedirect(route('vendor.bookings.show', $booking));
     $this->actingAs($this->customer)->get(route('bookings.index'))->assertOk()->assertSee($booking->reference);
 });
