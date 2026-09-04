@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Customer;
 
+use App\Enums\WeddingRole;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreWeddingRequest;
 use App\Models\Vendor;
@@ -19,7 +20,8 @@ class WeddingController extends Controller
 
     public function store(StoreWeddingRequest $request): RedirectResponse
     {
-        $request->user()->weddings()->create($request->validated());
+        $wedding = $request->user()->createdWeddings()->create($request->validated());
+        $wedding->addMember($request->user(), WeddingRole::Owner);
 
         return redirect()->route('dashboard')->with('status', 'Wedding project dicipta. Mari cari vendor untuk majlis anda.');
     }

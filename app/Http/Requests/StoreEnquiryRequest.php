@@ -26,7 +26,7 @@ class StoreEnquiryRequest extends FormRequest
             'message' => ['required', 'string', 'min:10', 'max:2000'],
             'event_date' => ['nullable', 'date', 'after:today'],
             'package_id' => ['nullable', Rule::exists(Package::class, 'id')->where('vendor_id', $vendor->id)],
-            'wedding_id' => ['nullable', Rule::exists('weddings', 'id')->where('user_id', $this->user()->id)],
+            'wedding_id' => ['nullable', Rule::in($this->user()->weddings()->pluck('weddings.id'))],
         ];
     }
 

@@ -9,6 +9,7 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Customer as CustomerArea;
 use App\Http\Controllers\Customer\BookingController;
 use App\Http\Controllers\Customer\PaymentController;
+use App\Http\Controllers\InvitationAcceptanceController;
 use App\Http\Controllers\LandingController;
 use App\Http\Controllers\ReportVendorController;
 use App\Http\Controllers\Vendor as VendorArea;
@@ -19,6 +20,8 @@ Route::get('/', [VendorController::class, 'index'])->name('vendors.index');
 Route::get('/vendors/{vendor}', [VendorController::class, 'show'])->name('vendors.show');
 
 Route::get('/about', LandingController::class)->name('landing');
+
+Route::get('/invitations/{invitation}', [InvitationAcceptanceController::class, 'show'])->name('invitations.show');
 
 Route::redirect('/vendors', '/');
 Route::redirect('/marketplace', '/');
@@ -75,6 +78,10 @@ Route::middleware('auth')->group(function (): void {
     Route::post('/weddings', [CustomerArea\WeddingController::class, 'store'])->name('weddings.store');
     Route::get('/weddings/{wedding}/edit', [CustomerArea\WeddingController::class, 'edit'])->name('weddings.edit');
     Route::put('/weddings/{wedding}', [CustomerArea\WeddingController::class, 'update'])->name('weddings.update');
+    Route::post('/weddings/{wedding}/invitations', [CustomerArea\WeddingInvitationController::class, 'store'])->name('weddings.invitations.store');
+    Route::delete('/weddings/{wedding}/invitations/{invitation}', [CustomerArea\WeddingInvitationController::class, 'destroy'])->name('weddings.invitations.destroy');
+    Route::delete('/weddings/{wedding}/members/{member}', [CustomerArea\WeddingMemberController::class, 'destroy'])->name('weddings.members.destroy');
+    Route::post('/invitations/{invitation}', [InvitationAcceptanceController::class, 'store'])->name('invitations.accept');
 
     Route::get('/enquiries', [CustomerArea\EnquiryController::class, 'index'])->name('enquiries.index');
     Route::get('/enquiries/{enquiry}', [CustomerArea\EnquiryController::class, 'show'])->name('enquiries.show');

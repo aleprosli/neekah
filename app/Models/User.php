@@ -7,6 +7,7 @@ use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -36,7 +37,17 @@ class User extends Authenticatable
         return $this->hasOne(Vendor::class);
     }
 
-    public function weddings(): HasMany
+    /**
+     * Every wedding this user is part of, whether they created it or were invited.
+     */
+    public function weddings(): BelongsToMany
+    {
+        return $this->belongsToMany(Wedding::class, 'wedding_members')
+            ->withPivot('role')
+            ->withTimestamps();
+    }
+
+    public function createdWeddings(): HasMany
     {
         return $this->hasMany(Wedding::class);
     }

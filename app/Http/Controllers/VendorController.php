@@ -107,7 +107,7 @@ class VendorController extends Controller
             'vendor' => $vendor,
             'category' => $vendor->category,
             'related' => $related,
-            'defaultEventDate' => $request->user()?->weddings()->latest()->first()?->event_date->toDateString(),
+            'defaultEventDate' => $request->user()?->weddings()->latest('event_date')->first()?->event_date->toDateString(),
         ]);
     }
 }

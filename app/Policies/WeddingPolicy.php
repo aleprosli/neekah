@@ -9,11 +9,22 @@ class WeddingPolicy
 {
     public function view(User $user, Wedding $wedding): bool
     {
-        return $user->isAdmin() || $wedding->user_id === $user->id;
+        return $user->isAdmin() || $wedding->hasMember($user);
     }
 
+    /**
+     * Both halves of the couple may edit the shared project.
+     */
     public function update(User $user, Wedding $wedding): bool
     {
-        return $wedding->user_id === $user->id;
+        return $wedding->hasMember($user);
+    }
+
+    /**
+     * Only the creator invites or removes a partner.
+     */
+    public function manageMembers(User $user, Wedding $wedding): bool
+    {
+        return $wedding->isOwnedBy($user);
     }
 }

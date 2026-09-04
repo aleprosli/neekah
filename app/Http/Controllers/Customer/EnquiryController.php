@@ -35,7 +35,7 @@ class EnquiryController extends Controller
             'vendor_id' => $vendor->id,
             'wedding_id' => $request->filled('wedding_id')
                 ? $request->integer('wedding_id')
-                : $request->user()->weddings()->latest('event_date')->value('id'),
+                : $request->user()->weddings()->latest('event_date')->value('weddings.id'),
             'status' => EnquiryStatus::Open,
         ]);
 

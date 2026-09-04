@@ -7,6 +7,8 @@ use App\Enums\PaymentStatus;
 use App\Enums\PaymentType;
 use Database\Factories\BookingFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -58,6 +60,18 @@ class Booking extends Model
         } while (static::where('reference', $reference)->exists());
 
         return $reference;
+    }
+
+    /**
+     * Bookings the customer made themselves, plus every booking on a wedding they share.
+     */
+    #[Scope]
+    protected function forCustomer(Builder $query, User $user): Builder
+    {
+        return $query->where(function (Builder $query) use ($user): void {
+            $query->where('user_id', $user->id)
+                ->orWhereIn('wedding_id', $user->weddings()->select('weddings.id'));
+        });
     }
 
     public function user(): BelongsTo

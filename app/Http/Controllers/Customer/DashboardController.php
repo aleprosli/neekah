@@ -6,6 +6,7 @@ use App\Enums\BookingStatus;
 use App\Enums\EnquiryStatus;
 use App\Enums\PaymentStatus;
 use App\Http\Controllers\Controller;
+use App\Models\Booking;
 use App\Models\Category;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
@@ -18,9 +19,10 @@ class DashboardController extends Controller
     public function __invoke(Request $request): View
     {
         $user = $request->user();
-        $wedding = $user->weddings()->latest('event_date')->first();
+        $wedding = $user->weddings()->with(['members', 'invitations' => fn ($query) => $query->pending()])->latest('event_date')->first();
 
-        $bookings = $user->bookings()
+        $bookings = Booking::query()
+            ->forCustomer($user)
             ->with(['vendor.category', 'payments'])
             ->whereIn('status', [BookingStatus::PendingPayment, BookingStatus::Confirmed, BookingStatus::Completed])
             ->orderBy('event_date')

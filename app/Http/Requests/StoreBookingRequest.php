@@ -26,7 +26,7 @@ class StoreBookingRequest extends FormRequest
         return [
             'package_id' => ['required', Rule::exists(Package::class, 'id')->where('vendor_id', $vendor->id)->where('is_active', true)],
             'event_date' => ['required', 'date', 'after:today'],
-            'wedding_id' => ['nullable', Rule::exists('weddings', 'id')->where('user_id', $this->user()->id)],
+            'wedding_id' => ['nullable', Rule::in($this->user()->weddings()->pluck('weddings.id'))],
             'notes' => ['nullable', 'string', 'max:500'],
         ];
     }

@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\WeddingRole;
 use App\Models\User;
 use App\Models\Vendor;
 use App\Models\Wedding;
@@ -12,6 +13,16 @@ use Illuminate\Database\Eloquent\Factories\Factory;
  */
 class WeddingFactory extends Factory
 {
+    /**
+     * The creator is always a member, as the owner.
+     */
+    public function configure(): static
+    {
+        return $this->afterCreating(function (Wedding $wedding): void {
+            $wedding->addMember($wedding->user, WeddingRole::Owner);
+        });
+    }
+
     /**
      * @return array<string, mixed>
      */

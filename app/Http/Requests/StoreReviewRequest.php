@@ -13,7 +13,7 @@ class StoreReviewRequest extends FormRequest
         /** @var Booking $booking */
         $booking = $this->route('booking');
 
-        return $booking->user_id === $this->user()?->id && $booking->canBeReviewed();
+        return ($this->user()?->can('review', $booking) ?? false) && $booking->canBeReviewed();
     }
 
     /**

@@ -47,8 +47,11 @@ class BookingController extends Controller
         $vendor = $request->user()->vendor;
         $package = Package::findOrFail($request->integer('package_id'));
 
-        $booking = $createBooking->handle($request->customer(), $vendor, $package, [
+        $customer = $request->customer();
+
+        $booking = $createBooking->handle($customer, $vendor, $package, [
             'event_date' => $request->date('event_date'),
+            'wedding_id' => $customer->weddings()->latest('event_date')->value('weddings.id'),
             'notes' => $request->string('notes')->toString() ?: null,
         ]);
 

@@ -17,7 +17,8 @@ class BookingController extends Controller
 {
     public function index(Request $request): View
     {
-        $bookings = $request->user()->bookings()
+        $bookings = Booking::query()
+            ->forCustomer($request->user())
             ->with(['vendor.category', 'payments'])
             ->latest()
             ->orderByDesc('id')
@@ -34,7 +35,9 @@ class BookingController extends Controller
 
         $booking = $createBooking->handle($request->user(), $vendor, $package, [
             'event_date' => $request->date('event_date'),
-            'wedding_id' => $request->filled('wedding_id') ? $request->integer('wedding_id') : null,
+            'wedding_id' => $request->filled('wedding_id')
+                ? $request->integer('wedding_id')
+                : $request->user()->weddings()->latest('event_date')->value('weddings.id'),
             'notes' => $request->string('notes')->toString() ?: null,
         ]);
 
