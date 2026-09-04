@@ -2,22 +2,21 @@
 
 namespace App\Http\Controllers;
 
-use App\Support\DemoCatalogue;
+use App\Models\Category;
+use App\Models\Vendor;
 use Illuminate\Contracts\View\View;
 
 class LandingController extends Controller
 {
-    public function __construct(private DemoCatalogue $catalogue) {}
-
     /**
-     * Show the public landing page with placeholder marketplace data.
+     * Show the promotional landing page.
      */
     public function __invoke(): View
     {
         return view('landing', [
             'flow' => $this->flow(),
-            'categories' => $this->catalogue->categories(),
-            'vendors' => $this->catalogue->featured(),
+            'categories' => Category::active()->ordered()->get(),
+            'vendors' => Vendor::query()->approved()->with('category')->orderByDesc('score')->orderBy('id')->limit(6)->get(),
             'features' => $this->features(),
             'vendorPoints' => $this->vendorPoints(),
         ]);

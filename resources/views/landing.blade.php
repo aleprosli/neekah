@@ -157,7 +157,7 @@
                         <select id="search-category" name="category" class="rounded-xl border-0 bg-transparent px-3 py-2 text-sm font-medium focus:ring-2 focus:ring-brand-400 focus:outline-none">
                             <option value="">Semua kategori</option>
                             @foreach ($categories as $category)
-                                <option value="{{ $category['slug'] }}">{{ $category['name'] }}</option>
+                                <option value="{{ $category->slug }}">{{ $category->name }}</option>
                             @endforeach
                         </select>
                         <label class="sr-only" for="search-q">Cari</label>
@@ -169,10 +169,10 @@
                 <ul class="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
                     @foreach ($categories as $category)
                         <li>
-                            <a href="{{ route('vendors.index', ['category' => $category['slug']]) }}" class="flex h-full flex-col gap-1 rounded-2xl border border-line bg-surface-raised p-4 transition hover:border-brand-300 hover:shadow-md">
-                                <span class="text-2xl">{{ $category['icon'] }}</span>
-                                <span class="font-semibold">{{ $category['name'] }}</span>
-                                <span class="text-xs text-ink-muted">{{ $category['examples'] }}</span>
+                            <a href="{{ route('vendors.index', ['category' => $category->slug]) }}" class="flex h-full flex-col gap-1 rounded-2xl border border-line bg-surface-raised p-4 transition hover:border-brand-300 hover:shadow-md">
+                                <span class="text-2xl">{{ $category->icon }}</span>
+                                <span class="font-semibold">{{ $category->name }}</span>
+                                <span class="text-xs text-ink-muted">{{ $category->examples }}</span>
                             </a>
                         </li>
                     @endforeach
@@ -185,7 +185,7 @@
 
                 <ul class="mt-6 grid gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
                     @foreach ($vendors as $vendor)
-                        <li><x-vendor-card :vendor="$vendor" :category="$categories->firstWhere('slug', $vendor['category'])" /></li>
+                        <li><x-vendor-card :vendor="$vendor" /></li>
                     @endforeach
                 </ul>
 

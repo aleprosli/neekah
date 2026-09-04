@@ -1,4 +1,4 @@
-<x-layouts.app :title="$activeCategory ? $activeCategory['name'] : 'Cari Vendor'">
+<x-layouts.app :title="$activeCategory?->name ?? 'Cari Vendor'">
     <x-site.header />
     <x-vendor-search filter-dialog="filters" :categories="$categories" :states="$states" />
 
@@ -15,9 +15,9 @@
                     </li>
                     @foreach ($categories as $category)
                         <li>
-                            <a href="{{ route('vendors.index', array_filter(['category' => $category['slug'], 'q' => $filters['q'], 'state' => $filters['state']])) }}" @class(['group flex w-16 flex-col items-center gap-2 text-center text-[11px] font-medium whitespace-nowrap transition', 'text-brand-700' => $filters['category'] === $category['slug'], 'text-ink-muted hover:text-ink' => $filters['category'] !== $category['slug']])>
-                                <span @class(['flex size-12 items-center justify-center rounded-full text-2xl transition', 'bg-brand-600 shadow-md shadow-brand-600/30' => $filters['category'] === $category['slug'], 'bg-surface-muted group-hover:bg-brand-50' => $filters['category'] !== $category['slug']])>{{ $category['icon'] }}</span>
-                                {{ $category['name'] }}
+                            <a href="{{ route('vendors.index', array_filter(['category' => $category->slug, 'q' => $filters['q'], 'state' => $filters['state']])) }}" @class(['group flex w-16 flex-col items-center gap-2 text-center text-[11px] font-medium whitespace-nowrap transition', 'text-brand-700' => $filters['category'] === $category->slug, 'text-ink-muted hover:text-ink' => $filters['category'] !== $category->slug])>
+                                <span @class(['flex size-12 items-center justify-center rounded-full text-2xl transition', 'bg-brand-600 shadow-md shadow-brand-600/30' => $filters['category'] === $category->slug, 'bg-surface-muted group-hover:bg-brand-50' => $filters['category'] !== $category->slug])>{{ $category->icon }}</span>
+                                {{ $category->name }}
                             </a>
                         </li>
                     @endforeach
@@ -88,7 +88,7 @@
                     </form>
                 </x-filter-popover>
 
-                <x-filter-popover label="Tahap vendor" :active="$filters['tier']" width="w-80">
+                <x-filter-popover label="Tahap vendor" :active="$filters['tier'] ? \App\Enums\VendorTier::from($filters['tier'])->label() : null" width="w-80">
                     <form method="GET" action="{{ route('vendors.index') }}" class="flex flex-wrap gap-2">
                         <x-filter-hidden :filters="$filters" except="tier" />
                         <label class="{{ $chipOption }}">
@@ -97,8 +97,8 @@
                         </label>
                         @foreach ($tiers as $tier)
                             <label class="{{ $chipOption }}">
-                                <input type="radio" name="tier" value="{{ $tier }}" class="sr-only" onchange="this.form.requestSubmit()" @checked($filters['tier'] === $tier)>
-                                @if ($tier === 'Recommended')🏆 @endif{{ $tier }}
+                                <input type="radio" name="tier" value="{{ $tier->value }}" class="sr-only" onchange="this.form.requestSubmit()" @checked($filters['tier'] === $tier->value)>
+                                @if ($tier === \App\Enums\VendorTier::Recommended)🏆 @endif{{ $tier->label() }}
                             </label>
                         @endforeach
                     </form>
@@ -120,7 +120,7 @@
             <div class="flex items-center justify-between gap-3 text-sm md:justify-end">
                 <p class="text-ink-muted">
                     <span class="font-display text-lg font-semibold text-ink">{{ $vendors->total() }} vendor</span>
-                    @if ($activeCategory) · {{ $activeCategory['name'] }} @endif
+                    @if ($activeCategory) · {{ $activeCategory->name }} @endif
                     @if ($filters['q']) · "{{ $filters['q'] }}" @endif
                     <span class="ml-1 rounded-full bg-gold-300/50 px-2 py-0.5 text-[11px] font-medium text-brand-900 dark:bg-gold-500/20 dark:text-gold-300">Data demo</span>
                 </p>
@@ -147,10 +147,10 @@
                 <a href="{{ route('vendors.index') }}" class="rounded-full bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700">Buang semua filter</a>
             </div>
         @else
-            <h1 class="sr-only">{{ $activeCategory ? $activeCategory['name'] : 'Semua vendor' }}</h1>
+            <h1 class="sr-only">{{ $activeCategory?->name ?? 'Semua vendor' }}</h1>
             <ul class="grid grid-cols-2 gap-x-3 gap-y-8 sm:gap-x-6 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
                 @foreach ($vendors as $vendor)
-                    <li><x-vendor-card :vendor="$vendor" :category="$categories->firstWhere('slug', $vendor['category'])" /></li>
+                    <li><x-vendor-card :vendor="$vendor" /></li>
                 @endforeach
             </ul>
 
@@ -238,8 +238,8 @@
                         </label>
                         @foreach ($tiers as $tier)
                             <label class="cursor-pointer rounded-full border border-line px-4 py-2 text-sm transition has-checked:border-brand-600 has-checked:bg-brand-600 has-checked:text-white hover:border-brand-400">
-                                <input type="radio" name="tier" value="{{ $tier }}" class="sr-only" @checked($filters['tier'] === $tier)>
-                                @if ($tier === 'Recommended')🏆 @endif{{ $tier }}
+                                <input type="radio" name="tier" value="{{ $tier->value }}" class="sr-only" @checked($filters['tier'] === $tier->value)>
+                                @if ($tier === \App\Enums\VendorTier::Recommended)🏆 @endif{{ $tier->label() }}
                             </label>
                         @endforeach
                     </div>

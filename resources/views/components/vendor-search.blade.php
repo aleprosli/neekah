@@ -8,7 +8,7 @@
     ];
     $budgets = [1000 => 'Bawah RM1,000', 3000 => 'Bawah RM3,000', 5000 => 'Bawah RM5,000', 10000 => 'Bawah RM10,000'];
     $activeCategory = $categories->firstWhere('slug', $current['category']);
-    $summary = collect([$activeCategory['name'] ?? null, $current['state'], $budgets[(int) $current['max_price']] ?? null])->filter();
+    $summary = collect([$activeCategory?->name, $current['state'], $budgets[(int) $current['max_price']] ?? null])->filter();
 @endphp
 
 <section class="relative overflow-hidden bg-[radial-gradient(ellipse_at_top_left,var(--color-brand-100),transparent_60%),radial-gradient(ellipse_at_bottom_right,var(--color-gold-300),transparent_55%)] pt-24 pb-8 dark:bg-[radial-gradient(ellipse_at_top_left,var(--color-brand-900),transparent_60%)] md:pt-28 md:pb-12">
@@ -25,7 +25,7 @@
                 <select name="category" class="cursor-pointer appearance-none bg-transparent text-sm font-medium focus:outline-none">
                     <option value="">Semua kategori</option>
                     @foreach ($categories as $category)
-                        <option value="{{ $category['slug'] }}" @selected($current['category'] === $category['slug'])>{{ $category['name'] }}</option>
+                        <option value="{{ $category->slug }}" @selected($current['category'] === $category->slug)>{{ $category->name }}</option>
                     @endforeach
                 </select>
             </label>

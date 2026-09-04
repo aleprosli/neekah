@@ -12,8 +12,26 @@
         </nav>
 
         <div class="flex items-center gap-1">
-            <a href="{{ route('landing') }}" class="hidden rounded-full px-4 py-2 text-sm font-medium transition hover:bg-surface-muted sm:inline">Tentang</a>
-            <a href="{{ route('landing') }}#cta" class="rounded-full bg-brand-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-700">Mula percuma</a>
+            @auth
+                <a href="{{ route('bookings.index') }}" @class(['hidden rounded-full px-4 py-2 text-sm font-medium transition hover:bg-surface-muted sm:inline', 'bg-surface-muted text-brand-700' => request()->routeIs('bookings.*')])>Tempahan</a>
+                <details data-popover class="relative">
+                    <summary class="flex cursor-pointer list-none items-center gap-2 rounded-full border border-line py-1 pr-1 pl-3 text-sm font-medium select-none hover:shadow-md [&::-webkit-details-marker]:hidden">
+                        <span class="hidden max-w-32 truncate sm:inline">{{ auth()->user()->name }}</span>
+                        <span class="flex size-7 items-center justify-center rounded-full bg-brand-600 text-xs font-semibold text-white">{{ mb_substr(auth()->user()->name, 0, 1) }}</span>
+                    </summary>
+                    <div class="absolute top-full right-0 z-20 mt-2 w-56 rounded-2xl border border-line bg-surface-raised p-2 text-sm shadow-xl shadow-brand-900/10">
+                        <p class="truncate px-3 py-2 text-xs text-ink-muted">{{ auth()->user()->email }}</p>
+                        <a href="{{ route('bookings.index') }}" class="block rounded-xl px-3 py-2 hover:bg-surface-muted">Tempahan saya</a>
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button type="submit" class="w-full rounded-xl px-3 py-2 text-left hover:bg-surface-muted">Log keluar</button>
+                        </form>
+                    </div>
+                </details>
+            @else
+                <a href="{{ route('login') }}" class="hidden rounded-full px-4 py-2 text-sm font-medium transition hover:bg-surface-muted sm:inline">Log masuk</a>
+                <a href="{{ route('register') }}" class="rounded-full bg-brand-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-700">Daftar</a>
+            @endauth
         </div>
     </header>
 </div>
