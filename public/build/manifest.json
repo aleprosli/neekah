@@ -1,0 +1,69 @@
+{
+  "_fonts-CoMmZiAc.css": {
+    "file": "assets/fonts-CoMmZiAc.css",
+    "src": "_fonts-CoMmZiAc.css"
+  },
+  "_instrument-sans-400-normal-D1W7dsQl.woff": {
+    "file": "assets/instrument-sans-400-normal-D1W7dsQl.woff",
+    "src": "_instrument-sans-400-normal-D1W7dsQl.woff"
+  },
+  "_instrument-sans-400-normal-DRC__1Mx.woff2": {
+    "file": "assets/instrument-sans-400-normal-DRC__1Mx.woff2",
+    "src": "_instrument-sans-400-normal-DRC__1Mx.woff2"
+  },
+  "_instrument-sans-500-normal-Dk9ku72i.woff2": {
+    "file": "assets/instrument-sans-500-normal-Dk9ku72i.woff2",
+    "src": "_instrument-sans-500-normal-Dk9ku72i.woff2"
+  },
+  "_instrument-sans-500-normal-Z6ESRlEs.woff": {
+    "file": "assets/instrument-sans-500-normal-Z6ESRlEs.woff",
+    "src": "_instrument-sans-500-normal-Z6ESRlEs.woff"
+  },
+  "_instrument-sans-600-normal-B7fBEWYG.woff2": {
+    "file": "assets/instrument-sans-600-normal-B7fBEWYG.woff2",
+    "src": "_instrument-sans-600-normal-B7fBEWYG.woff2"
+  },
+  "_instrument-sans-600-normal-B9e8oLYv.woff": {
+    "file": "assets/instrument-sans-600-normal-B9e8oLYv.woff",
+    "src": "_instrument-sans-600-normal-B9e8oLYv.woff"
+  },
+  "_playfair-display-500-normal-BScSeVwi.woff": {
+    "file": "assets/playfair-display-500-normal-BScSeVwi.woff",
+    "src": "_playfair-display-500-normal-BScSeVwi.woff"
+  },
+  "_playfair-display-500-normal-DIxvyhka.woff2": {
+    "file": "assets/playfair-display-500-normal-DIxvyhka.woff2",
+    "src": "_playfair-display-500-normal-DIxvyhka.woff2"
+  },
+  "_playfair-display-600-normal-CZLGqjJe.woff2": {
+    "file": "assets/playfair-display-600-normal-CZLGqjJe.woff2",
+    "src": "_playfair-display-600-normal-CZLGqjJe.woff2"
+  },
+  "_playfair-display-600-normal-CxxueQ0Z.woff": {
+    "file": "assets/playfair-display-600-normal-CxxueQ0Z.woff",
+    "src": "_playfair-display-600-normal-CxxueQ0Z.woff"
+  },
+  "_playfair-display-700-normal-Bc_1Q1cG.woff": {
+    "file": "assets/playfair-display-700-normal-Bc_1Q1cG.woff",
+    "src": "_playfair-display-700-normal-Bc_1Q1cG.woff"
+  },
+  "_playfair-display-700-normal-CuDiGg7c.woff2": {
+    "file": "assets/playfair-display-700-normal-CuDiGg7c.woff2",
+    "src": "_playfair-display-700-normal-CuDiGg7c.woff2"
+  },
+  "resources/css/app.css": {
+    "file": "assets/app-ClUI6aaH.css",
+    "name": "app",
+    "names": [
+      "app.css"
+    ],
+    "src": "resources/css/app.css",
+    "isEntry": true
+  },
+  "resources/js/app.js": {
+    "file": "assets/app-BpyH6per.js",
+    "name": "app",
+    "src": "resources/js/app.js",
+    "isEntry": true
+  }
+}
