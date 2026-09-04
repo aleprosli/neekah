@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin as AdminArea;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Customer as CustomerArea;
@@ -66,4 +67,20 @@ Route::middleware('auth')->group(function (): void {
     Route::get('/enquiries', [CustomerArea\EnquiryController::class, 'index'])->name('enquiries.index');
     Route::get('/enquiries/{enquiry}', [CustomerArea\EnquiryController::class, 'show'])->name('enquiries.show');
     Route::post('/vendors/{vendor}/enquiries', [CustomerArea\EnquiryController::class, 'store'])->name('vendors.enquiries.store');
+});
+
+Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function (): void {
+    Route::get('/', AdminArea\DashboardController::class)->name('dashboard');
+    Route::get('/vendors', [AdminArea\VendorController::class, 'index'])->name('vendors.index');
+    Route::get('/vendors/{vendor}', [AdminArea\VendorController::class, 'show'])->name('vendors.show');
+    Route::post('/vendors/{vendor}/status', [AdminArea\VendorApprovalController::class, 'store'])->name('vendors.status');
+    Route::put('/vendors/{vendor}/tier', [AdminArea\VendorTierController::class, 'update'])->name('vendors.tier');
+    Route::get('/users', [AdminArea\UserController::class, 'index'])->name('users.index');
+    Route::get('/categories', [AdminArea\CategoryController::class, 'index'])->name('categories.index');
+    Route::post('/categories', [AdminArea\CategoryController::class, 'store'])->name('categories.store');
+    Route::put('/categories/{category}', [AdminArea\CategoryController::class, 'update'])->name('categories.update');
+    Route::delete('/categories/{category}', [AdminArea\CategoryController::class, 'destroy'])->name('categories.destroy');
+    Route::get('/bookings', [AdminArea\BookingController::class, 'index'])->name('bookings.index');
+    Route::get('/bookings/{booking}', [AdminArea\BookingController::class, 'show'])->name('bookings.show');
+    Route::get('/transactions', [AdminArea\TransactionController::class, 'index'])->name('transactions.index');
 });

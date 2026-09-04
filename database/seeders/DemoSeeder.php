@@ -72,12 +72,42 @@ class DemoSeeder extends Seeder
             $vendors->push($vendor);
         }
 
+        $this->seedPendingVendor($categories);
+
         $this->seedHistory($couple, $wedding, $vendors);
 
         $vendors->each(function (Vendor $vendor): void {
             $vendor->refresh();
             $vendor->update(['score' => $vendor->calculateScore()]);
         });
+    }
+
+    /**
+     * One vendor awaiting approval so the admin dashboard has something to act on.
+     *
+     * @param  Collection<string, Category>  $categories
+     */
+    private function seedPendingVendor($categories): void
+    {
+        $owner = User::factory()->vendor()->create([
+            'name' => 'Nur Photography',
+            'email' => 'nur-photography@vendor.neekah.test',
+        ]);
+
+        Vendor::create([
+            'user_id' => $owner->id,
+            'category_id' => $categories['photography']->id,
+            'name' => 'Nur Photography',
+            'slug' => 'nur-photography',
+            'tagline' => 'Photographer baharu di Melaka, gaya moden.',
+            'city' => 'Melaka Tengah',
+            'state' => 'Melaka',
+            'phone' => '012-999 8888',
+            'whatsapp' => '60129998888',
+            'status' => VendorStatus::Pending,
+            'tier' => VendorTier::New,
+            'cover_tone' => 'from-sky-400 to-indigo-300',
+        ]);
     }
 
     /**
