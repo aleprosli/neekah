@@ -59,3 +59,76 @@ document.addEventListener('click', async (event) => {
         button.textContent = original;
     }, 2000);
 });
+
+/**
+ * Vendor comparison tray. Selections live in sessionStorage so they survive
+ * paging and filtering, and travel to /compare as a query string.
+ */
+(() => {
+    const KEY = 'neekah:compare';
+    const MAX = 4;
+    const tray = document.querySelector('[data-compare-tray]');
+    if (!tray) {
+        return;
+    }
+
+    const read = () => {
+        try {
+            return JSON.parse(sessionStorage.getItem(KEY)) ?? [];
+        } catch {
+            return [];
+        }
+    };
+
+    const write = (list) => {
+        try {
+            sessionStorage.setItem(KEY, JSON.stringify(list));
+        } catch {
+            // A private window without storage still gets a working page.
+        }
+    };
+
+    const render = () => {
+        const list = read();
+        tray.hidden = list.length === 0;
+        tray.querySelector('[data-compare-count]').textContent = list.length;
+        tray.querySelector('[data-compare-names]').textContent = list.map((item) => item.name).join(', ');
+        tray.querySelector('[data-compare-link]').href =
+            '/compare?' + list.map((item) => 'vendors[]=' + encodeURIComponent(item.slug)).join('&');
+
+        document.querySelectorAll('[data-compare]').forEach((box) => {
+            box.checked = list.some((item) => item.slug === box.dataset.compare);
+        });
+    };
+
+    document.addEventListener('change', (event) => {
+        const box = event.target.closest('[data-compare]');
+        if (!box) {
+            return;
+        }
+
+        const list = read().filter((item) => item.slug !== box.dataset.compare);
+
+        if (box.checked) {
+            if (list.length >= MAX) {
+                box.checked = false;
+                tray.querySelector('[data-compare-limit]').hidden = false;
+                setTimeout(() => (tray.querySelector('[data-compare-limit]').hidden = true), 2500);
+                return;
+            }
+            list.push({ slug: box.dataset.compare, name: box.dataset.compareName });
+        }
+
+        write(list);
+        render();
+    });
+
+    document.addEventListener('click', (event) => {
+        if (event.target.closest('[data-compare-clear]')) {
+            write([]);
+            render();
+        }
+    });
+
+    render();
+})();

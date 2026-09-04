@@ -13,10 +13,12 @@ use App\Http\Controllers\InvitationAcceptanceController;
 use App\Http\Controllers\LandingController;
 use App\Http\Controllers\ReportVendorController;
 use App\Http\Controllers\Vendor as VendorArea;
+use App\Http\Controllers\VendorComparisonController;
 use App\Http\Controllers\VendorController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [VendorController::class, 'index'])->name('vendors.index');
+Route::get('/compare', VendorComparisonController::class)->name('vendors.compare');
 Route::get('/vendors/{vendor}', [VendorController::class, 'show'])->name('vendors.show');
 
 Route::get('/about', LandingController::class)->name('landing');

@@ -150,7 +150,13 @@
             <h1 class="sr-only">{{ $activeCategory?->name ?? 'Semua vendor' }}</h1>
             <ul class="grid grid-cols-2 gap-x-3 gap-y-8 sm:gap-x-6 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
                 @foreach ($vendors as $vendor)
-                    <li><x-vendor-card :vendor="$vendor" /></li>
+                    <li class="relative">
+                        <x-vendor-card :vendor="$vendor" />
+                        <label class="absolute top-3 right-12 flex cursor-pointer items-center gap-1.5 rounded-full bg-white/90 px-2.5 py-1 text-xs font-medium text-ink shadow-sm">
+                            <input type="checkbox" data-compare="{{ $vendor->slug }}" data-compare-name="{{ $vendor->name }}" class="accent-brand-600">
+                            Banding
+                        </label>
+                    </li>
                 @endforeach
             </ul>
 
@@ -173,6 +179,20 @@
             @endif
         @endif
     </main>
+
+    {{-- Compare tray --}}
+    <div data-compare-tray hidden class="fixed inset-x-0 bottom-16 z-30 px-4 md:bottom-4">
+        <div class="mx-auto flex max-w-3xl items-center gap-3 rounded-2xl border border-line bg-surface-raised px-4 py-3 shadow-2xl shadow-brand-900/20">
+            <span class="flex size-8 shrink-0 items-center justify-center rounded-full bg-brand-600 text-sm font-semibold text-white" data-compare-count>0</span>
+            <div class="min-w-0 flex-1">
+                <p class="text-sm font-medium">Vendor untuk dibanding</p>
+                <p class="truncate text-xs text-ink-muted" data-compare-names></p>
+                <p class="text-xs font-medium text-brand-700" data-compare-limit hidden>Maksimum 4 vendor sahaja.</p>
+            </div>
+            <button type="button" data-compare-clear class="shrink-0 text-xs font-medium text-ink-muted hover:text-ink">Kosongkan</button>
+            <a data-compare-link href="{{ route('vendors.compare') }}" class="shrink-0 rounded-full bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700">Banding</a>
+        </div>
+    </div>
 
     {{-- Filter dialog --}}
     <dialog id="filters" class="m-auto w-full max-w-lg rounded-3xl bg-surface-raised p-0 text-ink shadow-2xl backdrop:bg-black/40 max-sm:mt-auto max-sm:mb-0 max-sm:max-h-[92dvh] max-sm:rounded-b-none">
