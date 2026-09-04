@@ -35,11 +35,15 @@
                             </td>
                             <td class="px-4 py-3 text-right">
                                 @if ($category->vendors_count === 0)
-                                    <form method="POST" action="{{ route('admin.categories.destroy', $category) }}" onsubmit="return confirm('Padam kategori {{ $category->name }}?')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="text-xs font-medium text-ink-muted hover:text-brand-700">Padam</button>
-                                    </form>
+                                    <x-confirm-action
+                                        :action="route('admin.categories.destroy', $category)"
+                                        method="DELETE"
+                                        tone="danger"
+                                        :title="'Padam kategori '.$category->name.'?'"
+                                        message="Kategori ini tiada vendor, jadi ia selamat dipadam. Tindakan ini tidak boleh dibatalkan."
+                                        confirm="Padam kategori"
+                                        trigger-class="text-xs font-medium text-ink-muted hover:text-brand-700"
+                                    >Padam</x-confirm-action>
                                 @endif
                             </td>
                         </tr>

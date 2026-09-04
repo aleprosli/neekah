@@ -20,11 +20,18 @@
                     @if ($item->caption)
                         <p class="truncate px-3 py-2 text-xs text-ink-muted">{{ $item->caption }}</p>
                     @endif
-                    <form method="POST" action="{{ route('vendor.portfolio.destroy', $item) }}" class="absolute top-2 right-2" onsubmit="return confirm('Padam gambar ini?')">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="flex size-8 items-center justify-center rounded-full bg-black/60 text-white opacity-0 transition group-hover:opacity-100 focus:opacity-100" aria-label="Padam">✕</button>
-                    </form>
+                    <div class="absolute top-2 right-2">
+                        <x-confirm-action
+                            :action="route('vendor.portfolio.destroy', $item)"
+                            method="DELETE"
+                            tone="danger"
+                            title="Padam gambar ini?"
+                            message="Gambar akan dibuang daripada portfolio anda secara kekal."
+                            confirm="Padam gambar"
+                            trigger-class="flex size-8 items-center justify-center rounded-full bg-black/60 text-white opacity-0 transition group-hover:opacity-100 focus:opacity-100"
+                            aria-label="Padam"
+                        >✕</x-confirm-action>
+                    </div>
                 </li>
             @endforeach
         </ul>

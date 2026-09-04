@@ -39,10 +39,13 @@
                         <td class="px-4 py-3 whitespace-nowrap text-ink-muted">{{ $user->created_at->translatedFormat('j M Y') }}</td>
                         <td class="px-4 py-3 text-right">
                             @if ($user->canBeImpersonated())
-                                <form method="POST" action="{{ route('admin.users.impersonate', $user) }}" onsubmit="return confirm('Log masuk sebagai {{ $user->name }}? Tindakan ini direkod dalam log.')">
-                                    @csrf
-                                    <button type="submit" class="rounded-full border border-line px-3 py-1.5 text-xs font-medium whitespace-nowrap transition hover:border-brand-400 hover:text-brand-700">Impersonate</button>
-                                </form>
+                                <x-confirm-action
+                                    :action="route('admin.users.impersonate', $user)"
+                                    :title="'Log masuk sebagai '.$user->name.'?'"
+                                    message="Anda akan melihat Neekah persis seperti pengguna ini. Pembayaran dimatikan, dan tindakan ini direkod dalam log sistem."
+                                    confirm="Ya, impersonate"
+                                    trigger-class="rounded-full border border-line px-3 py-1.5 text-xs font-medium whitespace-nowrap transition hover:border-brand-400 hover:text-brand-700"
+                                >Impersonate</x-confirm-action>
                             @endif
                         </td>
                     </tr>

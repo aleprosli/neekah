@@ -70,11 +70,17 @@
                     <div class="flex items-center justify-between gap-3"><dt class="text-ink-muted">Pasangan</dt><dd class="truncate font-medium">{{ $partner->name }}</dd></div>
                 </dl>
                 @if ($isOwner)
-                    <form method="POST" action="{{ route('weddings.members.destroy', [$wedding, $partner]) }}" class="mt-2 text-center" onsubmit="return confirm('Buang {{ $partner->name }} daripada majlis ini?')">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="text-xs font-medium text-ink-muted underline underline-offset-4 hover:text-brand-700">Buang pasangan</button>
-                    </form>
+                    <div class="mt-2 text-center">
+                        <x-confirm-action
+                            :action="route('weddings.members.destroy', [$wedding, $partner])"
+                            method="DELETE"
+                            tone="danger"
+                            :title="'Buang '.$partner->name.' daripada majlis ini?'"
+                            message="Mereka akan hilang akses kepada checklist, bajet dan semua tempahan majlis ini serta-merta. Anda boleh menjemput semula kemudian."
+                            confirm="Buang pasangan"
+                            trigger-class="text-xs font-medium text-ink-muted underline underline-offset-4 hover:text-brand-700"
+                        >Buang pasangan</x-confirm-action>
+                    </div>
                 @endif
             @elseif ($state === 'pending')
                 @if ($isOwner)

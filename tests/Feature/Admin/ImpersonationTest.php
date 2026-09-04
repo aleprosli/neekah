@@ -79,3 +79,14 @@ it('shows an impersonate button only for impersonatable users', function () {
     $response->assertOk()->assertSee(route('admin.users.impersonate', $this->customer), false);
     $response->assertDontSee(route('admin.users.impersonate', $this->admin), false);
 });
+
+it('confirms in an in-app dialog rather than a browser prompt', function () {
+    $this->actingAs($this->admin)
+        ->get(route('admin.users.index'))
+        ->assertOk()
+        ->assertSee('<dialog id="confirm-', false)
+        ->assertSee('data-dialog-open="confirm-', false)
+        ->assertSee('Log masuk sebagai '.$this->customer->name.'?')
+        ->assertSee('Ya, impersonate')
+        ->assertDontSee('return confirm(', false);
+});

@@ -33,11 +33,15 @@
                     </ul>
                     <div class="mt-auto flex gap-2 border-t border-line pt-3 text-sm">
                         <a href="{{ route('vendor.packages.edit', $package) }}" class="rounded-full border border-line px-4 py-1.5 font-medium transition hover:border-brand-400">Edit</a>
-                        <form method="POST" action="{{ route('vendor.packages.destroy', $package) }}" onsubmit="return confirm('Padam pakej {{ $package->name }}?')">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="rounded-full px-4 py-1.5 font-medium text-ink-muted transition hover:bg-surface-muted hover:text-ink">Padam</button>
-                        </form>
+                        <x-confirm-action
+                            :action="route('vendor.packages.destroy', $package)"
+                            method="DELETE"
+                            tone="danger"
+                            :title="'Padam pakej '.$package->name.'?'"
+                            message="Pakej ini tidak akan dipaparkan lagi pada profil anda. Tempahan sedia ada tidak terjejas."
+                            confirm="Padam pakej"
+                            trigger-class="rounded-full px-4 py-1.5 font-medium text-ink-muted transition hover:bg-surface-muted hover:text-ink"
+                        >Padam</x-confirm-action>
                     </div>
                 </li>
             @endforeach
