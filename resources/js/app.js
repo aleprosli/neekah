@@ -1,18 +1,26 @@
 /**
- * Take the preloader down once the page has finished loading, and again when
- * the browser restores the page from its back/forward cache, where `load`
- * never fires a second time.
+ * Take the preloader down at whichever comes later, the minimum hold set in
+ * config('neekah.preloader.seconds') or the page finishing loading. Also take
+ * it down when the browser restores the page from its back/forward cache,
+ * where `load` never fires a second time.
  */
 (() => {
-    const dismiss = () => {
-        const overlay = document.getElementById('nk-preloader');
-        if (!overlay) {
-            return;
-        }
+    const overlay = document.getElementById('nk-preloader');
+    if (!overlay) {
+        return;
+    }
 
+    const startedAt = performance.now();
+    const holdMs = Math.max(0, parseFloat(overlay.dataset.minSeconds || '0') * 1000);
+
+    const remove = () => {
         overlay.classList.add('is-done');
         overlay.addEventListener('transitionend', () => overlay.remove(), { once: true });
+        // A removed element fires no transitionend, so do not rely on it alone.
+        setTimeout(() => overlay.remove(), 600);
     };
+
+    const dismiss = () => setTimeout(remove, Math.max(0, holdMs - (performance.now() - startedAt)));
 
     if (document.readyState === 'complete') {
         dismiss();
@@ -20,7 +28,7 @@
         window.addEventListener('load', dismiss, { once: true });
     }
 
-    window.addEventListener('pageshow', (event) => event.persisted && dismiss());
+    window.addEventListener('pageshow', (event) => event.persisted && remove());
 })();
 
 document.addEventListener('click', (event) => {

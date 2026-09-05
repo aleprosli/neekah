@@ -38,6 +38,23 @@ return [
     | icon:   the browser tab and home screen icon.
     */
 
+    /*
+    |--------------------------------------------------------------------------
+    | Preloader
+    |--------------------------------------------------------------------------
+    | How long the opening screen stays up, in seconds, counted from the first
+    | paint. The page is revealed at whichever comes later, this minimum or the
+    | page actually finishing loading. Set it to 0 to reveal as soon as the
+    | page is ready.
+    |
+    | This is a deliberate hold, so it costs the visitor real time on every
+    | page. Keep it short.
+    */
+
+    'preloader' => [
+        'seconds' => (float) env('NEEKAH_PRELOADER_SECONDS', 1),
+    ],
+
     'brand' => [
         'lockup' => env('NEEKAH_BRAND_LOCKUP', 'img/logo/neekah-lockup.png'),
         'mark' => env('NEEKAH_BRAND_MARK', 'img/logo/neekah-mark-512.png'),

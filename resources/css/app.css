@@ -68,7 +68,7 @@ html {
     transition:
         opacity 0.35s ease,
         visibility 0.35s ease;
-    animation: nk-preloader-failsafe 0.35s ease 5s forwards;
+    animation: nk-preloader-failsafe 0.35s ease var(--nk-preloader-failsafe, 5s) forwards;
 }
 
 #nk-preloader.is-done {

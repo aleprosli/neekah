@@ -40,3 +40,48 @@ it('keeps the neekah preloader off a couple invitation card', function () {
         ->assertOk()
         ->assertDontSee('id="nk-preloader"', false);
 });
+
+it('reads the preloader hold from config and tells the browser about it', function () {
+    config()->set('neekah.preloader.seconds', 3.5);
+
+    $this->get(route('vendors.index'))
+        ->assertOk()
+        ->assertSee('data-min-seconds="3.5"', false)
+        // The failsafe has to outlast the hold, or it would uncover the page early.
+        ->assertSee('--nk-preloader-failsafe: 8.5s', false);
+});
+
+it('holds for two seconds unless the deployment says otherwise', function () {
+    expect(config('neekah.preloader.seconds'))->toBe(2.0);
+
+    $this->get(route('vendors.index'))->assertOk()->assertSee('data-min-seconds="2"', false);
+});
+
+it('accepts a zero hold, so the page shows as soon as it is ready', function () {
+    config()->set('neekah.preloader.seconds', 0);
+
+    $this->get(route('vendors.index'))->assertOk()->assertSee('data-min-seconds="0"', false);
+});
+
+it('keeps the white strokes in the lockup solid, not see through', function () {
+    // Keying the cream board out by colour alone turned the white script into a
+    // half transparent ghost, because white is only 26 apart from the cream.
+    $image = imagecreatefrompng(public_path(config('neekah.brand.lockup')));
+    $solid = 0;
+    $white = 0;
+
+    for ($y = 0; $y < imagesy($image); $y++) {
+        for ($x = 0; $x < imagesx($image); $x++) {
+            $colour = imagecolorat($image, $x, $y);
+            $alpha = ($colour >> 24) & 0x7F;
+
+            if ($alpha < 10 && (($colour >> 16) & 0xFF) > 235 && (($colour >> 8) & 0xFF) > 235 && ($colour & 0xFF) > 235) {
+                $white++;
+                $solid += $alpha === 0 ? 1 : 0;
+            }
+        }
+    }
+
+    expect($white)->toBeGreaterThan(1000)
+        ->and($solid / $white)->toBeGreaterThan(0.95);
+});
