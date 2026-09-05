@@ -145,6 +145,11 @@ class Vendor extends Model
      * bookings 20%, completion rate 15%, response rate 15%, platform transactions
      * 10%, profile and catalogue quality 10%. Penalty points subtract from the total.
      */
+    /**
+     * Below this many answerable enquiries, a response rate is noise.
+     */
+    public const MIN_ENQUIRIES_FOR_RESPONSE_RATE = 5;
+
     public function calculateScore(): float
     {
         $quality = ($this->hasCompleteProfile() ? 5 : 0) + ($this->hasCompleteCatalogue() ? 5 : 0);
@@ -153,12 +158,39 @@ class Vendor extends Model
             ((float) $this->rating_avg / 5 * 30)
             + (min($this->completed_bookings_count, 50) / 50 * 20)
             + ($this->completion_rate / 100 * 15)
-            + ($this->response_rate / 100 * 15)
+            + (($this->response_rate ?? 0) / 100 * 15)
             + (min($this->points_total, 2000) / 2000 * 10)
             + $quality
             - ($this->penalty_points / 10),
             2
         ));
+    }
+
+    /**
+     * How the response rate reads to a human, including when we have not
+     * measured one yet.
+     */
+    public function responseRateLabel(): string
+    {
+        return $this->response_rate === null ? 'Belum diukur' : $this->response_rate.'%';
+    }
+
+    /**
+     * How many enquiries the vendor answered, over the enquiries old enough to
+     * have been answered. Returns null below the threshold: with two or three
+     * enquiries the figure swings between 0 and 100 and means nothing, and a
+     * number shown to couples as a performance fact has to be measured.
+     */
+    public function calculateResponseRate(): ?int
+    {
+        $answerable = $this->enquiries()->where('created_at', '<=', now()->subDay());
+        $total = $answerable->clone()->count();
+
+        if ($total < self::MIN_ENQUIRIES_FOR_RESPONSE_RATE) {
+            return null;
+        }
+
+        return (int) round($answerable->clone()->whereNotNull('replied_at')->count() / $total * 100);
     }
 
     /**

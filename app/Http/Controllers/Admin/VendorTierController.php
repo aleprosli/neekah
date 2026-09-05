@@ -19,16 +19,11 @@ class VendorTierController extends Controller
     {
         $validated = $request->validate([
             'tier' => ['required', Rule::enum(VendorTier::class)],
-            'response_rate' => ['nullable', 'integer', 'between:0,100'],
             'tier_locked' => ['nullable', 'boolean'],
         ]);
 
         $vendor->tier = VendorTier::from($validated['tier']);
         $vendor->tier_locked = $request->boolean('tier_locked');
-
-        if (isset($validated['response_rate'])) {
-            $vendor->response_rate = $validated['response_rate'];
-        }
 
         $vendor->save();
         $recalculateStats->handle($vendor);

@@ -24,6 +24,7 @@ class RecalculateVendorStats
         ]);
 
         $vendor->completion_rate = $vendor->calculateCompletionRate();
+        $vendor->response_rate = $vendor->calculateResponseRate();
         $vendor->save();
 
         $this->awardPoints->syncMilestones($vendor);
@@ -57,14 +58,14 @@ class RecalculateVendorStats
             $completed >= 30
                 && $rating >= 4.7
                 && $vendor->reviews_count >= 15
-                && $vendor->response_rate >= 95
+                && ($vendor->response_rate ?? 0) >= 95
                 && $vendor->completion_rate >= 90
                 && $recentViolations === 0 => VendorTier::Recommended,
 
             $completed >= 15
                 && $rating >= 4.5
                 && $vendor->reviews_count >= 8
-                && $vendor->response_rate >= 90 => VendorTier::Top,
+                && ($vendor->response_rate ?? 0) >= 90 => VendorTier::Top,
 
             $completed >= 5
                 && $rating >= 4.0

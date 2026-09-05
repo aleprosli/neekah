@@ -5,6 +5,7 @@
     $openViolations = \App\Models\VendorViolation::where('status', \App\Enums\ViolationStatus::Open)->count();
     $nav = [
         ['label' => 'Ringkasan', 'icon' => '📊', 'href' => route('admin.dashboard'), 'active' => request()->routeIs('admin.dashboard')],
+        ['label' => 'Analitik', 'icon' => '📈', 'href' => route('admin.analytics'), 'active' => request()->routeIs('admin.analytics')],
         ['label' => 'Vendor', 'icon' => '🏪', 'href' => route('admin.vendors.index'), 'active' => request()->routeIs('admin.vendors.*'), 'badge' => $pendingVendors ?: null],
         ['label' => 'Pengguna', 'icon' => '👥', 'href' => route('admin.users.index'), 'active' => request()->routeIs('admin.users.*')],
         ['label' => 'Kategori', 'icon' => '🗂️', 'href' => route('admin.categories.index'), 'active' => request()->routeIs('admin.categories.*')],

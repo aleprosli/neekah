@@ -5,8 +5,44 @@
         <x-stat-card label="Performance point" :value="number_format($vendor->points_total)" :hint="$vendor->penalty_points ? '− '.$vendor->penalty_points.' penalti pelanggaran' : 'Tiada penalti'" />
         <x-stat-card label="Vendor Score" :value="number_format((float) $vendor->score, 2)" hint="Maksimum 100" />
         <x-stat-card label="Completion rate" :value="$vendor->completion_rate.'%'" :hint="$vendor->completed_bookings_count.' majlis selesai'" />
-        <x-stat-card label="Response rate" :value="$vendor->response_rate.'%'" hint="Balas enquiry dalam 24 jam" />
+        <x-stat-card label="Response rate" :value="$vendor->responseRateLabel()" :hint="$vendor->response_rate === null ? 'Perlu sekurang-kurangnya '.\App\Models\Vendor::MIN_ENQUIRIES_FOR_RESPONSE_RATE.' enquiry untuk diukur' : 'Enquiry yang anda balas'" />
     </div>
+
+    {{-- Analytics --}}
+    <section class="mt-8">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+            <h2 class="font-display text-xl font-semibold">Prestasi {{ $period->label() }} terakhir</h2>
+            <div class="flex flex-wrap gap-2">
+                @foreach (\App\Support\AnalyticsPeriod::CHOICES as $months => $label)
+                    <a href="{{ route('vendor.points.index', ['months' => $months]) }}" @class(['rounded-full border px-4 py-1.5 text-xs font-medium transition', 'border-brand-600 bg-brand-600 text-white' => $period->months === $months, 'border-line hover:border-brand-400' => $period->months !== $months])>{{ $label }}</a>
+                @endforeach
+            </div>
+        </div>
+
+        <div class="mt-4 grid gap-4 sm:grid-cols-3">
+            <x-stat-card label="Pendapatan" :value="'RM'.number_format($revenueTotal)" hint="Bayaran diterima dalam tempoh" />
+            <x-stat-card label="Enquiry dibalas" :value="$enquiryCount > 0 ? $enquiryReplied.' / '.$enquiryCount : 'Tiada enquiry'" hint="Enquiry yang anda terima" />
+            <x-stat-card
+                label="Enquiry jadi tempahan"
+                :value="$enquiryCount > 0 ? round($enquiryToBookings / $enquiryCount * 100).'%' : 'Tiada data'"
+                :hint="$enquiryToBookings.' tempahan dalam tempoh'" />
+        </div>
+
+        <div class="mt-4 grid gap-4 lg:grid-cols-3">
+            <div class="rounded-2xl border border-line bg-surface-raised p-5">
+                <h3 class="text-sm font-semibold">Pendapatan mengikut bulan</h3>
+                <x-chart.bars :series="$revenueSeries" :format="fn ($v) => 'RM'.number_format($v)" class="mt-4" />
+            </div>
+            <div class="rounded-2xl border border-line bg-surface-raised p-5">
+                <h3 class="text-sm font-semibold">Majlis selesai</h3>
+                <x-chart.bars :series="$completedSeries" :format="fn ($v) => number_format($v)" class="mt-4" />
+            </div>
+            <div class="rounded-2xl border border-line bg-surface-raised p-5">
+                <h3 class="text-sm font-semibold">Rating dari masa ke masa</h3>
+                <x-chart.line :series="$ratingSeries" :format="fn ($v) => number_format($v, 1)" class="mt-4" empty="Belum cukup review untuk menunjukkan aliran." />
+            </div>
+        </div>
+    </section>
 
     {{-- Tier ladder --}}
     <section class="mt-8 flex flex-col gap-4">

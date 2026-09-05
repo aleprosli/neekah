@@ -154,5 +154,19 @@ function givePerformance(Vendor $vendor, int $completed, int $reviews, int $rati
         ]);
     }
 
-    $vendor->update(['response_rate' => $responseRate]);
+    giveAnsweredEnquiries($vendor, $responseRate);
+}
+
+/**
+ * The response rate is measured from real enquiries now, so the tests have to
+ * create the enquiries rather than type the number in.
+ */
+function giveAnsweredEnquiries(Vendor $vendor, int $percent, int $total = 20): void
+{
+    $vendor->enquiries()->delete();
+
+    $answered = (int) round($total * $percent / 100);
+
+    Enquiry::factory()->count($answered)->for($vendor)->create(['created_at' => now()->subDays(3), 'replied_at' => now()->subDays(2)]);
+    Enquiry::factory()->count($total - $answered)->for($vendor)->create(['created_at' => now()->subDays(3), 'replied_at' => null]);
 }

@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Actions\AwardVendorPoints;
 use App\Actions\RecalculateVendorStats;
 use App\Actions\SeedWeddingChecklist;
+use App\Enums\EnquiryStatus;
 use App\Enums\PaymentStatus;
 use App\Enums\PaymentType;
 use App\Enums\PointReason;
@@ -89,11 +90,42 @@ class DemoSeeder extends Seeder
 
         $this->seedHistory($couple, $wedding, $vendors);
 
+        $this->seedEnquiryHistory($couple, $vendors);
+
         $recalculate = app(RecalculateVendorStats::class);
 
         $vendors->each(function (Vendor $vendor) use ($recalculate): void {
             $recalculate->handle($vendor->refresh());
         });
+    }
+
+    /**
+     * Enquiries behind each vendor's advertised response rate. The rate is
+     * measured from these rows now, so seeding the number alone would show a
+     * figure with nothing underneath it.
+     *
+     * @param  Collection<int, Vendor>  $vendors
+     */
+    private function seedEnquiryHistory(User $couple, $vendors): void
+    {
+        foreach ($vendors as $vendor) {
+            $total = 20;
+            $answered = (int) round($total * $vendor->response_rate / 100);
+
+            for ($i = 0; $i < $total; $i++) {
+                $sentAt = now()->subDays(random_int(3, 300));
+
+                $vendor->enquiries()->create([
+                    'user_id' => $couple->id,
+                    'message' => 'Salam, boleh saya tahu pakej dan tarikh yang masih kosong?',
+                    'status' => $i < $answered ? EnquiryStatus::Replied : EnquiryStatus::Open,
+                    'reply' => $i < $answered ? 'Terima kasih. Tarikh tersebut masih kosong, saya hantar butiran pakej sebentar lagi.' : null,
+                    'replied_at' => $i < $answered ? $sentAt->copy()->addHours(random_int(1, 20)) : null,
+                    'created_at' => $sentAt,
+                    'updated_at' => $sentAt,
+                ]);
+            }
+        }
     }
 
     /**

@@ -42,7 +42,7 @@ class VendorFactory extends Factory
             'rating_avg' => 0,
             'reviews_count' => 0,
             'completed_bookings_count' => 0,
-            'response_rate' => fake()->numberBetween(80, 100),
+            'response_rate' => null,
             'score' => 0,
             'approved_at' => now(),
         ];

@@ -63,7 +63,7 @@ class VendorComparisonController extends Controller
             $this->row('Bilangan pakej', $vendors->map(fn (Vendor $v): string => (string) $v->packages->count())->all(), $this->bestIndex($vendors, fn (Vendor $v): float => $v->packages->count())),
             $this->row('Majlis selesai', $vendors->map(fn (Vendor $v): string => (string) $v->completed_bookings_count)->all(), $this->bestIndex($vendors, fn (Vendor $v): float => $v->completed_bookings_count)),
             $this->row('Completion rate', $vendors->map(fn (Vendor $v): string => $v->completion_rate.'%')->all(), $this->bestIndex($vendors, fn (Vendor $v): float => $v->completion_rate)),
-            $this->row('Response rate', $vendors->map(fn (Vendor $v): string => $v->response_rate.'%')->all(), $this->bestIndex($vendors, fn (Vendor $v): float => $v->response_rate)),
+            $this->row('Response rate', $vendors->map(fn (Vendor $v): string => $v->responseRateLabel())->all(), $this->bestIndex($vendors, fn (Vendor $v): float => (float) ($v->response_rate ?? 0))),
             $this->row('Vendor Score', $vendors->map(fn (Vendor $v): string => number_format((float) $v->score, 1))->all(), $this->bestIndex($vendors, fn (Vendor $v): float => (float) $v->score)),
         ];
     }

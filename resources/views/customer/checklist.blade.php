@@ -11,15 +11,7 @@
         <x-stat-card label="Lewat" :value="$overdue" :hint="$overdue ? 'Perlu perhatian segera' : 'Semua mengikut jadual'" />
     </div>
 
-    <div class="mt-6 rounded-2xl border border-line bg-surface-raised p-5">
-        <div class="flex items-center justify-between text-sm">
-            <span class="font-medium">Kemajuan keseluruhan</span>
-            <span class="text-ink-muted">{{ $done }} / {{ $total }}</span>
-        </div>
-        <div class="mt-3 h-2.5 overflow-hidden rounded-full bg-surface-muted">
-            <div class="h-full rounded-full bg-brand-600 transition-all" style="width: {{ $progress }}%"></div>
-        </div>
-    </div>
+    <x-progress-bar label="Kemajuan keseluruhan" :caption="$done.' / '.$total" :value="$done" :max="$total" class="mt-6 rounded-2xl border border-line bg-surface-raised p-5" />
 
     {{-- Add a task --}}
     <form method="POST" action="{{ route('weddings.tasks.store', $wedding) }}" class="mt-6 flex flex-col gap-3 rounded-2xl border border-line bg-surface-raised p-5 sm:flex-row sm:items-end">

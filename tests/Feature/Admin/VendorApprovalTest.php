@@ -56,17 +56,16 @@ it('rejects an unknown status value', function () {
 });
 
 it('pins a tier the admin locks and recalculates the score', function () {
-    $vendor = Vendor::factory()->for(Category::first())->create(['response_rate' => 80]);
+    $vendor = Vendor::factory()->for(Category::first())->create();
 
     $this->actingAs($this->admin)
-        ->put(route('admin.vendors.tier', $vendor), ['tier' => 'recommended', 'response_rate' => 100, 'tier_locked' => 1])
+        ->put(route('admin.vendors.tier', $vendor), ['tier' => 'recommended', 'tier_locked' => 1])
         ->assertRedirect();
 
     $vendor->refresh();
 
     expect($vendor->tier)->toBe(VendorTier::Recommended)
         ->and($vendor->tier_locked)->toBeTrue()
-        ->and($vendor->response_rate)->toBe(100)
         ->and((float) $vendor->score)->toBe($vendor->calculateScore());
 });
 

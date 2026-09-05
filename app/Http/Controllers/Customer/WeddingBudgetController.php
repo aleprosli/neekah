@@ -3,13 +3,17 @@
 namespace App\Http\Controllers\Customer;
 
 use App\Enums\BookingStatus;
+use App\Enums\PaymentStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
 use App\Models\Category;
+use App\Models\Payment;
 use App\Models\Wedding;
+use App\Support\AnalyticsPeriod;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;
 
 class WeddingBudgetController extends Controller
@@ -23,6 +27,7 @@ class WeddingBudgetController extends Controller
         $wedding = $request->user()->weddings()->latest('event_date')->firstOrFail();
         Gate::authorize('view', $wedding);
 
+        $period = AnalyticsPeriod::fromRequest($request);
         $categories = Category::active()->ordered()->get();
         $planned = $wedding->budgetItems()->pluck('planned_amount', 'category_id');
 
@@ -53,7 +58,45 @@ class WeddingBudgetController extends Controller
             'totalPlanned' => (float) $planned->sum(),
             'totalActual' => (float) $rows->sum('actual'),
             'totalPaid' => (float) $rows->sum('paid'),
+            'period' => $period,
+            'committedSeries' => $this->committedByMonth($bookings, $period),
+            'paidSeries' => $this->paidByMonth($bookings, $period),
+            'categoryMix' => $rows->filter(fn (array $row): bool => $row['actual'] > 0)
+                ->map(fn (array $row): array => ['label' => $row['category']->name, 'value' => $row['actual']])
+                ->sortByDesc('value')
+                ->values()
+                ->all(),
         ]);
+    }
+
+    /**
+     * What the couple committed by month, so spending is visible as a shape and
+     * not only as a total.
+     *
+     * @param  Collection<int, Booking>  $bookings
+     * @return array<int, array{label: string, value: float}>
+     */
+    private function committedByMonth(Collection $bookings, AnalyticsPeriod $period): array
+    {
+        $totals = $bookings
+            ->groupBy(fn (Booking $booking): string => $booking->created_at->format('Y-m'))
+            ->map(fn (Collection $group): float => (float) $group->sum('total_amount'));
+
+        return $period->series($totals);
+    }
+
+    /**
+     * @param  Collection<int, Booking>  $bookings
+     * @return array<int, array{label: string, value: float}>
+     */
+    private function paidByMonth(Collection $bookings, AnalyticsPeriod $period): array
+    {
+        $totals = $bookings
+            ->flatMap(fn (Booking $booking) => $booking->payments->where('status', PaymentStatus::Paid)->whereNotNull('paid_at'))
+            ->groupBy(fn (Payment $payment): string => $payment->paid_at->format('Y-m'))
+            ->map(fn (Collection $group): float => (float) $group->sum('amount'));
+
+        return $period->series($totals);
     }
 
     /**

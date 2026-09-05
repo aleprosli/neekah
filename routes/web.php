@@ -144,6 +144,7 @@ Route::middleware('auth')->group(function (): void {
 
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function (): void {
     Route::get('/', AdminArea\DashboardController::class)->name('dashboard');
+    Route::get('/analytics', AdminArea\AnalyticsController::class)->name('analytics');
     Route::get('/vendors', [AdminArea\VendorController::class, 'index'])->name('vendors.index');
     Route::get('/vendors/{vendor}', [AdminArea\VendorController::class, 'show'])->name('vendors.show');
     Route::post('/vendors/{vendor}/status', [AdminArea\VendorApprovalController::class, 'store'])->name('vendors.status');

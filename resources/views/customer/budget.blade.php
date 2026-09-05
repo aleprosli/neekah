@@ -12,18 +12,28 @@
         <x-stat-card label="Baki bajet" :value="'RM'.number_format($remaining)" :hint="$remaining < 0 ? 'Melebihi bajet' : 'Masih ada ruang'" />
     </div>
 
-    <div class="mt-6 rounded-2xl border border-line bg-surface-raised p-5">
-        <div class="flex items-center justify-between text-sm">
-            <span class="font-medium">Penggunaan bajet</span>
-            <span class="text-ink-muted">RM{{ number_format($totalActual) }} / RM{{ number_format($budget) }}</span>
-        </div>
-        <div class="mt-3 h-2.5 overflow-hidden rounded-full bg-surface-muted">
-            <div @class(['h-full rounded-full transition-all', 'bg-brand-600' => $totalActual <= $budget, 'bg-amber-500' => $totalActual > $budget]) style="width: {{ $used }}%"></div>
-        </div>
+    <x-progress-bar label="Penggunaan bajet" :caption="'RM'.number_format($totalActual).' / RM'.number_format($budget)" :value="$totalActual" :max="$budget" :over="$totalActual > $budget" class="mt-6 rounded-2xl border border-line bg-surface-raised p-5">
         @if ($totalPlanned > $budget)
             <p class="mt-2 text-xs text-amber-700">Agihan kategori anda melebihi jumlah bajet sebanyak RM{{ number_format($totalPlanned - $budget) }}.</p>
         @endif
-    </div>
+    </x-progress-bar>
+
+    <section class="mt-6 grid gap-4 lg:grid-cols-2">
+        <div class="rounded-2xl border border-line bg-surface-raised p-5">
+            <h2 class="font-semibold">Komitmen mengikut bulan</h2>
+            <p class="text-sm text-ink-muted">Jumlah tempahan yang anda buat setiap bulan.</p>
+            <x-chart.bars :series="$committedSeries" :format="fn ($v) => 'RM'.number_format($v)" class="mt-4" empty="Belum ada tempahan untuk dipaparkan." />
+        </div>
+        <div class="rounded-2xl border border-line bg-surface-raised p-5">
+            <h2 class="font-semibold">Bayaran mengikut bulan</h2>
+            <p class="text-sm text-ink-muted">Wang yang benar-benar sudah keluar.</p>
+            <x-chart.bars :series="$paidSeries" :format="fn ($v) => 'RM'.number_format($v)" class="mt-4" empty="Belum ada bayaran direkod." />
+        </div>
+        <div class="rounded-2xl border border-line bg-surface-raised p-5 lg:col-span-2">
+            <h2 class="font-semibold">Perbelanjaan mengikut kategori</h2>
+            <x-chart.donut :series="$categoryMix" :format="fn ($v) => 'RM'.number_format($v)" class="mt-4" empty="Tempah vendor untuk melihat agihan perbelanjaan anda." />
+        </div>
+    </section>
 
     <form method="POST" action="{{ route('weddings.budget.update', $wedding) }}" class="mt-6">
         @csrf

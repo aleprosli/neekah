@@ -57,13 +57,13 @@
                     <span class="flex size-12 shrink-0 items-center justify-center rounded-full bg-linear-to-br text-lg font-semibold text-white {{ $vendor->cover_tone }}">{{ mb_substr($vendor->name, 0, 1) }}</span>
                     <div>
                         <p class="font-semibold">Dikendalikan oleh {{ $vendor->name }}</p>
-                        <p class="text-sm text-ink-muted">@if ($vendor->tier === VendorTier::Recommended)🏆 @endif{{ $vendor->tier->label() }} Vendor · Response rate {{ $vendor->response_rate }}%</p>
+                        <p class="text-sm text-ink-muted">@if ($vendor->tier === VendorTier::Recommended)🏆 @endif{{ $vendor->tier->label() }} Vendor · Response rate {{ $vendor->responseRateLabel() }}</p>
                     </div>
                 </div>
 
                 {{-- Highlights --}}
                 <ul class="flex flex-col gap-5 py-6">
-                    @foreach ([['🔒', 'Booking & bayaran melalui Neekah', 'Deposit dan baki direkod dalam platform. Anda dilindungi jika berlaku pertikaian.'], ['⚡', 'Response rate '.$vendor->response_rate.'%', 'Vendor ini membalas kebanyakan enquiry dalam masa 24 jam.'], ['✓', $vendor->completed_bookings_count.' majlis selesai', 'Review di bawah datang daripada pasangan yang benar-benar menempah.']] as [$icon, $title, $text])
+                    @foreach ([['🔒', 'Booking & bayaran melalui Neekah', 'Deposit dan baki direkod dalam platform. Anda dilindungi jika berlaku pertikaian.'], ['⚡', 'Response rate '.$vendor->responseRateLabel(), $vendor->response_rate === null ? 'Vendor ini belum menerima cukup enquiry untuk kami mengukur kadar balasan mereka.' : 'Diukur dari enquiry yang diterima melalui Neekah.'], ['✓', $vendor->completed_bookings_count.' majlis selesai', 'Review di bawah datang daripada pasangan yang benar-benar menempah.']] as [$icon, $title, $text])
                         <li class="flex gap-4">
                             <span class="w-6 shrink-0 text-center text-xl leading-6">{{ $icon }}</span>
                             <div>

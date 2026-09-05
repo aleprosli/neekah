@@ -30,19 +30,11 @@
         </div>
 
         {{-- Budget bar --}}
-        <div class="mt-6 rounded-2xl border border-line bg-surface-raised p-5">
-            <div class="flex items-center justify-between text-sm">
-                <span class="font-medium">Penggunaan bajet</span>
-                <span class="text-ink-muted">RM{{ number_format($committed, 0) }} / RM{{ number_format($budget, 0) }}</span>
-            </div>
-            <div class="mt-3 h-2.5 overflow-hidden rounded-full bg-surface-muted">
-                @php $used = $budget > 0 ? min(100, round($committed / $budget * 100)) : 0; @endphp
-                <div @class(['h-full rounded-full transition-all', 'bg-brand-600' => $committed <= $budget, 'bg-amber-500' => $committed > $budget]) style="width: {{ $used }}%"></div>
-            </div>
+        <x-progress-bar label="Penggunaan bajet" :caption="'RM'.number_format($committed, 0).' / RM'.number_format($budget, 0)" :value="$committed" :max="$budget" :over="$committed > $budget" class="mt-6 rounded-2xl border border-line bg-surface-raised p-5">
             @if ($committed > $budget)
                 <p class="mt-2 text-xs text-amber-700">Anda telah melebihi bajet sebanyak RM{{ number_format($committed - $budget, 0) }}.</p>
             @endif
-        </div>
+        </x-progress-bar>
 
         <x-wedding-couple :wedding="$wedding" class="mt-6" />
 

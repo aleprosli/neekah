@@ -24,7 +24,7 @@
                 <div><dt class="text-ink-muted">Harga bermula</dt><dd class="font-semibold">RM{{ number_format((float) $vendor->price_from, 2) }} / {{ $vendor->price_unit->label() }}</dd></div>
                 <div><dt class="text-ink-muted">Vendor Score</dt><dd class="font-semibold">{{ number_format((float) $vendor->score, 2) }} @if ($vendor->tier_locked)<span class="text-xs font-normal text-ink-muted">· tahap dikunci</span>@endif</dd></div>
                 <div><dt class="text-ink-muted">Performance points</dt><dd class="font-semibold">{{ number_format($vendor->points_total) }} @if ($vendor->penalty_points)<span class="text-xs font-normal text-red-600">− {{ $vendor->penalty_points }} penalti</span>@endif</dd></div>
-                <div><dt class="text-ink-muted">Completion rate</dt><dd class="font-semibold">{{ $vendor->completion_rate }}% · response {{ $vendor->response_rate }}%</dd></div>
+                <div><dt class="text-ink-muted">Completion rate</dt><dd class="font-semibold">{{ $vendor->completion_rate }}% · response {{ $vendor->responseRateLabel() }}</dd></div>
                 @if ($vendor->tagline)
                     <div class="sm:col-span-2"><dt class="text-ink-muted">Tagline</dt><dd>{{ $vendor->tagline }}</dd></div>
                 @endif
@@ -87,7 +87,7 @@
                         <option value="{{ $case->value }}" @selected($vendor->tier === $case)>{{ $case->label() }}</option>
                     @endforeach
                 </x-form.select>
-                <x-form.field label="Response rate (%)" name="response_rate" type="number" min="0" max="100" :value="$vendor->response_rate" />
+                <p class="text-xs text-ink-muted">Response rate dikira dari enquiry yang vendor ini balas, jadi ia tidak boleh ditetapkan secara manual.</p>
                 <label class="flex items-start gap-2 text-sm">
                     <input type="hidden" name="tier_locked" value="0">
                     <input type="checkbox" name="tier_locked" value="1" class="mt-0.5 accent-brand-600" @checked($vendor->tier_locked)>

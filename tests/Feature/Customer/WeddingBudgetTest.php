@@ -1,6 +1,7 @@
 <?php
 
 use App\Actions\SeedWeddingChecklist;
+use App\Enums\PaymentStatus;
 use App\Enums\WeddingRole;
 use App\Models\Booking;
 use App\Models\Category;
@@ -78,4 +79,35 @@ it('warns when bookings run over the wedding budget', function () {
     Booking::factory()->confirmed()->for($this->aina)->for($vendor)->create(['wedding_id' => $this->wedding->id, 'total_amount' => 35000]);
 
     $this->actingAs($this->aina)->get(route('budget.index'))->assertOk()->assertSee('Melebihi bajet');
+});
+
+it('charts spending by month and by category alongside the table', function () {
+    $vendor = Vendor::factory()->for(Category::first())->create();
+
+    $booking = Booking::factory()->confirmed()->for($this->aina)->for($vendor)->create([
+        'wedding_id' => $this->wedding->id,
+        'total_amount' => 8000,
+        'created_at' => now()->subMonth(),
+    ]);
+
+    Payment::factory()->for($booking)->create([
+        'status' => PaymentStatus::Paid,
+        'amount' => 3000,
+        'paid_at' => now()->subMonth(),
+    ]);
+
+    $this->actingAs($this->aina)->get(route('budget.index'))
+        ->assertOk()
+        ->assertSee('Komitmen mengikut bulan')
+        ->assertSee('Bayaran mengikut bulan')
+        ->assertSee('Perbelanjaan mengikut kategori')
+        ->assertSee('RM8,000')
+        ->assertSee('RM3,000');
+});
+
+it('shows an empty chart message rather than a blank box before any booking', function () {
+    $this->actingAs($this->aina)->get(route('budget.index'))
+        ->assertOk()
+        ->assertSee('Belum ada tempahan untuk dipaparkan.')
+        ->assertSee('Tempah vendor untuk melihat agihan perbelanjaan anda.');
 });
