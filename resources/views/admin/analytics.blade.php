@@ -20,32 +20,32 @@
     </div>
 
     <div class="mt-6 grid gap-4 lg:grid-cols-2">
-        <section class="rounded-2xl border border-line bg-surface-raised p-5">
+        <section class="min-w-0 rounded-2xl border border-line bg-surface-raised p-5">
             <h2 class="font-semibold">Nilai transaksi mengikut bulan</h2>
             <x-chart.bars :series="$grossSeries" :format="fn ($v) => 'RM'.number_format($v)" class="mt-4" />
         </section>
 
-        <section class="rounded-2xl border border-line bg-surface-raised p-5">
+        <section class="min-w-0 rounded-2xl border border-line bg-surface-raised p-5">
             <h2 class="font-semibold">Komisen mengikut bulan</h2>
             <x-chart.bars :series="$commissionSeries" :format="fn ($v) => 'RM'.number_format($v)" class="mt-4" />
         </section>
 
-        <section class="rounded-2xl border border-line bg-surface-raised p-5">
+        <section class="min-w-0 rounded-2xl border border-line bg-surface-raised p-5">
             <h2 class="font-semibold">Tempahan mengikut status</h2>
             <x-chart.donut :series="$bookingsByStatus" class="mt-4" />
         </section>
 
-        <section class="rounded-2xl border border-line bg-surface-raised p-5">
+        <section class="min-w-0 rounded-2xl border border-line bg-surface-raised p-5">
             <h2 class="font-semibold">Kategori mengikut nilai tempahan</h2>
             <x-chart.donut :series="$categoryMix" :format="fn ($v) => 'RM'.number_format($v)" class="mt-4" />
         </section>
 
-        <section class="rounded-2xl border border-line bg-surface-raised p-5">
+        <section class="min-w-0 rounded-2xl border border-line bg-surface-raised p-5">
             <h2 class="font-semibold">Pendaftaran pengantin</h2>
             <x-chart.line :series="$signupSeries" :format="fn ($v) => number_format($v)" class="mt-4" />
         </section>
 
-        <section class="rounded-2xl border border-line bg-surface-raised p-5">
+        <section class="min-w-0 rounded-2xl border border-line bg-surface-raised p-5">
             <h2 class="font-semibold">Pendaftaran vendor</h2>
             <x-chart.line :series="$vendorSignupSeries" :format="fn ($v) => number_format($v)" class="mt-4" />
         </section>

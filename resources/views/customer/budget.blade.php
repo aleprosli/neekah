@@ -19,12 +19,12 @@
     </x-progress-bar>
 
     <section class="mt-6 grid gap-4 lg:grid-cols-2">
-        <div class="rounded-2xl border border-line bg-surface-raised p-5">
+        <div class="min-w-0 rounded-2xl border border-line bg-surface-raised p-5">
             <h2 class="font-semibold">Komitmen mengikut bulan</h2>
             <p class="text-sm text-ink-muted">Jumlah tempahan yang anda buat setiap bulan.</p>
             <x-chart.bars :series="$committedSeries" :format="fn ($v) => 'RM'.number_format($v)" class="mt-4" empty="Belum ada tempahan untuk dipaparkan." />
         </div>
-        <div class="rounded-2xl border border-line bg-surface-raised p-5">
+        <div class="min-w-0 rounded-2xl border border-line bg-surface-raised p-5">
             <h2 class="font-semibold">Bayaran mengikut bulan</h2>
             <p class="text-sm text-ink-muted">Wang yang benar-benar sudah keluar.</p>
             <x-chart.bars :series="$paidSeries" :format="fn ($v) => 'RM'.number_format($v)" class="mt-4" empty="Belum ada bayaran direkod." />

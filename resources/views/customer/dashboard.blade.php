@@ -40,7 +40,7 @@
 
         <div class="mt-8 grid gap-8 lg:grid-cols-[1fr_320px]">
             {{-- Booked vendors --}}
-            <section class="flex flex-col gap-4">
+            <section class="flex min-w-0 flex-col gap-4">
                 <h2 class="font-display text-xl font-semibold">Vendor majlis anda</h2>
                 @if ($bookings->isEmpty())
                     <p class="rounded-2xl border border-dashed border-line p-6 text-sm text-ink-muted">Belum ada vendor ditempah. <a href="{{ route('vendors.index') }}" class="font-medium text-brand-600 underline underline-offset-4">Cari vendor</a> untuk mula.</p>
@@ -66,7 +66,7 @@
             </section>
 
             {{-- Checklist --}}
-            <section class="flex flex-col gap-4">
+            <section class="flex min-w-0 flex-col gap-4">
                 <h2 class="font-display text-xl font-semibold">Checklist kategori</h2>
                 <ul class="flex flex-col gap-1 rounded-2xl border border-line p-3">
                     @foreach ($categories as $category)
