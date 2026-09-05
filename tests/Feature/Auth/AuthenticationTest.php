@@ -85,3 +85,11 @@ it('sends each role to its own dashboard after login', function () {
         $this->post(route('logout'));
     }
 });
+
+it('offers a log in link in the header that is not hidden on a phone', function () {
+    $response = $this->get(route('vendors.index'))->assertOk();
+
+    // The link used to carry "hidden ... sm:inline", so a phone visitor had to
+    // go through the register page to find their way to log in.
+    expect($response->getContent())->toMatch('/<a href="[^"]*\/login"[^>]*class="(?![^"]*\bhidden\b)[^"]*">\s*Log masuk/');
+});

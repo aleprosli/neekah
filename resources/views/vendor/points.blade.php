@@ -81,7 +81,7 @@
                                 'border border-line text-ink-muted' => ! $requirement['met'],
                             ])>{{ $requirement['met'] ? '✓' : '' }}</span>
                             <span @class(['text-ink-muted' => $requirement['met']])>{{ $requirement['label'] }}</span>
-                            <span class="ml-auto font-medium">{{ $requirement['current'] }} <span class="text-ink-muted">/ {{ $requirement['target'] }}</span></span>
+                            <span class="ml-auto shrink-0 font-medium">{{ $requirement['current'] }} <span class="text-ink-muted">/ {{ $requirement['target'] }}</span></span>
                         </li>
                     @endforeach
                 </ul>
@@ -98,7 +98,7 @@
         {{-- How points are earned --}}
         <section class="flex flex-col gap-4">
             <h2 class="font-display text-xl font-semibold">Cara point diberi</h2>
-            <div class="overflow-hidden rounded-2xl border border-line">
+            <div class="overflow-x-auto rounded-2xl border border-line">
                 <table class="w-full text-sm">
                     <thead class="bg-surface-muted text-left text-xs tracking-wide text-ink-muted uppercase">
                         <tr>

@@ -9,7 +9,7 @@
         {{ $active ?? $label }}
         <svg class="size-3.5 opacity-70" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
     </summary>
-    <div @class(['absolute top-full z-20 mt-2 rounded-2xl border border-line bg-surface-raised p-4 shadow-xl shadow-brand-900/10', $width, 'left-0' => $align === 'left', 'right-0' => $align === 'right'])>
+    <div @class(['absolute top-full z-20 mt-2 max-w-[calc(100vw-2rem)] rounded-2xl border border-line bg-surface-raised p-4 shadow-xl shadow-brand-900/10', $width, 'left-0' => $align === 'left', 'left-0 sm:right-0 sm:left-auto' => $align === 'right'])>
         {{ $slot }}
     </div>
 </details>

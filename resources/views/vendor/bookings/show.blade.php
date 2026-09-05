@@ -14,7 +14,7 @@
     <div class="grid gap-6 lg:grid-cols-[1fr_320px]">
         <div class="flex flex-col gap-6">
             <dl class="grid gap-3 rounded-2xl border border-line p-5 text-sm sm:grid-cols-2">
-                <div><dt class="text-ink-muted">Pelanggan</dt><dd class="font-semibold">{{ $booking->user->name }}</dd><dd class="text-ink-muted">{{ $booking->user->email }}@if ($booking->user->phone) · {{ $booking->user->phone }}@endif</dd></div>
+                <div><dt class="text-ink-muted">Pelanggan</dt><dd class="font-semibold">{{ $booking->user->name }}</dd><dd class="break-words text-ink-muted">{{ $booking->user->email }}@if ($booking->user->phone) · {{ $booking->user->phone }}@endif</dd></div>
                 <div><dt class="text-ink-muted">Pakej</dt><dd class="font-semibold">{{ $booking->package_name }}</dd></div>
                 <div><dt class="text-ink-muted">Tarikh majlis</dt><dd class="font-semibold">{{ $booking->event_date->translatedFormat('l, j F Y') }}</dd></div>
                 <div><dt class="text-ink-muted">Dibuat</dt><dd class="font-semibold">{{ $booking->created_at->translatedFormat('j M Y, g:i A') }}</dd></div>

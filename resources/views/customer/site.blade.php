@@ -27,7 +27,7 @@
                     <a href="{{ $site->url() }}" target="_blank" class="mt-1 block truncate text-sm text-brand-700 underline underline-offset-4">{{ $site->url() }}</a>
                     <p class="mt-1 text-xs text-ink-muted">{{ number_format($site->views) }} tontonan · <a href="{{ route('guests.index') }}" class="hover:text-ink">{{ $rsvpCount }} tetamu mengesahkan kehadiran</a></p>
                 @else
-                    <p class="mt-1 text-sm text-ink-muted">Kad anda akan berada di {{ $site->subdomain }}.{{ $domain }} selepas disiarkan.</p>
+                    <p class="mt-1 text-sm break-words text-ink-muted">Kad anda akan berada di {{ $site->subdomain }}.{{ $domain }} selepas disiarkan.</p>
                 @endif
             </div>
             <form method="POST" action="{{ route('weddings.site.publish', $wedding) }}" class="shrink-0">

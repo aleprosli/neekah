@@ -5,8 +5,8 @@
         @if ($role)
             <input type="hidden" name="role" value="{{ $role->value }}">
         @endif
-        <div class="flex gap-2">
-            <input type="search" name="q" value="{{ request('q') }}" placeholder="Cari nama atau emel…" class="flex-1 rounded-full border border-line bg-surface px-5 py-2.5 text-sm focus:border-brand-400 focus:outline-none">
+        <div class="flex flex-wrap gap-2">
+            <input type="search" size="1" name="q" value="{{ request('q') }}" placeholder="Cari nama atau emel…" class="flex-1 rounded-full border border-line bg-surface px-5 py-2.5 text-sm focus:border-brand-400 focus:outline-none">
             <button type="submit" class="rounded-full bg-brand-600 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700">Cari</button>
         </div>
         <div class="flex flex-wrap gap-2">

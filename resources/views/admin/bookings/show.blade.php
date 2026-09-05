@@ -8,7 +8,7 @@
     <div class="grid gap-6 lg:grid-cols-[1fr_320px]">
         <dl class="grid gap-3 rounded-2xl border border-line p-5 text-sm sm:grid-cols-2">
             <div><dt class="text-ink-muted">Vendor</dt><dd class="font-semibold"><a href="{{ route('admin.vendors.show', $booking->vendor) }}" class="hover:text-brand-700">{{ $booking->vendor->name }}</a></dd><dd class="text-ink-muted">{{ $booking->vendor->category->name }}</dd></div>
-            <div><dt class="text-ink-muted">Pengantin</dt><dd class="font-semibold">{{ $booking->user->name }}</dd><dd class="text-ink-muted">{{ $booking->user->email }}</dd></div>
+            <div><dt class="text-ink-muted">Pengantin</dt><dd class="font-semibold">{{ $booking->user->name }}</dd><dd class="break-words text-ink-muted">{{ $booking->user->email }}</dd></div>
             <div><dt class="text-ink-muted">Pakej</dt><dd class="font-semibold">{{ $booking->package_name }}</dd></div>
             <div><dt class="text-ink-muted">Dibuat</dt><dd class="font-semibold">{{ $booking->created_at->translatedFormat('j M Y, g:i A') }}</dd></div>
             @if ($booking->wedding)

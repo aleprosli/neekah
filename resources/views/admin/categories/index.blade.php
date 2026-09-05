@@ -18,8 +18,8 @@
                                     @csrf
                                     @method('PUT')
                                     <input type="text" name="icon" value="{{ $category->icon }}" class="w-14 rounded-lg border border-line bg-surface px-2 py-1.5 text-center" aria-label="Ikon">
-                                    <input type="text" name="name" value="{{ $category->name }}" class="w-40 rounded-lg border border-line bg-surface px-3 py-1.5" aria-label="Nama">
-                                    <input type="text" name="examples" value="{{ $category->examples }}" class="w-56 rounded-lg border border-line bg-surface px-3 py-1.5 text-xs" aria-label="Contoh">
+                                    <input type="text" name="name" value="{{ $category->name }}" class="w-32 sm:w-40 rounded-lg border border-line bg-surface px-3 py-1.5" aria-label="Nama">
+                                    <input type="text" name="examples" value="{{ $category->examples }}" class="w-40 sm:w-56 rounded-lg border border-line bg-surface px-3 py-1.5 text-xs" aria-label="Contoh">
                                     <input type="number" name="sort_order" value="{{ $category->sort_order }}" class="w-16 rounded-lg border border-line bg-surface px-2 py-1.5" aria-label="Susunan">
                                     <label class="flex items-center gap-1 text-xs">
                                         <input type="hidden" name="is_active" value="0">

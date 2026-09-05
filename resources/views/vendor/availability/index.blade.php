@@ -19,7 +19,7 @@
                 @else
                     <ul class="divide-y divide-line">
                         @foreach ($dates as $date)
-                            <li class="flex items-center gap-3 px-5 py-3 text-sm">
+                            <li class="flex flex-wrap items-center gap-x-3 gap-y-1 px-5 py-3 text-sm">
                                 <span class="font-medium">{{ $date->date->translatedFormat('D, j M Y') }}</span>
                                 <span class="truncate text-ink-muted">{{ $date->reason }}</span>
                                 <form method="POST" action="{{ route('vendor.availability.destroy', $date) }}" class="ml-auto">
@@ -41,7 +41,7 @@
             @else
                 <ul class="divide-y divide-line">
                     @foreach ($bookedDates as $booking)
-                        <li class="flex items-center gap-3 px-5 py-3 text-sm">
+                        <li class="flex flex-wrap items-center gap-x-3 gap-y-1 px-5 py-3 text-sm">
                             <span class="font-medium">{{ $booking->event_date->translatedFormat('D, j M Y') }}</span>
                             <a href="{{ route('vendor.bookings.show', $booking) }}" class="text-ink-muted hover:text-ink">{{ $booking->reference }}</a>
                             <x-booking-status :status="$booking->status" class="ml-auto" />

@@ -23,7 +23,7 @@
         </div>
         <x-form.textarea label="Nota (pilihan)" name="notes" :value="$wedding->notes" rows="3" placeholder="Tema, jumlah tetamu, permintaan khas" />
 
-        <div class="flex gap-2 pt-2">
+        <div class="flex flex-wrap gap-2 pt-2">
             <button type="submit" class="rounded-full bg-brand-600 px-8 py-3 text-sm font-semibold text-white transition hover:bg-brand-700">{{ $editing ? 'Simpan' : 'Cipta majlis' }}</button>
             <a href="{{ route('dashboard') }}" class="rounded-full px-6 py-3 text-sm font-medium text-ink-muted transition hover:bg-surface-muted">Batal</a>
         </div>

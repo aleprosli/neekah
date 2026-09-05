@@ -12,7 +12,7 @@
         @endif
     </summary>
 
-    <div class="absolute top-full right-0 z-20 mt-2 w-80 overflow-hidden rounded-2xl border border-line bg-surface-raised text-sm shadow-xl shadow-brand-900/10">
+    <div class="absolute top-full right-0 z-20 mt-2 w-80 max-w-[calc(100vw-2rem)] overflow-hidden rounded-2xl border border-line bg-surface-raised text-sm shadow-xl shadow-brand-900/10">
         <div class="flex items-center justify-between border-b border-line px-4 py-3">
             <p class="font-semibold">Notifikasi</p>
             @if ($unreadCount)

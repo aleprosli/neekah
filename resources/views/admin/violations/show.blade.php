@@ -9,7 +9,7 @@
                 <p class="text-xs font-semibold tracking-wide text-ink-muted uppercase">Laporan</p>
                 <p class="mt-2 text-sm leading-relaxed whitespace-pre-line">{{ $violation->description }}</p>
                 <dl class="mt-4 grid gap-2 border-t border-line pt-4 text-sm sm:grid-cols-2">
-                    <div><dt class="text-ink-muted">Pelapor</dt><dd class="font-medium">{{ $violation->reporter?->name ?? 'Pengguna dipadam' }}</dd><dd class="text-ink-muted">{{ $violation->reporter?->email }}</dd></div>
+                    <div><dt class="text-ink-muted">Pelapor</dt><dd class="font-medium">{{ $violation->reporter?->name ?? 'Pengguna dipadam' }}</dd><dd class="break-words text-ink-muted">{{ $violation->reporter?->email }}</dd></div>
                     @if ($violation->booking)
                         <div><dt class="text-ink-muted">Booking</dt><dd class="font-medium"><a href="{{ route('admin.bookings.show', $violation->booking) }}" class="hover:text-brand-700">{{ $violation->booking->reference }}</a></dd></div>
                     @endif

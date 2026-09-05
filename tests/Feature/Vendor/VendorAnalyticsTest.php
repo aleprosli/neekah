@@ -86,3 +86,11 @@ it('no longer lets an admin type a response rate in by hand', function () {
 
     expect($this->vendor->fresh()->response_rate)->toBe(0);
 });
+
+it('lets the points table scroll rather than clipping the vendor own totals', function () {
+    $response = $this->actingAs($this->owner)->get(route('vendor.points.index'))->assertOk();
+
+    // The wrapper used to be overflow-hidden, which cut the right-hand column
+    // off on a phone with no way to scroll it back into view.
+    expect($response->getContent())->toMatch('/<div class="overflow-x-auto[^"]*">\s*<table/');
+});

@@ -17,7 +17,7 @@
     <div class="grid gap-6 lg:grid-cols-[1fr_320px]">
         <div class="flex flex-col gap-6">
             <dl class="grid gap-3 rounded-2xl border border-line p-5 text-sm sm:grid-cols-2">
-                <div><dt class="text-ink-muted">Pemilik</dt><dd class="font-semibold">{{ $vendor->user->name }}</dd><dd class="text-ink-muted">{{ $vendor->user->email }}@if ($vendor->user->phone) · {{ $vendor->user->phone }}@endif</dd></div>
+                <div><dt class="text-ink-muted">Pemilik</dt><dd class="font-semibold">{{ $vendor->user->name }}</dd><dd class="break-words text-ink-muted">{{ $vendor->user->email }}@if ($vendor->user->phone) · {{ $vendor->user->phone }}@endif</dd></div>
                 <div><dt class="text-ink-muted">Didaftar</dt><dd class="font-semibold">{{ $vendor->created_at->translatedFormat('j M Y') }}</dd></div>
                 <div><dt class="text-ink-muted">Rating</dt><dd class="font-semibold">★ {{ number_format($vendor->rating_avg, 2) }} ({{ $vendor->reviews_count }} review)</dd></div>
                 <div><dt class="text-ink-muted">Booking</dt><dd class="font-semibold">{{ $bookingCount }} jumlah · {{ $vendor->completed_bookings_count }} selesai</dd></div>

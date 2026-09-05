@@ -4,7 +4,7 @@
 
 <div {{ $attributes }}>
     @if ($label || $caption)
-        <div class="flex items-center justify-between text-sm">
+        <div class="flex flex-wrap items-center justify-between gap-x-3 text-sm">
             @if ($label)<span class="font-medium">{{ $label }}</span>@endif
             @if ($caption)<span class="text-ink-muted">{{ $caption }}</span>@endif
         </div>

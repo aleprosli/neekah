@@ -54,7 +54,7 @@
                                         <p class="truncate font-medium">{{ $booking->vendor->name }}</p>
                                         <p class="truncate text-sm text-ink-muted">{{ $booking->vendor->category->name }} · {{ $booking->package_name }}</p>
                                     </div>
-                                    <div class="text-right">
+                                    <div class="shrink-0 text-right">
                                         <p class="text-sm font-semibold">RM{{ number_format((float) $booking->total_amount, 0) }}</p>
                                         <x-booking-status :status="$booking->status" />
                                     </div>

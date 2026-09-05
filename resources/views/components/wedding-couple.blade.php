@@ -51,7 +51,7 @@
                     Menunggu jawapan
                 </p>
                 <h2 class="mt-1 font-display text-xl font-semibold">Jemputan dihantar</h2>
-                <p class="mt-1 text-sm text-ink-muted">{{ $pendingInvite->email }} belum menerima jemputan. Pautan ini sah sehingga {{ $pendingInvite->expires_at->translatedFormat('j F Y') }}.</p>
+                <p class="mt-1 text-sm break-words text-ink-muted">{{ $pendingInvite->email }} belum menerima jemputan. Pautan ini sah sehingga {{ $pendingInvite->expires_at->translatedFormat('j F Y') }}.</p>
             @else
                 <p class="flex items-center gap-2 text-xs font-semibold tracking-wide text-ink-muted uppercase">
                     <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 15 6-6M6.5 10.5 5 12a4 4 0 0 0 5.7 5.7l1.3-1.5M17.5 13.5 19 12a4 4 0 0 0-5.7-5.7L12 7.8"/></svg>

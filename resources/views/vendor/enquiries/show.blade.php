@@ -22,7 +22,7 @@
         </div>
 
         <aside class="flex flex-col gap-3 rounded-2xl border border-line p-5 text-sm lg:self-start">
-            <div><p class="text-ink-muted">Pelanggan</p><p class="font-medium">{{ $enquiry->user->name }}</p><p class="text-ink-muted">{{ $enquiry->user->email }}@if ($enquiry->user->phone) · {{ $enquiry->user->phone }}@endif</p></div>
+            <div><p class="text-ink-muted">Pelanggan</p><p class="font-medium">{{ $enquiry->user->name }}</p><p class="break-words text-ink-muted">{{ $enquiry->user->email }}@if ($enquiry->user->phone) · {{ $enquiry->user->phone }}@endif</p></div>
             @if ($enquiry->event_date)
                 <div><p class="text-ink-muted">Tarikh majlis</p><p class="font-medium">{{ $enquiry->event_date->translatedFormat('l, j F Y') }}</p></div>
             @endif

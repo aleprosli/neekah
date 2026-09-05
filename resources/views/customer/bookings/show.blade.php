@@ -93,7 +93,7 @@
                             <span class="font-semibold">RM{{ number_format((float) $payment->amount, 2) }}</span>
                         </div>
                         @if ($payment->isPaid())
-                            <p class="text-xs text-emerald-700">✓ Dibayar {{ $payment->paid_at->translatedFormat('j M Y') }} · {{ $payment->gateway_reference }}</p>
+                            <p class="text-xs break-words text-emerald-700">✓ Dibayar {{ $payment->paid_at->translatedFormat('j M Y') }} · {{ $payment->gateway_reference }}</p>
                         @elseif ($booking->status === BookingStatus::Cancelled)
                             <p class="text-xs text-ink-muted">Dibatalkan</p>
                         @elseif ($payment->type === PaymentType::Balance && ! $booking->depositPayment?->isPaid())
