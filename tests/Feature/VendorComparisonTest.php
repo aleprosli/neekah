@@ -64,5 +64,5 @@ it('offers a compare checkbox and tray on the marketplace', function () {
         ->assertOk()
         ->assertSee('data-compare="abc"', false)
         ->assertSee('data-compare-tray', false)
-        ->assertSee('Banding');
+        ->assertSee('Banding ABC Studio');
 });

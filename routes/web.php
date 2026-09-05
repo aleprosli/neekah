@@ -12,17 +12,29 @@ use App\Http\Controllers\Customer\PaymentController;
 use App\Http\Controllers\InvitationAcceptanceController;
 use App\Http\Controllers\LandingController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\PublicSiteController;
+use App\Http\Controllers\RsvpController;
+use App\Http\Controllers\SiteTemplatePreviewController;
 use App\Http\Controllers\ReportVendorController;
 use App\Http\Controllers\Vendor as VendorArea;
 use App\Http\Controllers\VendorComparisonController;
 use App\Http\Controllers\VendorController;
 use Illuminate\Support\Facades\Route;
 
+// Published invitations live on their own subdomain, e.g. ainahakim.neekah.test
+Route::domain('{subdomain}.'.config('neekah.site_domain'))->group(function (): void {
+    Route::get('/', PublicSiteController::class)->name('sites.show');
+    Route::post('/rsvp', [RsvpController::class, 'store'])->middleware('throttle:10,1')->name('sites.rsvp');
+});
+
 Route::get('/', [VendorController::class, 'index'])->name('vendors.index');
 Route::get('/compare', VendorComparisonController::class)->name('vendors.compare');
 Route::get('/vendors/{vendor}', [VendorController::class, 'show'])->name('vendors.show');
 
 Route::get('/about', LandingController::class)->name('landing');
+
+Route::get('/kad-jemputan', [SiteTemplatePreviewController::class, 'index'])->name('sites.templates');
+Route::get('/kad-jemputan/{template}', [SiteTemplatePreviewController::class, 'show'])->name('sites.templates.show');
 
 Route::get('/invitations/{invitation}', [InvitationAcceptanceController::class, 'show'])->name('invitations.show');
 
@@ -100,6 +112,11 @@ Route::middleware('auth')->group(function (): void {
     Route::post('/weddings/{wedding}/timeline', [CustomerArea\WeddingTimelineController::class, 'store'])->name('weddings.timeline.store');
     Route::put('/weddings/{wedding}/timeline/{item}', [CustomerArea\WeddingTimelineController::class, 'update'])->name('weddings.timeline.update');
     Route::delete('/weddings/{wedding}/timeline/{item}', [CustomerArea\WeddingTimelineController::class, 'destroy'])->name('weddings.timeline.destroy');
+
+    Route::get('/kad', [CustomerArea\WeddingSiteController::class, 'edit'])->name('site.edit');
+    Route::get('/kad/preview', [CustomerArea\WeddingSiteController::class, 'preview'])->name('site.preview');
+    Route::put('/weddings/{wedding}/kad', [CustomerArea\WeddingSiteController::class, 'update'])->name('weddings.site.update');
+    Route::put('/weddings/{wedding}/kad/publish', [CustomerArea\WeddingSiteController::class, 'publish'])->name('weddings.site.publish');
 
     Route::get('/budget', [CustomerArea\WeddingBudgetController::class, 'index'])->name('budget.index');
     Route::put('/weddings/{wedding}/budget', [CustomerArea\WeddingBudgetController::class, 'update'])->name('weddings.budget.update');

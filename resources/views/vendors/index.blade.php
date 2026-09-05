@@ -150,13 +150,7 @@
             <h1 class="sr-only">{{ $activeCategory?->name ?? 'Semua vendor' }}</h1>
             <ul class="grid grid-cols-2 gap-x-3 gap-y-8 sm:gap-x-6 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
                 @foreach ($vendors as $vendor)
-                    <li class="relative">
-                        <x-vendor-card :vendor="$vendor" />
-                        <label class="absolute top-3 right-12 flex cursor-pointer items-center gap-1.5 rounded-full bg-white/90 px-2.5 py-1 text-xs font-medium text-ink shadow-sm">
-                            <input type="checkbox" data-compare="{{ $vendor->slug }}" data-compare-name="{{ $vendor->name }}" class="accent-brand-600">
-                            Banding
-                        </label>
-                    </li>
+                    <li><x-vendor-card :vendor="$vendor" comparable /></li>
                 @endforeach
             </ul>
 

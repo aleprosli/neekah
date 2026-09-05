@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 #[Fillable(['user_id', 'title', 'event_date', 'city', 'state', 'budget', 'notes'])]
 class Wedding extends Model
@@ -94,6 +95,11 @@ class Wedding extends Model
     public function budgetItems(): HasMany
     {
         return $this->hasMany(WeddingBudgetItem::class);
+    }
+
+    public function site(): HasOne
+    {
+        return $this->hasOne(WeddingSite::class);
     }
 
     public function timelineItems(): HasMany
