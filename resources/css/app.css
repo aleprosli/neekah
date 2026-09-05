@@ -6,6 +6,8 @@
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
     --font-display: 'Playfair Display', ui-serif, Georgia, 'Times New Roman', serif;
+    --font-script: 'Great Vibes', 'Snell Roundhand', cursive;
+    --font-serif-card: 'Cormorant Garamond', ui-serif, Georgia, serif;
 
     --color-brand-50: oklch(0.97 0.02 20);
     --color-brand-100: oklch(0.93 0.04 20);
@@ -53,5 +55,96 @@ html {
 
     &::-webkit-scrollbar {
         display: none;
+    }
+}
+
+/*
+| Wedding card motion
+|--------------------------------------------------------------------------
+| Shared by every invitation template. All of it is disabled when the visitor
+| asks for reduced motion.
+*/
+
+@keyframes nk-sway {
+    0%, 100% { transform: rotate(-2.5deg) translateY(0); }
+    50% { transform: rotate(2.5deg) translateY(-6px); }
+}
+
+@keyframes nk-drift {
+    0% { transform: translate3d(0, -8vh, 0) rotate(0deg); opacity: 0; }
+    10% { opacity: var(--nk-petal-opacity, 0.7); }
+    90% { opacity: var(--nk-petal-opacity, 0.7); }
+    100% { transform: translate3d(var(--nk-drift-x, 6vw), 108vh, 0) rotate(var(--nk-spin, 420deg)); opacity: 0; }
+}
+
+@keyframes nk-glow {
+    0%, 100% { opacity: 0.35; transform: scale(1); }
+    50% { opacity: 0.75; transform: scale(1.08); }
+}
+
+@keyframes nk-rise {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: none; }
+}
+
+@utility nk-sway {
+    animation: nk-sway 7s ease-in-out infinite;
+    transform-origin: center;
+}
+
+@utility nk-glow {
+    animation: nk-glow 5s ease-in-out infinite;
+}
+
+/* Sections fade up as they scroll into view. */
+[data-reveal] {
+    opacity: 0;
+    transform: translateY(24px);
+    transition:
+        opacity 0.9s ease,
+        transform 0.9s ease;
+}
+
+[data-reveal].is-visible {
+    opacity: 1;
+    transform: none;
+}
+
+.nk-petal {
+    position: absolute;
+    top: 0;
+    animation: nk-drift linear infinite;
+    pointer-events: none;
+}
+
+.nk-open [data-gate] {
+    opacity: 0;
+    visibility: hidden;
+    transform: scale(1.08);
+    transition:
+        opacity 0.9s ease,
+        transform 0.9s ease,
+        visibility 0.9s;
+}
+
+.nk-open [data-card] > * {
+    animation: nk-rise 1s ease both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .nk-sway,
+    .nk-glow,
+    .nk-petal {
+        animation: none !important;
+    }
+
+    [data-reveal] {
+        opacity: 1;
+        transform: none;
+        transition: none;
+    }
+
+    .nk-open [data-card] > * {
+        animation: none;
     }
 }

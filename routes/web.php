@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin as AdminArea;
 use App\Http\Controllers\Auth\GoogleController;
+use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
@@ -25,6 +26,7 @@ use Illuminate\Support\Facades\Route;
 Route::domain('{subdomain}.'.config('neekah.site_domain'))->group(function (): void {
     Route::get('/', PublicSiteController::class)->name('sites.show');
     Route::post('/rsvp', [RsvpController::class, 'store'])->middleware('throttle:10,1')->name('sites.rsvp');
+    Route::get('/kalendar.ics', CalendarController::class)->name('sites.calendar');
 });
 
 Route::get('/', [VendorController::class, 'index'])->name('vendors.index');

@@ -15,6 +15,12 @@ export default defineConfig({
                 bunny('Playfair Display', {
                     weights: [500, 600, 700],
                 }),
+                bunny('Great Vibes', {
+                    weights: [400],
+                }),
+                bunny('Cormorant Garamond', {
+                    weights: [300, 400, 500, 600],
+                }),
             ],
         }),
         tailwindcss(),

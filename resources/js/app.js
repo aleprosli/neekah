@@ -132,3 +132,79 @@ document.addEventListener('click', async (event) => {
 
     render();
 })();
+
+/**
+ * Wedding invitation cards: the opening gate, the live countdown and
+ * scroll reveals. All of it no-ops on pages without a card.
+ */
+(() => {
+    const card = document.querySelector('[data-card]');
+    if (!card) {
+        return;
+    }
+
+    // Opening gate: the card stays sealed until the guest opens it.
+    const gate = document.querySelector('[data-gate]');
+    const open = () => {
+        document.documentElement.classList.add('nk-open');
+        document.body.style.overflow = '';
+        setTimeout(() => gate?.remove(), 1000);
+    };
+
+    if (gate) {
+        document.body.style.overflow = 'hidden';
+        gate.querySelectorAll('[data-gate-open]').forEach((button) => button.addEventListener('click', open));
+    }
+
+    // Countdown to the moment the ceremony begins.
+    const clock = document.querySelector('[data-countdown]');
+    if (clock) {
+        const target = new Date(clock.dataset.countdown).getTime();
+        const units = {
+            days: clock.querySelector('[data-unit="days"]'),
+            hours: clock.querySelector('[data-unit="hours"]'),
+            minutes: clock.querySelector('[data-unit="minutes"]'),
+            seconds: clock.querySelector('[data-unit="seconds"]'),
+        };
+
+        const tick = () => {
+            const left = Math.max(0, target - Date.now());
+            const second = 1000;
+            const values = {
+                days: Math.floor(left / (second * 60 * 60 * 24)),
+                hours: Math.floor((left / (second * 60 * 60)) % 24),
+                minutes: Math.floor((left / (second * 60)) % 60),
+                seconds: Math.floor((left / second) % 60),
+            };
+
+            Object.entries(units).forEach(([unit, node]) => {
+                if (node) {
+                    node.textContent = String(values[unit]).padStart(2, '0');
+                }
+            });
+        };
+
+        tick();
+        setInterval(tick, 1000);
+    }
+
+    // Sections rise into view as the guest scrolls.
+    const reveals = document.querySelectorAll('[data-reveal]');
+    if (reveals.length && 'IntersectionObserver' in window) {
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            },
+            { rootMargin: '0px 0px -12% 0px' },
+        );
+
+        reveals.forEach((node) => observer.observe(node));
+    } else {
+        reveals.forEach((node) => node.classList.add('is-visible'));
+    }
+})();

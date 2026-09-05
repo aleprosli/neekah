@@ -85,6 +85,50 @@ it('refuses an RSVP after the deadline or without a name', function () {
     expect(WeddingRsvp::count())->toBe(0);
 });
 
+it('seals the card behind an opening gate with motion and a live countdown', function () {
+    $site = WeddingSite::factory()->published()->create(['bride_name' => 'Aina', 'groom_name' => 'Hakim', 'starts_at' => '11:00']);
+
+    $response = $this->get(siteUrl($site));
+
+    $response->assertOk()
+        ->assertSee('data-gate', false)
+        ->assertSee('Buka kad')
+        ->assertSee('data-countdown', false)
+        ->assertSee('data-reveal', false)
+        ->assertSee('nk-petal', false)
+        ->assertSee('data-unit="seconds"', false);
+
+    // The countdown targets the ceremony start, not midnight.
+    $response->assertSee($site->event_date->copy()->setTimeFromTimeString('11:00:00')->toIso8601String(), false);
+});
+
+it('opens the card straight away in preview, with no gate to click through', function () {
+    $this->get(route('sites.templates.show', 'bunga'))
+        ->assertOk()
+        ->assertSee('data-card', false)
+        ->assertDontSee('data-gate', false);
+});
+
+it('offers a calendar file guests can add to their phone', function () {
+    $site = WeddingSite::factory()->published()->create([
+        'bride_name' => 'Aina',
+        'groom_name' => 'Hakim',
+        'venue_name' => 'Dewan Seri Melati',
+        'starts_at' => '11:00',
+        'ends_at' => '16:00',
+    ]);
+
+    $response = $this->get(siteUrl($site, '/kalendar.ics'));
+
+    $response->assertOk()
+        ->assertHeader('content-type', 'text/calendar; charset=utf-8')
+        ->assertSee('BEGIN:VEVENT', false)
+        ->assertSee('Majlis Perkahwinan Aina & Hakim', false)
+        ->assertSee('Dewan Seri Melati', false);
+
+    $this->get('http://tiada.'.config('neekah.site_domain').'/kalendar.ics')->assertNotFound();
+});
+
 it('shows the template gallery and a sample of each design', function () {
     $this->get(route('sites.templates'))->assertOk()->assertSee('Pilih template anda')->assertSee('Klasik');
 

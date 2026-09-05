@@ -1,7 +1,47 @@
 {
-  "_fonts-CoMmZiAc.css": {
-    "file": "assets/fonts-CoMmZiAc.css",
-    "src": "_fonts-CoMmZiAc.css"
+  "_cormorant-garamond-300-normal-BuXLI6C0.woff": {
+    "file": "assets/cormorant-garamond-300-normal-BuXLI6C0.woff",
+    "src": "_cormorant-garamond-300-normal-BuXLI6C0.woff"
+  },
+  "_cormorant-garamond-300-normal-Cw-E_7L1.woff2": {
+    "file": "assets/cormorant-garamond-300-normal-Cw-E_7L1.woff2",
+    "src": "_cormorant-garamond-300-normal-Cw-E_7L1.woff2"
+  },
+  "_cormorant-garamond-400-normal-B-1hWBU7.woff2": {
+    "file": "assets/cormorant-garamond-400-normal-B-1hWBU7.woff2",
+    "src": "_cormorant-garamond-400-normal-B-1hWBU7.woff2"
+  },
+  "_cormorant-garamond-400-normal-B7YtguxJ.woff": {
+    "file": "assets/cormorant-garamond-400-normal-B7YtguxJ.woff",
+    "src": "_cormorant-garamond-400-normal-B7YtguxJ.woff"
+  },
+  "_cormorant-garamond-500-normal-BsRWmXhO.woff2": {
+    "file": "assets/cormorant-garamond-500-normal-BsRWmXhO.woff2",
+    "src": "_cormorant-garamond-500-normal-BsRWmXhO.woff2"
+  },
+  "_cormorant-garamond-500-normal-zIXX3Q-H.woff": {
+    "file": "assets/cormorant-garamond-500-normal-zIXX3Q-H.woff",
+    "src": "_cormorant-garamond-500-normal-zIXX3Q-H.woff"
+  },
+  "_cormorant-garamond-600-normal-2CBVLo0M.woff": {
+    "file": "assets/cormorant-garamond-600-normal-2CBVLo0M.woff",
+    "src": "_cormorant-garamond-600-normal-2CBVLo0M.woff"
+  },
+  "_cormorant-garamond-600-normal-Co1r35X9.woff2": {
+    "file": "assets/cormorant-garamond-600-normal-Co1r35X9.woff2",
+    "src": "_cormorant-garamond-600-normal-Co1r35X9.woff2"
+  },
+  "_fonts-Byp4LSx8.css": {
+    "file": "assets/fonts-Byp4LSx8.css",
+    "src": "_fonts-Byp4LSx8.css"
+  },
+  "_great-vibes-400-normal-BAZ173uY.woff": {
+    "file": "assets/great-vibes-400-normal-BAZ173uY.woff",
+    "src": "_great-vibes-400-normal-BAZ173uY.woff"
+  },
+  "_great-vibes-400-normal-q5-78SH_.woff2": {
+    "file": "assets/great-vibes-400-normal-q5-78SH_.woff2",
+    "src": "_great-vibes-400-normal-q5-78SH_.woff2"
   },
   "_instrument-sans-400-normal-D1W7dsQl.woff": {
     "file": "assets/instrument-sans-400-normal-D1W7dsQl.woff",
@@ -52,7 +92,7 @@
     "src": "_playfair-display-700-normal-CuDiGg7c.woff2"
   },
   "resources/css/app.css": {
-    "file": "assets/app-em75jesx.css",
+    "file": "assets/app-DrYu-lUv.css",
     "name": "app",
     "names": [
       "app.css"
@@ -61,7 +101,7 @@
     "isEntry": true
   },
   "resources/js/app.js": {
-    "file": "assets/app-Cqm2N8Qg.js",
+    "file": "assets/app-Da4fOW3S.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true
