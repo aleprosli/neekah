@@ -2,11 +2,11 @@
 
 use App\Http\Controllers\Admin as AdminArea;
 use App\Http\Controllers\Auth\GoogleController;
-use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\Customer as CustomerArea;
 use App\Http\Controllers\Customer\BookingController;
 use App\Http\Controllers\Customer\PaymentController;
@@ -14,9 +14,9 @@ use App\Http\Controllers\InvitationAcceptanceController;
 use App\Http\Controllers\LandingController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PublicSiteController;
+use App\Http\Controllers\ReportVendorController;
 use App\Http\Controllers\RsvpController;
 use App\Http\Controllers\SiteTemplatePreviewController;
-use App\Http\Controllers\ReportVendorController;
 use App\Http\Controllers\Vendor as VendorArea;
 use App\Http\Controllers\VendorComparisonController;
 use App\Http\Controllers\VendorController;
@@ -24,7 +24,7 @@ use Illuminate\Support\Facades\Route;
 
 // Published invitations live on their own subdomain, e.g. ainahakim.neekah.test
 Route::domain('{subdomain}.'.config('neekah.site_domain'))->group(function (): void {
-    Route::get('/', PublicSiteController::class)->name('sites.show');
+    Route::get('/', PublicSiteController::class)->middleware('throttle:60,1')->name('sites.show');
     Route::post('/rsvp', [RsvpController::class, 'store'])->middleware('throttle:10,1')->name('sites.rsvp');
     Route::get('/kalendar.ics', CalendarController::class)->name('sites.calendar');
 });
@@ -109,6 +109,15 @@ Route::middleware('auth')->group(function (): void {
     Route::post('/weddings/{wedding}/tasks', [CustomerArea\WeddingTaskController::class, 'store'])->name('weddings.tasks.store');
     Route::put('/weddings/{wedding}/tasks/{task}', [CustomerArea\WeddingTaskController::class, 'update'])->name('weddings.tasks.update');
     Route::delete('/weddings/{wedding}/tasks/{task}', [CustomerArea\WeddingTaskController::class, 'destroy'])->name('weddings.tasks.destroy');
+
+    Route::get('/tetamu', [CustomerArea\WeddingGuestController::class, 'index'])->name('guests.index');
+    Route::post('/weddings/{wedding}/guests', [CustomerArea\WeddingGuestController::class, 'store'])->name('weddings.guests.store');
+    Route::put('/weddings/{wedding}/guests/{guest}', [CustomerArea\WeddingGuestController::class, 'update'])->name('weddings.guests.update');
+    Route::delete('/weddings/{wedding}/guests/{guest}', [CustomerArea\WeddingGuestController::class, 'destroy'])->name('weddings.guests.destroy');
+    Route::post('/weddings/{wedding}/guests/import', [CustomerArea\WeddingGuestImportController::class, 'store'])->name('weddings.guests.import');
+    Route::post('/weddings/{wedding}/guests/{guest}/share', [CustomerArea\WeddingGuestShareController::class, 'store'])->name('weddings.guests.share');
+    Route::delete('/weddings/{wedding}/guests/{guest}/share', [CustomerArea\WeddingGuestShareController::class, 'destroy'])->name('weddings.guests.share.destroy');
+    Route::put('/weddings/{wedding}/rsvps/{rsvp}', [CustomerArea\WeddingRsvpController::class, 'update'])->name('weddings.rsvps.update');
 
     Route::get('/timeline', [CustomerArea\WeddingTimelineController::class, 'index'])->name('timeline.index');
     Route::post('/weddings/{wedding}/timeline', [CustomerArea\WeddingTimelineController::class, 'store'])->name('weddings.timeline.store');

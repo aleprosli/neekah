@@ -10,6 +10,7 @@
         ['label' => 'Checklist', 'icon' => '✅', 'href' => route('checklist.index'), 'active' => request()->routeIs('checklist.*'), 'badge' => $outstandingTasks ?: null],
         ['label' => 'Timeline', 'icon' => '🗓️', 'href' => route('timeline.index'), 'active' => request()->routeIs('timeline.*')],
         ['label' => 'Bajet', 'icon' => '💰', 'href' => route('budget.index'), 'active' => request()->routeIs('budget.*')],
+        ['label' => 'Tetamu', 'icon' => '🧑‍🤝‍🧑', 'href' => route('guests.index'), 'active' => request()->routeIs('guests.*')],
         ['label' => 'Kad jemputan', 'icon' => '💌', 'href' => route('site.edit'), 'active' => request()->routeIs('site.*')],
         ['label' => 'Tempahan', 'icon' => '🧾', 'href' => route('bookings.index'), 'active' => request()->routeIs('bookings.*')],
         ['label' => 'Enquiry', 'icon' => '💬', 'href' => route('enquiries.index'), 'active' => request()->routeIs('enquiries.*'), 'badge' => $repliedEnquiries ?: null],

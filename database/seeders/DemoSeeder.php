@@ -254,12 +254,33 @@ class DemoSeeder extends Seeder
         // views is deliberately not mass assignable, so set it directly.
         $site->forceFill(['views' => 6])->save();
 
+        $guests = [];
+
+        foreach ([
+            ['Pak Cik Samad', '012-999 8888', 'groom', 'family', 4],
+            ['Kak Long Aida', '013-222 3344', 'bride', 'family', 2],
+            ['Encik Rahim', '019-777 1122', 'groom', 'work', 2],
+            ['Puan Noraini', '014-555 6677', 'bride', 'neighbours', 3],
+            ['Cikgu Zaleha', null, 'bride', 'friends', 2],
+        ] as [$name, $phone, $side, $group, $paxInvited]) {
+            $guests[$name] = $wedding->guests()->create([
+                'name' => $name,
+                'phone' => $phone,
+                'side' => $side,
+                'group' => $group,
+                'pax_invited' => $paxInvited,
+            ]);
+        }
+
         foreach ([
             ['Pak Cik Samad', '012-999 8888', true, 4, 'Semoga berbahagia ke akhir hayat!'],
             ['Kak Long Aida', '013-222 3344', true, 2, 'Insya-Allah kami datang.'],
             ['Encik Rahim', '019-777 1122', false, 0, 'Maaf, ada urusan di luar negeri.'],
         ] as [$name, $phone, $attending, $pax, $message]) {
-            $site->rsvps()->create(compact('name', 'phone', 'attending', 'pax', 'message'));
+            $site->rsvps()->create(compact('name', 'phone', 'attending', 'pax', 'message') + [
+                'wedding_guest_id' => $guests[$name]->id,
+                'matched_by' => 'token',
+            ]);
         }
     }
 

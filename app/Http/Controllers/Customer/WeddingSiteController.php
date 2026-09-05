@@ -37,7 +37,7 @@ class WeddingSiteController extends Controller
             'site' => $site,
             'templates' => SiteTemplate::active()->ordered()->get()->groupBy('style'),
             'domain' => config('neekah.site_domain'),
-            'rsvpCount' => $wedding->site?->rsvps()->where('attending', true)->sum('pax') ?? 0,
+            'rsvpCount' => $wedding->site?->confirmedPax() ?? 0,
         ]);
     }
 

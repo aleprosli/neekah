@@ -76,6 +76,29 @@ class WeddingSite extends Model
         return $this->hasMany(WeddingRsvp::class)->latest();
     }
 
+    /**
+     * Heads we have actually been told about. This is the caterer figure, and
+     * it is summed from replies only, never from the invitation list.
+     */
+    public function confirmedPax(): int
+    {
+        return (int) $this->rsvps()->where('attending', true)->where('counted', true)->sum('pax');
+    }
+
+    /**
+     * The ceiling on the people who have not replied. A ceiling, not an
+     * expectation, so it is never folded into the confirmed number.
+     */
+    public function awaitingPax(): int
+    {
+        return (int) $this->wedding->guests()->whereDoesntHave('rsvp')->sum('pax_invited');
+    }
+
+    public function declinedCount(): int
+    {
+        return $this->rsvps()->where('attending', false)->count();
+    }
+
     #[Scope]
     protected function published(Builder $query): Builder
     {

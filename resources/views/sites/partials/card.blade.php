@@ -1,4 +1,4 @@
-@props(['site', 'template', 'preview' => false])
+@props(['site', 'template', 'preview' => false, 'guest' => null])
 
 @php
     $ornament = $template->ornament();
@@ -10,7 +10,7 @@
     @include('sites.partials.motion', ['template' => $template])
 
     @unless ($preview)
-        @include('sites.partials.gate', ['site' => $site, 'template' => $template, 'eyebrow' => $eyebrow])
+        @include('sites.partials.gate', ['site' => $site, 'template' => $template, 'eyebrow' => $eyebrow, 'guest' => $guest])
     @endunless
 
     <div data-card class="relative z-10 mx-auto max-w-lg pb-20">
@@ -85,7 +85,7 @@
                     <p class="nk-body mb-7 text-sm">Maklum balas anda memudahkan kami menyediakan jamuan.</p>
                     <div class="nk-panel relative overflow-hidden rounded-3xl p-7">
                         @include('sites.ornaments.'.$ornament, ['position' => 'top-right'])
-                        <div class="relative">@include('sites.partials.rsvp', ['site' => $site, 'preview' => $preview])</div>
+                        <div class="relative">@include('sites.partials.rsvp', ['site' => $site, 'preview' => $preview, 'guest' => $guest])</div>
                     </div>
                 </section>
             @endif

@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\SiteTemplate;
+use App\Models\WeddingGuest;
 use App\Models\WeddingRsvp;
 use App\Models\WeddingSite;
 use Database\Seeders\SiteTemplateSeeder;
@@ -166,4 +167,111 @@ it('shows the gallery, filters it by style, and samples every design', function 
     }
 
     $this->get(route('sites.templates.show', 'tiada'))->assertNotFound();
+});
+
+it('greets the named guest behind their personal link and records the open', function () {
+    $site = WeddingSite::factory()->published()->create();
+    $guest = WeddingGuest::factory()->for($site->wedding)->create(['name' => 'Pak Long Rahim', 'pax_invited' => 4]);
+
+    $this->get(siteUrl($site, '/?u='.$guest->token))
+        ->assertOk()
+        ->assertSee('Kepada Pak Long Rahim')
+        ->assertSee('value="'.$guest->token.'"', false);
+
+    $guest->refresh();
+
+    expect($guest->open_count)->toBe(1)
+        ->and($guest->first_opened_at)->not->toBeNull();
+});
+
+it('does not count a link preview crawler as the guest opening the card', function () {
+    $site = WeddingSite::factory()->published()->create();
+    $guest = WeddingGuest::factory()->for($site->wedding)->create();
+
+    $this->withHeader('User-Agent', 'WhatsApp/2.23 A')->get(siteUrl($site, '/?u='.$guest->token))->assertOk();
+
+    expect($guest->fresh()->open_count)->toBe(0);
+});
+
+it('renders the ordinary card for a guessed token, giving away nothing', function () {
+    $site = WeddingSite::factory()->published()->create();
+    $guest = WeddingGuest::factory()->for($site->wedding)->create(['name' => 'Pak Long Rahim']);
+
+    $this->get(siteUrl($site, '/?u=tidakwujudlangsu'))
+        ->assertOk()
+        ->assertDontSee('Pak Long Rahim')
+        ->assertDontSee('Kepada');
+});
+
+it('ignores a token belonging to a different wedding', function () {
+    $site = WeddingSite::factory()->published()->create();
+    $other = WeddingGuest::factory()->create(['name' => 'Tetamu Majlis Lain']);
+
+    $this->get(siteUrl($site, '/?u='.$other->token))
+        ->assertOk()
+        ->assertDontSee('Tetamu Majlis Lain');
+});
+
+it('attaches a tokenised reply to its guest and updates it on a second submission', function () {
+    $site = WeddingSite::factory()->published()->create();
+    $guest = WeddingGuest::factory()->for($site->wedding)->create(['pax_invited' => 6]);
+
+    $this->post(siteUrl($site, '/rsvp'), ['u' => $guest->token, 'name' => 'Rahim', 'attending' => 1, 'pax' => 2])->assertRedirect();
+    $this->post(siteUrl($site, '/rsvp'), ['u' => $guest->token, 'name' => 'Rahim', 'attending' => 1, 'pax' => 4])->assertRedirect();
+
+    expect(WeddingRsvp::count())->toBe(1)
+        ->and(WeddingRsvp::sole()->pax)->toBe(4)
+        ->and(WeddingRsvp::sole()->wedding_guest_id)->toBe($guest->id)
+        ->and(WeddingRsvp::sole()->matched_by)->toBe('token')
+        ->and($site->confirmedPax())->toBe(4);
+});
+
+it('refuses to seat more people than the invitation allows', function () {
+    $site = WeddingSite::factory()->published()->create();
+    $guest = WeddingGuest::factory()->for($site->wedding)->create(['pax_invited' => 2]);
+
+    $this->post(siteUrl($site, '/rsvp'), ['u' => $guest->token, 'name' => 'Rahim', 'attending' => 1, 'pax' => 20])
+        ->assertSessionHasErrors('pax');
+
+    expect(WeddingRsvp::count())->toBe(0);
+});
+
+it('matches an untokenised reply on phone only when exactly one guest carries it', function () {
+    $site = WeddingSite::factory()->published()->create();
+    $sole = WeddingGuest::factory()->for($site->wedding)->create(['phone' => '012-345 6789']);
+
+    $this->post(siteUrl($site, '/rsvp'), ['name' => 'Rahim', 'phone' => '+60123456789', 'attending' => 1, 'pax' => 2]);
+
+    expect(WeddingRsvp::sole()->wedding_guest_id)->toBe($sole->id)
+        ->and(WeddingRsvp::sole()->matched_by)->toBe('phone');
+});
+
+it('leaves a reply unattached when two guests share a phone number', function () {
+    $site = WeddingSite::factory()->published()->create();
+    WeddingGuest::factory()->count(2)->for($site->wedding)->create(['phone' => '012-345 6789']);
+
+    $this->post(siteUrl($site, '/rsvp'), ['name' => 'Rahim', 'phone' => '0123456789', 'attending' => 1, 'pax' => 2]);
+
+    expect(WeddingRsvp::sole()->wedding_guest_id)->toBeNull()
+        ->and(WeddingRsvp::sole()->matched_by)->toBeNull();
+});
+
+it('never matches on name alone', function () {
+    $site = WeddingSite::factory()->published()->create();
+    WeddingGuest::factory()->for($site->wedding)->create(['name' => 'Aina', 'phone' => null]);
+
+    $this->post(siteUrl($site, '/rsvp'), ['name' => 'Aina', 'attending' => 1, 'pax' => 1]);
+
+    expect(WeddingRsvp::sole()->wedding_guest_id)->toBeNull();
+});
+
+it('keeps the guest list off the public card', function () {
+    $site = WeddingSite::factory()->published()->create();
+    $guest = WeddingGuest::factory()->for($site->wedding)->create(['name' => 'Pak Long Rahim', 'phone' => '012-345 6789']);
+    WeddingGuest::factory()->for($site->wedding)->create(['name' => 'Kak Ani Rahmah']);
+
+    $this->get(siteUrl($site, '/?u='.$guest->token))
+        ->assertOk()
+        ->assertDontSee('Kak Ani Rahmah')
+        ->assertDontSee('012-345 6789');
 });

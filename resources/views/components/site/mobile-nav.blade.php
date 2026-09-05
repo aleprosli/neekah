@@ -15,7 +15,7 @@
         <li>
             @auth
                 @php $home = match (true) { auth()->user()->isAdmin() => route('admin.dashboard'), auth()->user()->isVendor() => route('vendor.dashboard'), default => route('dashboard') }; @endphp
-                <a href="{{ $home }}" @class(['flex flex-col items-center gap-1 py-2', 'text-brand-600' => request()->routeIs('dashboard', 'weddings.*', 'bookings.*', 'enquiries.*', 'vendor.*', 'admin.*'), 'text-ink-muted' => ! request()->routeIs('dashboard', 'weddings.*', 'bookings.*', 'enquiries.*', 'vendor.*', 'admin.*')])>
+                <a href="{{ $home }}" @class(['flex flex-col items-center gap-1 py-2', 'text-brand-600' => request()->routeIs('dashboard', 'weddings.*', 'guests.*', 'bookings.*', 'enquiries.*', 'vendor.*', 'admin.*'), 'text-ink-muted' => ! request()->routeIs('dashboard', 'weddings.*', 'guests.*', 'bookings.*', 'enquiries.*', 'vendor.*', 'admin.*')])>
                     <svg class="size-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
                     Akaun
                 </a>

@@ -24,7 +24,7 @@
                 </p>
                 @if ($site->is_published)
                     <a href="{{ $site->url() }}" target="_blank" class="mt-1 block truncate text-sm text-brand-700 underline underline-offset-4">{{ $site->url() }}</a>
-                    <p class="mt-1 text-xs text-ink-muted">{{ number_format($site->views) }} tontonan · {{ $rsvpCount }} tetamu mengesahkan kehadiran</p>
+                    <p class="mt-1 text-xs text-ink-muted">{{ number_format($site->views) }} tontonan · <a href="{{ route('guests.index') }}" class="hover:text-ink">{{ $rsvpCount }} tetamu mengesahkan kehadiran</a></p>
                 @else
                     <p class="mt-1 text-sm text-ink-muted">Kad anda akan berada di {{ $site->subdomain }}.{{ $domain }} selepas disiarkan.</p>
                 @endif
@@ -165,36 +165,13 @@
         </div>
     </form>
 
-    {{-- RSVP list --}}
+    {{-- Replies live on the guest page, so there is only one place the
+         headcount can be read and only one number to trust. --}}
     @if ($exists && $site->rsvps()->exists())
-        <section class="mt-10 flex flex-col gap-4">
-            <h2 class="font-display text-xl font-semibold">Senarai RSVP ({{ $site->rsvps()->count() }})</h2>
-            <div class="overflow-x-auto rounded-2xl border border-line">
-                <table class="w-full text-sm">
-                    <thead class="bg-surface-muted text-left text-xs tracking-wide text-ink-muted uppercase">
-                        <tr>
-                            <th class="px-4 py-3 font-semibold">Nama</th>
-                            <th class="px-4 py-3 font-semibold">Telefon</th>
-                            <th class="px-4 py-3 font-semibold">Kehadiran</th>
-                            <th class="px-4 py-3 text-right font-semibold">Pax</th>
-                            <th class="px-4 py-3 font-semibold">Ucapan</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-line">
-                        @foreach ($site->rsvps as $rsvp)
-                            <tr>
-                                <td class="px-4 py-3 font-medium">{{ $rsvp->name }}</td>
-                                <td class="px-4 py-3 text-ink-muted">{{ $rsvp->phone }}</td>
-                                <td class="px-4 py-3">
-                                    <span @class(['rounded-full px-2.5 py-1 text-xs font-semibold', 'bg-emerald-100 text-emerald-800' => $rsvp->attending, 'bg-surface-muted text-ink-muted' => ! $rsvp->attending])>{{ $rsvp->attending ? 'Hadir' : 'Tidak hadir' }}</span>
-                                </td>
-                                <td class="px-4 py-3 text-right">{{ $rsvp->attending ? $rsvp->pax : '—' }}</td>
-                                <td class="px-4 py-3 text-ink-muted">{{ $rsvp->message }}</td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
+        <section class="mt-10 flex flex-col items-start gap-3 rounded-2xl border border-line bg-surface-raised p-5">
+            <h2 class="font-display text-xl font-semibold">{{ $site->rsvps()->count() }} jawapan RSVP diterima</h2>
+            <p class="text-sm text-ink-muted">Lihat siapa yang menjawab, siapa yang belum, dan jumlah kehadiran yang disahkan di halaman tetamu.</p>
+            <a href="{{ route('guests.index') }}" class="rounded-full bg-brand-600 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700">Buka senarai tetamu</a>
         </section>
     @endif
 </x-layouts.customer>

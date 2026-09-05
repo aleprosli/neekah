@@ -1,4 +1,4 @@
-@props(['site', 'preview' => false])
+@props(['site', 'preview' => false, 'guest' => null])
 
 <div class="mx-auto w-full max-w-sm">
     @if (session('rsvp'))
@@ -12,7 +12,13 @@
 
         <form method="POST" action="{{ $preview ? '#' : route('sites.rsvp', ['subdomain' => $site->subdomain]) }}" class="flex flex-col gap-3" @if ($preview) onsubmit="return false" @endif>
             @csrf
-            <input type="text" name="name" value="{{ old('name') }}" placeholder="Nama anda" required class="nk-field w-full rounded-xl px-4 py-2.5 text-sm">
+            @if ($guest)
+                <input type="hidden" name="u" value="{{ $guest['token'] }}">
+                @if ($guest['has_responded'])
+                    <p class="nk-muted text-center text-xs">Anda sudah menjawab. Hantar sekali lagi untuk mengemas kini jawapan anda.</p>
+                @endif
+            @endif
+            <input type="text" name="name" value="{{ old('name', $guest['name'] ?? '') }}" placeholder="Nama anda" required class="nk-field w-full rounded-xl px-4 py-2.5 text-sm">
             <input type="tel" name="phone" value="{{ old('phone') }}" placeholder="Nombor telefon" class="nk-field w-full rounded-xl px-4 py-2.5 text-sm">
             <div class="grid grid-cols-2 gap-3">
                 @foreach ([1 => 'Hadir', 0 => 'Tidak hadir'] as $value => $label)
@@ -22,7 +28,7 @@
                     </label>
                 @endforeach
             </div>
-            <input type="number" name="pax" value="{{ old('pax', 1) }}" min="1" max="20" placeholder="Bilangan orang" class="nk-field w-full rounded-xl px-4 py-2.5 text-sm">
+            <input type="number" name="pax" value="{{ old('pax', $guest['pax_invited'] ?? 1) }}" min="1" max="{{ $guest['pax_invited'] ?? 20 }}" placeholder="Bilangan orang" class="nk-field w-full rounded-xl px-4 py-2.5 text-sm">
             <textarea name="message" rows="2" placeholder="Ucapan untuk pengantin" class="nk-field w-full rounded-xl px-4 py-2.5 text-sm">{{ old('message') }}</textarea>
             <button type="submit" class="nk-button w-full rounded-full py-3 text-sm font-semibold">Hantar RSVP</button>
         </form>

@@ -102,6 +102,11 @@ class Wedding extends Model
         return $this->hasOne(WeddingSite::class);
     }
 
+    public function guests(): HasMany
+    {
+        return $this->hasMany(WeddingGuest::class)->orderBy('name');
+    }
+
     public function timelineItems(): HasMany
     {
         return $this->hasMany(WeddingTimelineItem::class)->orderBy('starts_at');

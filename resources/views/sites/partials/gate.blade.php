@@ -1,4 +1,4 @@
-@props(['site', 'template', 'eyebrow'])
+@props(['site', 'template', 'eyebrow', 'guest' => null])
 
 {{-- The sealed card. Guests tap to open, the way a physical kad is opened. --}}
 <div data-gate class="nk-card fixed inset-0 z-50 flex flex-col items-center justify-center overflow-hidden px-8 text-center" style="{{ $template->cssVariables() }}">
@@ -7,6 +7,9 @@
 
     <div class="relative">
         <p class="nk-eyebrow">{{ $eyebrow }}</p>
+        @if ($guest)
+            <p class="nk-muted mt-3 text-sm">Kepada {{ $guest['name'] }}</p>
+        @endif
         <p class="nk-script mt-8">
             <span class="nk-name block text-4xl sm:text-5xl">{{ $site->bride_name }}</span>
             <span class="nk-accent my-3 block text-2xl">&amp;</span>
