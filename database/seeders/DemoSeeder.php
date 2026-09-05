@@ -15,6 +15,7 @@ use App\Models\Booking;
 use App\Models\Category;
 use App\Models\Payment;
 use App\Models\Review;
+use App\Models\SiteTemplate;
 use App\Models\User;
 use App\Models\Vendor;
 use App\Models\Wedding;
@@ -212,6 +213,54 @@ class DemoSeeder extends Seeder
         Payment::factory()->create(['booking_id' => $booking->id, 'type' => PaymentType::Balance, 'amount' => $booking->balanceAmount(), 'status' => PaymentStatus::Pending]);
 
         $this->seedTimeline($wedding, $vendor);
+        $this->seedInvitationCard($wedding);
+    }
+
+    /**
+     * A published invitation card for the demo couple, so the feature is not
+     * empty after a fresh seed.
+     */
+    private function seedInvitationCard(Wedding $wedding): void
+    {
+        $site = $wedding->site()->create([
+            'subdomain' => 'ainapilihhakim',
+            'template' => SiteTemplate::query()->orderBy('sort_order')->value('slug'),
+            'is_published' => true,
+            'bride_name' => 'Aina Zulkifli',
+            'groom_name' => 'Hakim Ismail',
+            'bride_parents' => 'Zulkifli bin Hassan & Rohana binti Ahmad',
+            'groom_parents' => 'Ismail bin Yusof & Salmah binti Osman',
+            'salutation' => "Dengan penuh kesyukuran, kami menjemput Dato' / Datin / Tuan / Puan / Encik / Cik ke majlis perkahwinan anakanda kami",
+            'event_date' => $wedding->event_date,
+            'starts_at' => '11:00',
+            'ends_at' => '16:00',
+            'venue_name' => 'Dewan Seri Melati',
+            'venue_address' => 'Jalan Sultanah, 05350 Alor Setar, Kedah',
+            'map_url' => 'https://maps.google.com',
+            'itinerary' => [
+                ['time' => '11:00 pagi', 'label' => 'Ketibaan tetamu'],
+                ['time' => '12:30 tengah hari', 'label' => 'Ketibaan pengantin'],
+                ['time' => '1:00 petang', 'label' => 'Makan beradab'],
+                ['time' => '4:00 petang', 'label' => 'Majlis bersurai'],
+            ],
+            'contacts' => [
+                ['name' => 'Puan Rohana', 'phone' => '012-345 6789'],
+                ['name' => 'Encik Ismail', 'phone' => '013-456 7890'],
+            ],
+            'rsvp_enabled' => true,
+            'closing_note' => 'Kehadiran dan doa restu daripada tuan/puan amatlah kami hargai.',
+        ]);
+
+        // views is deliberately not mass assignable, so set it directly.
+        $site->forceFill(['views' => 6])->save();
+
+        foreach ([
+            ['Pak Cik Samad', '012-999 8888', true, 4, 'Semoga berbahagia ke akhir hayat!'],
+            ['Kak Long Aida', '013-222 3344', true, 2, 'Insya-Allah kami datang.'],
+            ['Encik Rahim', '019-777 1122', false, 0, 'Maaf, ada urusan di luar negeri.'],
+        ] as [$name, $phone, $attending, $pax, $message]) {
+            $site->rsvps()->create(compact('name', 'phone', 'attending', 'pax', 'message'));
+        }
     }
 
     /**
