@@ -71,6 +71,20 @@ html {
     animation: nk-preloader-failsafe 0.35s ease var(--nk-preloader-failsafe, 5s) forwards;
 }
 
+/* On an invitation the opening screen belongs to the couple, so it takes its
+   colours from their chosen template rather than the Neekah palette. */
+#nk-preloader.nk-card {
+    background-color: var(--nk-page);
+}
+
+#nk-preloader.nk-card .nk-preloader-bar {
+    background-color: color-mix(in oklab, var(--nk-ink) 12%, transparent);
+}
+
+#nk-preloader.nk-card .nk-preloader-bar span {
+    background-color: var(--nk-accent);
+}
+
 #nk-preloader.is-done {
     visibility: hidden;
     opacity: 0;

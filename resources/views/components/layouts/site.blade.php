@@ -1,6 +1,16 @@
 @props(['site', 'template', 'preview' => false, 'sample' => false])
 
 <x-layouts.app :title="$site->coupleNames()" :description="'Jemputan majlis perkahwinan '.$site->coupleNames()" :preloader="false">
+    {{-- The invitation opens with the couple's own names in their own colours.
+         The Neekah brand has no business standing in front of their card. --}}
+    <x-site.preloader class="nk-card" :style="$template->cssVariables()" :label="$site->coupleNames()">
+        <p class="nk-script text-center">
+            <span class="nk-name block text-3xl sm:text-4xl">{{ $site->bride_name }}</span>
+            <span class="nk-accent my-2 block text-xl">&amp;</span>
+            <span class="nk-name block text-3xl sm:text-4xl">{{ $site->groom_name }}</span>
+        </p>
+    </x-site.preloader>
+
     @if ($preview)
         <div class="sticky top-0 z-50 bg-ink text-surface">
             <div class="mx-auto flex max-w-4xl flex-col items-center justify-between gap-2 px-4 py-2 text-sm sm:flex-row sm:px-6">

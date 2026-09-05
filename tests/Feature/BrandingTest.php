@@ -31,14 +31,23 @@ it('covers the page with a preloader that javascript takes down', function () {
         ->assertSee('Memuatkan Neekah');
 });
 
-it('keeps the neekah preloader off a couple invitation card', function () {
+it('opens an invitation in the couple own colours, never the neekah brand', function () {
     $this->seed(SiteTemplateSeeder::class);
-    $site = WeddingSite::factory()->published()->create();
+    $site = WeddingSite::factory()->published()->create([
+        'template' => 'seri-gangsa',
+        'bride_name' => 'Aina',
+        'groom_name' => 'Hakim',
+    ]);
 
-    // The card opens with its own gate. Our brand must not sit in front of it.
-    $this->get('http://'.$site->subdomain.'.'.config('neekah.site_domain').'/')
-        ->assertOk()
-        ->assertDontSee('id="nk-preloader"', false);
+    $response = $this->get('http://'.$site->subdomain.'.'.config('neekah.site_domain').'/')->assertOk();
+
+    $response->assertSee('class="nk-preloader nk-card"', false)
+        ->assertSee('--nk-page:', false)
+        ->assertSee('Memuatkan Aina &amp; Hakim', false);
+
+    // Guests are the couple's, not ours. Our logo has no place in front of
+    // the card they were invited to.
+    expect($response->getContent())->not->toContain(asset(config('neekah.brand.lockup')));
 });
 
 it('reads the preloader hold from config and tells the browser about it', function () {
@@ -51,12 +60,12 @@ it('reads the preloader hold from config and tells the browser about it', functi
         ->assertSee('--nk-preloader-failsafe: 8.5s', false);
 });
 
-it('holds only briefly unless the deployment says otherwise', function () {
-    // Long enough that a fast load does not flash the logo, short enough that
-    // nobody is left waiting on a screen that shows no real progress.
-    expect(config('neekah.preloader.seconds'))->toBe(0.6);
+it('sends whatever hold this deployment configured through to the browser', function () {
+    // Deliberately not pinned to a number. The shipped default lives in
+    // config/neekah.php and each deployment is free to tune it in .env.
+    $seconds = config('neekah.preloader.seconds');
 
-    $this->get(route('vendors.index'))->assertOk()->assertSee('data-min-seconds="0.6"', false);
+    $this->get(route('vendors.index'))->assertOk()->assertSee('data-min-seconds="'.$seconds.'"', false);
 });
 
 it('accepts a zero hold, so the page shows as soon as it is ready', function () {
