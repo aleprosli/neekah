@@ -51,10 +51,12 @@ it('reads the preloader hold from config and tells the browser about it', functi
         ->assertSee('--nk-preloader-failsafe: 8.5s', false);
 });
 
-it('holds for two seconds unless the deployment says otherwise', function () {
-    expect(config('neekah.preloader.seconds'))->toBe(2.0);
+it('holds only briefly unless the deployment says otherwise', function () {
+    // Long enough that a fast load does not flash the logo, short enough that
+    // nobody is left waiting on a screen that shows no real progress.
+    expect(config('neekah.preloader.seconds'))->toBe(0.6);
 
-    $this->get(route('vendors.index'))->assertOk()->assertSee('data-min-seconds="2"', false);
+    $this->get(route('vendors.index'))->assertOk()->assertSee('data-min-seconds="0.6"', false);
 });
 
 it('accepts a zero hold, so the page shows as soon as it is ready', function () {

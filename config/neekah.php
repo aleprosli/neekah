@@ -48,7 +48,8 @@ return [
     | page is ready.
     |
     | This is a deliberate hold, so it costs the visitor real time on every
-    | page. Keep it short.
+    | single page. The default is short on purpose: long enough that a fast
+    | load does not flash the logo and vanish, short enough that nobody waits.
     */
 
     'preloader' => [
