@@ -1,7 +1,13 @@
 <?php
 
+use App\Models\SiteTemplate;
 use App\Models\WeddingRsvp;
 use App\Models\WeddingSite;
+use Database\Seeders\SiteTemplateSeeder;
+
+beforeEach(function () {
+    $this->seed(SiteTemplateSeeder::class);
+});
 
 function siteUrl(WeddingSite $site, string $path = '/'): string
 {
@@ -14,7 +20,7 @@ it('serves a published invitation on its own subdomain', function () {
         'bride_name' => 'Aina',
         'groom_name' => 'Hakim',
         'venue_name' => 'Dewan Seri Melati',
-        'template' => 'klasik',
+        'template' => 'seri-gangsa',
     ]);
 
     $this->get(siteUrl($site))
@@ -41,9 +47,13 @@ it('returns 404 for an unpublished or unknown address', function () {
     $this->get('http://tiada-langsung.'.config('neekah.site_domain'))->assertNotFound();
 });
 
-it('renders every template', function () {
-    foreach (array_keys(WeddingSite::TEMPLATES) as $template) {
-        $site = WeddingSite::factory()->published()->create(['template' => $template]);
+it('renders all twenty templates', function () {
+    $templates = SiteTemplate::active()->get();
+
+    expect($templates)->toHaveCount(20);
+
+    foreach ($templates as $template) {
+        $site = WeddingSite::factory()->published()->create(['template' => $template->slug]);
 
         $this->get(siteUrl($site))->assertOk()->assertSee($site->bride_name);
     }
@@ -86,7 +96,8 @@ it('refuses an RSVP after the deadline or without a name', function () {
 });
 
 it('seals the card behind an opening gate with motion and a live countdown', function () {
-    $site = WeddingSite::factory()->published()->create(['bride_name' => 'Aina', 'groom_name' => 'Hakim', 'starts_at' => '11:00']);
+    // Seri Gangsa is a design with drifting petals; some designs are deliberately still.
+    $site = WeddingSite::factory()->published()->create(['template' => 'seri-gangsa', 'bride_name' => 'Aina', 'groom_name' => 'Hakim', 'starts_at' => '11:00']);
 
     $response = $this->get(siteUrl($site));
 
@@ -102,8 +113,14 @@ it('seals the card behind an opening gate with motion and a live countdown', fun
     $response->assertSee($site->event_date->copy()->setTimeFromTimeString('11:00:00')->toIso8601String(), false);
 });
 
+it('leaves the quiet designs unanimated', function () {
+    $still = WeddingSite::factory()->published()->create(['template' => 'putih-tenang']);
+
+    $this->get(siteUrl($still))->assertOk()->assertDontSee('nk-petal', false);
+});
+
 it('opens the card straight away in preview, with no gate to click through', function () {
-    $this->get(route('sites.templates.show', 'bunga'))
+    $this->get(route('sites.templates.show', 'mawar-pagi'))
         ->assertOk()
         ->assertSee('data-card', false)
         ->assertDontSee('data-gate', false);
@@ -129,13 +146,22 @@ it('offers a calendar file guests can add to their phone', function () {
     $this->get('http://tiada.'.config('neekah.site_domain').'/kalendar.ics')->assertNotFound();
 });
 
-it('shows the template gallery and a sample of each design', function () {
-    $this->get(route('sites.templates'))->assertOk()->assertSee('Pilih template anda')->assertSee('Klasik');
+it('shows the gallery, filters it by style, and samples every design', function () {
+    $this->get(route('sites.templates'))
+        ->assertOk()
+        ->assertSee('20 template untuk dipilih')
+        ->assertSee('Seri Gangsa')
+        ->assertSee('Malam Emas');
 
-    foreach (array_keys(WeddingSite::TEMPLATES) as $template) {
+    $this->get(route('sites.templates', ['style' => 'Islamik']))
+        ->assertOk()
+        ->assertSee('Nur Geometri')
+        ->assertDontSee('Malam Emas');
+
+    foreach (SiteTemplate::active()->get() as $template) {
         $this->get(route('sites.templates.show', $template))
             ->assertOk()
-            ->assertSee('Contoh template')
+            ->assertSee('Contoh template '.$template->name)
             ->assertSee('Aina Zulkifli');
     }
 

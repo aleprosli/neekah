@@ -14,11 +14,12 @@ class PublicSiteController extends Controller
     {
         $site = WeddingSite::query()
             ->published()
+            ->with('siteTemplate')
             ->where('subdomain', $subdomain)
             ->firstOr(fn () => abort(404, 'Kad jemputan ini tidak dijumpai.'));
 
         $site->increment('views');
 
-        return view('sites.show', ['site' => $site, 'preview' => false]);
+        return view('sites.show', ['site' => $site, 'template' => $site->design(), 'preview' => false]);
     }
 }

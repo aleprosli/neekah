@@ -5,11 +5,13 @@ use App\Models\User;
 use App\Models\Wedding;
 use App\Models\WeddingSite;
 use Database\Seeders\CategorySeeder;
+use Database\Seeders\SiteTemplateSeeder;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 
 beforeEach(function () {
     $this->seed(CategorySeeder::class);
+    $this->seed(SiteTemplateSeeder::class);
     $this->aina = User::factory()->create();
     $this->wedding = Wedding::factory()->for($this->aina)->create(['title' => 'Aina & Hakim', 'city' => 'Alor Setar', 'state' => 'Kedah']);
 });
@@ -32,7 +34,7 @@ it('creates the invitation as a draft that is not public yet', function () {
     $site = WeddingSite::sole();
 
     expect($site->subdomain)->toBe('ainapilihhakim')
-        ->and($site->template)->toBe('bunga')
+        ->and($site->template)->toBe('mawar-pagi')
         ->and($site->is_published)->toBeFalse()
         ->and($site->itinerary)->toHaveCount(2)
         ->and($site->contacts)->toHaveCount(1);
@@ -101,7 +103,7 @@ function siteData(): array
 {
     return [
         'subdomain' => 'ainapilihhakim',
-        'template' => 'bunga',
+        'template' => 'mawar-pagi',
         'bride_name' => 'Aina Zulkifli',
         'groom_name' => 'Hakim Ismail',
         'event_date' => now()->addMonths(4)->toDateString(),

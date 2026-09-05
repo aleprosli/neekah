@@ -2,41 +2,53 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\SiteTemplate;
 use App\Models\WeddingSite;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\Request;
 
 class SiteTemplatePreviewController extends Controller
 {
     /**
-     * A template preview filled with sample content, so a couple can browse the
-     * designs before creating anything.
+     * The design gallery, grouped by style.
      */
-    public function show(string $template): View
+    public function index(Request $request): View
     {
-        abort_unless(array_key_exists($template, WeddingSite::TEMPLATES), 404);
+        $templates = SiteTemplate::active()->ordered()->get();
+        $style = $request->string('style')->toString();
+
+        return view('sites.templates', [
+            'styles' => $templates->pluck('style')->unique()->values(),
+            'style' => $style,
+            'templates' => $style ? $templates->where('style', $style)->values() : $templates,
+        ]);
+    }
+
+    /**
+     * A full sample of one design, so a couple can judge it before signing up.
+     */
+    public function show(SiteTemplate $template): View
+    {
+        abort_unless($template->is_active, 404);
 
         return view('sites.show', [
             'site' => $this->sample($template),
+            'template' => $template,
             'preview' => true,
             'sample' => true,
         ]);
     }
 
-    public function index(): View
-    {
-        return view('sites.templates', ['templates' => WeddingSite::TEMPLATES]);
-    }
-
-    private function sample(string $template): WeddingSite
+    private function sample(SiteTemplate $template): WeddingSite
     {
         return new WeddingSite([
             'subdomain' => 'contoh',
-            'template' => $template,
+            'template' => $template->slug,
             'bride_name' => 'Aina Zulkifli',
             'groom_name' => 'Hakim Ismail',
             'bride_parents' => 'Zulkifli bin Hassan & Rohana binti Ahmad',
             'groom_parents' => 'Ismail bin Yusof & Salmah binti Osman',
-            'salutation' => 'Dengan penuh kesyukuran, kami menjemput Dato\' / Datin / Tuan / Puan / Encik / Cik ke majlis perkahwinan anakanda kami',
+            'salutation' => "Dengan penuh kesyukuran, kami menjemput Dato' / Datin / Tuan / Puan / Encik / Cik ke majlis perkahwinan anakanda kami",
             'event_date' => now()->addMonths(4)->startOfDay(),
             'starts_at' => '11:00',
             'ends_at' => '16:00',

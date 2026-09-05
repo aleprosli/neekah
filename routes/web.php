@@ -36,7 +36,7 @@ Route::get('/vendors/{vendor}', [VendorController::class, 'show'])->name('vendor
 Route::get('/about', LandingController::class)->name('landing');
 
 Route::get('/kad-jemputan', [SiteTemplatePreviewController::class, 'index'])->name('sites.templates');
-Route::get('/kad-jemputan/{template}', [SiteTemplatePreviewController::class, 'show'])->name('sites.templates.show');
+Route::get('/kad-jemputan/{template:slug}', [SiteTemplatePreviewController::class, 'show'])->name('sites.templates.show');
 
 Route::get('/invitations/{invitation}', [InvitationAcceptanceController::class, 'show'])->name('invitations.show');
 

@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\SiteTemplate;
 use App\Models\Wedding;
 use App\Models\WeddingSite;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -23,7 +24,8 @@ class WeddingSiteFactory extends Factory
         return [
             'wedding_id' => Wedding::factory(),
             'subdomain' => Str::slug($bride.'-'.$groom).'-'.fake()->unique()->numberBetween(100, 999),
-            'template' => 'klasik',
+            'template' => SiteTemplate::query()->orderBy('sort_order')->value('slug')
+                ?? SiteTemplate::factory()->create(['slug' => 'seri-gangsa'])->slug,
             'is_published' => false,
             'bride_name' => $bride,
             'groom_name' => $groom,

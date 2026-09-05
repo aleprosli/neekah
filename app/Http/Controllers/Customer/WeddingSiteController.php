@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Customer;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreWeddingSiteRequest;
+use App\Models\SiteTemplate;
 use App\Models\Wedding;
 use App\Models\WeddingSite;
 use Illuminate\Contracts\View\View;
@@ -24,10 +25,17 @@ class WeddingSiteController extends Controller
         $wedding = $request->user()->weddings()->latest('event_date')->firstOrFail();
         Gate::authorize('view', $wedding);
 
+        $site = $wedding->site ?? $this->draftFor($wedding);
+
+        // Arriving from a gallery preview preselects that design.
+        if ($chosen = $request->string('template')->toString()) {
+            $site->template = $chosen;
+        }
+
         return view('customer.site', [
             'wedding' => $wedding,
-            'site' => $wedding->site ?? $this->draftFor($wedding),
-            'templates' => WeddingSite::TEMPLATES,
+            'site' => $site,
+            'templates' => SiteTemplate::active()->ordered()->get()->groupBy('style'),
             'domain' => config('neekah.site_domain'),
             'rsvpCount' => $wedding->site?->rsvps()->where('attending', true)->sum('pax') ?? 0,
         ]);
@@ -83,6 +91,7 @@ class WeddingSiteController extends Controller
 
         return view('sites.show', [
             'site' => $site,
+            'template' => $site->design(),
             'preview' => true,
         ]);
     }
@@ -97,7 +106,7 @@ class WeddingSiteController extends Controller
         return new WeddingSite([
             'wedding_id' => $wedding->id,
             'subdomain' => Str::slug($wedding->title) ?: 'majlis-'.$wedding->id,
-            'template' => 'klasik',
+            'template' => SiteTemplate::active()->ordered()->value('slug') ?? 'seri-gangsa',
             'bride_name' => $bride ?: 'Pengantin Perempuan',
             'groom_name' => $groom ?: 'Pengantin Lelaki',
             'event_date' => $wedding->event_date,

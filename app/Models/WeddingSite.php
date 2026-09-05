@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsTo as EloquentBelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
 
@@ -22,18 +23,6 @@ class WeddingSite extends Model
 {
     /** @use HasFactory<WeddingSiteFactory> */
     use HasFactory;
-
-    /**
-     * Templates a couple can choose from. Each one is a Blade view under sites/templates.
-     *
-     * @var array<string, array{name: string, description: string, palette: string}>
-     */
-    public const TEMPLATES = [
-        'klasik' => ['name' => 'Klasik', 'description' => 'Songket dan emas, sesuai untuk majlis tradisional.', 'palette' => 'from-brand-700 to-brand-900'],
-        'moden' => ['name' => 'Moden', 'description' => 'Bersih dan lapang, tipografi besar.', 'palette' => 'from-slate-700 to-slate-900'],
-        'bunga' => ['name' => 'Bunga', 'description' => 'Lembut dengan sentuhan bunga dan warna pastel.', 'palette' => 'from-rose-300 to-fuchsia-400'],
-        'malam' => ['name' => 'Malam', 'description' => 'Latar gelap berkilau, sesuai untuk majlis malam.', 'palette' => 'from-indigo-800 to-slate-900'],
-    ];
 
     /**
      * Subdomains nobody may claim, because the platform uses them.
@@ -67,6 +56,21 @@ class WeddingSite extends Model
         return $this->belongsTo(Wedding::class);
     }
 
+    public function siteTemplate(): EloquentBelongsTo
+    {
+        return $this->belongsTo(SiteTemplate::class, 'template', 'slug');
+    }
+
+    /**
+     * The chosen design, falling back to the first active one if it was retired.
+     */
+    public function design(): SiteTemplate
+    {
+        return $this->siteTemplate
+            ?? SiteTemplate::active()->ordered()->first()
+            ?? throw new \RuntimeException('Tiada template kad jemputan yang aktif.');
+    }
+
     public function rsvps(): HasMany
     {
         return $this->hasMany(WeddingRsvp::class)->latest();
@@ -83,11 +87,11 @@ class WeddingSite extends Model
      */
     public function url(): string
     {
-        $parts = parse_url(config('app.url'));
-        $scheme = $parts['scheme'] ?? 'http';
-        $port = isset($parts['port']) ? ':'.$parts['port'] : '';
+        $port = config('neekah.site_port');
 
-        return $scheme.'://'.$this->subdomain.'.'.config('neekah.site_domain').$port;
+        return config('neekah.site_scheme').'://'
+            .$this->subdomain.'.'.config('neekah.site_domain')
+            .($port ? ':'.$port : '');
     }
 
     public function coupleNames(): string
@@ -97,7 +101,7 @@ class WeddingSite extends Model
 
     public function templateName(): string
     {
-        return self::TEMPLATES[$this->template]['name'] ?? $this->template;
+        return $this->design()->name;
     }
 
     public function startsAtLabel(): ?string

@@ -148,3 +148,84 @@ html {
         animation: none;
     }
 }
+
+/*
+| Invitation card surface
+|--------------------------------------------------------------------------
+| Every template feeds the same classes through CSS custom properties, so a
+| design lives entirely in a JSON column rather than in a stylesheet.
+*/
+
+.nk-card {
+    background: var(--nk-page);
+    color: var(--nk-ink);
+    font-family: var(--nk-serif);
+}
+
+.nk-script {
+    font-family: var(--nk-script);
+    line-height: 1.15;
+}
+
+.nk-ink { color: var(--nk-ink); }
+.nk-name { color: var(--nk-name); }
+.nk-accent { color: var(--nk-accent); }
+.nk-body { color: var(--nk-body); }
+.nk-muted { color: var(--nk-muted); }
+
+.nk-panel {
+    background: var(--nk-panel);
+    border: 1px solid var(--nk-line);
+}
+
+.nk-hairline { border-color: var(--nk-line); }
+.nk-dot { background: var(--nk-accent); }
+
+.nk-button {
+    background: var(--nk-button-bg);
+    color: var(--nk-button-text);
+    transition: filter 0.2s ease;
+}
+
+.nk-button:hover { filter: brightness(1.12); }
+
+.nk-chip {
+    border: 1px solid var(--nk-line);
+    background: var(--nk-panel);
+    color: var(--nk-body);
+    transition: border-color 0.2s ease;
+}
+
+.nk-chip:hover { border-color: var(--nk-accent); }
+
+.nk-field {
+    border: 1px solid var(--nk-line);
+    background: var(--nk-panel);
+    color: var(--nk-ink);
+}
+
+.nk-field::placeholder { color: var(--nk-muted); }
+.nk-field:focus { border-color: var(--nk-accent); outline: none; }
+
+.nk-eyebrow {
+    color: var(--nk-muted);
+    letter-spacing: 0.38em;
+    text-transform: uppercase;
+    font-size: 11px;
+}
+
+/* Layout flourishes a JSON design can switch on. */
+.nk-arch {
+    border-radius: 50% 50% 12px 12px / 42% 42% 4% 4%;
+}
+
+.nk-frame-inner {
+    border: 1px solid var(--nk-line);
+    outline: 1px solid var(--nk-accent);
+    outline-offset: 7px;
+}
+
+.nk-ribbon {
+    background: var(--nk-accent);
+    color: var(--nk-page);
+}

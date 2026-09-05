@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\SiteTemplate;
 use App\Models\WeddingSite;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -34,7 +35,7 @@ class StoreWeddingSiteRequest extends FormRequest
                 Rule::notIn(WeddingSite::RESERVED_SUBDOMAINS),
                 Rule::unique(WeddingSite::class, 'subdomain')->ignore($site),
             ],
-            'template' => ['required', Rule::in(array_keys(WeddingSite::TEMPLATES))],
+            'template' => ['required', Rule::exists(SiteTemplate::class, 'slug')->where('is_active', true)],
             'bride_name' => ['required', 'string', 'max:80'],
             'groom_name' => ['required', 'string', 'max:80'],
             'bride_parents' => ['nullable', 'string', 'max:160'],

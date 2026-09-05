@@ -47,28 +47,34 @@
         @method('PUT')
 
         {{-- Template --}}
-        <section class="flex flex-col gap-4 rounded-2xl border border-line bg-surface-raised p-6">
-            <div>
-                <h2 class="font-semibold">Template</h2>
-                <p class="text-sm text-ink-muted">Tekan nama template untuk melihat contoh penuh dalam tab baharu.</p>
+        <section class="flex flex-col gap-5 rounded-2xl border border-line bg-surface-raised p-6">
+            <div class="flex flex-wrap items-end justify-between gap-3">
+                <div>
+                    <h2 class="font-semibold">Template</h2>
+                    <p class="text-sm text-ink-muted">{{ $templates->flatten()->count() }} reka bentuk. Tekan "Lihat contoh" untuk membuka satu kad penuh.</p>
+                </div>
+                <a href="{{ route('sites.templates') }}" target="_blank" class="text-sm font-medium text-brand-600 underline underline-offset-4">Layari galeri</a>
             </div>
-            <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                @foreach ($templates as $slug => $template)
-                    <label class="cursor-pointer">
-                        <input type="radio" name="template" value="{{ $slug }}" class="peer sr-only" @checked(old('template', $site->template) === $slug)>
-                        <span class="flex flex-col gap-2 rounded-2xl border border-line p-2 transition peer-checked:border-brand-600 peer-checked:ring-2 peer-checked:ring-brand-400/40 hover:border-brand-300">
-                            <span class="flex aspect-[4/3] items-center justify-center rounded-xl bg-linear-to-br text-center text-white {{ $template['palette'] }}">
-                                <span class="font-display text-sm font-semibold">Aina &amp; Hakim</span>
-                            </span>
-                            <span class="px-1 pb-1">
-                                <span class="block text-sm font-semibold">{{ $template['name'] }}</span>
-                                <span class="block text-xs text-ink-muted">{{ $template['description'] }}</span>
-                                <a href="{{ route('sites.templates.show', $slug) }}" target="_blank" class="mt-1 inline-block text-xs font-medium text-brand-600 underline underline-offset-4">Lihat contoh</a>
-                            </span>
-                        </span>
-                    </label>
-                @endforeach
-            </div>
+
+            @foreach ($templates as $style => $group)
+                <div>
+                    <p class="mb-3 text-xs font-semibold tracking-wide text-ink-muted uppercase">{{ $style }}</p>
+                    <div class="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-5">
+                        @foreach ($group as $template)
+                            <label class="cursor-pointer">
+                                <input type="radio" name="template" value="{{ $template->slug }}" class="peer sr-only" @checked(old('template', $site->template) === $template->slug)>
+                                <span class="flex flex-col gap-1.5 rounded-2xl border border-line p-1.5 transition peer-checked:border-brand-600 peer-checked:ring-2 peer-checked:ring-brand-400/40 hover:border-brand-300">
+                                    @include('sites.partials.thumbnail', ['template' => $template])
+                                    <span class="px-1 pb-0.5">
+                                        <span class="block truncate text-xs font-semibold">{{ $template->name }}</span>
+                                        <a href="{{ route('sites.templates.show', $template) }}" target="_blank" class="text-[11px] text-brand-600 underline underline-offset-2">Lihat contoh</a>
+                                    </span>
+                                </span>
+                            </label>
+                        @endforeach
+                    </div>
+                </div>
+            @endforeach
         </section>
 
         {{-- Address --}}
