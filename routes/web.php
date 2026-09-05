@@ -127,6 +127,8 @@ Route::middleware('auth')->group(function (): void {
     Route::get('/kad', [CustomerArea\WeddingSiteController::class, 'edit'])->name('site.edit');
     Route::get('/kad/preview', [CustomerArea\WeddingSiteController::class, 'preview'])->name('site.preview');
     Route::put('/weddings/{wedding}/kad', [CustomerArea\WeddingSiteController::class, 'update'])->name('weddings.site.update');
+    Route::post('/weddings/{wedding}/kad/galeri', [CustomerArea\WeddingSitePhotoController::class, 'store'])->name('weddings.site.photos.store');
+    Route::delete('/weddings/{wedding}/kad/galeri/{photo}', [CustomerArea\WeddingSitePhotoController::class, 'destroy'])->name('weddings.site.photos.destroy');
     Route::put('/weddings/{wedding}/kad/publish', [CustomerArea\WeddingSiteController::class, 'publish'])->name('weddings.site.publish');
 
     Route::get('/budget', [CustomerArea\WeddingBudgetController::class, 'index'])->name('budget.index');

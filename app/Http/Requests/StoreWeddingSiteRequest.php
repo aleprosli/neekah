@@ -58,6 +58,14 @@ class StoreWeddingSiteRequest extends FormRequest
             'rsvp_enabled' => ['nullable', 'boolean'],
             'rsvp_deadline' => ['nullable', 'date', 'before_or_equal:event_date'],
             'closing_note' => ['nullable', 'string', 'max:500'],
+            'gift_enabled' => ['nullable', 'boolean'],
+            'gift_note' => ['nullable', 'string', 'max:500'],
+            'gift_qr_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
+            'gift_accounts' => ['nullable', 'array', 'max:4'],
+            'gift_accounts.*.bank' => ['nullable', 'string', 'max:60'],
+            'gift_accounts.*.holder' => ['nullable', 'string', 'max:80'],
+            'gift_accounts.*.number' => ['nullable', 'string', 'max:40'],
+            'wishes_enabled' => ['nullable', 'boolean'],
         ];
     }
 
@@ -68,7 +76,7 @@ class StoreWeddingSiteRequest extends FormRequest
      */
     public function siteAttributes(): array
     {
-        $data = $this->safe()->except('cover_image');
+        $data = $this->safe()->except(['cover_image', 'gift_qr_image']);
 
         $data['itinerary'] = collect($data['itinerary'] ?? [])
             ->filter(fn (array $row): bool => filled($row['time'] ?? null) && filled($row['label'] ?? null))
@@ -82,7 +90,15 @@ class StoreWeddingSiteRequest extends FormRequest
             ->values()
             ->all();
 
+        $data['gift_accounts'] = collect($data['gift_accounts'] ?? [])
+            ->filter(fn (array $row): bool => filled($row['bank'] ?? null) && filled($row['number'] ?? null))
+            ->map(fn (array $row): array => ['bank' => $row['bank'], 'holder' => $row['holder'] ?? '', 'number' => $row['number']])
+            ->values()
+            ->all();
+
         $data['rsvp_enabled'] = $this->boolean('rsvp_enabled');
+        $data['gift_enabled'] = $this->boolean('gift_enabled');
+        $data['wishes_enabled'] = $this->boolean('wishes_enabled');
 
         return $data;
     }
@@ -103,6 +119,8 @@ class StoreWeddingSiteRequest extends FormRequest
             'map_url' => 'pautan peta',
             'cover_image' => 'gambar utama',
             'rsvp_deadline' => 'tarikh akhir RSVP',
+            'gift_note' => 'nota hadiah',
+            'gift_qr_image' => 'kod QR DuitNow',
         ];
     }
 

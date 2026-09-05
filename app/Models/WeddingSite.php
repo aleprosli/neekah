@@ -12,12 +12,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsTo as EloquentBelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Storage;
 
 #[Fillable([
     'wedding_id', 'subdomain', 'template', 'is_published', 'salutation', 'bride_name', 'groom_name',
     'bride_parents', 'groom_parents', 'invitation_note', 'event_date', 'starts_at', 'ends_at',
     'venue_name', 'venue_address', 'map_url', 'itinerary', 'contacts', 'cover_image',
     'rsvp_enabled', 'rsvp_deadline', 'closing_note',
+    'gift_enabled', 'gift_note', 'gift_qr_image', 'gift_accounts', 'wishes_enabled',
 ])]
 class WeddingSite extends Model
 {
@@ -43,6 +45,9 @@ class WeddingSite extends Model
             'rsvp_deadline' => 'date',
             'itinerary' => 'array',
             'contacts' => 'array',
+            'gift_accounts' => 'array',
+            'gift_enabled' => 'boolean',
+            'wishes_enabled' => 'boolean',
         ];
     }
 
@@ -97,6 +102,34 @@ class WeddingSite extends Model
     public function declinedCount(): int
     {
         return $this->rsvps()->where('attending', false)->count();
+    }
+
+    public function photos(): HasMany
+    {
+        return $this->hasMany(WeddingSitePhoto::class)->orderBy('sort_order')->orderBy('id');
+    }
+
+    /**
+     * Wishes the couple has approved for public display. Guests write these in
+     * the RSVP form, so every wish is attached to a real reply and there is no
+     * anonymous write endpoint on the card to abuse.
+     */
+    public function approvedWishes(): HasMany
+    {
+        return $this->hasMany(WeddingRsvp::class)
+            ->whereNotNull('message')
+            ->whereNotNull('message_approved_at')
+            ->reorder('message_approved_at', 'desc');
+    }
+
+    public function showsGift(): bool
+    {
+        return $this->gift_enabled && (filled($this->gift_accounts) || filled($this->gift_qr_image));
+    }
+
+    public function giftQrUrl(): ?string
+    {
+        return $this->gift_qr_image ? Storage::disk('public')->url($this->gift_qr_image) : null;
     }
 
     #[Scope]

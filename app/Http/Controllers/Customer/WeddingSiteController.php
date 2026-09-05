@@ -38,6 +38,7 @@ class WeddingSiteController extends Controller
             'templates' => SiteTemplate::active()->ordered()->get()->groupBy('style'),
             'domain' => config('neekah.site_domain'),
             'rsvpCount' => $wedding->site?->confirmedPax() ?? 0,
+            'wishes' => $wedding->site?->rsvps()->whereNotNull('message')->get() ?? collect(),
         ]);
     }
 
@@ -51,6 +52,14 @@ class WeddingSiteController extends Controller
             }
 
             $attributes['cover_image'] = $request->file('cover_image')->store('sites/'.$wedding->id, 'public');
+        }
+
+        if ($request->hasFile('gift_qr_image')) {
+            if ($wedding->site?->gift_qr_image) {
+                Storage::disk('public')->delete($wedding->site->gift_qr_image);
+            }
+
+            $attributes['gift_qr_image'] = $request->file('gift_qr_image')->store('sites/'.$wedding->id, 'public');
         }
 
         $site = $wedding->site()->updateOrCreate([], $attributes);

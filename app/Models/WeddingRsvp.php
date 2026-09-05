@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-#[Fillable(['wedding_site_id', 'wedding_guest_id', 'matched_by', 'name', 'phone', 'attending', 'pax', 'counted', 'message'])]
+#[Fillable(['wedding_site_id', 'wedding_guest_id', 'matched_by', 'name', 'phone', 'attending', 'pax', 'counted', 'message', 'message_approved_at'])]
 class WeddingRsvp extends Model
 {
     /** @use HasFactory<WeddingRsvpFactory> */
@@ -23,6 +23,7 @@ class WeddingRsvp extends Model
         return [
             'attending' => 'boolean',
             'counted' => 'boolean',
+            'message_approved_at' => 'datetime',
         ];
     }
 
@@ -47,6 +48,11 @@ class WeddingRsvp extends Model
      * Whether the link to a named guest was inferred rather than proven by a
      * personal link. The couple sees this qualified, never as fact.
      */
+    public function wishIsPublic(): bool
+    {
+        return $this->message_approved_at !== null;
+    }
+
     public function isSoftMatched(): bool
     {
         return $this->matched_by === 'phone';

@@ -90,6 +90,65 @@
                 </section>
             @endif
 
+            {{-- Money gift --}}
+            @if ($site->showsGift())
+                <section id="hadiah" data-reveal class="scroll-mt-8 py-14 text-center">
+                    <p class="nk-eyebrow">Salam kaut</p>
+                    <h2 class="nk-name mt-3 mb-2 text-2xl">Hadiah untuk pengantin</h2>
+                    @if ($site->gift_note)
+                        <p class="nk-body mb-7 text-sm">{{ $site->gift_note }}</p>
+                    @endif
+                    <div class="nk-panel relative overflow-hidden rounded-3xl p-7">
+                        @include('sites.ornaments.'.$ornament, ['position' => 'top-right'])
+                        <div class="relative flex flex-col items-center gap-6">
+                            @if ($site->giftQrUrl())
+                                <img src="{{ $site->giftQrUrl() }}" alt="Kod QR DuitNow" class="w-48 rounded-2xl bg-white p-3">
+                            @endif
+                            @foreach ($site->gift_accounts ?? [] as $account)
+                                <div class="w-full">
+                                    <p class="nk-muted text-xs tracking-wide uppercase">{{ $account['bank'] }}</p>
+                                    <p class="nk-name mt-1 text-lg">{{ $account['number'] }}</p>
+                                    <p class="nk-body text-sm">{{ $account['holder'] }}</p>
+                                    <button type="button" data-copy="{{ $account['number'] }}" class="nk-button mt-3 rounded-full px-6 py-2 text-xs font-semibold">Salin nombor akaun</button>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                </section>
+            @endif
+
+            {{-- Photo gallery --}}
+            @if ($site->relationLoaded('photos') ? $site->photos->isNotEmpty() : $site->photos()->exists())
+                <section id="galeri" data-reveal class="scroll-mt-8 py-14 text-center">
+                    <p class="nk-eyebrow">Galeri</p>
+                    @include('sites.partials.divider-css', ['class' => 'mt-5'])
+                    <div class="mt-8 grid grid-cols-2 gap-3">
+                        @foreach ($site->photos as $photo)
+                            <figure class="overflow-hidden rounded-2xl">
+                                <img src="{{ $photo->url() }}" alt="{{ $photo->caption ?? 'Gambar pengantin' }}" loading="lazy" class="h-40 w-full object-cover sm:h-56">
+                                @if ($photo->caption)<figcaption class="nk-muted mt-1.5 text-xs">{{ $photo->caption }}</figcaption>@endif
+                            </figure>
+                        @endforeach
+                    </div>
+                </section>
+            @endif
+
+            {{-- Wishes --}}
+            @if ($site->wishes_enabled && $site->approvedWishes()->exists())
+                <section id="ucapan" data-reveal class="scroll-mt-8 py-14 text-center">
+                    <p class="nk-eyebrow">Ucapan</p>
+                    <h2 class="nk-name mt-3 mb-7 text-2xl">Doa dan restu</h2>
+                    <ul class="flex flex-col gap-3 text-left">
+                        @foreach ($site->approvedWishes as $wish)
+                            <li class="nk-panel rounded-2xl px-5 py-4">
+                                <p class="nk-body text-sm leading-relaxed">{{ $wish->message }}</p>
+                                <p class="nk-muted mt-2 text-xs">— {{ $wish->name }}</p>
+                            </li>
+                        @endforeach
+                    </ul>
+                </section>
+            @endif
+
             {{-- Contacts --}}
             @if (filled($site->contacts))
                 <section data-reveal class="py-14 text-center">

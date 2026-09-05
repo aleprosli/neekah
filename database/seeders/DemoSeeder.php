@@ -248,6 +248,13 @@ class DemoSeeder extends Seeder
                 ['name' => 'Encik Ismail', 'phone' => '013-456 7890'],
             ],
             'rsvp_enabled' => true,
+            'gift_enabled' => true,
+            'gift_note' => 'Kehadiran anda sudah cukup bermakna. Jika ingin memberi hadiah, kami sediakan butiran di bawah.',
+            'gift_accounts' => [
+                ['bank' => 'Maybank', 'holder' => 'Aina Zulkifli', 'number' => '158012345678'],
+                ['bank' => 'CIMB', 'holder' => 'Hakim Ismail', 'number' => '705566778899'],
+            ],
+            'wishes_enabled' => true,
             'closing_note' => 'Kehadiran dan doa restu daripada tuan/puan amatlah kami hargai.',
         ]);
 
@@ -280,6 +287,7 @@ class DemoSeeder extends Seeder
             $site->rsvps()->create(compact('name', 'phone', 'attending', 'pax', 'message') + [
                 'wedding_guest_id' => $guests[$name]->id,
                 'matched_by' => 'token',
+                'message_approved_at' => $attending ? now() : null,
             ]);
         }
     }

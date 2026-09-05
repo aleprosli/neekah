@@ -2,6 +2,7 @@
     $exists = $site->exists;
     $itinerary = old('itinerary', $site->itinerary ?? []);
     $contacts = old('contacts', $site->contacts ?? []);
+    $giftAccounts = old('gift_accounts', $site->gift_accounts ?? []);
 @endphp
 
 <x-layouts.customer title="Kad jemputan" heading="Kad jemputan digital" subheading="Isi maklumat majlis, pilih template dan siarkan pada alamat web anda sendiri.">
@@ -159,11 +160,106 @@
             <x-form.textarea label="Nota penutup" name="closing_note" :value="$site->closing_note" rows="2" />
         </section>
 
+        {{-- Money gift --}}
+        <section class="flex flex-col gap-4 rounded-2xl border border-line bg-surface-raised p-6">
+            <div>
+                <h2 class="font-semibold">Salam kaut</h2>
+                <p class="text-sm text-ink-muted">Kod QR DuitNow dan nombor akaun untuk tetamu yang ingin memberi hadiah.</p>
+            </div>
+
+            <label class="flex items-center gap-2 text-sm">
+                <input type="hidden" name="gift_enabled" value="0">
+                <input type="checkbox" name="gift_enabled" value="1" class="accent-brand-600" @checked(old('gift_enabled', $site->gift_enabled))>
+                Papar bahagian hadiah pada kad
+            </label>
+
+            <x-form.textarea label="Nota hadiah (pilihan)" name="gift_note" :value="$site->gift_note" rows="2" />
+
+            <label class="flex flex-col gap-1.5">
+                <span class="text-sm font-medium">Kod QR DuitNow</span>
+                <input type="file" name="gift_qr_image" accept="image/*" class="text-sm">
+                @if ($site->giftQrUrl())
+                    <img src="{{ $site->giftQrUrl() }}" alt="Kod QR DuitNow" class="mt-2 w-32 rounded-xl border border-line">
+                @endif
+            </label>
+
+            @for ($i = 0; $i < 3; $i++)
+                <div class="grid gap-3 sm:grid-cols-3">
+                    <input type="text" name="gift_accounts[{{ $i }}][bank]" value="{{ $giftAccounts[$i]['bank'] ?? '' }}" placeholder="Maybank" class="rounded-xl border border-line bg-surface px-4 py-2.5 text-sm focus:border-brand-400 focus:outline-none">
+                    <input type="text" name="gift_accounts[{{ $i }}][holder]" value="{{ $giftAccounts[$i]['holder'] ?? '' }}" placeholder="Nama pemegang akaun" class="rounded-xl border border-line bg-surface px-4 py-2.5 text-sm focus:border-brand-400 focus:outline-none">
+                    <input type="text" name="gift_accounts[{{ $i }}][number]" value="{{ $giftAccounts[$i]['number'] ?? '' }}" placeholder="1234 5678 9012" class="rounded-xl border border-line bg-surface px-4 py-2.5 text-sm focus:border-brand-400 focus:outline-none">
+                </div>
+            @endfor
+
+            <label class="flex items-center gap-2 border-t border-line pt-4 text-sm">
+                <input type="hidden" name="wishes_enabled" value="0">
+                <input type="checkbox" name="wishes_enabled" value="1" class="accent-brand-600" @checked(old('wishes_enabled', $site->wishes_enabled ?? true))>
+                Papar ucapan tetamu yang anda luluskan pada kad
+            </label>
+        </section>
+
         <div class="flex flex-wrap gap-3">
             <button type="submit" class="rounded-full bg-brand-600 px-8 py-3 text-sm font-semibold text-white transition hover:bg-brand-700">{{ $exists ? 'Simpan kad' : 'Cipta kad jemputan' }}</button>
             <a href="{{ route('site.preview') }}" target="_blank" class="rounded-full border border-line px-6 py-3 text-sm font-medium transition hover:border-brand-400">Pratonton</a>
         </div>
     </form>
+
+    {{-- Gallery. Its own form because it uploads files independently of the
+         card fields above. --}}
+    @if ($exists)
+        <section class="mt-10 flex flex-col gap-4">
+            <h2 class="font-display text-xl font-semibold">Galeri gambar</h2>
+            <form method="POST" action="{{ route('weddings.site.photos.store', $wedding) }}" enctype="multipart/form-data" class="flex flex-col gap-3 rounded-2xl border border-line bg-surface-raised p-5">
+                @csrf
+                <input type="file" name="images[]" accept="image/*" multiple required class="text-sm">
+                <input type="text" name="caption" placeholder="Kapsyen (pilihan)" class="rounded-xl border border-line bg-surface px-4 py-2.5 text-sm focus:border-brand-400 focus:outline-none">
+                <button type="submit" class="w-fit rounded-full bg-brand-600 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700">Muat naik gambar</button>
+            </form>
+
+            @if ($site->photos->isNotEmpty())
+                <ul class="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                    @foreach ($site->photos as $photo)
+                        <li class="flex flex-col gap-1.5">
+                            <img src="{{ $photo->url() }}" alt="{{ $photo->caption ?? '' }}" class="h-32 w-full rounded-xl object-cover">
+                            <x-confirm-action
+                                :action="route('weddings.site.photos.destroy', [$wedding, $photo])"
+                                method="DELETE"
+                                tone="danger"
+                                title="Padam gambar ini?"
+                                message="Gambar akan dibuang dari galeri kad jemputan."
+                                confirm="Padam"
+                                trigger-class="text-xs font-medium text-ink-muted hover:text-brand-700"
+                            >Padam</x-confirm-action>
+                        </li>
+                    @endforeach
+                </ul>
+            @endif
+        </section>
+    @endif
+
+    {{-- Wishes. Guests write these in the RSVP form, so nothing appears on the
+         card until the couple approves it. --}}
+    @if ($exists && $wishes->isNotEmpty())
+        <section class="mt-10 flex flex-col gap-4">
+            <h2 class="font-display text-xl font-semibold">Ucapan tetamu</h2>
+            <p class="text-sm text-ink-muted">Hanya ucapan yang anda luluskan akan dipaparkan pada kad jemputan.</p>
+            <ul class="flex flex-col gap-3">
+                @foreach ($wishes as $wish)
+                    <li class="flex flex-col gap-2 rounded-2xl border border-line bg-surface-raised p-4 sm:flex-row sm:items-center">
+                        <div class="min-w-0 flex-1">
+                            <p class="text-sm italic text-ink-muted">“{{ $wish->message }}”</p>
+                            <p class="mt-1 text-sm font-medium">{{ $wish->name }}</p>
+                        </div>
+                        <form method="POST" action="{{ route('weddings.rsvps.update', [$wedding, $wish]) }}" class="shrink-0">
+                            @csrf @method('PUT')
+                            <input type="hidden" name="approve_message" value="{{ $wish->wishIsPublic() ? 0 : 1 }}">
+                            <button type="submit" @class(['rounded-full px-5 py-2 text-xs font-semibold transition', 'border border-line hover:border-brand-400' => $wish->wishIsPublic(), 'bg-brand-600 text-white hover:bg-brand-700' => ! $wish->wishIsPublic()])>{{ $wish->wishIsPublic() ? 'Sembunyikan' : 'Luluskan' }}</button>
+                        </form>
+                    </li>
+                @endforeach
+            </ul>
+        </section>
+    @endif
 
     {{-- Replies live on the guest page, so there is only one place the
          headcount can be read and only one number to trust. --}}

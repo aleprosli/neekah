@@ -24,12 +24,23 @@ class WeddingRsvpController extends Controller
         $validated = $request->validate([
             'counted' => ['nullable', 'boolean'],
             'detach' => ['nullable', 'boolean'],
+            'approve_message' => ['nullable', 'boolean'],
         ]);
 
         if ($request->boolean('detach')) {
             $rsvp->update(['wedding_guest_id' => null, 'matched_by' => null]);
 
             return back()->with('status', 'Padanan tetamu dibuang.');
+        }
+
+        if ($request->has('approve_message')) {
+            $approved = $request->boolean('approve_message');
+
+            $rsvp->update(['message_approved_at' => $approved ? now() : null]);
+
+            return back()->with('status', $approved
+                ? 'Ucapan dipaparkan pada kad jemputan.'
+                : 'Ucapan disembunyikan dari kad jemputan.');
         }
 
         $rsvp->update(['counted' => (bool) ($validated['counted'] ?? false)]);
