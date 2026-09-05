@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\RenderInvitationPreview;
 use App\Models\WeddingGuest;
 use App\Models\WeddingSite;
 use App\Support\Seo;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class PublicSiteController extends Controller
@@ -36,7 +36,11 @@ class PublicSiteController extends Controller
 
         $seo->title($site->coupleNames())
             ->description('Jemputan majlis perkahwinan '.$site->coupleNames().' pada '.$site->event_date->translatedFormat('j F Y').($site->venue_name ? ' di '.$site->venue_name : '').'.')
-            ->image($site->cover_image ? Storage::disk('public')->url($site->cover_image) : null)
+            ->image(
+                route('sites.preview-image', ['subdomain' => $site->subdomain]),
+                RenderInvitationPreview::WIDTH,
+                RenderInvitationPreview::HEIGHT,
+            )
             ->withoutSiteName()
             ->noindex();
 

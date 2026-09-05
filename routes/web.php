@@ -11,6 +11,7 @@ use App\Http\Controllers\Customer as CustomerArea;
 use App\Http\Controllers\Customer\BookingController;
 use App\Http\Controllers\Customer\PaymentController;
 use App\Http\Controllers\InvitationAcceptanceController;
+use App\Http\Controllers\InvitationPreviewController;
 use App\Http\Controllers\LandingController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PublicSiteController;
@@ -28,6 +29,7 @@ Route::domain('{subdomain}.'.config('neekah.site_domain'))->group(function (): v
     Route::get('/', PublicSiteController::class)->middleware('throttle:60,1')->name('sites.show');
     Route::post('/rsvp', [RsvpController::class, 'store'])->middleware('throttle:10,1')->name('sites.rsvp');
     Route::get('/kalendar.ics', CalendarController::class)->name('sites.calendar');
+    Route::get('/preview.png', InvitationPreviewController::class)->name('sites.preview-image');
 });
 
 Route::get('/', [VendorController::class, 'index'])->name('vendors.index');
@@ -43,6 +45,7 @@ Route::get('/sitemap-templates.xml', [SitemapController::class, 'templates'])->n
 
 Route::get('/kad-jemputan', [SiteTemplatePreviewController::class, 'index'])->name('sites.templates');
 Route::get('/kad-jemputan/{template:slug}', [SiteTemplatePreviewController::class, 'show'])->name('sites.templates.show');
+Route::get('/kad-jemputan/{template:slug}/preview.png', [SiteTemplatePreviewController::class, 'previewImage'])->name('sites.templates.image');
 
 Route::get('/invitations/{invitation}', [InvitationAcceptanceController::class, 'show'])->name('invitations.show');
 

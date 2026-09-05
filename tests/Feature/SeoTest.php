@@ -1,5 +1,6 @@
 <?php
 
+use App\Actions\RenderInvitationPreview;
 use App\Models\Category;
 use App\Models\SiteTemplate;
 use App\Models\User;
@@ -8,6 +9,7 @@ use App\Models\WeddingSite;
 use App\Support\Seo;
 use Database\Seeders\CategorySeeder;
 use Database\Seeders\SiteTemplateSeeder;
+use Illuminate\Support\Facades\Storage;
 
 beforeEach(function () {
     $this->seed(CategorySeeder::class);
@@ -167,4 +169,87 @@ it('stamps this deployment own sitemap address into robots.txt', function () {
 
 it('refuses to serve the app sitemap from a card subdomain', function () {
     $this->get('http://aina.'.config('neekah.site_domain').'/sitemap.xml')->assertNotFound();
+});
+
+it('previews a shared card as the couple own design, not the neekah logo', function () {
+    $this->seed(SiteTemplateSeeder::class);
+    $site = WeddingSite::factory()->published()->create([
+        'template' => 'malam-emas',
+        'bride_name' => 'Aina',
+        'groom_name' => 'Hakim',
+    ]);
+
+    $this->get('http://'.$site->subdomain.'.'.config('neekah.site_domain').'/')
+        ->assertOk()
+        ->assertSee('property="og:image" content="'.e(route('sites.preview-image', ['subdomain' => $site->subdomain])).'"', false)
+        ->assertSee('property="og:image:width" content="1200"', false)
+        ->assertSee('property="og:image:height" content="630"', false)
+        ->assertDontSee('neekah-og.png');
+});
+
+it('draws that preview at the size whatsapp and facebook render', function () {
+    Storage::fake('public');
+    $this->seed(SiteTemplateSeeder::class);
+    $site = WeddingSite::factory()->published()->create(['template' => 'seri-gangsa']);
+
+    $response = $this->get('http://'.$site->subdomain.'.'.config('neekah.site_domain').'/preview.png')
+        ->assertOk()
+        ->assertHeader('content-type', 'image/png');
+
+    $image = imagecreatefromstring($response->getContent());
+
+    expect(imagesx($image))->toBe(1200)
+        ->and(imagesy($image))->toBe(630);
+});
+
+it('paints the preview in the palette of the template the couple chose', function () {
+    $this->seed(SiteTemplateSeeder::class);
+    $site = WeddingSite::factory()->published()->create(['bride_name' => 'Aina', 'groom_name' => 'Hakim']);
+    $render = app(RenderInvitationPreview::class);
+
+    $corner = function (string $slug) use ($site, $render): array {
+        $site->template = $slug;
+        $image = imagecreatefromstring($render->draw($site, SiteTemplate::where('slug', $slug)->sole()));
+        $colour = imagecolorat($image, 5, 5);
+
+        return [($colour >> 16) & 0xFF, ($colour >> 8) & 0xFF, $colour & 0xFF];
+    };
+
+    // A light template and a dark one must not come out the same picture.
+    expect($corner('seri-gangsa'))->not->toBe($corner('malam-emas'));
+});
+
+it('redraws the preview when the couple edits the card', function () {
+    Storage::fake('public');
+    $this->seed(SiteTemplateSeeder::class);
+    $site = WeddingSite::factory()->published()->create(['bride_name' => 'Aina']);
+    $render = app(RenderInvitationPreview::class);
+
+    $before = $render->handle($site, $site->design());
+
+    $site->update(['bride_name' => 'Aina Sofea']);
+    $after = $render->handle($site->fresh(), $site->design());
+
+    expect($after)->not->toBe($before);
+    Storage::disk('public')->assertExists($after);
+});
+
+it('gives each template gallery page a preview of that design', function () {
+    $this->seed(SiteTemplateSeeder::class);
+    $template = SiteTemplate::where('slug', 'mawar-pagi')->sole();
+
+    $this->get(route('sites.templates.show', $template))
+        ->assertOk()
+        ->assertSee(e(route('sites.templates.image', $template)), false);
+
+    $this->get(route('sites.templates.image', $template))
+        ->assertOk()
+        ->assertHeader('content-type', 'image/png');
+});
+
+it('refuses a preview for an unpublished card', function () {
+    $this->seed(SiteTemplateSeeder::class);
+    $draft = WeddingSite::factory()->create(['subdomain' => 'belum-siar']);
+
+    $this->get('http://belum-siar.'.config('neekah.site_domain').'/preview.png')->assertNotFound();
 });

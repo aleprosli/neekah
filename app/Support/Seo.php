@@ -28,6 +28,10 @@ class Seo
 
     private ?string $image = null;
 
+    private ?int $imageWidth = null;
+
+    private ?int $imageHeight = null;
+
     private string $type = 'website';
 
     private bool $indexable = true;
@@ -78,11 +82,29 @@ class Seo
         return $this;
     }
 
-    public function image(?string $url): static
+    /**
+     * Facebook and WhatsApp render the preview faster, and without guessing at
+     * the crop, when the dimensions are declared alongside the image.
+     */
+    public function image(?string $url, ?int $width = null, ?int $height = null): static
     {
-        $this->image = $url ?: $this->image;
+        if ($url) {
+            $this->image = $url;
+            $this->imageWidth = $width;
+            $this->imageHeight = $height;
+        }
 
         return $this;
+    }
+
+    public function imageWidth(): ?int
+    {
+        return $this->imageWidth ?? ($this->image === null ? 1200 : null);
+    }
+
+    public function imageHeight(): ?int
+    {
+        return $this->imageHeight ?? ($this->image === null ? 630 : null);
     }
 
     public function type(string $type): static

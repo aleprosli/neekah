@@ -15,6 +15,11 @@
 <meta property="og:description" content="{{ $seo->resolvedDescription() }}">
 <meta property="og:url" content="{{ $seo->resolvedCanonical() }}">
 <meta property="og:image" content="{{ $seo->resolvedImage() }}">
+<meta property="og:image:alt" content="{{ $seo->resolvedTitle() }}">
+@if ($seo->imageWidth())
+    <meta property="og:image:width" content="{{ $seo->imageWidth() }}">
+    <meta property="og:image:height" content="{{ $seo->imageHeight() }}">
+@endif
 <meta property="og:locale" content="{{ str_replace('-', '_', app()->getLocale()) }}_MY">
 
 <meta name="twitter:card" content="summary_large_image">

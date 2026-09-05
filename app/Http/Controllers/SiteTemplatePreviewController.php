@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\RenderInvitationPreview;
 use App\Models\SiteTemplate;
 use App\Models\WeddingSite;
 use App\Support\Seo;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class SiteTemplatePreviewController extends Controller
 {
@@ -36,7 +38,12 @@ class SiteTemplatePreviewController extends Controller
     {
         abort_unless($template->is_active, 404);
 
-        $seo->title('Kad jemputan '.$template->name)
+        $seo->image(
+            route('sites.templates.image', $template),
+            RenderInvitationPreview::WIDTH,
+            RenderInvitationPreview::HEIGHT,
+        )
+            ->title('Kad jemputan '.$template->name)
             ->description('Contoh kad jemputan digital reka bentuk '.$template->name.'. Gaya '.$template->style.', dengan animasi pembuka, kiraan detik, RSVP dan peta.');
 
         return view('sites.show', [
@@ -44,6 +51,20 @@ class SiteTemplatePreviewController extends Controller
             'template' => $template,
             'preview' => true,
             'sample' => true,
+        ]);
+    }
+
+    /**
+     * The link preview for a template page, drawn from the same sample the
+     * page itself shows.
+     */
+    public function previewImage(SiteTemplate $template, RenderInvitationPreview $render): Response
+    {
+        abort_unless($template->is_active, 404);
+
+        return response($render->draw($this->sample($template), $template), 200, [
+            'Content-Type' => 'image/png',
+            'Cache-Control' => 'public, max-age=604800',
         ]);
     }
 
