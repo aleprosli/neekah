@@ -1,8 +1,9 @@
 <div class="sticky top-3 z-40 h-0 px-3 sm:px-6">
     <header class="mx-auto flex max-w-6xl items-center justify-between gap-2 rounded-full sm:gap-4 border border-line/70 bg-surface/85 py-2 pr-2 pl-4 shadow-lg shadow-black/5 backdrop-blur-md">
-        <a href="{{ route('vendors.index') }}" class="flex items-center gap-2">
-            <span class="flex size-8 items-center justify-center rounded-full bg-brand-600 font-display text-base font-semibold text-white">N</span>
-            <span class="font-display text-lg font-semibold tracking-tight">neekah</span>
+        {{-- max-w lets the lockup scale down on a very narrow phone instead of
+             pushing the log in and register buttons off the header. --}}
+        <a href="{{ route('vendors.index') }}" class="flex min-w-0 items-center" aria-label="{{ config('app.name') }}">
+            <x-brand.lockup class="h-7 max-w-[42vw] object-contain sm:h-8" />
         </a>
 
         <nav class="hidden items-center gap-1 text-sm font-medium md:flex" aria-label="Utama">

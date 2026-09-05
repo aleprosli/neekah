@@ -50,6 +50,95 @@ html {
     background-color: var(--surface);
 }
 
+/*
+| Preloader
+| Visible from the first paint, removed by app.js on window load. The failsafe
+| animation hides it after five seconds no matter what, so a script error can
+| never leave a visitor staring at a covered page.
+*/
+#nk-preloader {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    display: grid;
+    place-items: center;
+    padding: 1.5rem;
+    background-color: var(--surface);
+    opacity: 1;
+    transition:
+        opacity 0.35s ease,
+        visibility 0.35s ease;
+    animation: nk-preloader-failsafe 0.35s ease 5s forwards;
+}
+
+#nk-preloader.is-done {
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
+    animation: none;
+}
+
+.nk-preloader-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.75rem;
+    animation: nk-preloader-enter 0.5s ease both;
+}
+
+.nk-preloader-bar {
+    position: relative;
+    width: 7rem;
+    height: 3px;
+    overflow: hidden;
+    border-radius: 999px;
+    background-color: var(--surface-muted);
+}
+
+.nk-preloader-bar span {
+    position: absolute;
+    inset-block: 0;
+    width: 45%;
+    border-radius: inherit;
+    background-color: var(--color-brand-600);
+    animation: nk-preloader-sweep 1.15s ease-in-out infinite;
+}
+
+@keyframes nk-preloader-enter {
+    from {
+        opacity: 0;
+        transform: translateY(0.5rem) scale(0.98);
+    }
+}
+
+@keyframes nk-preloader-sweep {
+    0% {
+        left: -45%;
+    }
+    100% {
+        left: 100%;
+    }
+}
+
+@keyframes nk-preloader-failsafe {
+    to {
+        visibility: hidden;
+        opacity: 0;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .nk-preloader-inner {
+        animation: none;
+    }
+
+    .nk-preloader-bar span {
+        left: 0;
+        width: 100%;
+        animation: none;
+    }
+}
+
 @utility no-scrollbar {
     scrollbar-width: none;
 

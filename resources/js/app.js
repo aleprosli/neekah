@@ -1,3 +1,28 @@
+/**
+ * Take the preloader down once the page has finished loading, and again when
+ * the browser restores the page from its back/forward cache, where `load`
+ * never fires a second time.
+ */
+(() => {
+    const dismiss = () => {
+        const overlay = document.getElementById('nk-preloader');
+        if (!overlay) {
+            return;
+        }
+
+        overlay.classList.add('is-done');
+        overlay.addEventListener('transitionend', () => overlay.remove(), { once: true });
+    };
+
+    if (document.readyState === 'complete') {
+        dismiss();
+    } else {
+        window.addEventListener('load', dismiss, { once: true });
+    }
+
+    window.addEventListener('pageshow', (event) => event.persisted && dismiss());
+})();
+
 document.addEventListener('click', (event) => {
     const opener = event.target.closest('[data-dialog-open]');
     if (opener) {

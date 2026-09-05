@@ -22,4 +22,27 @@ return [
 
     'site_port' => env('NEEKAH_SITE_PORT'),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Brand artwork
+    |--------------------------------------------------------------------------
+    | Every logo on the site reads from here, so swapping the brand is a change
+    | in one place. Paths are relative to public/ and resolved with asset().
+    |
+    | Supply artwork already trimmed to its own edges. A file with built-in
+    | padding renders small inside its box, because the layout sizes the file
+    | and cannot know where the artwork stops.
+    |
+    | lockup: mark plus wordmark, transparent, used in the header and preloader.
+    | mark:   the square tile, used where only an icon fits.
+    | icon:   the browser tab and home screen icon.
+    */
+
+    'brand' => [
+        'lockup' => env('NEEKAH_BRAND_LOCKUP', 'img/logo/neekah-lockup.png'),
+        'mark' => env('NEEKAH_BRAND_MARK', 'img/logo/neekah-mark-512.png'),
+        'icon' => env('NEEKAH_BRAND_ICON', 'img/logo/neekah-mark-192.png'),
+        'apple_icon' => env('NEEKAH_BRAND_APPLE_ICON', 'img/logo/neekah-mark-180.png'),
+    ],
+
 ];

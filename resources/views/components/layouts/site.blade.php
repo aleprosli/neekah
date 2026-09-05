@@ -1,6 +1,6 @@
 @props(['site', 'template', 'preview' => false, 'sample' => false])
 
-<x-layouts.app :title="$site->coupleNames()" :description="'Jemputan majlis perkahwinan '.$site->coupleNames()">
+<x-layouts.app :title="$site->coupleNames()" :description="'Jemputan majlis perkahwinan '.$site->coupleNames()" :preloader="false">
     @if ($preview)
         <div class="sticky top-0 z-50 bg-ink text-surface">
             <div class="mx-auto flex max-w-4xl flex-col items-center justify-between gap-2 px-4 py-2 text-sm sm:flex-row sm:px-6">
