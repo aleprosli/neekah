@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Actions\AcceptWeddingInvitation;
 use App\Models\WeddingInvitation;
+use App\Support\Seo;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -13,8 +14,9 @@ class InvitationAcceptanceController extends Controller
     /**
      * Show the invitation. A guest is sent to sign in first and returns here afterwards.
      */
-    public function show(Request $request, WeddingInvitation $invitation): View|RedirectResponse
+    public function show(Request $request, WeddingInvitation $invitation, Seo $seo): View|RedirectResponse
     {
+        $seo->noindex();
         $invitation->load(['wedding', 'inviter']);
 
         if (! $request->user()) {

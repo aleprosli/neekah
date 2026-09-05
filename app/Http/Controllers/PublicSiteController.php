@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\WeddingGuest;
 use App\Models\WeddingSite;
+use App\Support\Seo;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class PublicSiteController extends Controller
@@ -22,7 +24,7 @@ class PublicSiteController extends Controller
     /**
      * A published invitation, served from its own subdomain.
      */
-    public function __invoke(Request $request, string $subdomain): View
+    public function __invoke(Request $request, string $subdomain, Seo $seo): View
     {
         $site = WeddingSite::query()
             ->published()
@@ -31,6 +33,12 @@ class PublicSiteController extends Controller
             ->firstOr(fn () => abort(404, 'Kad jemputan ini tidak dijumpai.'));
 
         $site->increment('views');
+
+        $seo->title($site->coupleNames())
+            ->description('Jemputan majlis perkahwinan '.$site->coupleNames().' pada '.$site->event_date->translatedFormat('j F Y').($site->venue_name ? ' di '.$site->venue_name : '').'.')
+            ->image($site->cover_image ? Storage::disk('public')->url($site->cover_image) : null)
+            ->withoutSiteName()
+            ->noindex();
 
         $guest = $this->resolveGuest($request, $site);
 

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Vendor;
+use App\Support\Seo;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -15,8 +16,10 @@ class VendorComparisonController extends Controller
      * Compare approved vendors side by side. Selection travels in the query string,
      * so a couple can share the comparison with their partner as a link.
      */
-    public function __invoke(Request $request): View
+    public function __invoke(Request $request, Seo $seo): View
     {
+        $seo->title('Banding vendor')->noindex();
+
         $slugs = collect($request->query('vendors'))
             ->flatten()
             ->filter(fn ($slug): bool => is_string($slug) && $slug !== '')

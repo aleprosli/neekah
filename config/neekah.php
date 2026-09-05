@@ -56,6 +56,22 @@ return [
         'seconds' => (float) env('NEEKAH_PRELOADER_SECONDS', 1),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Search and social defaults
+    |--------------------------------------------------------------------------
+    | Fallbacks for any page that does not describe itself. Individual pages
+    | override these through App\Support\Seo; nothing writes meta tags except
+    | the seo.tags component, so the two can never disagree.
+    */
+
+    'seo' => [
+        'tagline' => env('NEEKAH_SEO_TAGLINE', 'Semua Urusan Majlis, Satu Platform'),
+        'description' => env('NEEKAH_SEO_DESCRIPTION', 'Cari dan tempah vendor perkahwinan di Malaysia. Checklist, bajet, timeline dan kad jemputan digital dalam satu platform.'),
+        'image' => env('NEEKAH_SEO_IMAGE', 'img/logo/neekah-og.png'),
+        'twitter' => env('NEEKAH_SEO_TWITTER'),
+    ],
+
     'brand' => [
         'lockup' => env('NEEKAH_BRAND_LOCKUP', 'img/logo/neekah-lockup.png'),
         'mark' => env('NEEKAH_BRAND_MARK', 'img/logo/neekah-mark-512.png'),

@@ -1,5 +1,7 @@
 @props(['title', 'subtitle' => null])
 
+@php app(App\Support\Seo::class)->noindex(); @endphp
+
 <x-layouts.app :title="$title">
     <x-site.header />
 

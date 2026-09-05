@@ -16,6 +16,7 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PublicSiteController;
 use App\Http\Controllers\ReportVendorController;
 use App\Http\Controllers\RsvpController;
+use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\SiteTemplatePreviewController;
 use App\Http\Controllers\Vendor as VendorArea;
 use App\Http\Controllers\VendorComparisonController;
@@ -34,6 +35,11 @@ Route::get('/compare', VendorComparisonController::class)->name('vendors.compare
 Route::get('/vendors/{vendor}', [VendorController::class, 'show'])->name('vendors.show');
 
 Route::get('/about', LandingController::class)->name('landing');
+
+Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap.index');
+Route::get('/sitemap-pages.xml', [SitemapController::class, 'pages'])->name('sitemap.pages');
+Route::get('/sitemap-vendors.xml', [SitemapController::class, 'vendors'])->name('sitemap.vendors');
+Route::get('/sitemap-templates.xml', [SitemapController::class, 'templates'])->name('sitemap.templates');
 
 Route::get('/kad-jemputan', [SiteTemplatePreviewController::class, 'index'])->name('sites.templates');
 Route::get('/kad-jemputan/{template:slug}', [SiteTemplatePreviewController::class, 'show'])->name('sites.templates.show');

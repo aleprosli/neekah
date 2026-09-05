@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\SiteTemplate;
 use App\Models\WeddingSite;
+use App\Support\Seo;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 
@@ -12,10 +13,14 @@ class SiteTemplatePreviewController extends Controller
     /**
      * The design gallery, grouped by style.
      */
-    public function index(Request $request): View
+    public function index(Request $request, Seo $seo): View
     {
         $templates = SiteTemplate::active()->ordered()->get();
         $style = $request->string('style')->toString();
+
+        $seo->title($style ? 'Template kad jemputan '.$style : 'Template kad kahwin digital')
+            ->description('Pilih daripada '.$templates->count().' reka bentuk kad jemputan digital. Setiap kad datang dengan alamat web sendiri, RSVP, atur cara dan peta lokasi.')
+            ->canonical(url()->current().($style ? '?'.http_build_query(['style' => $style]) : ''));
 
         return view('sites.templates', [
             'styles' => $templates->pluck('style')->unique()->values(),
@@ -27,9 +32,12 @@ class SiteTemplatePreviewController extends Controller
     /**
      * A full sample of one design, so a couple can judge it before signing up.
      */
-    public function show(SiteTemplate $template): View
+    public function show(SiteTemplate $template, Seo $seo): View
     {
         abort_unless($template->is_active, 404);
+
+        $seo->title('Kad jemputan '.$template->name)
+            ->description('Contoh kad jemputan digital reka bentuk '.$template->name.'. Gaya '.$template->style.', dengan animasi pembuka, kiraan detik, RSVP dan peta.');
 
         return view('sites.show', [
             'site' => $this->sample($template),

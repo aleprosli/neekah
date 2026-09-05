@@ -5,9 +5,11 @@ namespace App\Http\Controllers;
 use App\Enums\VendorTier;
 use App\Models\Category;
 use App\Models\Vendor;
+use App\Support\Seo;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class VendorController extends Controller
 {
@@ -22,7 +24,7 @@ class VendorController extends Controller
     /**
      * List approved vendors with search, filters, sorting and pagination.
      */
-    public function index(Request $request): View
+    public function index(Request $request, Seo $seo): View
     {
         $categories = Category::active()->ordered()->get();
         $sort = $request->string('sort')->toString();
@@ -68,6 +70,8 @@ class VendorController extends Controller
             ->paginate(12)
             ->withQueryString();
 
+        $this->describeListing($seo, $request, $activeCategory, $filters);
+
         return view('vendors.index', [
             'vendors' => $vendors,
             'filters' => $filters,
@@ -83,7 +87,7 @@ class VendorController extends Controller
     /**
      * Show an approved vendor's public profile with packages, reviews and booking form.
      */
-    public function show(Request $request, Vendor $vendor): View
+    public function show(Request $request, Vendor $vendor, Seo $seo): View
     {
         abort_unless($vendor->isApproved(), 404);
 
@@ -103,11 +107,50 @@ class VendorController extends Controller
             ->limit(3)
             ->get();
 
+        $seo->title($vendor->name.' — '.$vendor->category->name.' di '.$vendor->city)
+            ->description($vendor->tagline ?: Str::of((string) $vendor->description)->squish()->value())
+            ->image($vendor->portfolioItems->first()?->url())
+            ->type('profile');
+
         return view('vendors.show', [
             'vendor' => $vendor,
             'category' => $vendor->category,
             'related' => $related,
             'defaultEventDate' => $request->user()?->weddings()->latest('event_date')->first()?->event_date->toDateString(),
         ]);
+    }
+
+    /**
+     * Describe the listing to search engines.
+     *
+     * Only the filters that make a genuinely different page reach the canonical
+     * URL. Price, rating, tier and sort produce the same vendors in a different
+     * order, so folding them onto one address stops a dozen near-identical
+     * pages competing with each other. A keyword search is not our content at
+     * all, so it stays out of the index entirely.
+     *
+     * @param  array<string, mixed>  $filters
+     */
+    private function describeListing(Seo $seo, Request $request, ?Category $category, array $filters): void
+    {
+        $page = max(1, $request->integer('page', 1));
+
+        $keep = array_filter([
+            'category' => $filters['category'],
+            'state' => $filters['state'],
+            'page' => $page > 1 ? $page : null,
+        ]);
+
+        $where = $filters['state'] ? ' di '.$filters['state'] : ' di Malaysia';
+
+        $seo->title($category ? 'Vendor '.$category->name.$where : 'Cari vendor perkahwinan'.$where)
+            ->description($category
+                ? 'Bandingkan dan tempah '.Str::lower($category->name).$where.'. Harga, pakej, rating dan review daripada pasangan yang benar-benar menempah.'
+                : null)
+            ->canonical(url()->current().($keep ? '?'.http_build_query($keep) : ''));
+
+        if ($filters['q']) {
+            $seo->noindex();
+        }
     }
 }

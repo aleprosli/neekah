@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\Vendor;
+use App\Support\Seo;
 use Illuminate\Contracts\View\View;
 
 class LandingController extends Controller
@@ -11,8 +12,11 @@ class LandingController extends Controller
     /**
      * Show the promotional landing page.
      */
-    public function __invoke(): View
+    public function __invoke(Seo $seo): View
     {
+        $seo->title('Rancang majlis anda dari mula hingga hari bahagia')
+            ->description('Checklist, bajet, timeline, kad jemputan digital dan vendor yang disahkan. Semua urusan majlis anda dalam satu platform.');
+
         return view('landing', [
             'flow' => $this->flow(),
             'categories' => Category::active()->ordered()->get(),

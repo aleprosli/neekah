@@ -1,2 +1,13 @@
 User-agent: *
-Disallow:
+Allow: /
+
+# Search results and token links are not content of ours.
+Disallow: /compare
+Disallow: /invitations/
+
+# Invitation cards sit on their own subdomains and are served this
+# same file. They stay crawlable on purpose, so the noindex tag on
+# each card is actually read.
+
+# Run "php artisan neekah:robots" on deploy to stamp the Sitemap line
+# in with this deployment's own address.
