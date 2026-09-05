@@ -5,18 +5,22 @@
     <main class="mx-auto max-w-[1760px] px-4 pb-24 sm:px-6 md:pb-10 lg:px-10">
         {{-- Category tiles --}}
         <div class="border-b border-line py-5">
-            <div class="no-scrollbar -mx-4 flex overflow-x-auto px-4 sm:mx-0 sm:px-0 md:justify-center">
+            <div class="no-scrollbar -mx-4 flex overflow-x-auto px-4 py-1 sm:mx-0 sm:px-0 md:justify-center">
                 <ul class="flex w-max gap-4 sm:gap-6">
                     <li>
                         <a href="{{ route('vendors.index', array_filter(['q' => $filters['q'], 'state' => $filters['state']])) }}" @class(['group flex w-16 flex-col items-center gap-2 text-center text-[11px] font-medium whitespace-nowrap transition', 'text-brand-700' => ! $filters['category'], 'text-ink-muted hover:text-ink' => $filters['category']])>
-                            <span @class(['flex size-12 items-center justify-center rounded-full text-2xl transition', 'bg-brand-600 shadow-md shadow-brand-600/30' => ! $filters['category'], 'bg-surface-muted group-hover:bg-brand-50' => $filters['category']])>🎉</span>
+                            <span @class(['flex size-14 items-center justify-center overflow-hidden rounded-full bg-white text-2xl transition', 'shadow-md shadow-brand-600/30 ring-2 ring-brand-600' => ! $filters['category'], 'ring-1 ring-line group-hover:ring-brand-300' => $filters['category']])>
+                                <x-category-icon class="size-9" fallback="🎉" />
+                            </span>
                             Semua
                         </a>
                     </li>
                     @foreach ($categories as $category)
                         <li>
                             <a href="{{ route('vendors.index', array_filter(['category' => $category->slug, 'q' => $filters['q'], 'state' => $filters['state']])) }}" @class(['group flex w-16 flex-col items-center gap-2 text-center text-[11px] font-medium whitespace-nowrap transition', 'text-brand-700' => $filters['category'] === $category->slug, 'text-ink-muted hover:text-ink' => $filters['category'] !== $category->slug])>
-                                <span @class(['flex size-12 items-center justify-center rounded-full text-2xl transition', 'bg-brand-600 shadow-md shadow-brand-600/30' => $filters['category'] === $category->slug, 'bg-surface-muted group-hover:bg-brand-50' => $filters['category'] !== $category->slug])>{{ $category->icon }}</span>
+                                <span @class(['flex size-14 items-center justify-center overflow-hidden rounded-full bg-white text-2xl transition', 'shadow-md shadow-brand-600/30 ring-2 ring-brand-600' => $filters['category'] === $category->slug, 'ring-1 ring-line group-hover:ring-brand-300' => $filters['category'] !== $category->slug])>
+                                    <x-category-icon class="size-9" :slug="$category->slug" :fallback="$category->icon" />
+                                </span>
                                 {{ $category->name }}
                             </a>
                         </li>

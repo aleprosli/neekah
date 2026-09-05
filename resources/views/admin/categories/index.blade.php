@@ -17,6 +17,7 @@
                                 <form method="POST" action="{{ route('admin.categories.update', $category) }}" class="flex flex-wrap items-center gap-2">
                                     @csrf
                                     @method('PUT')
+                                    <x-category-icon class="size-9 shrink-0" :slug="$category->slug" :fallback="$category->icon" title="Ilustrasi kategori" />
                                     <input type="text" name="icon" value="{{ $category->icon }}" class="w-14 rounded-lg border border-line bg-surface px-2 py-1.5 text-center" aria-label="Ikon">
                                     <input type="text" name="name" value="{{ $category->name }}" class="w-32 sm:w-40 rounded-lg border border-line bg-surface px-3 py-1.5" aria-label="Nama">
                                     <input type="text" name="examples" value="{{ $category->examples }}" class="w-40 sm:w-56 rounded-lg border border-line bg-surface px-3 py-1.5 text-xs" aria-label="Contoh">
@@ -56,7 +57,7 @@
             @csrf
             <h2 class="font-semibold">Tambah kategori</h2>
             <x-form.field label="Nama" name="name" placeholder="Kereta Pengantin" required />
-            <x-form.field label="Ikon (emoji)" name="icon" placeholder="🚗" required />
+            <x-form.field label="Ikon (emoji)" name="icon" placeholder="🚗" help="Digunakan jika kategori ini belum ada ilustrasi SVG." required />
             <x-form.field label="Contoh" name="examples" placeholder="Sewa kereta, deco kereta" />
             <x-form.field label="Susunan" name="sort_order" type="number" value="99" />
             <label class="flex items-center gap-2 text-sm">

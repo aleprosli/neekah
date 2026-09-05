@@ -20,7 +20,10 @@ it('shows every active vendor category in the marketplace preview', function () 
 
     foreach (Category::active()->get() as $category) {
         $response->assertSee($category->name);
+        $response->assertDontSee($category->icon, escape: false);
     }
+
+    $response->assertSee('img/icon/venue.svg')->assertSee('img/icon/decoration.svg');
 });
 
 it('shows approved featured vendors and the vendor point system', function () {

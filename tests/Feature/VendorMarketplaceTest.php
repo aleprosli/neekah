@@ -102,3 +102,32 @@ it('returns 404 for unknown or unapproved vendors', function () {
     $this->get(route('vendors.show', 'vendor-tak-wujud'))->assertNotFound();
     $this->get(route('vendors.show', $pending))->assertNotFound();
 });
+
+it('draws every category filter tile with its own illustration', function () {
+    Vendor::factory()->for($this->photography)->create();
+
+    $response = $this->get('/')->assertOk();
+
+    $response->assertSee('img/icon/all.svg')
+        ->assertSee('img/icon/photography.svg')
+        ->assertSee('img/icon/catering.svg');
+
+    foreach (Category::pluck('icon') as $emoji) {
+        $response->assertDontSee($emoji, escape: false);
+    }
+});
+
+it('draws the category illustration on each vendor card', function () {
+    Vendor::factory()->for($this->catering)->create(['name' => 'Dapur Warisan Catering']);
+
+    $this->get('/')
+        ->assertOk()
+        ->assertSee('img/icon/catering.svg')
+        ->assertDontSee($this->catering->icon, escape: false);
+});
+
+it('falls back to the category emoji when no illustration exists', function () {
+    Category::where('slug', 'photography')->update(['slug' => 'sewa-kereta', 'icon' => '🚗']);
+
+    $this->get('/')->assertOk()->assertSee('🚗', escape: false);
+});

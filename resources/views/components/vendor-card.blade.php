@@ -14,7 +14,7 @@
                 <span class="absolute top-3 left-3 rounded-full bg-white/95 px-2.5 py-1 text-xs font-semibold text-ink shadow-sm">Top vendor</span>
             @endif
             <span class="absolute inset-x-0 bottom-0 h-1/3 bg-linear-to-t from-black/35 to-transparent"></span>
-            <span class="absolute bottom-3 left-3 text-3xl drop-shadow" aria-hidden="true">{{ $vendor->category->icon }}</span>
+            <span class="absolute bottom-3 left-3 flex size-10 items-center justify-center rounded-full bg-white text-xl shadow-sm" aria-hidden="true"><x-category-icon class="size-6" :slug="$vendor->category->slug" :fallback="$vendor->category->icon" /></span>
         </div>
 
         <p class="mt-2 truncate text-[11px] font-semibold tracking-wide text-brand-600 uppercase">{{ $vendor->category->name }} · {{ $vendor->state }}</p>

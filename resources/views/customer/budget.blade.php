@@ -53,7 +53,7 @@
                 <tbody class="divide-y divide-line">
                     @foreach ($rows as $row)
                         <tr>
-                            <td class="px-4 py-3 whitespace-nowrap">{{ $row['category']->icon }} {{ $row['category']->name }}</td>
+                            <td class="px-4 py-3 whitespace-nowrap"><x-category-icon class="inline-block size-5 shrink-0 align-[-0.3em]" :slug="$row['category']->slug" :fallback="$row['category']->icon" /> {{ $row['category']->name }}</td>
                             <td class="px-4 py-3 text-right">
                                 <label class="sr-only" for="planned-{{ $row['category']->id }}">Bajet {{ $row['category']->name }}</label>
                                 <input id="planned-{{ $row['category']->id }}" type="number" step="50" min="0" name="planned[{{ $row['category']->id }}]" value="{{ (int) $row['planned'] }}" class="w-28 rounded-lg border border-line bg-surface px-2 py-1.5 text-right focus:border-brand-400 focus:outline-none">

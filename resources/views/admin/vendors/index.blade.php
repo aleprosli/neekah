@@ -40,7 +40,7 @@
                                 <a href="{{ route('admin.vendors.show', $vendor) }}" class="font-medium hover:text-brand-700">{{ $vendor->name }}</a>
                                 <p class="text-xs text-ink-muted">{{ $vendor->user->email }}</p>
                             </td>
-                            <td class="px-4 py-3 whitespace-nowrap">{{ $vendor->category->icon }} {{ $vendor->category->name }}</td>
+                            <td class="px-4 py-3 whitespace-nowrap"><x-category-icon class="inline-block size-5 shrink-0 align-[-0.3em]" :slug="$vendor->category->slug" :fallback="$vendor->category->icon" /> {{ $vendor->category->name }}</td>
                             <td class="px-4 py-3 whitespace-nowrap">{{ $vendor->city }}, {{ $vendor->state }}</td>
                             <td class="px-4 py-3 whitespace-nowrap">{{ $vendor->tier->label() }}</td>
                             <td class="px-4 py-3 text-right">{{ number_format((float) $vendor->score, 1) }}</td>

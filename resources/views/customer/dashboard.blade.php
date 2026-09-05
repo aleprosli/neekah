@@ -49,7 +49,7 @@
                         @foreach ($bookings as $booking)
                             <li>
                                 <a href="{{ route('bookings.show', $booking) }}" class="flex items-center gap-4 p-4 transition hover:bg-surface-muted">
-                                    <span class="flex size-12 shrink-0 items-center justify-center rounded-xl bg-linear-to-br text-xl {{ $booking->vendor->cover_tone }}">{{ $booking->vendor->category->icon }}</span>
+                                    <span class="flex size-12 shrink-0 items-center justify-center rounded-xl bg-linear-to-br p-1 text-xl {{ $booking->vendor->cover_tone }}"><x-category-icon class="size-full" :slug="$booking->vendor->category->slug" :fallback="$booking->vendor->category->icon" /></span>
                                     <div class="min-w-0 flex-1">
                                         <p class="truncate font-medium">{{ $booking->vendor->name }}</p>
                                         <p class="truncate text-sm text-ink-muted">{{ $booking->vendor->category->name }} · {{ $booking->package_name }}</p>
@@ -74,7 +74,7 @@
                         <li>
                             <a href="{{ $done ? route('bookings.index') : route('vendors.index', ['category' => $category->slug]) }}" class="flex items-center gap-3 rounded-xl px-2 py-1.5 text-sm transition hover:bg-surface-muted">
                                 <span @class(['flex size-5 shrink-0 items-center justify-center rounded-full text-[10px] font-semibold', 'bg-emerald-500 text-white' => $done, 'border border-line' => ! $done])>{{ $done ? '✓' : '' }}</span>
-                                <span aria-hidden="true">{{ $category->icon }}</span>
+                                <x-category-icon class="size-5 shrink-0" :slug="$category->slug" :fallback="$category->icon" />
                                 <span @class(['text-ink-muted line-through' => $done])>{{ $category->name }}</span>
                             </a>
                         </li>

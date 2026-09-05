@@ -41,8 +41,8 @@
                 {{-- Summary --}}
                 <div class="flex flex-col gap-2 pb-6">
                     <h1 class="font-display text-2xl font-semibold tracking-tight md:hidden">{{ $vendor->name }}</h1>
-                    <h2 class="hidden text-lg font-medium md:block">{{ $category->icon }} {{ $category->name }} · {{ $vendor->tagline }}</h2>
-                    <p class="text-ink-muted md:hidden">{{ $category->icon }} {{ $category->name }} · {{ $vendor->city }}, {{ $vendor->state }}</p>
+                    <h2 class="hidden text-lg font-medium md:block"><x-category-icon class="inline-block size-5 shrink-0 align-[-0.3em]" :slug="$category->slug" :fallback="$category->icon" /> {{ $category->name }} · {{ $vendor->tagline }}</h2>
+                    <p class="text-ink-muted md:hidden"><x-category-icon class="inline-block size-5 shrink-0 align-[-0.3em]" :slug="$category->slug" :fallback="$category->icon" /> {{ $category->name }} · {{ $vendor->city }}, {{ $vendor->state }}</p>
                     <p class="text-sm">
                         <span class="font-semibold"><span class="text-gold-500">★</span> {{ $vendor->reviews_count ? number_format($vendor->rating_avg, 1) : 'Baru' }}</span>
                         <span class="text-ink-muted">·</span>

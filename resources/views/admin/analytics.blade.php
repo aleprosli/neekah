@@ -56,7 +56,7 @@
         <ul class="mt-4 flex flex-col gap-2">
             @foreach ($topVendors as $vendor)
                 <li class="flex items-center justify-between gap-3 text-sm">
-                    <a href="{{ route('admin.vendors.show', $vendor) }}" class="min-w-0 truncate hover:text-brand-700">{{ $vendor->category->icon }} {{ $vendor->name }}</a>
+                    <a href="{{ route('admin.vendors.show', $vendor) }}" class="min-w-0 truncate hover:text-brand-700"><x-category-icon class="inline-block size-5 shrink-0 align-[-0.3em]" :slug="$vendor->category->slug" :fallback="$vendor->category->icon" /> {{ $vendor->name }}</a>
                     <span class="shrink-0 text-ink-muted">{{ number_format($vendor->score, 1) }}</span>
                 </li>
             @endforeach

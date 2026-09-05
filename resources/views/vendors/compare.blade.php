@@ -8,7 +8,7 @@
             <h1 class="font-display text-3xl font-semibold tracking-tight">Banding vendor</h1>
             <p class="text-sm text-ink-muted">
                 @if ($sharedCategory)
-                    {{ $sharedCategory->icon }} {{ $sharedCategory->name }} · {{ $vendors->count() }} vendor dibandingkan
+                    <x-category-icon class="inline-block size-5 shrink-0 align-[-0.3em]" :slug="$sharedCategory->slug" :fallback="$sharedCategory->icon" /> {{ $sharedCategory->name }} · {{ $vendors->count() }} vendor dibandingkan
                 @else
                     Pilih sehingga {{ \App\Http\Controllers\VendorComparisonController::MAX_VENDORS }} vendor daripada marketplace.
                 @endif

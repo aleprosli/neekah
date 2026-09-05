@@ -89,15 +89,15 @@
                             <p class="text-xs font-semibold tracking-wide text-ink-muted uppercase">Akan datang</p>
                             <ul class="mt-3 flex flex-col gap-2 text-sm">
                                 <li class="flex items-center justify-between rounded-xl border border-line px-3 py-2">
-                                    <span>📸 Photographer</span>
+                                    <span><x-category-icon class="inline-block size-5 shrink-0 align-[-0.3em]" slug="photography" fallback="📸" /> Photographer</span>
                                     <span class="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-semibold text-emerald-700">Confirmed</span>
                                 </li>
                                 <li class="flex items-center justify-between rounded-xl border border-line px-3 py-2">
-                                    <span>🍽️ Catering</span>
+                                    <span><x-category-icon class="inline-block size-5 shrink-0 align-[-0.3em]" slug="catering" fallback="🍽️" /> Catering</span>
                                     <span class="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-semibold text-emerald-700">Confirmed</span>
                                 </li>
                                 <li class="flex items-center justify-between rounded-xl border border-line px-3 py-2">
-                                    <span>💄 Makeup</span>
+                                    <span><x-category-icon class="inline-block size-5 shrink-0 align-[-0.3em]" slug="makeup" fallback="💄" /> Makeup</span>
                                     <span class="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-700">Pending</span>
                                 </li>
                             </ul>
@@ -170,7 +170,7 @@
                     @foreach ($categories as $category)
                         <li>
                             <a href="{{ route('vendors.index', ['category' => $category->slug]) }}" class="flex h-full flex-col gap-1 rounded-2xl border border-line bg-surface-raised p-4 transition hover:border-brand-300 hover:shadow-md">
-                                <span class="text-2xl">{{ $category->icon }}</span>
+                                <x-category-icon class="size-9" :slug="$category->slug" :fallback="$category->icon" />
                                 <span class="font-semibold">{{ $category->name }}</span>
                                 <span class="text-xs text-ink-muted">{{ $category->examples }}</span>
                             </a>

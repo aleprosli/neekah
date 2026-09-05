@@ -52,7 +52,7 @@
                         <div class="min-w-0 flex-1">
                             <p class="truncate font-medium">{{ $task->title }}</p>
                             <p class="flex flex-wrap items-center gap-x-2 text-xs text-ink-muted">
-                                @if ($task->category)<span>{{ $task->category->icon }} {{ $task->category->name }}</span>@endif
+                                @if ($task->category)<span><x-category-icon class="inline-block size-5 shrink-0 align-[-0.3em]" :slug="$task->category->slug" :fallback="$task->category->icon" /> {{ $task->category->name }}</span>@endif
                                 @if ($task->due_date)
                                     <span @class(['font-medium text-red-600' => $task->isOverdue()])>
                                         {{ $task->isOverdue() ? 'Lewat ' : '' }}{{ $task->due_date->translatedFormat('j M Y') }}

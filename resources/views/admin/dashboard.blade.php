@@ -25,7 +25,7 @@
                 <ul class="divide-y divide-line rounded-2xl border border-line">
                     @foreach ($pendingVendors as $vendor)
                         <li class="flex items-center gap-3 p-4">
-                            <span class="flex size-10 shrink-0 items-center justify-center rounded-xl bg-linear-to-br text-lg {{ $vendor->cover_tone }}">{{ $vendor->category->icon }}</span>
+                            <span class="flex size-10 shrink-0 items-center justify-center rounded-xl bg-linear-to-br p-1 text-lg {{ $vendor->cover_tone }}"><x-category-icon class="size-full" :slug="$vendor->category->slug" :fallback="$vendor->category->icon" /></span>
                             <div class="min-w-0 flex-1">
                                 <a href="{{ route('admin.vendors.show', $vendor) }}" class="block truncate font-medium hover:text-brand-700">{{ $vendor->name }}</a>
                                 <p class="truncate text-xs text-ink-muted">{{ $vendor->category->name }} · {{ $vendor->city }}, {{ $vendor->state }}</p>

@@ -13,7 +13,7 @@
             @foreach ($enquiries as $enquiry)
                 <li>
                     <a href="{{ route('enquiries.show', $enquiry) }}" class="flex items-center gap-4 p-4 transition hover:bg-surface-muted">
-                        <span class="flex size-12 shrink-0 items-center justify-center rounded-xl bg-linear-to-br text-xl {{ $enquiry->vendor->cover_tone }}">{{ $enquiry->vendor->category->icon }}</span>
+                        <span class="flex size-12 shrink-0 items-center justify-center rounded-xl bg-linear-to-br p-1 text-xl {{ $enquiry->vendor->cover_tone }}"><x-category-icon class="size-full" :slug="$enquiry->vendor->category->slug" :fallback="$enquiry->vendor->category->icon" /></span>
                         <div class="min-w-0 flex-1">
                             <div class="flex items-center gap-2">
                                 <p class="truncate font-medium">{{ $enquiry->vendor->name }}</p>

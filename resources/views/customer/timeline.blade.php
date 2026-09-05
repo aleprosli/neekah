@@ -68,7 +68,7 @@
                                 <p class="font-medium">{{ $item->title }}</p>
                                 <p class="flex flex-wrap items-center gap-x-2 text-sm text-ink-muted">
                                     @if ($item->vendor)
-                                        <a href="{{ route('vendors.show', $item->vendor) }}" class="hover:text-ink">{{ $item->vendor->category->icon }} {{ $item->vendor->name }}</a>
+                                        <a href="{{ route('vendors.show', $item->vendor) }}" class="hover:text-ink"><x-category-icon class="inline-block size-5 shrink-0 align-[-0.3em]" :slug="$item->vendor->category->slug" :fallback="$item->vendor->category->icon" /> {{ $item->vendor->name }}</a>
                                     @endif
                                     @if ($item->location)<span>📍 {{ $item->location }}</span>@endif
                                 </p>
