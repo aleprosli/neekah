@@ -10,6 +10,7 @@
             <a href="{{ route('vendors.index') }}" @class(['rounded-full px-4 py-2 transition hover:bg-surface-muted', 'bg-surface-muted text-brand-700' => request()->routeIs('vendors.*')])>Cari Vendor</a>
             <a href="{{ route('landing') }}#cara" class="rounded-full px-4 py-2 transition hover:bg-surface-muted">Cara Ia Berfungsi</a>
             <a href="{{ route('vendor.register') }}" class="rounded-full px-4 py-2 transition hover:bg-surface-muted">Untuk Vendor</a>
+            <a href="{{ route('blog.index') }}" @class(['rounded-full px-4 py-2 transition hover:bg-surface-muted', 'bg-surface-muted text-brand-700' => request()->routeIs('blog.*')])>Blog</a>
         </nav>
 
         <div class="flex shrink-0 items-center gap-1">

@@ -125,7 +125,7 @@
                     <div class="mt-8 grid grid-cols-2 gap-3">
                         @foreach ($site->photos as $photo)
                             <figure class="overflow-hidden rounded-2xl">
-                                <img src="{{ $photo->url() }}" alt="{{ $photo->caption ?? 'Gambar pengantin' }}" loading="lazy" class="h-40 w-full object-cover sm:h-56">
+                                <img src="{{ \App\Actions\StoreOptimizedImage::thumbnailUrl($photo->path) }}" alt="{{ $photo->caption ?? 'Gambar pengantin' }}" loading="lazy" decoding="async" class="h-40 w-full object-cover sm:h-56">
                                 @if ($photo->caption)<figcaption class="nk-muted mt-1.5 text-xs">{{ $photo->caption }}</figcaption>@endif
                             </figure>
                         @endforeach

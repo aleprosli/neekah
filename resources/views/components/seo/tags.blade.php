@@ -21,6 +21,12 @@
     <meta property="og:image:height" content="{{ $seo->imageHeight() }}">
 @endif
 <meta property="og:locale" content="{{ str_replace('-', '_', app()->getLocale()) }}_MY">
+@if ($seo->publishedTime())
+    <meta property="article:published_time" content="{{ $seo->publishedTime() }}">
+@endif
+@if ($seo->modifiedTime())
+    <meta property="article:modified_time" content="{{ $seo->modifiedTime() }}">
+@endif
 
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="{{ $seo->resolvedTitle() }}">
@@ -28,4 +34,9 @@
 <meta name="twitter:image" content="{{ $seo->resolvedImage() }}">
 @if (config('neekah.seo.twitter'))
     <meta name="twitter:site" content="{{ config('neekah.seo.twitter') }}">
+@endif
+
+@if ($jsonLd = $seo->jsonLd())
+    {{-- Encoded by Seo::jsonLd() with JSON_HEX_TAG, so it cannot break out of the tag. --}}
+    <script type="application/ld+json">{!! $jsonLd !!}</script>
 @endif

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Vendor;
 
+use App\Actions\StoreOptimizedImage;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\UpdateVendorProfileRequest;
 use App\Models\Category;
@@ -9,7 +10,6 @@ use App\Models\Vendor;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 class ProfileController extends Controller
 {
@@ -23,17 +23,14 @@ class ProfileController extends Controller
         ]);
     }
 
-    public function update(UpdateVendorProfileRequest $request): RedirectResponse
+    public function update(UpdateVendorProfileRequest $request, StoreOptimizedImage $storeImage): RedirectResponse
     {
         $vendor = $request->user()->vendor;
         $data = $request->safe()->except('cover_image');
 
         if ($request->hasFile('cover_image')) {
-            if ($vendor->cover_image) {
-                Storage::disk('public')->delete($vendor->cover_image);
-            }
-
-            $data['cover_image'] = $request->file('cover_image')->store('vendors/'.$vendor->id, 'public');
+            $storeImage->delete($vendor->cover_image);
+            $data['cover_image'] = $storeImage->handle($request->file('cover_image'), 'vendors/'.$vendor->id);
         }
 
         $vendor->update($data);

@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Support\ImageSettings;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreWeddingSitePhotoRequest extends FormRequest
@@ -14,11 +15,11 @@ class StoreWeddingSitePhotoRequest extends FormRequest
     /**
      * @return array<string, array<int, mixed>>
      */
-    public function rules(): array
+    public function rules(ImageSettings $images): array
     {
         return [
             'images' => ['required', 'array', 'min:1', 'max:12'],
-            'images.*' => ['image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
+            'images.*' => $images->uploadRules(),
             'caption' => ['nullable', 'string', 'max:160'],
         ];
     }

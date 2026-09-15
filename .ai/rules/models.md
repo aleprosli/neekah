@@ -2,6 +2,7 @@
 paths:
   - app/Models/WeddingGuest.php
   - app/Models/Vendor.php
+  - app/Models/Post.php
 ---
 
 # Models
@@ -13,3 +14,6 @@ RSVPs attach to a guest by token, or by phone when exactly one guest of that wed
 
 ## response_rate is measured, never set by hand
 vendors.response_rate is derived in Vendor::calculateResponseRate() from enquiries answered over enquiries older than 24 hours, and refreshed by RecalculateVendorStats. It is nullable and returns null below MIN_ENQUIRIES_FOR_RESPONSE_RATE, because with two or three enquiries the figure is noise. Display it through responseRateLabel(), which reads "Belum diukur" when null. Do not add a form field that sets it: one existed in the admin tier form and was removed, and any value typed in is overwritten on the next recalculation anyway.
+
+## Blog body is sanitised on save; publish times are Malaysian time
+Post body is printed unescaped ({!! !!}), so every write must pass through App\Support\HtmlSanitizer (StorePostRequest::attributesForPost does). app.timezone is UTC: the admin's datetime-local input is parsed in Post::LOCAL_TIMEZONE (Asia/Kuala_Lumpur) and displayed via localPublishedAt(); never call setTimezone() on the published_at attribute itself.

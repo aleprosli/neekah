@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Customer;
 
+use App\Actions\StoreOptimizedImage;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreWeddingSiteRequest;
 use App\Models\SiteTemplate;
@@ -11,7 +12,6 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class WeddingSiteController extends Controller
@@ -42,24 +42,19 @@ class WeddingSiteController extends Controller
         ]);
     }
 
-    public function update(StoreWeddingSiteRequest $request, Wedding $wedding): RedirectResponse
+    public function update(StoreWeddingSiteRequest $request, Wedding $wedding, StoreOptimizedImage $storeImage): RedirectResponse
     {
         $attributes = $request->siteAttributes();
 
         if ($request->hasFile('cover_image')) {
-            if ($wedding->site?->cover_image) {
-                Storage::disk('public')->delete($wedding->site->cover_image);
-            }
-
-            $attributes['cover_image'] = $request->file('cover_image')->store('sites/'.$wedding->id, 'public');
+            $storeImage->delete($wedding->site?->cover_image);
+            $attributes['cover_image'] = $storeImage->handle($request->file('cover_image'), 'sites/'.$wedding->id);
         }
 
+        // Lossless: a guest scans this from the screen, and compression blur breaks the scan.
         if ($request->hasFile('gift_qr_image')) {
-            if ($wedding->site?->gift_qr_image) {
-                Storage::disk('public')->delete($wedding->site->gift_qr_image);
-            }
-
-            $attributes['gift_qr_image'] = $request->file('gift_qr_image')->store('sites/'.$wedding->id, 'public');
+            $storeImage->delete($wedding->site?->gift_qr_image);
+            $attributes['gift_qr_image'] = $storeImage->handle($request->file('gift_qr_image'), 'sites/'.$wedding->id, lossless: true);
         }
 
         $site = $wedding->site()->updateOrCreate([], $attributes);

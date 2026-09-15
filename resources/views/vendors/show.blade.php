@@ -23,7 +23,8 @@
                 @if ($gallery->isNotEmpty())
                     @foreach ($gallery as $item)
                         <div @class(['overflow-hidden', 'col-span-4 row-span-2 md:col-span-2' => $loop->first, 'hidden md:block' => ! $loop->first])>
-                            <img src="{{ $item->url() }}" alt="{{ $item->caption }}" class="size-full object-cover">
+                            {{-- The large first photo is what the visitor sees first, so it loads at once and at full size; the small tiles take thumbnails. --}}
+                            <img src="{{ $loop->first ? $item->url() : \App\Actions\StoreOptimizedImage::thumbnailUrl($item->path) }}" alt="{{ $item->caption ?: $vendor->name }}" @if ($loop->first) fetchpriority="high" @else loading="lazy" @endif decoding="async" class="size-full object-cover">
                         </div>
                     @endforeach
                 @else

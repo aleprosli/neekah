@@ -2,6 +2,7 @@
 
 namespace App\Support;
 
+use Carbon\CarbonInterface;
 use Illuminate\Support\Str;
 
 /**
@@ -37,6 +38,13 @@ class Seo
     private bool $indexable = true;
 
     private bool $withSiteName = true;
+
+    /** @var array<int, array<string, mixed>> */
+    private array $schemas = [];
+
+    private ?CarbonInterface $publishedAt = null;
+
+    private ?CarbonInterface $modifiedAt = null;
 
     public function title(?string $title): static
     {
@@ -184,5 +192,75 @@ class Seo
     public function resolvedImage(): string
     {
         return $this->image ?: asset(config('neekah.seo.image'));
+    }
+
+    /**
+     * Dates for an article, so a shared link and Google can show when it was
+     * written and last revised.
+     */
+    public function article(?CarbonInterface $publishedAt, ?CarbonInterface $modifiedAt = null): static
+    {
+        $this->publishedAt = $publishedAt;
+        $this->modifiedAt = $modifiedAt;
+
+        return $this;
+    }
+
+    public function publishedTime(): ?string
+    {
+        return $this->publishedAt?->toAtomString();
+    }
+
+    public function modifiedTime(): ?string
+    {
+        return $this->modifiedAt?->toAtomString();
+    }
+
+    /**
+     * Describe what the page is about to Google as a schema.org node, without
+     *
+     * @context; every node set for the page is printed together as one graph.
+     * Null and empty values are dropped, so optional facts can be passed as-is.
+     *
+     * @param  array<string, mixed>  $node
+     */
+    public function schema(array $node): static
+    {
+        $this->schemas[] = array_filter($node, fn (mixed $value): bool => $value !== null && $value !== []);
+
+        return $this;
+    }
+
+    /**
+     * The trail Google shows above the result instead of the bare URL.
+     *
+     * @param  array<string, string>  $trail  Name => URL, from the home page down to this page.
+     */
+    public function breadcrumbs(array $trail): static
+    {
+        $items = [];
+
+        foreach ($trail as $name => $url) {
+            $items[] = ['@type' => 'ListItem', 'position' => count($items) + 1, 'name' => (string) $name, 'item' => $url];
+        }
+
+        return $this->schema(['@type' => 'BreadcrumbList', 'itemListElement' => $items]);
+    }
+
+    /**
+     * The JSON-LD graph, or null when there is nothing to say or the page is
+     * kept out of the index anyway. HEX_TAG keeps a "</script>" inside any
+     * value from closing the tag early.
+     */
+    public function jsonLd(): ?string
+    {
+        if ($this->schemas === [] || ! $this->indexable) {
+            return null;
+        }
+
+        return json_encode(
+            ['@context' => 'https://schema.org', '@graph' => $this->schemas],
+            JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP,
+        ) ?: null;
     }
 }

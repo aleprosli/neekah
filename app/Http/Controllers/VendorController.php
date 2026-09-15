@@ -107,10 +107,35 @@ class VendorController extends Controller
             ->limit(3)
             ->get();
 
+        $description = $vendor->tagline ?: Str::of((string) $vendor->description)->squish()->value();
+
         $seo->title($vendor->name.' — '.$vendor->category->name.' di '.$vendor->city)
-            ->description($vendor->tagline ?: Str::of((string) $vendor->description)->squish()->value())
+            ->description($description)
             ->image($vendor->portfolioItems->first()?->url())
-            ->type('profile');
+            ->type('profile')
+            ->breadcrumbs([
+                'Neekah' => route('vendors.index'),
+                $vendor->category->name => route('vendors.index', ['category' => $vendor->category->slug]),
+                $vendor->name => route('vendors.show', $vendor),
+            ])
+            ->schema([
+                '@type' => 'LocalBusiness',
+                '@id' => route('vendors.show', $vendor).'#vendor',
+                'name' => $vendor->name,
+                'description' => $description ?: null,
+                'url' => route('vendors.show', $vendor),
+                'image' => $vendor->portfolioItems->take(3)->map(fn ($item): string => $item->url())->values()->all(),
+                'address' => ['@type' => 'PostalAddress', 'addressLocality' => $vendor->city, 'addressRegion' => $vendor->state, 'addressCountry' => 'MY'],
+                'priceRange' => 'Dari RM'.number_format((float) $vendor->price_from),
+                // Stars in results are only claimed once real reviews exist.
+                'aggregateRating' => $vendor->reviews_count > 0 ? [
+                    '@type' => 'AggregateRating',
+                    'ratingValue' => round((float) $vendor->rating_avg, 1),
+                    'reviewCount' => $vendor->reviews_count,
+                    'bestRating' => 5,
+                    'worstRating' => 1,
+                ] : null,
+            ]);
 
         return view('vendors.show', [
             'vendor' => $vendor,
@@ -146,8 +171,30 @@ class VendorController extends Controller
         $seo->title($category ? 'Vendor '.$category->name.$where : 'Cari vendor perkahwinan'.$where)
             ->description($category
                 ? 'Bandingkan dan tempah '.Str::lower($category->name).$where.'. Harga, pakej, rating dan review daripada pasangan yang benar-benar menempah.'
-                : null)
+                : 'Cari dan tempah vendor perkahwinan'.$where.': jurugambar, katering, pelamin, mak andam dan banyak lagi. Harga, pakej dan review sebenar.')
             ->canonical(url()->current().($keep ? '?'.http_build_query($keep) : ''));
+
+        if ($category) {
+            $seo->breadcrumbs(['Neekah' => route('vendors.index'), 'Vendor '.$category->name => route('vendors.index', ['category' => $category->slug])]);
+        }
+
+        // The home page is where Google learns the site's own name and logo.
+        if ($keep === []) {
+            $seo->schema([
+                '@type' => 'WebSite',
+                '@id' => route('vendors.index').'#website',
+                'name' => config('app.name'),
+                'url' => route('vendors.index'),
+                'inLanguage' => 'ms-MY',
+            ])->schema([
+                '@type' => 'Organization',
+                '@id' => route('vendors.index').'#organization',
+                'name' => config('app.name'),
+                'url' => route('vendors.index'),
+                'logo' => asset(config('neekah.brand.mark')),
+                'description' => config('neekah.seo.description'),
+            ]);
+        }
 
         if ($filters['q']) {
             $seo->noindex();

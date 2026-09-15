@@ -10,6 +10,7 @@ use App\Support\Seo;
 use Database\Seeders\CategorySeeder;
 use Database\Seeders\SiteTemplateSeeder;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 beforeEach(function () {
     $this->seed(CategorySeeder::class);
@@ -115,7 +116,57 @@ it('serves a sitemap index pointing at one file per kind of page', function () {
         ->assertHeader('content-type', 'application/xml; charset=utf-8')
         ->assertSee(route('sitemap.pages'))
         ->assertSee(route('sitemap.vendors'))
-        ->assertSee(route('sitemap.templates'));
+        ->assertSee(route('sitemap.templates'))
+        ->assertSee(route('sitemap.blog'));
+});
+
+it('names the site and its logo to google on the home page only', function () {
+    $html = $this->get(route('vendors.index'))->assertOk()->getContent();
+    $graph = collect(json_decode(Str::betweenFirst($html, '<script type="application/ld+json">', '</script>'), true)['@graph']);
+
+    expect($graph->pluck('@type')->all())->toBe(['WebSite', 'Organization']);
+
+    $this->get(route('vendors.index', ['category' => 'photography']))
+        ->assertOk()
+        ->assertDontSee('"@type":"WebSite"', false);
+});
+
+it('describes a vendor as a local business with its real rating and a breadcrumb', function () {
+    $vendor = Vendor::factory()->for(Category::where('slug', 'photography')->sole())->create([
+        'city' => 'Alor Setar',
+        'state' => 'Kedah',
+        'rating_avg' => 4.8,
+        'reviews_count' => 12,
+    ]);
+
+    $html = $this->get(route('vendors.show', $vendor))->assertOk()->getContent();
+    $graph = collect(json_decode(Str::betweenFirst($html, '<script type="application/ld+json">', '</script>'), true)['@graph']);
+    $business = $graph->firstWhere('@type', 'LocalBusiness');
+
+    expect($business['address']['addressRegion'])->toBe('Kedah')
+        ->and($business['aggregateRating']['ratingValue'])->toBe(4.8)
+        ->and($business['aggregateRating']['reviewCount'])->toBe(12)
+        ->and($graph->firstWhere('@type', 'BreadcrumbList')['itemListElement'])->toHaveCount(3);
+});
+
+it('claims no star rating for a vendor nobody has reviewed yet', function () {
+    $vendor = Vendor::factory()->for(Category::first())->create(['reviews_count' => 0]);
+
+    $html = $this->get(route('vendors.show', $vendor))->assertOk()->getContent();
+    $graph = collect(json_decode(Str::betweenFirst($html, '<script type="application/ld+json">', '</script>'), true)['@graph']);
+
+    expect($graph->firstWhere('@type', 'LocalBusiness'))->not->toHaveKey('aggregateRating');
+});
+
+it('describes the vendor sign up page, since vendors search for it', function () {
+    $this->get(route('vendor.register'))
+        ->assertOk()
+        ->assertSee('<title>Daftar sebagai vendor perkahwinan · Neekah</title>', false)
+        ->assertDontSee('name="robots" content="noindex', false);
+
+    $this->get(route('sitemap.pages'))
+        ->assertSee(route('vendor.register'))
+        ->assertSee(route('blog.index'));
 });
 
 it('lists approved vendors in the sitemap and leaves the rest out', function () {

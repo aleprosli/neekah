@@ -12,6 +12,8 @@
         ['label' => 'Tempahan', 'icon' => '🧾', 'href' => route('admin.bookings.index'), 'active' => request()->routeIs('admin.bookings.*')],
         ['label' => 'Laporan', 'icon' => '⚠️', 'href' => route('admin.violations.index'), 'active' => request()->routeIs('admin.violations.*'), 'badge' => $openViolations ?: null],
         ['label' => 'Kewangan', 'icon' => '💰', 'href' => route('admin.transactions.index'), 'active' => request()->routeIs('admin.transactions.*')],
+        ['label' => 'Blog', 'icon' => '📝', 'href' => route('admin.posts.index'), 'active' => request()->routeIs('admin.posts.*')],
+        ['label' => 'Tetapan', 'icon' => '⚙️', 'href' => route('admin.settings.edit'), 'active' => request()->routeIs('admin.settings.*')],
         ['label' => 'Log sistem', 'icon' => '🩺', 'href' => route('log-viewer.index'), 'active' => request()->routeIs('log-viewer.*')],
     ];
 @endphp

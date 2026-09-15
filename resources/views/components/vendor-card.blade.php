@@ -1,12 +1,12 @@
 @props(['vendor', 'comparable' => false])
 
-@php use App\Enums\VendorTier; @endphp
+@php use App\Actions\StoreOptimizedImage; use App\Enums\VendorTier; @endphp
 
 <div class="group relative flex flex-col gap-1">
     <a href="{{ route('vendors.show', $vendor) }}" class="flex flex-col gap-1">
         <div class="relative aspect-[4/5] overflow-hidden rounded-2xl bg-linear-to-br transition group-hover:shadow-xl group-hover:shadow-brand-900/10 {{ $vendor->cover_tone }}">
             @if ($vendor->cover_image)
-                <img src="{{ Storage::disk('public')->url($vendor->cover_image) }}" alt="" class="absolute inset-0 size-full object-cover">
+                <img src="{{ StoreOptimizedImage::thumbnailUrl($vendor->cover_image) }}" alt="{{ $vendor->category->name }} {{ $vendor->name }}" loading="lazy" decoding="async" class="absolute inset-0 size-full object-cover">
             @endif
             @if ($vendor->tier === VendorTier::Recommended)
                 <span class="absolute top-3 left-3 rounded-full bg-gold-300 px-2.5 py-1 text-xs font-semibold text-brand-900 shadow-sm">🏆 Recommended</span>

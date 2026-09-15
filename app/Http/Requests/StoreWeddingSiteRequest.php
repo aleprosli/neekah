@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use App\Models\SiteTemplate;
 use App\Models\WeddingSite;
+use App\Support\ImageSettings;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -24,7 +25,7 @@ class StoreWeddingSiteRequest extends FormRequest
     /**
      * @return array<string, array<int, mixed>>
      */
-    public function rules(): array
+    public function rules(ImageSettings $images): array
     {
         $site = $this->route('wedding')->site;
 
@@ -54,13 +55,13 @@ class StoreWeddingSiteRequest extends FormRequest
             'contacts' => ['nullable', 'array', 'max:6'],
             'contacts.*.name' => ['nullable', 'string', 'max:80'],
             'contacts.*.phone' => ['nullable', 'string', 'max:30'],
-            'cover_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
+            'cover_image' => ['nullable', ...$images->uploadRules()],
             'rsvp_enabled' => ['nullable', 'boolean'],
             'rsvp_deadline' => ['nullable', 'date', 'before_or_equal:event_date'],
             'closing_note' => ['nullable', 'string', 'max:500'],
             'gift_enabled' => ['nullable', 'boolean'],
             'gift_note' => ['nullable', 'string', 'max:500'],
-            'gift_qr_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
+            'gift_qr_image' => ['nullable', ...$images->uploadRules()],
             'gift_accounts' => ['nullable', 'array', 'max:4'],
             'gift_accounts.*.bank' => ['nullable', 'string', 'max:60'],
             'gift_accounts.*.holder' => ['nullable', 'string', 'max:80'],

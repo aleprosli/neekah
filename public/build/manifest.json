@@ -92,7 +92,7 @@
     "src": "_playfair-display-700-normal-CuDiGg7c.woff2"
   },
   "resources/css/app.css": {
-    "file": "assets/app-BXLRbTGr.css",
+    "file": "assets/app-Co6Rv-0X.css",
     "name": "app",
     "names": [
       "app.css"
@@ -101,9 +101,18 @@
     "isEntry": true
   },
   "resources/js/app.js": {
-    "file": "assets/app-B6XDTT_l.js",
+    "file": "assets/app-BM3RpWZe.js",
     "name": "app",
     "src": "resources/js/app.js",
-    "isEntry": true
+    "isEntry": true,
+    "dynamicImports": [
+      "resources/js/editor.js"
+    ]
+  },
+  "resources/js/editor.js": {
+    "file": "assets/editor-UqJ9v6pf.js",
+    "name": "editor",
+    "src": "resources/js/editor.js",
+    "isDynamicEntry": true
   }
 }

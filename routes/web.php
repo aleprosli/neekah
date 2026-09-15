@@ -6,6 +6,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\BlogController;
 use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\Customer as CustomerArea;
 use App\Http\Controllers\Customer\BookingController;
@@ -38,7 +39,11 @@ Route::get('/vendors/{vendor}', [VendorController::class, 'show'])->name('vendor
 
 Route::get('/about', LandingController::class)->name('landing');
 
+Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
+Route::get('/blog/{post:slug}', [BlogController::class, 'show'])->name('blog.show');
+
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap.index');
+Route::get('/sitemap-blog.xml', [SitemapController::class, 'blog'])->name('sitemap.blog');
 Route::get('/sitemap-pages.xml', [SitemapController::class, 'pages'])->name('sitemap.pages');
 Route::get('/sitemap-vendors.xml', [SitemapController::class, 'vendors'])->name('sitemap.vendors');
 Route::get('/sitemap-templates.xml', [SitemapController::class, 'templates'])->name('sitemap.templates');
@@ -170,4 +175,8 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/violations', [AdminArea\ViolationController::class, 'index'])->name('violations.index');
     Route::get('/violations/{violation}', [AdminArea\ViolationController::class, 'show'])->name('violations.show');
     Route::put('/violations/{violation}', [AdminArea\ViolationController::class, 'update'])->name('violations.update');
+    Route::resource('posts', AdminArea\PostController::class)->except('show');
+    Route::post('/posts/images', AdminArea\PostImageController::class)->middleware('throttle:30,1')->name('posts.images.store');
+    Route::get('/settings', [AdminArea\SettingController::class, 'edit'])->name('settings.edit');
+    Route::put('/settings', [AdminArea\SettingController::class, 'update'])->name('settings.update');
 });

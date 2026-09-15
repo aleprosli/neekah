@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Models\Post;
 use App\Models\SiteTemplate;
 use App\Models\Vendor;
 use Illuminate\Http\Request;
@@ -17,7 +18,7 @@ use Illuminate\Support\Collection;
  */
 class SitemapController extends Controller
 {
-    /** Points Googlebot at the three lists rather than one long file. */
+    /** Points Googlebot at the separate lists rather than one long file. */
     public function index(Request $request): Response
     {
         $this->refuseOnCardHost($request);
@@ -27,6 +28,7 @@ class SitemapController extends Controller
                 route('sitemap.pages'),
                 route('sitemap.vendors'),
                 route('sitemap.templates'),
+                route('sitemap.blog'),
             ],
         ]);
     }
@@ -39,6 +41,8 @@ class SitemapController extends Controller
             ['loc' => route('vendors.index'), 'priority' => '1.0', 'changefreq' => 'daily'],
             ['loc' => route('landing'), 'priority' => '0.8', 'changefreq' => 'monthly'],
             ['loc' => route('sites.templates'), 'priority' => '0.8', 'changefreq' => 'weekly'],
+            ['loc' => route('blog.index'), 'priority' => '0.8', 'changefreq' => 'weekly'],
+            ['loc' => route('vendor.register'), 'priority' => '0.6', 'changefreq' => 'monthly'],
         ]);
 
         // Category listings are real pages: each one is the canonical address
@@ -51,6 +55,25 @@ class SitemapController extends Controller
             ]);
 
         return $this->xml('sitemaps.urls', ['urls' => $urls->concat($categories)]);
+    }
+
+    /**
+     * Only published articles; a draft or a scheduled post appears here the
+     * moment its date passes, with no one having to regenerate anything.
+     */
+    public function blog(Request $request): Response
+    {
+        $this->refuseOnCardHost($request);
+
+        return $this->xml('sitemaps.urls', [
+            'urls' => Post::query()->published()->latest('published_at')->orderByDesc('id')->get(['id', 'slug', 'published_at', 'updated_at'])
+                ->map(fn (Post $post): array => [
+                    'loc' => $post->url(),
+                    'lastmod' => $post->updated_at?->toAtomString(),
+                    'priority' => '0.7',
+                    'changefreq' => 'monthly',
+                ]),
+        ]);
     }
 
     public function vendors(Request $request): Response

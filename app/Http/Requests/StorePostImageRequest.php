@@ -5,11 +5,11 @@ namespace App\Http\Requests;
 use App\Support\ImageSettings;
 use Illuminate\Foundation\Http\FormRequest;
 
-class StorePortfolioItemRequest extends FormRequest
+class StorePostImageRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()?->can('update', $this->user()->vendor) ?? false;
+        return $this->user()?->isAdmin() ?? false;
     }
 
     /**
@@ -18,9 +18,7 @@ class StorePortfolioItemRequest extends FormRequest
     public function rules(ImageSettings $images): array
     {
         return [
-            'images' => ['required', 'array', 'min:1', 'max:10'],
-            'images.*' => $images->uploadRules(),
-            'caption' => ['nullable', 'string', 'max:160'],
+            'image' => ['required', ...$images->uploadRules()],
         ];
     }
 
@@ -30,9 +28,7 @@ class StorePortfolioItemRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'images' => 'gambar',
-            'images.*' => 'gambar',
-            'caption' => 'kapsyen',
+            'image' => 'gambar',
         ];
     }
 }

@@ -5,6 +5,7 @@
             <a href="{{ route('landing') }}" class="transition hover:text-ink">Tentang</a>
             <a href="{{ route('vendors.index') }}" class="transition hover:text-ink">Cari Vendor</a>
             <a href="{{ route('vendor.register') }}" class="transition hover:text-ink">Jadi Vendor</a>
+            <a href="{{ route('blog.index') }}" class="transition hover:text-ink">Blog</a>
         </div>
     </div>
 </footer>

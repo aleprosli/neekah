@@ -7,14 +7,18 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\RegisterVendorRequest;
 use App\Models\Category;
 use App\Models\Vendor;
+use App\Support\Seo;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 
 class RegisterController extends Controller
 {
-    public function create(): View
+    public function create(Seo $seo): View
     {
+        $seo->title('Daftar sebagai vendor perkahwinan')
+            ->description('Sertai Neekah dan terima tempahan daripada pasangan di seluruh Malaysia. Profil percuma, bayaran direkod dalam platform, ranking ikut prestasi sebenar.');
+
         return view('vendor.register', [
             'categories' => Category::active()->ordered()->get(),
             'states' => Vendor::STATES,

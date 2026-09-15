@@ -5,6 +5,7 @@ namespace App\Http\Requests;
 use App\Enums\PriceUnit;
 use App\Models\Category;
 use App\Models\Vendor;
+use App\Support\ImageSettings;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -25,7 +26,7 @@ class UpdateVendorProfileRequest extends FormRequest
     /**
      * @return array<string, array<int, mixed>>
      */
-    public function rules(): array
+    public function rules(ImageSettings $images): array
     {
         return [
             'name' => ['required', 'string', 'max:120', Rule::unique(Vendor::class, 'name')->ignore($this->user()->vendor)],
@@ -39,7 +40,7 @@ class UpdateVendorProfileRequest extends FormRequest
             'price_from' => ['required', 'numeric', 'min:0', 'max:9999999'],
             'price_unit' => ['required', Rule::enum(PriceUnit::class)],
             'cover_tone' => ['required', Rule::in(self::TONES)],
-            'cover_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
+            'cover_image' => ['nullable', ...$images->uploadRules()],
         ];
     }
 
