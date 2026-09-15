@@ -126,7 +126,9 @@
                     <span class="font-display text-lg font-semibold text-ink">{{ $vendors->total() }} vendor</span>
                     @if ($activeCategory) · {{ $activeCategory->name }} @endif
                     @if ($filters['q']) · "{{ $filters['q'] }}" @endif
-                    <span class="ml-1 rounded-full bg-gold-300/50 px-2 py-0.5 text-[11px] font-medium text-brand-900">Data demo</span>
+                    @unless (app()->isProduction())
+                        <span class="ml-1 rounded-full bg-gold-300/50 px-2 py-0.5 text-[11px] font-medium text-brand-900">Data demo</span>
+                    @endunless
                 </p>
 
                 <x-filter-popover :label="'Susun: '.$sorts[$filters['sort']]" align="right" width="w-60">

@@ -24,6 +24,17 @@ it('serves the approved vendor listing at the root url with pagination', functio
         ->assertSee('page=2');
 });
 
+it('shows the demo data badge everywhere except production', function (string $environment, bool $showsBadge) {
+    app()->detectEnvironment(fn (): string => $environment);
+
+    $response = $this->get('/')->assertOk();
+
+    $showsBadge ? $response->assertSee('Data demo') : $response->assertDontSee('Data demo');
+})->with([
+    'local' => ['local', true],
+    'production' => ['production', false],
+]);
+
 it('redirects legacy listing urls to the root', function () {
     $this->get('/marketplace')->assertRedirect('/');
     $this->get('/vendors')->assertRedirect('/');
