@@ -119,12 +119,12 @@ Route::middleware('auth')->group(function (): void {
     Route::delete('/weddings/{wedding}/members/{member}', [CustomerArea\WeddingMemberController::class, 'destroy'])->name('weddings.members.destroy');
     Route::post('/invitations/{invitation}', [InvitationAcceptanceController::class, 'store'])->name('invitations.accept');
 
-    Route::get('/checklist', [CustomerArea\WeddingTaskController::class, 'index'])->name('checklist.index');
+    Route::get('/checklist', [CustomerArea\WeddingTaskController::class, 'index'])->middleware('wedding')->name('checklist.index');
     Route::post('/weddings/{wedding}/tasks', [CustomerArea\WeddingTaskController::class, 'store'])->name('weddings.tasks.store');
     Route::put('/weddings/{wedding}/tasks/{task}', [CustomerArea\WeddingTaskController::class, 'update'])->name('weddings.tasks.update');
     Route::delete('/weddings/{wedding}/tasks/{task}', [CustomerArea\WeddingTaskController::class, 'destroy'])->name('weddings.tasks.destroy');
 
-    Route::get('/tetamu', [CustomerArea\WeddingGuestController::class, 'index'])->name('guests.index');
+    Route::get('/tetamu', [CustomerArea\WeddingGuestController::class, 'index'])->middleware('wedding')->name('guests.index');
     Route::post('/weddings/{wedding}/guests', [CustomerArea\WeddingGuestController::class, 'store'])->name('weddings.guests.store');
     Route::put('/weddings/{wedding}/guests/{guest}', [CustomerArea\WeddingGuestController::class, 'update'])->name('weddings.guests.update');
     Route::delete('/weddings/{wedding}/guests/{guest}', [CustomerArea\WeddingGuestController::class, 'destroy'])->name('weddings.guests.destroy');
@@ -133,19 +133,19 @@ Route::middleware('auth')->group(function (): void {
     Route::delete('/weddings/{wedding}/guests/{guest}/share', [CustomerArea\WeddingGuestShareController::class, 'destroy'])->name('weddings.guests.share.destroy');
     Route::put('/weddings/{wedding}/rsvps/{rsvp}', [CustomerArea\WeddingRsvpController::class, 'update'])->name('weddings.rsvps.update');
 
-    Route::get('/timeline', [CustomerArea\WeddingTimelineController::class, 'index'])->name('timeline.index');
+    Route::get('/timeline', [CustomerArea\WeddingTimelineController::class, 'index'])->middleware('wedding')->name('timeline.index');
     Route::post('/weddings/{wedding}/timeline', [CustomerArea\WeddingTimelineController::class, 'store'])->name('weddings.timeline.store');
     Route::put('/weddings/{wedding}/timeline/{item}', [CustomerArea\WeddingTimelineController::class, 'update'])->name('weddings.timeline.update');
     Route::delete('/weddings/{wedding}/timeline/{item}', [CustomerArea\WeddingTimelineController::class, 'destroy'])->name('weddings.timeline.destroy');
 
-    Route::get('/kad', [CustomerArea\WeddingSiteController::class, 'edit'])->name('site.edit');
-    Route::get('/kad/preview', [CustomerArea\WeddingSiteController::class, 'preview'])->name('site.preview');
+    Route::get('/kad', [CustomerArea\WeddingSiteController::class, 'edit'])->middleware('wedding')->name('site.edit');
+    Route::get('/kad/preview', [CustomerArea\WeddingSiteController::class, 'preview'])->middleware('wedding')->name('site.preview');
     Route::put('/weddings/{wedding}/kad', [CustomerArea\WeddingSiteController::class, 'update'])->name('weddings.site.update');
     Route::post('/weddings/{wedding}/kad/galeri', [CustomerArea\WeddingSitePhotoController::class, 'store'])->name('weddings.site.photos.store');
     Route::delete('/weddings/{wedding}/kad/galeri/{photo}', [CustomerArea\WeddingSitePhotoController::class, 'destroy'])->name('weddings.site.photos.destroy');
     Route::put('/weddings/{wedding}/kad/publish', [CustomerArea\WeddingSiteController::class, 'publish'])->name('weddings.site.publish');
 
-    Route::get('/budget', [CustomerArea\WeddingBudgetController::class, 'index'])->name('budget.index');
+    Route::get('/budget', [CustomerArea\WeddingBudgetController::class, 'index'])->middleware('wedding')->name('budget.index');
     Route::put('/weddings/{wedding}/budget', [CustomerArea\WeddingBudgetController::class, 'update'])->name('weddings.budget.update');
 
     Route::get('/enquiries', [CustomerArea\EnquiryController::class, 'index'])->name('enquiries.index');
