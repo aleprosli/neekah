@@ -9,6 +9,7 @@
  */
 import { ref } from 'vue';
 import UiField from '../ui/UiField.vue';
+import UiTurnstile from '../ui/UiTurnstile.vue';
 
 const props = defineProps({
     action: { type: String, required: true },
@@ -67,10 +68,7 @@ const values = ref(Object.fromEntries(props.fields.map((field) => [field.name, f
             <a v-if="forgotUrl" :href="forgotUrl" class="ml-auto font-medium text-brand-600 underline underline-offset-4">Lupa kata laluan?</a>
         </div>
 
-        <!-- Turnstile renders itself into this element once its script loads. -->
-        <div v-if="turnstileSiteKey" class="min-w-0 overflow-hidden">
-            <div class="cf-turnstile" :data-sitekey="turnstileSiteKey" data-language="ms" data-size="flexible"></div>
-        </div>
+        <UiTurnstile v-if="turnstileSiteKey" :site-key="turnstileSiteKey" />
 
         <button type="submit" class="rounded-full bg-brand-600 py-3 text-sm font-semibold text-white transition hover:bg-brand-700">{{ submitLabel }}</button>
     </form>
