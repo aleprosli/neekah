@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Enums\ViolationStatus;
 use App\Enums\ViolationType;
 use App\Http\Requests\ReportVendorRequest;
+use App\Models\Booking;
 use App\Models\Vendor;
+use App\Support\VueProps;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -18,8 +20,18 @@ class ReportVendorController extends Controller
 
         return view('report-vendor', [
             'vendor' => $vendor,
-            'types' => ViolationType::cases(),
-            'bookings' => $request->user()->bookings()->whereBelongsTo($vendor)->latest()->get(),
+            'props' => VueProps::for([
+                'action' => route('vendors.report.store', $vendor),
+                'cancelUrl' => route('vendors.show', $vendor),
+                'types' => collect(ViolationType::cases())
+                    ->map(fn (ViolationType $type): array => ['value' => $type->value, 'label' => $type->label()])
+                    ->all(),
+                'bookings' => $request->user()->bookings()->whereBelongsTo($vendor)->latest()->get()
+                    ->map(fn (Booking $booking): array => [
+                        'value' => $booking->id,
+                        'label' => $booking->reference.' · '.$booking->event_date->translatedFormat('j M Y'),
+                    ])->values(),
+            ]),
         ]);
     }
 
