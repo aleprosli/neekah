@@ -12,8 +12,6 @@
         <div data-vue="vendor-register-form" data-props="@vueProps($props)"></div>
     </main>
 
-    {{-- Turnstile's own script, which finds the widget the component renders. --}}
-    <x-turnstile-script />
 
     <x-site.footer />
 </x-layouts.app>

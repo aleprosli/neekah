@@ -65,7 +65,10 @@ it('sends a stranger with the link to register and joins them automatically', fu
     $this->get(route('invitations.show', $invitation))->assertRedirect(route('register'));
 
     // The register page names the inviter and prefills the invited email.
-    $this->get(route('register'))->assertOk()->assertSee('Aina Zulkifli menjemput anda')->assertSee('baru@example.com');
+    $props = $this->get(route('register'))->assertOk()->viewData('props');
+
+    expect($props['invitation']['inviter'])->toBe('Aina Zulkifli')
+        ->and(collect($props['fields'])->firstWhere('name', 'email')['value'])->toBe('baru@example.com');
 
     $this->post(route('register'), [
         'name' => 'Baru Sekali',

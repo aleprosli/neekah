@@ -34,10 +34,12 @@ it('does not ask for a token while Turnstile is switched off', function () use (
 it('shows the widget on the register form once Turnstile is on', function () {
     enableTurnstile();
 
-    $this->get(route('register'))
-        ->assertSee('cf-turnstile')
-        ->assertSee('data-sitekey="site-key"', false)
-        ->assertSee('challenges.cloudflare.com/turnstile/v0/api.js');
+    // The form is a component, so the key travels in its props and the loader
+    // script has to be on the page for the widget to appear at all.
+    $response = $this->get(route('register'))->assertOk();
+
+    expect($response->viewData('props')['turnstileSiteKey'])->toBe('site-key');
+    $response->assertSee('challenges.cloudflare.com/turnstile/v0/api.js');
 });
 
 it('puts the widget on the vendor register form too', function () {

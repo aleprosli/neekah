@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StorePhoneNumberRequest;
 use App\Jobs\SendTelegramAlert;
 use App\Notifications\CustomerRegistered;
+use App\Support\AuthForm;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 
@@ -16,7 +17,24 @@ class PhoneNumberController extends Controller
 
     public function create(): View
     {
-        return view('auth.phone');
+        return view('auth.phone', [
+            'props' => AuthForm::for([
+                'action' => route('phone.store'),
+                'submitLabel' => 'Simpan dan teruskan',
+                'fields' => [
+                    [
+                        'name' => 'phone',
+                        'label' => 'Nombor telefon',
+                        'type' => 'tel',
+                        'autocomplete' => 'tel',
+                        'placeholder' => '012-345 6789',
+                        'required' => true,
+                        'value' => old('phone'),
+                        'help' => 'Nombor WhatsApp anda. Kami tidak memaparkannya kepada sesiapa selain vendor yang anda tempah.',
+                    ],
+                ],
+            ]),
+        ]);
     }
 
     /**

@@ -31,6 +31,9 @@
         <x-impersonation-banner />
         {{ $slot }}
 
+        {{-- Turnstile's own loader, which finds whichever widget a page rendered. --}}
+        <x-turnstile-script />
+
         {{-- Third-party scripts a page pushed here, loaded after its markup. --}}
         @stack('scripts')
     </body>

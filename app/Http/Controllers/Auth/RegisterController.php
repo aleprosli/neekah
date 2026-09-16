@@ -10,6 +10,7 @@ use App\Jobs\SendTelegramAlert;
 use App\Models\User;
 use App\Models\WeddingInvitation;
 use App\Notifications\CustomerRegistered;
+use App\Support\AuthForm;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -19,8 +20,31 @@ class RegisterController extends Controller
 {
     public function create(Request $request): View
     {
+        $invitation = $this->pendingInvitation($request);
+
         return view('auth.register', [
-            'invitation' => $this->pendingInvitation($request),
+            'invitation' => $invitation,
+            'props' => AuthForm::for([
+                'action' => route('register'),
+                'submitLabel' => 'Daftar',
+                'captcha' => true,
+                'googleUrl' => route('auth.google'),
+                'invitation' => $invitation ? [
+                    'initial' => mb_substr($invitation->inviter->name, 0, 1),
+                    'inviter' => $invitation->inviter->name,
+                    'wedding' => $invitation->wedding->title.' · '.$invitation->wedding->event_date->translatedFormat('j F Y'),
+                ] : null,
+                'fields' => [
+                    ['name' => 'name', 'label' => 'Nama', 'autocomplete' => 'name', 'placeholder' => 'Aina & Hakim', 'required' => true, 'value' => old('name')],
+                    ['name' => 'email', 'label' => 'Emel', 'type' => 'email', 'autocomplete' => 'email', 'required' => true, 'value' => old('email', $invitation?->email)],
+                    ['name' => 'phone', 'label' => 'Nombor telefon', 'type' => 'tel', 'autocomplete' => 'tel', 'placeholder' => '012-345 6789', 'value' => old('phone')],
+                    ['name' => 'password', 'label' => 'Kata laluan', 'type' => 'password', 'autocomplete' => 'new-password', 'help' => 'Sekurang-kurangnya 8 aksara.', 'required' => true],
+                    ['name' => 'password_confirmation', 'label' => 'Sahkan kata laluan', 'type' => 'password', 'autocomplete' => 'new-password', 'required' => true],
+                ],
+                'links' => [
+                    ['prefix' => 'Sudah ada akaun?', 'label' => 'Log masuk', 'url' => route('login')],
+                ],
+            ]),
         ]);
     }
 
