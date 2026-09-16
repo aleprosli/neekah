@@ -74,6 +74,21 @@ class EnquiryController extends Controller
 
         $enquiry->load(['vendor.category', 'package']);
 
-        return view('customer.enquiries.show', ['enquiry' => $enquiry]);
+        return view('customer.enquiries.show', [
+            'enquiry' => $enquiry,
+            'props' => VueProps::for([
+                'enquiry' => [
+                    'vendor' => $enquiry->vendor->name,
+                    'message' => $enquiry->message,
+                    'reply' => $enquiry->reply,
+                    'replied_at' => $enquiry->replied_at?->translatedFormat('j M Y, g:i A'),
+                    'book_url' => route('vendors.show', $enquiry->vendor).'#tempah',
+                    'context' => collect([
+                        $enquiry->event_date ? 'Tarikh: '.$enquiry->event_date->translatedFormat('j F Y') : null,
+                        $enquiry->package ? 'Pakej: '.$enquiry->package->name : null,
+                    ])->filter()->implode(' · ') ?: null,
+                ],
+            ]),
+        ]);
     }
 }
