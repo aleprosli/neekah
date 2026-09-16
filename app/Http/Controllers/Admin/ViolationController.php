@@ -26,6 +26,20 @@ class ViolationController extends Controller
             ->paginate(20)
             ->withQueryString();
 
+        $violations->setCollection($violations->getCollection()->map(fn (VendorViolation $violation): array => [
+            'id' => $violation->id,
+            'url' => route('admin.violations.show', $violation),
+            'vendor' => $violation->vendor->name,
+            'is_open' => $violation->isOpen(),
+            'badge' => $violation->isOpen()
+                ? 'Perlu semakan'
+                : ($violation->action?->label() ?? $violation->status->label()),
+            'type' => $violation->type->label(),
+            'reporter' => $violation->reporter?->name ?? 'pengguna dipadam',
+            'description' => $violation->description,
+            'reported' => $violation->created_at->diffForHumans(),
+        ]));
+
         return view('admin.violations.index', [
             'violations' => $violations,
             'status' => $status,

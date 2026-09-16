@@ -18,4 +18,14 @@ enum PaymentStatus: string
             self::Refunded => 'Dipulangkan',
         };
     }
+
+    /** The palette key the badge components use, in Blade and in Vue. */
+    public function tone(): string
+    {
+        return match ($this) {
+            self::Paid => 'emerald',
+            self::Pending => 'amber',
+            self::Failed, self::Refunded => 'muted',
+        };
+    }
 }

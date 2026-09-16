@@ -8,32 +8,12 @@
         @endforeach
     </div>
 
-    @if ($violations->isEmpty())
-        <p class="rounded-2xl border border-dashed border-line p-8 text-center text-sm text-ink-muted">Tiada laporan. Bagus!</p>
-    @else
-        <ul class="divide-y divide-line rounded-2xl border border-line">
-            @foreach ($violations as $violation)
-                <li>
-                    <a href="{{ route('admin.violations.show', $violation) }}" class="flex flex-col gap-2 p-4 transition hover:bg-surface-muted sm:flex-row sm:items-center sm:gap-4">
-                        <div class="min-w-0 flex-1">
-                            <div class="flex flex-wrap items-center gap-2">
-                                <p class="font-medium">{{ $violation->vendor->name }}</p>
-                                @if ($violation->isOpen())
-                                    <span class="rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-semibold text-amber-800">Perlu semakan</span>
-                                @elseif ($violation->action)
-                                    <span class="rounded-full bg-surface-muted px-2 py-0.5 text-[11px] font-semibold text-ink-muted">{{ $violation->action->label() }}</span>
-                                @else
-                                    <span class="rounded-full bg-surface-muted px-2 py-0.5 text-[11px] font-semibold text-ink-muted">{{ $violation->status->label() }}</span>
-                                @endif
-                            </div>
-                            <p class="mt-0.5 text-sm text-ink-muted">{{ $violation->type->label() }} · dilaporkan oleh {{ $violation->reporter?->name ?? 'pengguna dipadam' }}</p>
-                            <p class="truncate text-sm text-ink-muted">{{ $violation->description }}</p>
-                        </div>
-                        <span class="text-xs text-ink-muted">{{ $violation->created_at->diffForHumans() }}</span>
-                    </a>
-                </li>
-            @endforeach
-        </ul>
-        <div class="mt-6">{{ $violations->links() }}</div>
-    @endif
+    {{-- resources/js/components/admin/AdminViolationsPage.vue --}}
+    <div
+        data-vue="admin-violations-page"
+        data-props="{{ json_encode([
+            'violations' => $violations->items(),
+            'pagination' => $violations->hasPages() ? (string) $violations->links() : '',
+        ]) }}"
+    ></div>
 </x-layouts.admin>

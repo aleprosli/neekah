@@ -14,8 +14,30 @@ class PostController extends Controller
 {
     public function index(): View
     {
+        $posts = Post::query()->latest('updated_at')->orderByDesc('id')->paginate(20);
+
+        $posts->setCollection($posts->getCollection()->map(fn (Post $post): array => [
+            'id' => $post->id,
+            'title' => $post->title,
+            'slug' => $post->slug,
+            'state' => match (true) {
+                $post->isPublished() => 'published',
+                $post->isScheduled() => 'scheduled',
+                default => 'draft',
+            },
+            'status_label' => match (true) {
+                $post->isPublished() => 'Tersiar',
+                $post->isScheduled() => 'Dijadualkan '.$post->localPublishedAt()->translatedFormat('j M, g:i A'),
+                default => 'Draf',
+            },
+            'updated' => $post->updated_at->diffForHumans(),
+            'edit_url' => route('admin.posts.edit', $post),
+            'destroy_url' => route('admin.posts.destroy', $post),
+            'public_url' => $post->url(),
+        ]));
+
         return view('admin.posts.index', [
-            'posts' => Post::query()->latest('updated_at')->orderByDesc('id')->paginate(20),
+            'posts' => $posts,
         ]);
     }
 

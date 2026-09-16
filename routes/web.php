@@ -179,6 +179,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/bookings/data', [AdminArea\BookingController::class, 'data'])->name('bookings.data');
     Route::get('/bookings/{booking}', [AdminArea\BookingController::class, 'show'])->name('bookings.show');
     Route::get('/transactions', [AdminArea\TransactionController::class, 'index'])->name('transactions.index');
+    Route::get('/transactions/data', [AdminArea\TransactionController::class, 'data'])->name('transactions.data');
     Route::post('/users/{user}/impersonate', [AdminArea\ImpersonationController::class, 'store'])->name('users.impersonate');
     Route::get('/violations', [AdminArea\ViolationController::class, 'index'])->name('violations.index');
     Route::get('/violations/{violation}', [AdminArea\ViolationController::class, 'show'])->name('violations.show');
