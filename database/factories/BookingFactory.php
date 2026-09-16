@@ -29,7 +29,6 @@ class BookingFactory extends Factory
             'package_name' => 'Premium Package',
             'event_date' => fake()->dateTimeBetween('+2 months', '+1 year')->format('Y-m-d'),
             'total_amount' => $total,
-            'deposit_amount' => round($total * Booking::DEPOSIT_RATE, 2),
             'commission_rate' => Booking::COMMISSION_RATE,
             'commission_amount' => round($total * Booking::COMMISSION_RATE / 100, 2),
             'status' => BookingStatus::PendingPayment,

@@ -41,10 +41,10 @@ class BookingConfirmed extends Notification
         return (new MailMessage)
             ->subject('Booking '.$this->booking->reference.' disahkan')
             ->greeting('Hai '.$notifiable->name.',')
-            ->line('Deposit telah dibayar dan booking '.$this->booking->reference.' kini disahkan.')
+            ->line('Bayaran telah disahkan dan booking '.$this->booking->reference.' kini Confirmed.')
             ->line(($isVendor ? 'Pelanggan: '.$this->booking->user->name : 'Vendor: '.$this->booking->vendor->name).' · '.$this->booking->package_name)
             ->line('Tarikh majlis: '.$this->booking->event_date->translatedFormat('l, j F Y'))
-            ->line('Baki RM'.number_format($this->booking->balanceAmount(), 2).' perlu dijelaskan sebelum majlis.')
+            ->line('Baki RM'.number_format($this->booking->outstandingAmount(), 2).' masih belum direkod.')
             ->action('Lihat booking', $isVendor ? route('vendor.bookings.show', $this->booking) : route('bookings.show', $this->booking))
             ->salutation('Terima kasih, Neekah');
     }

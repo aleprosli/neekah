@@ -14,6 +14,7 @@ use App\Notifications\BookingCreatedForVendor;
 use App\Notifications\EnquiryReceived;
 use App\Notifications\EnquiryReplied;
 use App\Notifications\PaymentReceived;
+use App\Notifications\PaymentRecorded;
 use App\Notifications\VendorStatusChanged;
 use Database\Seeders\CategorySeeder;
 use Illuminate\Support\Facades\Notification;
@@ -38,11 +39,20 @@ it('emails both parties when a booking is created', function () {
     Notification::assertSentTo($this->vendor->user, BookingCreatedForVendor::class);
 });
 
-it('emails a receipt and a confirmation when the deposit is paid', function () {
-    $booking = Booking::factory()->for($this->customer)->for($this->vendor)->create(['total_amount' => 2500, 'deposit_amount' => 1000]);
-    $deposit = Payment::factory()->for($booking)->create(['amount' => 1000]);
+it('emails the vendor when a payment is recorded, and both sides when it is verified', function () {
+    $booking = Booking::factory()->for($this->customer)->for($this->vendor)->create(['total_amount' => 2500]);
 
-    $this->actingAs($this->customer)->post(route('bookings.payments.store', [$booking, $deposit]))->assertRedirect();
+    $this->actingAs($this->customer)
+        ->post(route('bookings.payments.store', $booking), ['amount' => 1000, 'paid_on' => now()->toDateString()])
+        ->assertRedirect();
+
+    Notification::assertSentTo($this->vendor->user, PaymentRecorded::class);
+
+    $payment = Payment::sole();
+
+    $this->actingAs($this->vendor->user)
+        ->post(route('vendor.bookings.payments.verify', [$booking, $payment]))
+        ->assertRedirect();
 
     Notification::assertSentTo($this->customer, PaymentReceived::class);
     Notification::assertSentTo($this->customer, BookingConfirmed::class);

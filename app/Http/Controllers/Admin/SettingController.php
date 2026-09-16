@@ -5,11 +5,13 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\UpdateContactSettingsRequest;
 use App\Http\Requests\UpdateImageSettingsRequest;
+use App\Http\Requests\UpdatePaymentSettingsRequest;
 use App\Http\Requests\UpdateSeoSettingsRequest;
 use App\Http\Requests\UpdateTelegramSettingsRequest;
 use App\Http\Requests\UpdateTurnstileSettingsRequest;
 use App\Support\ContactSettings;
 use App\Support\ImageSettings;
+use App\Support\PaymentSettings;
 use App\Support\Seo;
 use App\Support\SeoSettings;
 use App\Support\TelegramSettings;
@@ -20,7 +22,7 @@ use Illuminate\Http\RedirectResponse;
 
 class SettingController extends Controller
 {
-    public function edit(ContactSettings $contact, SeoSettings $seo, TurnstileSettings $turnstile, TelegramSettings $telegram, ImageSettings $images): View
+    public function edit(ContactSettings $contact, SeoSettings $seo, TurnstileSettings $turnstile, TelegramSettings $telegram, ImageSettings $images, PaymentSettings $payments): View
     {
         return view('admin.settings.edit', [
             'props' => VueProps::for([
@@ -29,6 +31,7 @@ class SettingController extends Controller
                     $this->seoSection($seo->all()),
                     $this->turnstileSection($turnstile->all(), $turnstile->isEnabled()),
                     $this->telegramSection($telegram->all(), $telegram->isEnabled()),
+                    $this->paymentSection($payments->all(), $payments->manualTransferEnabled()),
                     $this->imageSection($images),
                 ],
             ]),
@@ -133,6 +136,32 @@ class SettingController extends Controller
     }
 
     /**
+     * @param  array<string, mixed>  $values
+     * @return array<string, mixed>
+     */
+    private function paymentSection(array $values, bool $active): array
+    {
+        return [
+            'id' => 'bayaran',
+            'icon' => '🏦',
+            'label' => 'Bayaran',
+            'title' => 'Kaedah bayaran',
+            'description' => 'Wang tidak melalui Neekah. Pengantin berurusan terus dengan vendor, merekodkan bayaran yang telah dibuat berserta resit, dan vendor mengesahkannya. Booking hanya menjadi Confirmed selepas pengesahan itu.',
+            'action' => route('admin.settings.payments'),
+            'submit' => 'Simpan tetapan bayaran',
+            'badge' => ['active' => $active, 'label' => $active ? 'Manual transfer aktif' : 'Tiada kaedah bayaran'],
+            'columns' => true,
+            'fields' => [
+                ['name' => 'manual_transfer_enabled', 'label' => 'Benarkan rekod bayaran manual', 'type' => 'checkbox', 'value' => $values['manual_transfer_enabled'], 'wide' => true, 'help' => 'Apabila dimatikan, pengantin tidak boleh merekodkan sebarang bayaran pada booking mereka.'],
+                ['name' => 'bank_name', 'label' => 'Nama bank', 'value' => $values['bank_name'], 'placeholder' => 'Maybank'],
+                ['name' => 'account_holder', 'label' => 'Nama pemegang akaun', 'value' => $values['account_holder'], 'placeholder' => 'Neekah Enterprise'],
+                ['name' => 'account_number', 'label' => 'Nombor akaun', 'value' => $values['account_number'], 'placeholder' => '512345678901', 'help' => 'Biarkan kosong jika bayaran dibuat terus kepada akaun vendor.'],
+                ['name' => 'instructions', 'label' => 'Arahan bayaran', 'type' => 'textarea', 'rows' => 3, 'wide' => true, 'value' => $values['instructions'], 'help' => 'Dipaparkan kepada pengantin di borang rekod bayaran.'],
+            ],
+        ];
+    }
+
+    /**
      * @return array<string, mixed>
      */
     private function imageSection(ImageSettings $images): array
@@ -188,6 +217,13 @@ class SettingController extends Controller
         $telegram->save($request->settings());
 
         return $this->saved('Tetapan Telegram disimpan.');
+    }
+
+    public function updatePayments(UpdatePaymentSettingsRequest $request, PaymentSettings $payments): RedirectResponse
+    {
+        $payments->save($request->settings());
+
+        return $this->saved('Tetapan bayaran disimpan.');
     }
 
     public function update(UpdateImageSettingsRequest $request, ImageSettings $images): RedirectResponse

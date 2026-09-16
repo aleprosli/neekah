@@ -2,7 +2,7 @@
 
 use App\Enums\BookingStatus;
 use App\Enums\PaymentStatus;
-use App\Enums\PaymentType;
+use App\Enums\PointReason;
 use App\Models\Booking;
 use App\Models\Category;
 use App\Models\Package;
@@ -24,7 +24,7 @@ it('redirects guests to login when booking', function () {
         ->assertRedirect(route('login'));
 });
 
-it('creates a pending booking with deposit and balance payments', function () {
+it('creates a pending booking with no payments attached to it', function () {
     $eventDate = now()->addMonths(3)->toDateString();
 
     $this->actingAs($this->customer)
@@ -42,18 +42,16 @@ it('creates a pending booking with deposit and balance payments', function () {
         ->and($booking->package_name)->toBe('Premium Package')
         ->and($booking->event_date->toDateString())->toBe($eventDate)
         ->and((float) $booking->total_amount)->toBe(2500.0)
-        ->and((float) $booking->deposit_amount)->toBe(1000.0)
         ->and((float) $booking->commission_amount)->toBe(200.0)
         ->and($booking->status)->toBe(BookingStatus::PendingPayment)
         ->and($booking->reference)->toStartWith('NK-')
-        ->and($booking->payments)->toHaveCount(2)
-        ->and((float) $booking->depositPayment->amount)->toBe(1000.0)
-        ->and((float) $booking->balancePayment->amount)->toBe(1500.0);
+        ->and($booking->payments)->toBeEmpty();
 
-    $this->get(route('bookings.show', $booking))
-        ->assertOk()
-        ->assertSee($booking->reference)
-        ->assertSee('Bayar Deposit sekarang');
+    $props = $this->get(route('bookings.show', $booking))->assertOk()->viewData('props');
+
+    expect($props['booking']['reference'])->toBe($booking->reference)
+        ->and($props['payments'])->toBeEmpty()
+        ->and($props['paymentForm']['outstandingLabel'])->toBe('RM2,500.00');
 });
 
 it('rejects a booking on a date the vendor is unavailable or already booked', function () {
@@ -89,30 +87,84 @@ it('forbids vendors from booking as customers', function () {
         ->assertForbidden();
 });
 
-it('confirms the booking when the sandbox deposit is paid, then settles the balance', function () {
-    $booking = Booking::factory()->for($this->customer)->for($this->vendor)->create(['total_amount' => 2500, 'deposit_amount' => 1000]);
-    $deposit = Payment::factory()->for($booking)->create(['type' => PaymentType::Deposit, 'amount' => 1000]);
-    $balance = Payment::factory()->for($booking)->balance()->create(['amount' => 1500]);
+it('records a payment that waits for the vendor, then confirms the booking once verified', function () {
+    $booking = Booking::factory()->for($this->customer)->for($this->vendor)->create(['total_amount' => 2500]);
 
     $this->actingAs($this->customer)
-        ->post(route('bookings.payments.store', [$booking, $balance]))
-        ->assertSessionHasErrors('payment');
+        ->post(route('bookings.payments.store', $booking), [
+            'amount' => 1000,
+            'paid_on' => now()->subDay()->toDateString(),
+            'note' => 'Transfer Maybank2u',
+        ])
+        ->assertRedirect(route('bookings.show', $booking));
+
+    $payment = Payment::sole();
+
+    // Recording it alone changes nothing: only the vendor can see their account.
+    expect($payment->status)->toBe(PaymentStatus::AwaitingVerification)
+        ->and($payment->recorded_by)->toBe($this->customer->id)
+        ->and($booking->fresh()->status)->toBe(BookingStatus::PendingPayment)
+        ->and($booking->fresh()->paidAmount())->toBe(0.0);
+
+    $this->actingAs($this->vendor->user)
+        ->post(route('vendor.bookings.payments.verify', [$booking, $payment]))
+        ->assertRedirect(route('vendor.bookings.show', $booking));
+
+    $booking->refresh();
+    expect($payment->fresh()->status)->toBe(PaymentStatus::Paid)
+        ->and($payment->fresh()->verified_by)->toBe($this->vendor->user->id)
+        ->and($booking->status)->toBe(BookingStatus::Confirmed)
+        ->and($booking->confirmed_at)->not->toBeNull()
+        ->and($booking->paidAmount())->toBe(1000.0);
+});
+
+it('refuses to record more than the booking is worth', function () {
+    $booking = Booking::factory()->for($this->customer)->for($this->vendor)->create(['total_amount' => 2500]);
 
     $this->actingAs($this->customer)
-        ->post(route('bookings.payments.store', [$booking, $deposit]))
+        ->post(route('bookings.payments.store', $booking), ['amount' => 2600, 'paid_on' => now()->toDateString()])
+        ->assertSessionHasErrors('amount');
+
+    $this->actingAs($this->customer)
+        ->post(route('bookings.payments.store', $booking), ['amount' => 2500, 'paid_on' => now()->toDateString()])
+        ->assertRedirect();
+
+    // The first record already claims the whole amount, so a second cannot.
+    $this->actingAs($this->customer)
+        ->post(route('bookings.payments.store', $booking), ['amount' => 100, 'paid_on' => now()->toDateString()])
+        ->assertSessionHasErrors('amount');
+
+    expect($booking->payments()->count())->toBe(1);
+});
+
+it('lets the couple cancel a booking made by mistake, but not one already paid', function () {
+    $booking = Booking::factory()->for($this->customer)->for($this->vendor)->create(['total_amount' => 2500]);
+
+    $this->actingAs($this->customer)
+        ->post(route('bookings.cancel', $booking), ['reason' => 'Tersilap tekan'])
         ->assertRedirect(route('bookings.show', $booking));
 
     $booking->refresh();
-    expect($booking->status)->toBe(BookingStatus::Confirmed)
-        ->and($booking->confirmed_at)->not->toBeNull()
-        ->and($deposit->fresh()->status)->toBe(PaymentStatus::Paid)
-        ->and($deposit->fresh()->gateway_reference)->toStartWith('SBX-');
+    expect($booking->status)->toBe(BookingStatus::Cancelled)
+        ->and($booking->cancelled_at)->not->toBeNull()
+        ->and($booking->notes)->toContain('Tersilap tekan')
+        ->and($this->vendor->points()->where('reason', PointReason::PlatformBooking)->count())->toBe(0);
 
-    $this->actingAs($this->customer)
-        ->post(route('bookings.payments.store', [$booking, $balance]))
-        ->assertRedirect(route('bookings.show', $booking));
+    $paid = Booking::factory()->confirmed()->for($this->customer)->for($this->vendor)->create();
+    Payment::factory()->for($paid)->paid()->create();
 
-    expect($booking->fresh()->isFullyPaid())->toBeTrue();
+    $this->actingAs($this->customer)->post(route('bookings.cancel', $paid))->assertForbidden();
+    expect($paid->fresh()->status)->toBe(BookingStatus::Confirmed);
+});
+
+it('keeps a stranger from cancelling or recording a payment', function () {
+    $booking = Booking::factory()->for($this->customer)->for($this->vendor)->create();
+    $stranger = User::factory()->create();
+
+    $this->actingAs($stranger)->post(route('bookings.cancel', $booking))->assertForbidden();
+    $this->actingAs($stranger)
+        ->post(route('bookings.payments.store', $booking), ['amount' => 100, 'paid_on' => now()->toDateString()])
+        ->assertForbidden();
 });
 
 it('only lets the owning customer or the vendor view a booking', function () {
@@ -121,7 +173,6 @@ it('only lets the owning customer or the vendor view a booking', function () {
     $stranger = User::factory()->create();
 
     $this->actingAs($stranger)->get(route('bookings.show', $booking))->assertForbidden();
-    $this->actingAs($stranger)->post(route('bookings.payments.store', [$booking, $booking->payments()->first()]))->assertForbidden();
     $this->actingAs($this->vendor->user)->get(route('bookings.show', $booking))->assertRedirect(route('vendor.bookings.show', $booking));
     $this->actingAs($this->customer)->get(route('bookings.index'))->assertOk()->assertSee($booking->reference);
 });

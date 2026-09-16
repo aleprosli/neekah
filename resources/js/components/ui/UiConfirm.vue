@@ -13,6 +13,9 @@ defineProps({
     confirmLabel: { type: String, default: 'Teruskan' },
     cancelLabel: { type: String, default: 'Batal' },
     tone: { type: String, default: 'brand' },
+    // Mounted straight from Blade there is no slot to fill, so the trigger's
+    // wording can come through as a prop instead.
+    label: { type: String, default: null },
     triggerClass: { type: String, default: 'rounded-full border border-line px-3 py-1.5 text-xs font-medium transition hover:border-brand-400 hover:text-brand-700' },
     csrf: { type: String, required: true },
 });
@@ -21,7 +24,7 @@ const open = ref(false);
 </script>
 
 <template>
-    <button type="button" :class="triggerClass" @click="open = true"><slot /></button>
+    <button type="button" :class="triggerClass" @click="open = true"><slot>{{ label }}</slot></button>
 
     <Teleport to="body">
         <div v-if="open" class="fixed inset-0 z-50 flex items-end justify-center bg-black/40 p-0 sm:items-center sm:p-4" @click.self="open = false">

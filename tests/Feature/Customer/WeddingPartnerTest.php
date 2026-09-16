@@ -130,17 +130,16 @@ it('shows both partners the same wedding, bookings and budget', function () {
     $this->actingAs($this->aina)->get(route('bookings.show', $booking))->assertOk();
 });
 
-it('lets either partner pay for a shared booking', function () {
+it('lets either partner record a payment on a shared booking', function () {
     $vendor = Vendor::factory()->for(Category::first())->create();
     $this->wedding->addMember($this->hakim, WeddingRole::Partner);
-    $booking = Booking::factory()->for($this->aina)->for($vendor)->create(['wedding_id' => $this->wedding->id, 'total_amount' => 2500, 'deposit_amount' => 1000]);
-    $deposit = Payment::factory()->for($booking)->create(['amount' => 1000]);
+    $booking = Booking::factory()->for($this->aina)->for($vendor)->create(['wedding_id' => $this->wedding->id, 'total_amount' => 2500]);
 
     $this->actingAs($this->hakim)
-        ->post(route('bookings.payments.store', [$booking, $deposit]))
+        ->post(route('bookings.payments.store', $booking), ['amount' => 1000, 'paid_on' => now()->toDateString()])
         ->assertRedirect(route('bookings.show', $booking));
 
-    expect($deposit->fresh()->isPaid())->toBeTrue();
+    expect(Payment::sole()->recorded_by)->toBe($this->hakim->id);
 });
 
 it('lets the partner edit the wedding but not manage membership', function () {

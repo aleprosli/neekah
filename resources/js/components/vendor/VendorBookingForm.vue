@@ -1,7 +1,7 @@
 <script setup>
 /**
- * Recording a booking agreed off-platform. The split is shown as the vendor
- * picks a package, so the payout is never a surprise after the fact.
+ * Recording a booking agreed off-platform. The payout is shown as the vendor
+ * picks a package, so what they keep is never a surprise after the fact.
  */
 import { computed, ref } from 'vue';
 import UiField from '../ui/UiField.vue';
@@ -14,7 +14,6 @@ const props = defineProps({
     createPackageUrl: { type: String, required: true },
     csrf: { type: String, required: true },
     packages: { type: Array, required: true },
-    depositRate: { type: Number, required: true },
     commissionRate: { type: Number, required: true },
     errors: { type: Object, default: () => ({}) },
     old: { type: Object, default: () => ({}) },
@@ -36,13 +35,10 @@ const split = computed(() => {
     if (!chosen.value) return null;
 
     const total = Number(chosen.value.price);
-    const deposit = total * props.depositRate;
     const commission = total * props.commissionRate;
 
     return {
         total: money(total),
-        deposit: money(deposit),
-        balance: money(total - deposit),
         commission: money(commission),
         payout: money(total - commission),
     };
@@ -77,8 +73,6 @@ const split = computed(() => {
 
         <dl v-if="split" class="flex flex-col gap-2 rounded-xl bg-surface-muted p-4 text-sm">
             <div class="flex justify-between"><dt class="text-ink-muted">Jumlah pakej</dt><dd class="font-medium">{{ split.total }}</dd></div>
-            <div class="flex justify-between"><dt class="text-ink-muted">Deposit ({{ Math.round(depositRate * 100) }}%)</dt><dd>{{ split.deposit }}</dd></div>
-            <div class="flex justify-between"><dt class="text-ink-muted">Baki sebelum majlis</dt><dd>{{ split.balance }}</dd></div>
             <div class="flex justify-between"><dt class="text-ink-muted">Komisen platform ({{ Math.round(commissionRate * 100) }}%)</dt><dd>− {{ split.commission }}</dd></div>
             <div class="flex justify-between border-t border-line pt-2 font-semibold"><dt>Anda terima</dt><dd>{{ split.payout }}</dd></div>
         </dl>

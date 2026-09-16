@@ -77,7 +77,6 @@ it('shows budget totals and booked categories on the dashboard', function () {
     Booking::factory()->confirmed()->for($this->customer)->for($vendor)->create([
         'wedding_id' => $wedding->id,
         'total_amount' => 2500,
-        'deposit_amount' => 1000,
     ]);
 
     $this->actingAs($this->customer)

@@ -70,7 +70,7 @@
 
                 {{-- Highlights --}}
                 <ul class="flex flex-col gap-5 py-6">
-                    @foreach ([['🔒', 'Booking & bayaran melalui Neekah', 'Deposit dan baki direkod dalam platform. Anda dilindungi jika berlaku pertikaian.'], ['⚡', 'Response rate '.$vendor->responseRateLabel(), $vendor->response_rate === null ? 'Vendor ini belum menerima cukup enquiry untuk kami mengukur kadar balasan mereka.' : 'Diukur dari enquiry yang diterima melalui Neekah.'], ['✓', $vendor->completed_bookings_count.' majlis selesai', 'Review di bawah datang daripada pasangan yang benar-benar menempah.']] as [$icon, $title, $text])
+                    @foreach ([['🔒', 'Booking & rekod bayaran di Neekah', 'Setiap bayaran direkod dan disahkan vendor, jadi kedua-dua pihak ada rekod yang sama.'], ['⚡', 'Response rate '.$vendor->responseRateLabel(), $vendor->response_rate === null ? 'Vendor ini belum menerima cukup enquiry untuk kami mengukur kadar balasan mereka.' : 'Diukur dari enquiry yang diterima melalui Neekah.'], ['✓', $vendor->completed_bookings_count.' majlis selesai', 'Review di bawah datang daripada pasangan yang benar-benar menempah.']] as [$icon, $title, $text])
                         <li class="flex gap-4">
                             <span class="w-6 shrink-0 text-center text-xl leading-6">{{ $icon }}</span>
                             <div>
@@ -206,13 +206,7 @@
                         @endif
                     @endauth
 
-                    <p class="text-center text-sm text-ink-muted">Anda belum dicaj lagi. Deposit dibayar selepas booking dibuat.</p>
-
-                    <dl class="flex flex-col gap-2 text-sm">
-                        <div class="flex justify-between"><dt class="underline underline-offset-4">Deposit semasa tempah</dt><dd>40%</dd></div>
-                        <div class="flex justify-between"><dt class="underline underline-offset-4">Baki sebelum majlis</dt><dd>60%</dd></div>
-                        <div class="flex justify-between border-t border-line pt-3 font-semibold"><dt>Status selepas deposit</dt><dd class="text-emerald-600">Confirmed</dd></div>
-                    </dl>
+                    <p class="text-center text-sm text-ink-muted">Anda tidak dicaj di sini. Tempahan ini menghubungkan anda dengan vendor; bayaran diurus terus antara anda berdua dan direkodkan di halaman booking.</p>
                 </form>
 
                 {{-- Enquiry --}}

@@ -8,6 +8,7 @@
  * not expect to hunt for a save button.
  */
 import { computed, ref } from 'vue';
+import UiConfirm from '../ui/UiConfirm.vue';
 import { useUploadForm } from '../../composables/useUploadForm.js';
 import UiField from '../ui/UiField.vue';
 import UiUploadProgress from '../ui/UiUploadProgress.vue';
@@ -80,13 +81,6 @@ const onDrop = (to) => {
 };
 
 const destroyUrl = (photo) => props.destroyUrlTemplate.replace('__ID__', photo.id);
-
-/** Deleting removes the file for good, so it is the one action that asks. */
-const confirmDelete = (event) => {
-    if (!window.confirm('Padam gambar ini secara kekal?')) {
-        event.preventDefault();
-    }
-};
 </script>
 
 <template>
@@ -182,11 +176,16 @@ const confirmDelete = (event) => {
                         {{ photo.is_visible ? 'Sembunyikan' : 'Paparkan' }}
                     </button>
 
-                    <form :action="destroyUrl(photo)" method="POST" @submit="confirmDelete">
-                        <input type="hidden" name="_token" :value="csrf">
-                        <input type="hidden" name="_method" value="DELETE">
-                        <button type="submit" class="rounded-full px-2 py-1 text-xs text-ink-muted transition hover:bg-surface-muted hover:text-brand-700" aria-label="Padam">✕</button>
-                    </form>
+                    <UiConfirm
+                        :action="destroyUrl(photo)"
+                        method="DELETE"
+                        title="Padam gambar ini?"
+                        message="Fail dibuang untuk selamanya, termasuk salinan thumbnail. Anda perlu memuat naiknya semula jika berubah fikiran."
+                        confirm-label="Ya, padam"
+                        tone="danger"
+                        trigger-class="rounded-full px-2 py-1 text-xs text-ink-muted transition hover:bg-surface-muted hover:text-brand-700"
+                        :csrf="csrf"
+                    >✕</UiConfirm>
                 </div>
             </li>
         </ul>

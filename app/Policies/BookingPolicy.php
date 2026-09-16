@@ -15,11 +15,26 @@ class BookingPolicy
     }
 
     /**
-     * Either half of the couple may settle a payment on their shared wedding.
+     * Either half of the couple may record a payment on their shared wedding.
      */
-    public function pay(User $user, Booking $booking): bool
+    public function recordPayment(User $user, Booking $booking): bool
     {
-        return $this->belongsToCustomer($user, $booking);
+        return $this->belongsToCustomer($user, $booking) && $booking->status->isActive();
+    }
+
+    /**
+     * Calling off a booking is the couple's to do, and only while it is still a
+     * correction rather than a refund.
+     */
+    public function cancel(User $user, Booking $booking): bool
+    {
+        return $this->belongsToCustomer($user, $booking) && $booking->canBeCancelled();
+    }
+
+    /** Only the vendor can see their own account, so only they may verify. */
+    public function verifyPayment(User $user, Booking $booking): bool
+    {
+        return $user->isVendor() && $user->vendor?->id === $booking->vendor_id;
     }
 
     /**

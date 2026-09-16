@@ -41,7 +41,7 @@ enum PointReason: string
             self::ProfileComplete => 'Profile lengkap',
             self::CatalogueComplete => 'Catalogue lengkap',
             self::PlatformBooking => 'Booking melalui platform',
-            self::DepositPaid => 'Deposit dibayar',
+            self::DepositPaid => 'Bayaran disahkan',
             self::BookingCompleted => 'Booking selesai',
             self::FullPayment => 'Full payment',
             self::PositiveReview => 'Positive review',

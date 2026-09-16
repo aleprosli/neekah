@@ -34,7 +34,7 @@ class DashboardController extends Controller
         $committed = (float) $bookings->sum('total_amount');
         $budget = (float) ($wedding?->budget ?? 0);
         $paid = (float) $bookings->sum(fn (Booking $booking): float => $booking->paidAmount());
-        $pendingPayments = $bookings->flatMap->payments->where('status', PaymentStatus::Pending)->count();
+        $awaitingVerification = $bookings->flatMap->payments->where('status', PaymentStatus::AwaitingVerification)->count();
 
         return view('customer.dashboard', [
             'wedding' => $wedding,
@@ -46,7 +46,7 @@ class DashboardController extends Controller
                     ['label' => 'Bajet', 'value' => 'RM'.number_format($budget), 'hint' => 'Baki RM'.number_format($budget - $committed)],
                     ['label' => 'Ditempah', 'value' => 'RM'.number_format($committed), 'hint' => 'Dibayar RM'.number_format($paid)],
                     ['label' => 'Vendor', 'value' => $bookedCategoryIds->count().' / '.$categories->count(), 'hint' => ($categories->count() ? round($bookedCategoryIds->count() / $categories->count() * 100) : 0).'% kategori ditempah'],
-                    ['label' => 'Bayaran tertunggak', 'value' => $pendingPayments, 'hint' => 'Bayaran belum diselesaikan', 'href' => route('bookings.index')],
+                    ['label' => 'Menunggu pengesahan', 'value' => $awaitingVerification, 'hint' => 'Bayaran direkod, belum disahkan vendor', 'href' => route('bookings.index')],
                 ],
                 'budget' => $wedding === null ? null : [
                     'caption' => 'RM'.number_format($committed).' / RM'.number_format($budget),

@@ -3,14 +3,14 @@
 namespace App\Http\Controllers\Customer;
 
 use App\Actions\CreateBooking;
-use App\Enums\BookingStatus;
-use App\Enums\PaymentType;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreBookingRequest;
 use App\Models\Booking;
 use App\Models\Package;
 use App\Models\Payment;
 use App\Models\Vendor;
+use App\Support\ImageSettings;
+use App\Support\PaymentSettings;
 use App\Support\VueProps;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
@@ -69,10 +69,10 @@ class BookingController extends Controller
 
         return redirect()
             ->route('bookings.show', $booking)
-            ->with('status', 'Booking '.$booking->reference.' dibuat. Bayar deposit untuk sahkan tempahan anda.');
+            ->with('status', 'Booking '.$booking->reference.' dibuat. Berbincang dengan vendor, kemudian rekodkan bayaran anda di sini.');
     }
 
-    public function show(Request $request, Booking $booking): View|RedirectResponse
+    public function show(Request $request, Booking $booking, PaymentSettings $paymentSettings, ImageSettings $images): View|RedirectResponse
     {
         Gate::authorize('view', $booking);
 
@@ -96,7 +96,11 @@ class BookingController extends Controller
                     'commission_rate' => number_format((float) $booking->commission_rate, 0),
                 ],
                 'steps' => $this->progress($booking),
-                'payments' => $this->paymentRows($request, $booking),
+                'payments' => $this->paymentRows($booking),
+                'cancelForm' => $request->user()->can('cancel', $booking) ? [
+                    'action' => route('bookings.cancel', $booking),
+                ] : null,
+                'paymentForm' => $this->paymentForm($request, $booking, $paymentSettings, $images),
                 'review' => $booking->review ? [
                     'rating' => $booking->review->rating,
                     'comment' => $booking->review->comment,
@@ -128,11 +132,12 @@ class BookingController extends Controller
      */
     private function progress(Booking $booking): array
     {
+        $firstVerified = $booking->payments->first(fn (Payment $payment): bool => $payment->isPaid());
+
         $steps = [
             ['Booking dibuat', true, $booking->created_at],
-            ['Deposit dibayar', (bool) $booking->depositPayment?->isPaid(), $booking->depositPayment?->paid_at],
-            ['Booking disahkan', $booking->confirmed_at !== null, $booking->confirmed_at],
-            ['Baki dibayar', (bool) $booking->balancePayment?->isPaid(), $booking->balancePayment?->paid_at],
+            ['Bayaran direkod', $booking->payments->isNotEmpty(), $booking->payments->first()?->created_at],
+            ['Bayaran disahkan vendor', $firstVerified !== null, $firstVerified?->verified_at],
             ['Majlis selesai', $booking->completed_at !== null, $booking->completed_at],
             ['Review diberi', $booking->review !== null, $booking->review?->created_at],
         ];
@@ -147,40 +152,59 @@ class BookingController extends Controller
     }
 
     /**
-     * Each instalment, and whether this visitor can settle it right now.
+     * Every payment the couple has written down, and where it stands.
      *
      * @return array<int, array<string, mixed>>
      */
-    private function paymentRows(Request $request, Booking $booking): array
+    private function paymentRows(Booking $booking): array
     {
-        $canPay = $request->user()->can('pay', $booking);
-
         return $booking->payments
-            ->sortBy(fn (Payment $payment): int => $payment->type === PaymentType::Deposit ? 0 : 1)
-            ->map(function (Payment $payment) use ($booking, $canPay): array {
-                $isDeposit = $payment->type === PaymentType::Deposit;
-                $awaitingDeposit = ! $isDeposit && ! $booking->depositPayment?->isPaid();
-                $payable = ! $payment->isPaid()
-                    && $booking->status !== BookingStatus::Cancelled
-                    && ! $awaitingDeposit
-                    && $canPay;
-
-                return [
-                    'label' => $payment->type->label().' ('.($isDeposit ? '40%' : '60%').')',
-                    'amount' => 'RM'.number_format((float) $payment->amount, 2),
-                    'paid' => $payment->isPaid(),
-                    'note' => match (true) {
-                        $payment->isPaid() => '✓ Dibayar '.$payment->paid_at->translatedFormat('j M Y').' · '.$payment->gateway_reference,
-                        $booking->status === BookingStatus::Cancelled => 'Dibatalkan',
-                        $awaitingDeposit => 'Boleh dibayar selepas deposit',
-                        ! $canPay => 'Menunggu bayaran pelanggan',
-                        default => null,
-                    },
-                    'pay_url' => $payable ? route('bookings.payments.store', [$booking, $payment]) : null,
-                    'pay_label' => 'Bayar '.$payment->type->label().' sekarang',
-                ];
-            })
+            ->sortBy('created_at')
+            ->map(fn (Payment $payment): array => [
+                'reference' => $payment->reference,
+                'amount' => 'RM'.number_format((float) $payment->amount, 2),
+                'paid_on' => $payment->paid_on?->translatedFormat('j M Y'),
+                'note' => $payment->note,
+                'status_label' => $payment->status->label(),
+                'status_tone' => $payment->status->tone(),
+                'receipt_url' => $payment->receiptUrl(),
+                'awaiting' => $payment->isAwaitingVerification(),
+                'destroy_url' => $payment->isAwaitingVerification()
+                    ? route('bookings.payments.destroy', [$booking, $payment])
+                    : null,
+            ])
             ->values()
             ->all();
+    }
+
+    /**
+     * The form for writing down a payment, or the reason there isn't one.
+     *
+     * @return array<string, mixed>|null
+     */
+    private function paymentForm(Request $request, Booking $booking, PaymentSettings $settings, ImageSettings $images): ?array
+    {
+        if (! $settings->manualTransferEnabled() || ! $request->user()->can('recordPayment', $booking)) {
+            return null;
+        }
+
+        $awaiting = (float) $booking->payments
+            ->filter(fn (Payment $payment): bool => $payment->isAwaitingVerification())
+            ->sum('amount');
+
+        return [
+            'action' => route('bookings.payments.store', $booking),
+            'instructions' => $settings->instructions(),
+            'bank' => $settings->bankAccount(),
+            'imageHint' => $images->uploadHint('gambar resit penuh'),
+            'today' => now()->toDateString(),
+            'outstanding' => round($booking->outstandingAmount() - $awaiting, 2),
+            'outstandingLabel' => 'RM'.number_format(max($booking->outstandingAmount() - $awaiting, 0), 2),
+            'old' => [
+                'amount' => old('amount', ''),
+                'paid_on' => old('paid_on', now()->toDateString()),
+                'note' => old('note', ''),
+            ],
+        ];
     }
 }
