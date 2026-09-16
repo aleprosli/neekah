@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreWeddingGuestRequest;
 use App\Models\Wedding;
 use App\Models\WeddingGuest;
+use App\Support\VueProps;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -24,17 +25,55 @@ class WeddingGuestController extends Controller
         $site = $wedding->site;
         $guests = $wedding->guests()->with('rsvp')->get();
 
+        $duplicates = $this->duplicateNames($guests);
+
         return view('customer.guests', [
             'wedding' => $wedding,
-            'site' => $site,
-            'guests' => $guests,
-            'walkIns' => $site ? $site->rsvps()->whereNull('wedding_guest_id')->get() : collect(),
-            'sides' => GuestSide::cases(),
-            'groups' => GuestGroup::cases(),
-            'confirmedPax' => $site?->confirmedPax() ?? 0,
-            'awaitingPax' => $site?->awaitingPax() ?? 0,
-            'declinedCount' => $site?->declinedCount() ?? 0,
-            'duplicateNames' => $this->duplicateNames($guests),
+            'props' => VueProps::for([
+                'storeUrl' => route('weddings.guests.store', $wedding),
+                'importUrl' => route('weddings.guests.import', $wedding),
+                'importErrors' => session('importErrors', []),
+                'cardNotice' => $site?->is_published ? null : ['url' => route('site.edit')],
+                'stats' => [
+                    ['label' => 'Sah hadir', 'value' => ($site?->confirmedPax() ?? 0).' orang', 'hint' => 'Dijumlahkan dari jawapan RSVP sahaja'],
+                    ['label' => 'Belum jawab', 'value' => 'sehingga '.($site?->awaitingPax() ?? 0).' orang', 'hint' => 'Had atas jemputan yang belum dijawab'],
+                    ['label' => 'Tidak hadir', 'value' => ($site?->declinedCount() ?? 0).' jawapan', 'hint' => $guests->count().' tetamu dalam senarai'],
+                ],
+                'sides' => collect(GuestSide::cases())->map(fn (GuestSide $case): array => ['value' => $case->value, 'label' => $case->label()])->all(),
+                'groups' => collect(GuestGroup::cases())->map(fn (GuestGroup $case): array => ['value' => $case->value, 'label' => $case->label()])->all(),
+                'guests' => $guests->map(fn (WeddingGuest $guest): array => [
+                    'id' => $guest->id,
+                    'name' => $guest->name,
+                    'phone' => $guest->phone,
+                    'side' => $guest->side->label(),
+                    'group' => $guest->group->label(),
+                    'pax_invited' => $guest->pax_invited,
+                    'status' => $guest->status()->label(),
+                    'status_tone' => $guest->status()->tone(),
+                    'duplicate' => $duplicates->contains(mb_strtolower($guest->name)),
+                    'shared_at' => $guest->shared_at?->translatedFormat('j M Y'),
+                    'invite_url' => $guest->inviteUrl(),
+                    'share_url' => route('weddings.guests.share', [$wedding, $guest]),
+                    'unshare_url' => route('weddings.guests.share.destroy', [$wedding, $guest]),
+                    'destroy_url' => route('weddings.guests.destroy', [$wedding, $guest]),
+                    'rsvp' => $guest->rsvp ? [
+                        'summary' => 'Jawapan: '.($guest->rsvp->attending ? $guest->rsvp->pax.' orang hadir' : 'tidak hadir')
+                            .' · dikemas kini '.$guest->rsvp->updated_at->translatedFormat('j M, g:i A'),
+                        'soft_matched' => $guest->rsvp->isSoftMatched(),
+                        'message' => $guest->rsvp->message,
+                        'detach_url' => route('weddings.rsvps.update', [$wedding, $guest->rsvp]),
+                    ] : null,
+                ])->values(),
+                'walkIns' => ($site ? $site->rsvps()->whereNull('wedding_guest_id')->get() : collect())
+                    ->map(fn ($rsvp): array => [
+                        'id' => $rsvp->id,
+                        'name' => $rsvp->name,
+                        'counted' => (bool) $rsvp->counted,
+                        'message' => $rsvp->message,
+                        'summary' => ($rsvp->attending ? $rsvp->pax.' orang hadir' : 'Tidak hadir').($rsvp->phone ? ' · '.$rsvp->phone : ''),
+                        'update_url' => route('weddings.rsvps.update', [$wedding, $rsvp]),
+                    ])->values(),
+            ]),
         ]);
     }
 
