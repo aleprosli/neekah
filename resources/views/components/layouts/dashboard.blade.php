@@ -9,7 +9,8 @@
         <div class="grid gap-8 lg:grid-cols-[220px_1fr]">
             {{-- min-w-0 stops the nav's scrollable row from stretching the grid column past the viewport on a phone. --}}
             <aside class="min-w-0 lg:sticky lg:top-28 lg:self-start">
-                <nav class="no-scrollbar -mx-4 flex gap-1 overflow-x-auto px-4 lg:mx-0 lg:flex-col lg:px-0" aria-label="Dashboard">
+                {{-- Swapped on navigation too, so the active item follows the page. --}}
+                <nav data-nav-region class="no-scrollbar -mx-4 flex gap-1 overflow-x-auto px-4 lg:mx-0 lg:flex-col lg:px-0" aria-label="Dashboard">
                     @foreach ($nav as $item)
                         <a href="{{ $item['href'] }}" @class(['flex shrink-0 items-center gap-2 rounded-full px-4 py-2 text-sm font-medium whitespace-nowrap transition lg:rounded-xl', 'bg-brand-600 text-white' => $item['active'], 'text-ink-muted hover:bg-surface-muted hover:text-ink' => ! $item['active']])>
                             <span aria-hidden="true">{{ $item['icon'] }}</span>
