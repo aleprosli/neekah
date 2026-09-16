@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Actions\AcceptWeddingInvitation;
 use App\Models\WeddingInvitation;
 use App\Support\Seo;
+use App\Support\VueProps;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -27,7 +28,28 @@ class InvitationAcceptanceController extends Controller
             return redirect()->route('register');
         }
 
-        return view('invitations.show', ['invitation' => $invitation]);
+        $wedding = $invitation->wedding;
+
+        return view('invitations.show', [
+            'props' => VueProps::for([
+                'invitation' => ['inviter' => $invitation->inviter->name],
+                'state' => match (true) {
+                    $wedding->hasMember($request->user()) => 'member',
+                    ! $invitation->isPending() => 'expired',
+                    default => 'open',
+                },
+                'facts' => [
+                    ['label' => 'Majlis', 'value' => $wedding->title],
+                    ['label' => 'Tarikh', 'value' => $wedding->event_date->translatedFormat('j F Y')],
+                    ['label' => 'Lokasi', 'value' => $wedding->city.', '.$wedding->state],
+                    ['label' => 'Bajet', 'value' => 'RM'.number_format((float) $wedding->budget)],
+                ],
+                'acceptUrl' => route('invitations.accept', $invitation),
+                'dashboardUrl' => route('dashboard'),
+                'browseUrl' => route('vendors.index'),
+                'footnote' => 'Jemputan dihantar ke '.$invitation->email.'. Anda log masuk sebagai '.$request->user()->email.'.',
+            ]),
+        ]);
     }
 
     public function store(Request $request, WeddingInvitation $invitation, AcceptWeddingInvitation $accept): RedirectResponse

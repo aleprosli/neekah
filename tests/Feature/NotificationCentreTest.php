@@ -38,11 +38,14 @@ it('shows an unread badge in the header and lists notifications', function () {
         ->assertOk()
         ->assertSee('Notifikasi');
 
-    $this->actingAs($this->customer)
+    $props = $this->actingAs($this->customer)
         ->get(route('notifications.index'))
         ->assertOk()
-        ->assertSee('1 belum dibaca')
-        ->assertSee('Booking');
+        ->viewData('props');
+
+    expect($props['unreadCount'])->toBe(1)
+        ->and($props['notifications'][0]['unread'])->toBeTrue()
+        ->and($props['notifications'][0]['title'])->toContain('Booking');
 });
 
 it('marks one notification read and follows it to its target', function () {
