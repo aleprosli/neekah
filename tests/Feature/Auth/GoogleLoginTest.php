@@ -1,10 +1,15 @@
 <?php
 
 use App\Enums\UserRole;
+use App\Jobs\SendTelegramAlert;
 use App\Models\Category;
 use App\Models\User;
 use App\Models\Vendor;
+use App\Notifications\CustomerRegistered;
+use App\Support\TelegramSettings;
 use Database\Seeders\CategorySeeder;
+use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Queue;
 use Laravel\Socialite\Facades\Socialite;
 use Laravel\Socialite\Two\User as SocialiteUser;
 
@@ -35,6 +40,38 @@ it('registers a new customer from a Google account', function () {
         ->and($user->password)->toBeNull();
 
     $this->assertAuthenticatedAs($user);
+});
+
+it('holds a new Google customer at the phone form until they give a number', function () {
+    Notification::fake();
+    Queue::fake();
+    app(TelegramSettings::class)->save(['enabled' => true, 'bot_token' => 'bot-token', 'chat_id' => '-100123']);
+
+    fakeGoogleUser('aina@gmail.com');
+    $this->get(route('auth.google.callback'));
+
+    $user = User::sole();
+    expect($user->phone)->toBeNull();
+
+    // Nothing is announced yet: a lead without a number cannot be followed up.
+    Notification::assertNothingSent();
+    Queue::assertNotPushed(SendTelegramAlert::class);
+
+    $this->get(route('dashboard'))->assertRedirect(route('phone.create'));
+    $this->get(route('phone.create'))->assertOk()->assertSee('Nombor telefon');
+
+    $this->post(route('phone.store'), ['phone' => 'bukan nombor'])->assertSessionHasErrors('phone');
+
+    $this->post(route('phone.store'), ['phone' => '012-345 6789'])->assertRedirect(route('dashboard'));
+
+    expect($user->fresh()->phone)->toBe('012-345 6789');
+
+    Notification::assertSentTo($user, CustomerRegistered::class);
+    Queue::assertPushed(SendTelegramAlert::class, function (SendTelegramAlert $job): bool {
+        return str_contains((fn () => $this->text())->call($job), 'https://wa.me/60123456789');
+    });
+
+    $this->get(route('dashboard'))->assertOk();
 });
 
 it('links Google to an existing account by email instead of duplicating it', function () {

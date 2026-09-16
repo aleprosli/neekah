@@ -5,9 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Actions\AcceptWeddingInvitation;
 use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
-use App\Jobs\SendTelegramAlert;
 use App\Models\User;
-use App\Notifications\CustomerRegistered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
@@ -62,14 +60,9 @@ class GoogleController extends Controller
 
             $user->forceFill(['email_verified_at' => now()])->save();
 
-            $user->notify(new CustomerRegistered);
-
-            SendTelegramAlert::about('💍 <b>New user has been registered</b>', [
-                'Nama' => $user->name,
-                'Emel' => $user->email,
-                'Telefon' => $user->phone,
-                'WhatsApp' => $user->whatsappUrl(),
-            ]);
+            // The welcome and the lead alert wait for the phone number, which
+            // PhoneNumberController collects next; Google never gives us one.
+            request()->session()->put(PhoneNumberController::NEW_SIGNUP_KEY, true);
         }
 
         Auth::login($user, true);
