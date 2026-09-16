@@ -15,6 +15,8 @@ use Illuminate\Support\Str;
  */
 class Seo
 {
+    public function __construct(private readonly SeoSettings $settings) {}
+
     /** Google truncates a title around here, so trim rather than let it cut. */
     public const TITLE_LIMIT = 60;
 
@@ -163,7 +165,7 @@ class Seo
         $site = config('app.name');
 
         if (blank($this->title)) {
-            return Str::limit($site.' — '.config('neekah.seo.tagline'), self::TITLE_LIMIT, '');
+            return Str::limit($site.' — '.$this->settings->tagline(), self::TITLE_LIMIT, '');
         }
 
         if (! $this->withSiteName) {
@@ -181,7 +183,7 @@ class Seo
 
     public function resolvedDescription(): string
     {
-        return Str::limit($this->description ?: config('neekah.seo.description'), self::DESCRIPTION_LIMIT - 1, '…');
+        return Str::limit($this->description ?: $this->settings->description(), self::DESCRIPTION_LIMIT - 1, '…');
     }
 
     public function resolvedCanonical(): string

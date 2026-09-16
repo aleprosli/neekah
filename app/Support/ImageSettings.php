@@ -2,14 +2,12 @@
 
 namespace App\Support;
 
-use App\Models\Setting;
-
 /**
  * How uploaded images are resized and compressed, as set by an admin under
  * Admin → Tetapan. Every value falls back to a default, so a fresh install
  * optimises images before anyone has opened the settings page.
  */
-class ImageSettings
+class ImageSettings extends SettingGroup
 {
     /** @var array<string, string> */
     public const FORMATS = [
@@ -18,7 +16,7 @@ class ImageSettings
     ];
 
     /** @var array{max_dimension: int, thumbnail_width: int, quality: int, format: string, max_upload_mb: int} */
-    public const DEFAULTS = [
+    private const DEFAULTS = [
         'max_dimension' => 1920,
         'thumbnail_width' => 640,
         'quality' => 80,
@@ -80,30 +78,13 @@ class ImageSettings
     /**
      * @return array{max_dimension: int, thumbnail_width: int, quality: int, format: string, max_upload_mb: int}
      */
-    public function all(): array
+    public static function defaults(): array
     {
-        return [
-            'max_dimension' => $this->maxDimension(),
-            'thumbnail_width' => $this->thumbnailWidth(),
-            'quality' => $this->quality(),
-            'format' => $this->format(),
-            'max_upload_mb' => $this->maxUploadMegabytes(),
-        ];
+        return self::DEFAULTS;
     }
 
-    /**
-     * @param  array<string, int|string>  $values  Keyed like DEFAULTS.
-     */
-    public function save(array $values): void
+    protected static function prefix(): string
     {
-        Setting::put(collect($values)
-            ->only(array_keys(self::DEFAULTS))
-            ->mapWithKeys(fn (int|string $value, string $key): array => ['images.'.$key => $value])
-            ->all());
-    }
-
-    private function value(string $key): int|string
-    {
-        return Setting::values()['images.'.$key] ?? self::DEFAULTS[$key];
+        return 'images';
     }
 }

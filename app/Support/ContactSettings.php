@@ -1,0 +1,87 @@
+<?php
+
+namespace App\Support;
+
+/**
+ * How visitors reach Neekah itself: the numbers, the address and the social
+ * accounts shown in the footer and used in "hubungi kami" links. Set under
+ * Admin → Tetapan so nobody has to redeploy to change a phone number.
+ */
+class ContactSettings extends SettingGroup
+{
+    public function phone(): string
+    {
+        return $this->string('phone');
+    }
+
+    public function whatsapp(): string
+    {
+        return $this->string('whatsapp');
+    }
+
+    public function email(): string
+    {
+        return $this->string('email');
+    }
+
+    public function address(): string
+    {
+        return $this->string('address');
+    }
+
+    public function hours(): string
+    {
+        return $this->string('hours');
+    }
+
+    /** The number in wa.me form: digits only, with the country code. */
+    public function whatsappUrl(): ?string
+    {
+        $number = PhoneNumber::normalise($this->whatsapp() ?: $this->phone());
+
+        return $number ? 'https://wa.me/'.$number : null;
+    }
+
+    public function telUrl(): ?string
+    {
+        return $this->phone() ? 'tel:'.preg_replace('/[^0-9+]/', '', $this->phone()) : null;
+    }
+
+    /**
+     * Every social account that has been filled in, ready to render.
+     *
+     * @return array<int, array{label: string, url: string}>
+     */
+    public function socialLinks(): array
+    {
+        $labels = ['facebook' => 'Facebook', 'instagram' => 'Instagram', 'tiktok' => 'TikTok'];
+
+        return collect($labels)
+            ->map(fn (string $label, string $key): array => ['label' => $label, 'url' => $this->string($key)])
+            ->filter(fn (array $link): bool => $link['url'] !== '')
+            ->values()
+            ->all();
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public static function defaults(): array
+    {
+        return [
+            'phone' => '',
+            'whatsapp' => '',
+            'email' => (string) config('mail.from.address'),
+            'address' => '',
+            'hours' => '',
+            'facebook' => '',
+            'instagram' => '',
+            'tiktok' => '',
+        ];
+    }
+
+    protected static function prefix(): string
+    {
+        return 'contact';
+    }
+}

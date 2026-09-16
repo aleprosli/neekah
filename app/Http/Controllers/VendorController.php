@@ -6,6 +6,7 @@ use App\Enums\VendorTier;
 use App\Models\Category;
 use App\Models\Vendor;
 use App\Support\Seo;
+use App\Support\SeoSettings;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
@@ -192,7 +193,7 @@ class VendorController extends Controller
                 'name' => config('app.name'),
                 'url' => route('vendors.index'),
                 'logo' => asset(config('neekah.brand.mark')),
-                'description' => config('neekah.seo.description'),
+                'description' => app(SeoSettings::class)->description(),
             ]);
         }
 

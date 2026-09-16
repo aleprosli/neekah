@@ -1,6 +1,7 @@
 ---
 paths:
   - app/Support/Seo.php
+  - 'app/Support/**'
 ---
 
 # Support
@@ -16,3 +17,6 @@ robots.txt must stay a real file in public/. The standard Laravel nginx config, 
 
 ## JSON-LD also comes only from Seo
 Structured data is added with Seo::schema([...]) / breadcrumbs([name => url]) / article($published, $modified) from the controller, and printed once by seo/tags.blade.php as one @graph (JSON_HEX_TAG encoded). Never hand-write <script type="application/ld+json"> in a view. Noindex pages emit no JSON-LD. Only claim aggregateRating when real reviews exist.
+
+## Admin-editable settings extend SettingGroup
+Anything an admin can change under Admin → Tetapan lives in a class extending App\Support\SettingGroup (ContactSettings, SeoSettings, TurnstileSettings, ImageSettings). Each declares defaults() and a prefix(); values are stored one row per "prefix.key" in the settings table and read through Setting::values(), which is cached forever and forgotten on save. Never read a settings row directly, and never add a key without a default — defaults() is what makes a fresh install work and lets a group gain keys without a migration. config/neekah.php and config/services.php hold the defaults these groups fall back to, not the live values.

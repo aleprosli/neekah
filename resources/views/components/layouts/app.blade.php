@@ -25,5 +25,8 @@
 
         <x-impersonation-banner />
         {{ $slot }}
+
+        {{-- Third-party scripts a page pushed here, loaded after its markup. --}}
+        @stack('scripts')
     </body>
 </html>

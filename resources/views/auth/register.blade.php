@@ -18,6 +18,8 @@
         <x-form.field label="Kata laluan" name="password" type="password" autocomplete="new-password" help="Sekurang-kurangnya 8 aksara." required />
         <x-form.field label="Sahkan kata laluan" name="password_confirmation" type="password" autocomplete="new-password" required />
 
+        <x-turnstile />
+
         <button type="submit" class="rounded-full bg-brand-600 py-3 text-sm font-semibold text-white transition hover:bg-brand-700">Daftar</button>
     </form>
 

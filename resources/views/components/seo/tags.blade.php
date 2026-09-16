@@ -32,8 +32,8 @@
 <meta name="twitter:title" content="{{ $seo->resolvedTitle() }}">
 <meta name="twitter:description" content="{{ $seo->resolvedDescription() }}">
 <meta name="twitter:image" content="{{ $seo->resolvedImage() }}">
-@if (config('neekah.seo.twitter'))
-    <meta name="twitter:site" content="{{ config('neekah.seo.twitter') }}">
+@if ($twitter = app(App\Support\SeoSettings::class)->twitter())
+    <meta name="twitter:site" content="{{ $twitter }}">
 @endif
 
 @if ($jsonLd = $seo->jsonLd())

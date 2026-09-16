@@ -179,4 +179,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::post('/posts/images', AdminArea\PostImageController::class)->middleware('throttle:30,1')->name('posts.images.store');
     Route::get('/settings', [AdminArea\SettingController::class, 'edit'])->name('settings.edit');
     Route::put('/settings', [AdminArea\SettingController::class, 'update'])->name('settings.update');
+    Route::put('/settings/contact', [AdminArea\SettingController::class, 'updateContact'])->name('settings.contact');
+    Route::put('/settings/seo', [AdminArea\SettingController::class, 'updateSeo'])->name('settings.seo');
+    Route::put('/settings/turnstile', [AdminArea\SettingController::class, 'updateTurnstile'])->name('settings.turnstile');
 });

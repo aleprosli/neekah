@@ -54,6 +54,7 @@
             </section>
 
             <div class="flex flex-col items-center gap-3">
+                <x-turnstile />
                 <button type="submit" class="w-full rounded-full bg-brand-600 py-3.5 text-sm font-semibold text-white transition hover:bg-brand-700 sm:w-auto sm:px-10">Daftar sebagai vendor</button>
                 <p class="text-sm text-ink-muted">Sudah ada akaun? <a href="{{ route('login') }}" class="font-medium text-brand-600 underline underline-offset-4">Log masuk</a></p>
             </div>

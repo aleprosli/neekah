@@ -5,6 +5,7 @@ namespace App\Http\Requests;
 use App\Models\Category;
 use App\Models\User;
 use App\Models\Vendor;
+use App\Rules\Turnstile;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
@@ -31,6 +32,7 @@ class RegisterVendorRequest extends FormRequest
             'city' => ['required', 'string', 'max:80'],
             'state' => ['required', Rule::in(Vendor::STATES)],
             'tagline' => ['nullable', 'string', 'max:160'],
+            'cf-turnstile-response' => [app(Turnstile::class)],
         ];
     }
 
