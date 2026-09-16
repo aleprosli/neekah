@@ -8,6 +8,7 @@ use App\Http\Requests\StoreTimelineItemRequest;
 use App\Models\Vendor;
 use App\Models\Wedding;
 use App\Models\WeddingTimelineItem;
+use App\Support\VueProps;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -23,8 +24,31 @@ class WeddingTimelineController extends Controller
 
         return view('customer.timeline', [
             'wedding' => $wedding,
-            'items' => $wedding->timelineItems()->with('vendor.category')->get(),
-            'bookedVendors' => $this->bookedVendors($wedding),
+            'props' => VueProps::for([
+                'storeUrl' => route('weddings.timeline.store', $wedding),
+                'items' => $wedding->timelineItems()->with('vendor.category')->get()
+                    ->map(fn (WeddingTimelineItem $item): array => [
+                        'id' => $item->id,
+                        'starts_at' => $item->startsAtLabel(),
+                        'ends_at' => $item->endsAtLabel(),
+                        'title' => $item->title,
+                        'location' => $item->location,
+                        'notes' => $item->notes,
+                        'destroy_url' => route('weddings.timeline.destroy', [$wedding, $item]),
+                        'vendor' => $item->vendor ? [
+                            'name' => $item->vendor->name,
+                            'url' => route('vendors.show', $item->vendor),
+                            'icon' => $item->vendor->category->icon,
+                            'illustration' => $item->vendor->category->illustrationUrl(),
+                        ] : null,
+                    ])->values(),
+                'vendors' => $this->bookedVendors($wedding)
+                    ->map(fn (Vendor $vendor): array => [
+                        'id' => $vendor->id,
+                        'name' => $vendor->name,
+                        'icon' => $vendor->category->icon,
+                    ])->values(),
+            ]),
         ]);
     }
 

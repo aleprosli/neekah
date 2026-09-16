@@ -4,22 +4,60 @@ namespace App\Http\Controllers\Vendor;
 
 use App\Actions\StoreOptimizedImage;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\ReorderPortfolioRequest;
 use App\Http\Requests\StorePortfolioItemRequest;
 use App\Models\PortfolioItem;
+use App\Support\ImageSettings;
+use App\Support\VueProps;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class PortfolioItemController extends Controller
 {
-    public function index(Request $request): View
+    public function index(Request $request, ImageSettings $images): View
     {
         return view('vendor.portfolio.index', [
-            'items' => $request->user()->vendor->portfolioItems()->get(),
+            'props' => VueProps::for([
+                'reorderUrl' => route('vendor.portfolio.reorder'),
+                'storeUrl' => route('vendor.portfolio.store'),
+                'destroyUrlTemplate' => route('vendor.portfolio.destroy', ['item' => '__ID__']),
+                'imageHint' => $images->uploadHint('1600 × 1200px atau lebih'),
+                'items' => $request->user()->vendor->portfolioItems()->orderBy('sort_order')->get()
+                    ->map(fn (PortfolioItem $item): array => [
+                        'id' => $item->id,
+                        'url' => $item->url(),
+                        'thumbnail' => $item->thumbnailUrl(),
+                        'caption' => $item->caption,
+                        'is_visible' => $item->is_visible,
+                    ])->values(),
+            ]),
         ]);
     }
 
-    public function store(StorePortfolioItemRequest $request, StoreOptimizedImage $storeImage): RedirectResponse
+    /**
+     * Save the arrangement the vendor dragged into place. The whole list is
+     * sent at once, so one request settles both the order and which photos are
+     * shown, and a half-applied arrangement is impossible.
+     */
+    public function reorder(ReorderPortfolioRequest $request): JsonResponse
+    {
+        $vendor = $request->user()->vendor;
+
+        DB::transaction(function () use ($request, $vendor): void {
+            foreach ($request->validated('items') as $item) {
+                $vendor->portfolioItems()
+                    ->whereKey($item['id'])
+                    ->update(['sort_order' => $item['sort_order'], 'is_visible' => $item['is_visible']]);
+            }
+        });
+
+        return response()->json(['status' => 'ok']);
+    }
+
+    public function store(StorePortfolioItemRequest $request, StoreOptimizedImage $storeImage): RedirectResponse|JsonResponse
     {
         $vendor = $request->user()->vendor;
         $position = $vendor->portfolioItems()->count();
@@ -32,7 +70,11 @@ class PortfolioItemController extends Controller
             ]);
         }
 
-        return redirect()->route('vendor.portfolio.index')->with('status', count($request->file('images')).' gambar dimuat naik.');
+        return $this->redirectOrJson(
+            $request,
+            route('vendor.portfolio.index'),
+            count($request->file('images')).' gambar dimuat naik.',
+        );
     }
 
     public function destroy(Request $request, PortfolioItem $item, StoreOptimizedImage $storeImage): RedirectResponse

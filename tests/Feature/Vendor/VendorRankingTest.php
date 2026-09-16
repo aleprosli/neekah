@@ -126,13 +126,15 @@ it('tracks the completion rate from settled bookings', function () {
 it('shows the vendor their points, score and what the next tier needs', function () {
     givePerformance($this->vendor, completed: 5, reviews: 3, rating: 4);
 
-    $this->actingAs($this->vendor->user)
+    $props = $this->actingAs($this->vendor->user)
         ->get(route('vendor.points.index'))
         ->assertOk()
-        ->assertSee('Performance point')
-        ->assertSee('Vendor Score')
-        ->assertSee('Booking melalui platform')
-        ->assertSee('Untuk naik ke Top Vendor');
+        ->viewData('props');
+
+    expect(collect($props['stats'])->pluck('label'))->toContain('Performance point', 'Vendor Score')
+        ->and(collect($props['earnable'])->pluck('label'))->toContain('Booking melalui platform')
+        ->and($props['progress']['next'])->toBe('Top')
+        ->and(collect($props['progress']['requirements'])->pluck('label'))->toContain('Booking selesai');
 });
 
 /**

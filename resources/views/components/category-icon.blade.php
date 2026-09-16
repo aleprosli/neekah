@@ -1,26 +1,8 @@
 @props(['slug' => null, 'fallback' => null, 'alt' => ''])
 
 @php
-    /**
-     * Illustration file per category slug; a null slug is the "all categories" tile.
-     * Pelamin and Decoration share the floral-arch drawing.
-     */
-    $files = [
-        null => 'all',
-        'catering' => 'catering',
-        'pelamin' => 'decoration',
-        'decoration' => 'decoration',
-        'photography' => 'photography',
-        'videography' => 'videography',
-        'emcee' => 'emcee',
-        'makeup' => 'makeup',
-        'bridal' => 'bridal',
-        'venue' => 'venue',
-        'cake' => 'cake',
-        'entertainment' => 'entertainment',
-        'invitation' => 'invitation',
-    ];
-    $file = $files[$slug] ?? null;
+    // A null slug is the "all categories" tile; the rest come from the model.
+    $file = $slug === null ? 'all' : (App\Models\Category::ILLUSTRATIONS[$slug] ?? null);
 @endphp
 
 @if ($file)

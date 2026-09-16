@@ -8,36 +8,83 @@ use App\Http\Controllers\Controller;
 use App\Models\Booking;
 use App\Models\Payment;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class TransactionController extends Controller
 {
+    /** Columns for components/ui/DataTable.vue. */
+    private const COLUMNS = [
+        ['key' => 'reference', 'label' => 'Rujukan', 'sortable' => true],
+        ['key' => 'booking', 'label' => 'Booking'],
+        ['key' => 'vendor', 'label' => 'Vendor'],
+        ['key' => 'type', 'label' => 'Jenis'],
+        ['key' => 'amount', 'label' => 'Amaun', 'sortable' => true, 'align' => 'right'],
+        ['key' => 'status', 'label' => 'Status', 'type' => 'html'],
+        ['key' => 'date', 'label' => 'Tarikh', 'sort' => 'paid_at', 'sortable' => true],
+    ];
+
     /**
      * Financial view: gross transaction value, platform commission and vendor payouts.
      */
     public function index(Request $request): View
     {
-        $status = PaymentStatus::tryFrom($request->string('status')->toString());
-
-        $payments = Payment::query()
-            ->with(['booking.vendor', 'booking.user'])
-            ->when($status, fn ($query) => $query->where('status', $status))
-            ->orderByDesc('id')
-            ->paginate(25)
-            ->withQueryString();
-
         $gross = (float) Payment::where('status', PaymentStatus::Paid)->sum('amount');
         $commission = (float) Booking::whereIn('status', [BookingStatus::Confirmed, BookingStatus::Completed])->sum('commission_amount');
 
         return view('admin.transactions', [
-            'payments' => $payments,
-            'status' => $status,
-            'gross' => $gross,
-            'commission' => $commission,
-            'payout' => $gross - $commission,
-            'outstanding' => (float) Payment::where('status', PaymentStatus::Pending)
-                ->whereHas('booking', fn ($query) => $query->whereNot('status', BookingStatus::Cancelled))
-                ->sum('amount'),
+            'columns' => self::COLUMNS,
+            'status' => PaymentStatus::tryFrom($request->string('status')->toString()),
+            'stats' => [
+                ['label' => 'Gross transaction value', 'value' => 'RM'.number_format($gross, 2), 'hint' => 'Semua bayaran diterima'],
+                ['label' => 'Komisen platform', 'value' => 'RM'.number_format($commission, 2), 'hint' => '8% daripada booking aktif'],
+                ['label' => 'Payout vendor', 'value' => 'RM'.number_format($gross - $commission, 2), 'hint' => 'Selepas komisen'],
+                ['label' => 'Belum dibayar', 'value' => 'RM'.number_format((float) Payment::where('status', PaymentStatus::Pending)
+                    ->whereHas('booking', fn ($query) => $query->whereNot('status', BookingStatus::Cancelled))
+                    ->sum('amount'), 2), 'hint' => 'Deposit & baki tertunggak'],
+            ],
+        ]);
+    }
+
+    /** A page of payments for the table. */
+    public function data(Request $request): JsonResponse
+    {
+        $status = PaymentStatus::tryFrom($request->string('status')->toString());
+        $sort = in_array($request->string('sort')->toString(), ['reference', 'amount', 'paid_at'], true)
+            ? $request->string('sort')->toString()
+            : 'id';
+        $direction = $request->string('direction')->toString() === 'asc' ? 'asc' : 'desc';
+
+        $payments = Payment::query()
+            ->with(['booking.vendor', 'booking.user'])
+            ->when($status, fn ($query) => $query->where('status', $status))
+            ->when($request->string('search')->trim()->toString(), function ($query, string $keyword): void {
+                $like = '%'.$keyword.'%';
+                $query->where(fn ($query) => $query
+                    ->where('reference', 'like', $like)
+                    ->orWhereHas('booking', fn ($query) => $query->where('reference', 'like', $like))
+                    ->orWhereHas('booking.vendor', fn ($query) => $query->where('name', 'like', $like)));
+            })
+            ->orderBy($sort, $direction)
+            ->paginate(min($request->integer('per_page', 25), 100));
+
+        return response()->json([
+            'data' => $payments->getCollection()->map(fn (Payment $payment): array => [
+                'url' => route('admin.bookings.show', $payment->booking),
+                'reference' => $payment->reference,
+                'booking' => $payment->booking->reference,
+                'vendor' => $payment->booking->vendor->name,
+                'type' => $payment->type->label(),
+                'amount' => 'RM'.number_format((float) $payment->amount, 2),
+                'status' => view('components.admin.status-pill', ['label' => $payment->status->label(), 'tone' => $payment->status->tone()])->render(),
+                'date' => ($payment->paid_at ?? $payment->created_at)->translatedFormat('j M Y'),
+            ])->all(),
+            'meta' => [
+                'total' => $payments->total(),
+                'per_page' => $payments->perPage(),
+                'current_page' => $payments->currentPage(),
+                'last_page' => $payments->lastPage(),
+            ],
         ]);
     }
 }

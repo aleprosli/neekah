@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreWeddingRequest;
 use App\Models\Vendor;
 use App\Models\Wedding;
+use App\Support\VueProps;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Gate;
@@ -16,7 +17,7 @@ class WeddingController extends Controller
 {
     public function create(): View
     {
-        return view('customer.weddings.form', ['wedding' => new Wedding, 'states' => Vendor::STATES]);
+        return view('customer.weddings.form', $this->formData(new Wedding));
     }
 
     public function store(StoreWeddingRequest $request, SeedWeddingChecklist $seedChecklist): RedirectResponse
@@ -32,7 +33,7 @@ class WeddingController extends Controller
     {
         Gate::authorize('update', $wedding);
 
-        return view('customer.weddings.form', ['wedding' => $wedding, 'states' => Vendor::STATES]);
+        return view('customer.weddings.form', $this->formData($wedding));
     }
 
     public function update(StoreWeddingRequest $request, Wedding $wedding): RedirectResponse
@@ -40,5 +41,33 @@ class WeddingController extends Controller
         $wedding->update($request->validated());
 
         return redirect()->route('dashboard')->with('status', 'Maklumat majlis dikemas kini.');
+    }
+
+    /**
+     * What the form component needs, with anything already typed put back.
+     *
+     * @return array<string, mixed>
+     */
+    private function formData(Wedding $wedding): array
+    {
+        $editing = $wedding->exists;
+
+        return [
+            'editing' => $editing,
+            'props' => VueProps::for([
+                'editing' => $editing,
+                'action' => $editing ? route('weddings.update', $wedding) : route('weddings.store'),
+                'cancelUrl' => route('dashboard'),
+                'states' => Vendor::STATES,
+                'wedding' => [
+                    'title' => old('title', $wedding->title),
+                    'event_date' => old('event_date', $wedding->event_date?->toDateString()),
+                    'budget' => old('budget', $wedding->budget ?? 30000),
+                    'city' => old('city', $wedding->city),
+                    'state' => old('state', $wedding->state),
+                    'notes' => old('notes', $wedding->notes),
+                ],
+            ]),
+        ];
     }
 }

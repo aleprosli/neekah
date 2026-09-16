@@ -40,6 +40,18 @@ it('shows the widget on the register form once Turnstile is on', function () {
         ->assertSee('challenges.cloudflare.com/turnstile/v0/api.js');
 });
 
+it('puts the widget on the vendor register form too', function () {
+    enableTurnstile();
+    $this->seed(CategorySeeder::class);
+
+    $response = $this->get(route('vendor.register'))->assertOk();
+
+    // The form is a Vue component now, so the key travels in its props and the
+    // loader script still has to be on the page for the widget to appear.
+    expect($response->viewData('props')['turnstileSiteKey'])->toBe('site-key');
+    $response->assertSee('challenges.cloudflare.com/turnstile/v0/api.js');
+});
+
 it('turns a missing token into a form error', function () use ($registration) {
     enableTurnstile();
     Http::fake();

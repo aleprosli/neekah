@@ -112,6 +112,25 @@ it('never validates against a limit the server itself will refuse', function () 
         ->and($images->uploadRules())->toContain('max:'.($images->effectiveUploadMegabytes() * 1024));
 });
 
+it('answers an upload posted by the progress bar with somewhere to go', function () {
+    Storage::fake('public');
+    $vendor = Vendor::factory()->for(Category::first())->create();
+
+    // The progress bar posts over XHR. A 302 would be followed invisibly and
+    // would eat the flash message, so the destination comes back as JSON.
+    $this->actingAs($vendor->user)
+        ->post(
+            route('vendor.portfolio.store'),
+            ['images' => [UploadedFile::fake()->image('majlis.jpg', 800, 600)]],
+            ['Accept' => 'application/json'],
+        )
+        ->assertOk()
+        ->assertJsonPath('redirect', route('vendor.portfolio.index'));
+
+    expect(session('status'))->toBe('1 gambar dimuat naik.')
+        ->and(PortfolioItem::count())->toBe(1);
+});
+
 it('tells the vendor which formats and size are accepted', function () {
     $vendor = Vendor::factory()->for(Category::first())->create();
 

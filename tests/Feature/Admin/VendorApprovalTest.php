@@ -84,11 +84,16 @@ it('recomputes an unlocked tier from the vendor metrics instead of trusting the 
 it('shows a vendor detail page with owner, packages and controls', function () {
     $vendor = Vendor::factory()->pending()->for(Category::first())->create();
 
-    $this->actingAs($this->admin)
+    $props = $this->actingAs($this->admin)
         ->get(route('admin.vendors.show', $vendor))
         ->assertOk()
         ->assertSee($vendor->name)
-        ->assertSee($vendor->user->email)
-        ->assertSee('Vendor Score')
-        ->assertSee('Simpan ranking');
+        ->viewData('props');
+
+    expect(collect($props['facts'])->firstWhere('label', 'Pemilik')['detail'])->toContain($vendor->user->email)
+        ->and(collect($props['facts'])->pluck('label'))->toContain('Vendor Score')
+        ->and($props['vendor']['tier_url'])->toBe(route('admin.vendors.tier', $vendor))
+        // A pending vendor can be approved from here, and is not offered its own status.
+        ->and(collect($props['statusActions'])->pluck('value'))->toContain('approved')
+        ->not->toContain('pending');
 });

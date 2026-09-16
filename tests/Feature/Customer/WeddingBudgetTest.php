@@ -30,13 +30,13 @@ it('shows planned against actual per category from real bookings', function () {
     ]);
     Payment::factory()->for($booking)->paid()->create(['amount' => 3800]);
 
-    $this->actingAs($this->aina)
-        ->get(route('budget.index'))
-        ->assertOk()
-        ->assertSee('RM30,000')
-        ->assertSee('RM9,500')
-        ->assertSee('Dapur Warisan')
-        ->assertSee('dibayar RM3,800');
+    $props = $this->actingAs($this->aina)->get(route('budget.index'))->assertOk()->viewData('props');
+    $catering = collect($props['rows'])->firstWhere('category', 'Catering');
+
+    expect(collect($props['stats'])->firstWhere('label', 'Jumlah bajet')['value'])->toBe('RM30,000')
+        ->and($catering['actual'])->toBe('RM9,500')
+        ->and($catering['paid'])->toBe('RM3,800')
+        ->and(collect($catering['bookings'])->pluck('vendor'))->toContain('Dapur Warisan');
 });
 
 it('ignores cancelled bookings in the actual column', function () {
@@ -78,7 +78,9 @@ it('warns when bookings run over the wedding budget', function () {
     Package::factory()->for($vendor)->create();
     Booking::factory()->confirmed()->for($this->aina)->for($vendor)->create(['wedding_id' => $this->wedding->id, 'total_amount' => 35000]);
 
-    $this->actingAs($this->aina)->get(route('budget.index'))->assertOk()->assertSee('Melebihi bajet');
+    $props = $this->actingAs($this->aina)->get(route('budget.index'))->assertOk()->viewData('props');
+
+    expect(collect($props['stats'])->firstWhere('label', 'Baki bajet')['hint'])->toBe('Melebihi bajet');
 });
 
 it('charts spending by month and by category alongside the table', function () {
@@ -96,18 +98,23 @@ it('charts spending by month and by category alongside the table', function () {
         'paid_at' => now()->subMonth(),
     ]);
 
-    $this->actingAs($this->aina)->get(route('budget.index'))
-        ->assertOk()
-        ->assertSee('Komitmen mengikut bulan')
-        ->assertSee('Bayaran mengikut bulan')
-        ->assertSee('Perbelanjaan mengikut kategori')
-        ->assertSee('RM8,000')
-        ->assertSee('RM3,000');
+    $charts = $this->actingAs($this->aina)->get(route('budget.index'))->assertOk()->viewData('props')['charts'];
+
+    expect(array_keys($charts))->toBe(['committed', 'paid', 'categories'])
+        ->and(collect($charts['committed'])->sum('value'))->toBe(8000.0)
+        ->and(collect($charts['paid'])->sum('value'))->toBe(3000.0)
+        ->and(collect($charts['categories'])->sum('value'))->toBe(8000.0);
 });
 
 it('shows an empty chart message rather than a blank box before any booking', function () {
-    $this->actingAs($this->aina)->get(route('budget.index'))
-        ->assertOk()
-        ->assertSee('Belum ada tempahan untuk dipaparkan.')
-        ->assertSee('Tempah vendor untuk melihat agihan perbelanjaan anda.');
+    $charts = $this->actingAs($this->aina)->get(route('budget.index'))->assertOk()->viewData('props')['charts'];
+
+    // Nothing booked yet: the series are empty and the page says so in words
+    // rather than drawing a chart of nothing.
+    expect(collect($charts['committed'])->sum('value'))->toBe(0.0)
+        ->and($charts['categories'])->toBe([]);
+
+    expect(file_get_contents(resource_path('js/components/customer/CustomerBudgetPage.vue')))
+        ->toContain('Belum ada tempahan untuk dipaparkan.')
+        ->toContain('Tempah vendor untuk melihat agihan perbelanjaan anda.');
 });

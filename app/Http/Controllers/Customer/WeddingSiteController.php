@@ -8,10 +8,14 @@ use App\Http\Requests\StoreWeddingSiteRequest;
 use App\Models\SiteTemplate;
 use App\Models\Wedding;
 use App\Models\WeddingSite;
+use App\Support\ImageSettings;
+use App\Support\VueProps;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class WeddingSiteController extends Controller
@@ -32,13 +36,96 @@ class WeddingSiteController extends Controller
             $site->template = $chosen;
         }
 
+        $templates = SiteTemplate::active()->ordered()->get();
+        $images = app(ImageSettings::class);
+        $published = $wedding->site;
+
         return view('customer.site', [
             'wedding' => $wedding,
-            'site' => $site,
-            'templates' => SiteTemplate::active()->ordered()->get()->groupBy('style'),
-            'domain' => config('neekah.site_domain'),
-            'rsvpCount' => $wedding->site?->confirmedPax() ?? 0,
-            'wishes' => $wedding->site?->rsvps()->whereNotNull('message')->get() ?? collect(),
+            'props' => VueProps::for([
+                'exists' => $site->exists,
+                'action' => route('weddings.site.update', $wedding),
+                'domain' => config('neekah.site_domain'),
+                'imageHint' => $images->uploadHint('1600 × 1200px atau lebih'),
+                'limits' => [
+                    'templates' => $templates->count(),
+                    'gallery_url' => route('sites.templates'),
+                    'preview_url' => route('site.preview'),
+                    // The same ceilings StoreWeddingSiteRequest enforces, so the
+                    // form cannot offer a row the server will reject.
+                    'itinerary' => 12,
+                    'contacts' => 6,
+                    'gift_accounts' => 4,
+                ],
+                'site' => [
+                    'template' => old('template', $site->template),
+                    'subdomain' => old('subdomain', $site->subdomain),
+                    'bride_name' => old('bride_name', $site->bride_name),
+                    'groom_name' => old('groom_name', $site->groom_name),
+                    'bride_parents' => old('bride_parents', $site->bride_parents),
+                    'groom_parents' => old('groom_parents', $site->groom_parents),
+                    'salutation' => old('salutation', $site->salutation),
+                    'invitation_note' => old('invitation_note', $site->invitation_note),
+                    'event_date' => old('event_date', $site->event_date?->toDateString()),
+                    'starts_at' => old('starts_at', $site->starts_at ? Carbon::parse($site->starts_at)->format('H:i') : null),
+                    'ends_at' => old('ends_at', $site->ends_at ? Carbon::parse($site->ends_at)->format('H:i') : null),
+                    'venue_name' => old('venue_name', $site->venue_name),
+                    'venue_address' => old('venue_address', $site->venue_address),
+                    'map_url' => old('map_url', $site->map_url),
+                    'rsvp_enabled' => (bool) old('rsvp_enabled', $site->rsvp_enabled),
+                    'rsvp_deadline' => old('rsvp_deadline', $site->rsvp_deadline?->toDateString()),
+                    'closing_note' => old('closing_note', $site->closing_note),
+                    'gift_enabled' => (bool) old('gift_enabled', $site->gift_enabled),
+                    'gift_note' => old('gift_note', $site->gift_note),
+                    'wishes_enabled' => (bool) old('wishes_enabled', $site->wishes_enabled ?? true),
+                    'cover_url' => $site->cover_image ? Storage::disk('public')->url($site->cover_image) : null,
+                    'gift_qr_url' => $site->giftQrUrl(),
+                    'itinerary' => array_values(old('itinerary', $site->itinerary ?? [])),
+                    'contacts' => array_values(old('contacts', $site->contacts ?? [])),
+                    'gift_accounts' => array_values(old('gift_accounts', $site->gift_accounts ?? [])),
+                ],
+                'templateGroups' => $templates->groupBy('style')
+                    ->map(fn ($group, string $style): array => [
+                        'style' => $style,
+                        'templates' => $group->map(fn (SiteTemplate $template): array => [
+                            'slug' => $template->slug,
+                            'name' => $template->name,
+                            'url' => route('sites.templates.show', $template),
+                            // The thumbnail is a Blade partial shared with the
+                            // public gallery; rendering it here keeps one drawing.
+                            'thumbnail' => view('sites.partials.thumbnail', ['template' => $template])->render(),
+                        ])->values(),
+                    ])->values(),
+                'status' => $site->exists ? [
+                    'published' => (bool) $site->is_published,
+                    'url' => $site->url(),
+                    'views' => number_format($site->views),
+                    'rsvp_count' => $published?->confirmedPax() ?? 0,
+                    'guests_url' => route('guests.index'),
+                    'publish_url' => route('weddings.site.publish', $wedding),
+                    'draft_note' => 'Kad anda akan berada di '.$site->subdomain.'.'.config('neekah.site_domain').' selepas disiarkan.',
+                ] : null,
+                'gallery' => $site->exists ? [
+                    'store_url' => route('weddings.site.photos.store', $wedding),
+                    'photos' => $site->photos->map(fn ($photo): array => [
+                        'url' => $photo->url(),
+                        'caption' => $photo->caption,
+                        'destroy_url' => route('weddings.site.photos.destroy', [$wedding, $photo]),
+                    ])->values(),
+                ] : null,
+                'wishes' => ($published?->rsvps()->whereNotNull('message')->get() ?? collect())
+                    ->map(fn ($wish): array => [
+                        'id' => $wish->id,
+                        'name' => $wish->name,
+                        'message' => $wish->message,
+                        'public' => $wish->wishIsPublic(),
+                        'update_url' => route('weddings.rsvps.update', [$wedding, $wish]),
+                    ])->values(),
+                'rsvpSummary' => $published && $published->rsvps()->exists() ? [
+                    'count' => $published->rsvps()->count(),
+                    'url' => route('guests.index'),
+                ] : null,
+            ]),
         ]);
     }
 

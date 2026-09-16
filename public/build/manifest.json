@@ -91,8 +91,32 @@
     "file": "assets/playfair-display-700-normal-CuDiGg7c.woff2",
     "src": "_playfair-display-700-normal-CuDiGg7c.woff2"
   },
+  "node_modules/@tiptap/core/dist/index.js": {
+    "file": "assets/dist-BPdMn0UN.js",
+    "name": "dist",
+    "src": "node_modules/@tiptap/core/dist/index.js",
+    "isDynamicEntry": true
+  },
+  "node_modules/@tiptap/extension-image/dist/index.js": {
+    "file": "assets/dist-C9O8KPTy.js",
+    "name": "dist",
+    "src": "node_modules/@tiptap/extension-image/dist/index.js",
+    "isDynamicEntry": true,
+    "imports": [
+      "node_modules/@tiptap/core/dist/index.js"
+    ]
+  },
+  "node_modules/@tiptap/starter-kit/dist/index.js": {
+    "file": "assets/dist-RuWGCXMV.js",
+    "name": "dist",
+    "src": "node_modules/@tiptap/starter-kit/dist/index.js",
+    "isDynamicEntry": true,
+    "imports": [
+      "node_modules/@tiptap/core/dist/index.js"
+    ]
+  },
   "resources/css/app.css": {
-    "file": "assets/app-BcYpoaXH.css",
+    "file": "assets/app-CO3Z7H_i.css",
     "name": "app",
     "names": [
       "app.css"
@@ -101,18 +125,14 @@
     "isEntry": true
   },
   "resources/js/app.js": {
-    "file": "assets/app-CERTMFmL.js",
+    "file": "assets/app-CfaUFEWS.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
     "dynamicImports": [
-      "resources/js/editor.js"
+      "node_modules/@tiptap/core/dist/index.js",
+      "node_modules/@tiptap/extension-image/dist/index.js",
+      "node_modules/@tiptap/starter-kit/dist/index.js"
     ]
-  },
-  "resources/js/editor.js": {
-    "file": "assets/editor-UqJ9v6pf.js",
-    "name": "editor",
-    "src": "resources/js/editor.js",
-    "isDynamicEntry": true
   }
 }

@@ -13,6 +13,34 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 #[Fillable(['name', 'slug', 'icon', 'examples', 'sort_order', 'is_active'])]
 class Category extends Model
 {
+    /**
+     * The drawing for each category slug. Pelamin and Decoration share the
+     * floral-arch illustration; a slug that is not here falls back to its emoji.
+     *
+     * @var array<string, string>
+     */
+    public const ILLUSTRATIONS = [
+        'catering' => 'catering',
+        'pelamin' => 'decoration',
+        'decoration' => 'decoration',
+        'photography' => 'photography',
+        'videography' => 'videography',
+        'emcee' => 'emcee',
+        'makeup' => 'makeup',
+        'bridal' => 'bridal',
+        'venue' => 'venue',
+        'cake' => 'cake',
+        'entertainment' => 'entertainment',
+        'invitation' => 'invitation',
+    ];
+
+    public function illustrationUrl(): ?string
+    {
+        $file = self::ILLUSTRATIONS[$this->slug] ?? null;
+
+        return $file ? asset('img/icon/'.$file.'.svg') : null;
+    }
+
     /** @use HasFactory<CategoryFactory> */
     use HasFactory;
 

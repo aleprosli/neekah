@@ -14,6 +14,30 @@ beforeEach(function () {
     $this->seed(CategorySeeder::class);
 });
 
+it('walks a new vendor through what is missing and what each photo is for', function () {
+    $vendor = Vendor::factory()->pending()->for(Category::first())->create([
+        'tagline' => null,
+        'description' => null,
+        'cover_image' => null,
+        'price_from' => 0,
+    ]);
+
+    $this->actingAs($vendor->user)
+        ->get(route('vendor.dashboard'))
+        ->assertOk()
+        ->assertSee('data-vue="vendor-onboarding"', false)
+        ->assertViewHas('onboarding', function (array $steps): bool {
+            $keys = array_column($steps, 'key');
+            $done = array_column($steps, 'done');
+
+            // Every step explains itself; a bare checklist does not tell a
+            // vendor what a portfolio photo is even for.
+            return $keys === ['profil', 'cover', 'portfolio', 'pakej', 'harga', 'kalendar']
+                && $done === array_fill(0, 6, false)
+                && collect($steps)->every(fn (array $step): bool => filled($step['why']) && filled($step['href']));
+        });
+});
+
 it('registers a vendor as pending and logs the owner in', function () {
     $category = Category::first();
 

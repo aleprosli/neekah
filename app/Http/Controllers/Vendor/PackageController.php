@@ -6,7 +6,10 @@ use App\Actions\StoreOptimizedImage;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StorePackageRequest;
 use App\Models\Package;
+use App\Support\ImageSettings;
+use App\Support\VueProps;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -16,16 +19,27 @@ class PackageController extends Controller
     public function index(Request $request): View
     {
         return view('vendor.packages.index', [
-            'packages' => $request->user()->vendor->packages()->get(),
+            'packages' => $request->user()->vendor->packages()->get()
+                ->map(fn (Package $package): array => [
+                    'id' => $package->id,
+                    'name' => $package->name,
+                    'duration' => $package->duration,
+                    'price' => 'RM'.number_format((float) $package->price, 2),
+                    'features' => $package->features ?? [],
+                    'is_active' => $package->is_active,
+                    'thumbnail' => $package->thumbnailUrl(),
+                    'edit_url' => route('vendor.packages.edit', $package),
+                    'destroy_url' => route('vendor.packages.destroy', $package),
+                ])->values(),
         ]);
     }
 
-    public function create(): View
+    public function create(ImageSettings $images): View
     {
-        return view('vendor.packages.form', ['package' => new Package(['is_active' => true])]);
+        return view('vendor.packages.form', $this->formData(new Package(['is_active' => true]), $images));
     }
 
-    public function store(StorePackageRequest $request, StoreOptimizedImage $storeImage): RedirectResponse
+    public function store(StorePackageRequest $request, StoreOptimizedImage $storeImage): RedirectResponse|JsonResponse
     {
         $vendor = $request->user()->vendor;
 
@@ -39,17 +53,52 @@ class PackageController extends Controller
 
         $this->syncPriceFrom($request);
 
-        return redirect()->route('vendor.packages.index')->with('status', 'Pakej ditambah.');
+        return $this->redirectOrJson($request, route('vendor.packages.index'), 'Pakej ditambah.');
     }
 
-    public function edit(Package $package): View
+    public function edit(Package $package, ImageSettings $images): View
     {
         Gate::authorize('update', $package);
 
-        return view('vendor.packages.form', ['package' => $package]);
+        return view('vendor.packages.form', $this->formData($package, $images));
     }
 
-    public function update(StorePackageRequest $request, Package $package, StoreOptimizedImage $storeImage): RedirectResponse
+    /**
+     * What the form component needs, with anything the vendor already typed
+     * put back in place after a failed validation.
+     *
+     * @return array<string, mixed>
+     */
+    private function formData(Package $package, ImageSettings $images): array
+    {
+        $editing = $package->exists;
+        $submitted = old('features');
+
+        return [
+            'editing' => $editing,
+            'props' => VueProps::for([
+                'editing' => $editing,
+                'action' => $editing ? route('vendor.packages.update', $package) : route('vendor.packages.store'),
+                'cancelUrl' => route('vendor.packages.index'),
+                'imageHint' => $images->uploadHint('landskap 1600 × 1200px'),
+                'packageData' => [
+                    'name' => old('name', $package->name),
+                    'price' => old('price', $package->price),
+                    'duration' => old('duration', $package->duration),
+                    'description' => old('description', $package->description),
+                    'is_active' => (bool) old('is_active', $package->is_active),
+                    'image_url' => $package->imageUrl(),
+                    'features' => collect(is_string($submitted) ? preg_split('/\r\n|\r|\n/', $submitted) : $submitted ?? $package->features ?? [])
+                        ->map(fn ($feature): string => trim((string) $feature))
+                        ->filter()
+                        ->values()
+                        ->all(),
+                ],
+            ]),
+        ];
+    }
+
+    public function update(StorePackageRequest $request, Package $package, StoreOptimizedImage $storeImage): RedirectResponse|JsonResponse
     {
         $package->update([
             ...$request->safe()->except('features', 'is_active', 'image', 'remove_image'),
@@ -60,7 +109,7 @@ class PackageController extends Controller
 
         $this->syncPriceFrom($request);
 
-        return redirect()->route('vendor.packages.index')->with('status', 'Pakej dikemas kini.');
+        return $this->redirectOrJson($request, route('vendor.packages.index'), 'Pakej dikemas kini.');
     }
 
     public function destroy(Request $request, Package $package, StoreOptimizedImage $storeImage): RedirectResponse

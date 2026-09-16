@@ -17,13 +17,15 @@ beforeEach(function () {
 });
 
 it('offers a draft filled from the wedding project', function () {
-    $this->actingAs($this->aina)
-        ->get(route('site.edit'))
-        ->assertOk()
-        ->assertSee('Aina')
-        ->assertSee('Hakim')
-        ->assertSee('aina-hakim')
-        ->assertSee('Alamat web');
+    $props = $this->actingAs($this->aina)->get(route('site.edit'))->assertOk()->viewData('props');
+
+    // A couple with no card yet still opens the editor with something to
+    // preview, filled in from the wedding project.
+    expect($props['exists'])->toBeFalse()
+        ->and($props['site']['bride_name'])->toBe('Aina')
+        ->and($props['site']['groom_name'])->toBe('Hakim')
+        ->and($props['site']['subdomain'])->toBe('aina-hakim')
+        ->and($props['status'])->toBeNull();
 });
 
 it('creates the invitation as a draft that is not public yet', function () {
@@ -41,6 +43,24 @@ it('creates the invitation as a draft that is not public yet', function () {
 
     // Not reachable until published.
     $this->get('http://ainapilihhakim.'.config('neekah.site_domain'))->assertNotFound();
+});
+
+it('offers only as many itinerary rows as the server will accept', function () {
+    $props = $this->actingAs($this->aina)->get(route('site.edit'))->assertOk()->viewData('props');
+
+    // The editor adds rows on demand, so its ceilings have to match the rules
+    // in StoreWeddingSiteRequest or it would offer a row that is then rejected.
+    expect($props['limits']['itinerary'])->toBe(12)
+        ->and($props['limits']['contacts'])->toBe(6)
+        ->and($props['limits']['gift_accounts'])->toBe(4);
+
+    // The rules need a bound route to build, so the ceilings are read from the
+    // request itself rather than by instantiating it here.
+    $rules = file_get_contents(app_path('Http/Requests/StoreWeddingSiteRequest.php'));
+
+    expect($rules)->toContain("'itinerary' => ['nullable', 'array', 'max:12']")
+        ->toContain("'contacts' => ['nullable', 'array', 'max:6']")
+        ->toContain("'gift_accounts' => ['nullable', 'array', 'max:4']");
 });
 
 it('publishes and unpublishes the invitation', function () {

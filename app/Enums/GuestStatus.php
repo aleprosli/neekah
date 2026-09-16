@@ -20,4 +20,14 @@ enum GuestStatus: string
             self::Pending => 'Belum ditanda hantar',
         };
     }
+
+    /** The palette key the badge components use, in Blade and in Vue. */
+    public function tone(): string
+    {
+        return match ($this) {
+            self::Attending => 'attending',
+            self::Declined => 'declined',
+            default => 'pending',
+        };
+    }
 }

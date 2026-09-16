@@ -15,6 +15,51 @@ beforeEach(function () {
     $this->vendor = Vendor::factory()->for(Category::first())->create(['price_from' => 9999]);
 });
 
+it('lets a vendor arrange the gallery and hide a photo from it', function () {
+    $items = PortfolioItem::factory()->count(3)->for($this->vendor)->create();
+    $this->vendor->update(['status' => VendorStatus::Approved]);
+
+    $this->actingAs($this->vendor->user)
+        ->putJson(route('vendor.portfolio.reorder'), [
+            'items' => [
+                ['id' => $items[2]->id, 'sort_order' => 0, 'is_visible' => true],
+                ['id' => $items[0]->id, 'sort_order' => 1, 'is_visible' => true],
+                ['id' => $items[1]->id, 'sort_order' => 2, 'is_visible' => false],
+            ],
+        ])
+        ->assertOk();
+
+    expect($this->vendor->portfolioItems()->visible()->pluck('id')->all())
+        ->toBe([$items[2]->id, $items[0]->id]);
+
+    // The hidden photo is nowhere in the public page, not even in the lightbox.
+    $this->get(route('vendors.show', $this->vendor))
+        ->assertOk()
+        ->assertSee($items[2]->url())
+        ->assertDontSee($items[1]->url());
+});
+
+it('refuses to rearrange another vendor\'s photos', function () {
+    $other = PortfolioItem::factory()->for(Vendor::factory()->for(Category::first()))->create();
+
+    $this->actingAs($this->vendor->user)
+        ->putJson(route('vendor.portfolio.reorder'), [
+            'items' => [['id' => $other->id, 'sort_order' => 0, 'is_visible' => false]],
+        ])
+        ->assertStatus(422);
+
+    expect($other->fresh()->is_visible)->toBeTrue();
+});
+
+it('hands the whole gallery to the page, not just the five in the grid', function () {
+    PortfolioItem::factory()->count(8)->for($this->vendor)->create();
+    $this->vendor->update(['status' => VendorStatus::Approved]);
+
+    $this->get(route('vendors.show', $this->vendor))
+        ->assertOk()
+        ->assertViewHas('gallery', fn ($gallery) => $gallery->count() === 8);
+});
+
 it('stores, replaces and removes a package image', function () {
     Storage::fake('public');
 

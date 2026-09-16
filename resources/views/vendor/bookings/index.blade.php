@@ -12,35 +12,17 @@
         @endforeach
     </div>
 
-    @if ($bookings->isEmpty())
-        <p class="rounded-2xl border border-dashed border-line p-8 text-center text-sm text-ink-muted">Tiada tempahan dalam kategori ini.</p>
-    @else
-        <div class="overflow-x-auto rounded-2xl border border-line">
-            <table class="w-full text-sm">
-                <thead class="bg-surface-muted text-left text-xs tracking-wide text-ink-muted uppercase">
-                    <tr>
-                        <th class="px-4 py-3 font-semibold">Tarikh</th>
-                        <th class="px-4 py-3 font-semibold">Pelanggan</th>
-                        <th class="px-4 py-3 font-semibold">Pakej</th>
-                        <th class="px-4 py-3 text-right font-semibold">Jumlah</th>
-                        <th class="px-4 py-3 text-right font-semibold">Dibayar</th>
-                        <th class="px-4 py-3 font-semibold">Status</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-line">
-                    @foreach ($bookings as $booking)
-                        <tr class="transition hover:bg-surface-muted/60">
-                            <td class="px-4 py-3 whitespace-nowrap"><a href="{{ route('vendor.bookings.show', $booking) }}" class="font-medium hover:text-brand-700">{{ $booking->event_date->translatedFormat('j M Y') }}</a><p class="text-xs text-ink-muted">{{ $booking->reference }}</p></td>
-                            <td class="px-4 py-3">{{ $booking->user->name }}</td>
-                            <td class="px-4 py-3">{{ $booking->package_name }}</td>
-                            <td class="px-4 py-3 text-right whitespace-nowrap">RM{{ number_format((float) $booking->total_amount, 2) }}</td>
-                            <td class="px-4 py-3 text-right whitespace-nowrap">RM{{ number_format($booking->paidAmount(), 2) }}</td>
-                            <td class="px-4 py-3"><x-booking-status :status="$booking->status" /></td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
-        <div class="mt-6">{{ $bookings->links() }}</div>
-    @endif
+    {{-- resources/js/components/ui/DataTable.vue --}}
+    <div
+        data-vue="data-table"
+        data-props="@vueProps([
+            'dataUrl' => route('vendor.bookings.data', ['status' => $status?->value]),
+            'columns' => $columns,
+            'searchPlaceholder' => 'Cari rujukan, pakej atau pelanggan…',
+            'emptyTitle' => 'Tiada tempahan dalam kategori ini',
+            'emptyMessage' => 'Booking yang dibuat pengantin atau yang anda rekod akan muncul di sini.',
+            'initialSort' => 'event_date',
+        ])"
+    ></div>
+
 </x-layouts.vendor>

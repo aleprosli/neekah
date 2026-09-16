@@ -15,13 +15,20 @@ it('lists and filters users by role', function () {
     $customer = User::factory()->create(['name' => 'Aina Zulkifli']);
     $vendor = Vendor::factory()->for(Category::first())->create();
 
-    $this->actingAs($this->admin)->get(route('admin.users.index'))->assertOk()->assertSee('Aina Zulkifli')->assertSee($vendor->user->email);
+    $this->actingAs($this->admin)->get(route('admin.users.index'))->assertOk()->assertSee('data-vue="data-table"', false);
 
-    $this->actingAs($this->admin)
-        ->get(route('admin.users.index', ['role' => 'customer']))
-        ->assertOk()
-        ->assertSee($customer->email)
-        ->assertDontSee($vendor->user->email);
+    $all = $this->actingAs($this->admin)->getJson(route('admin.users.data'))->assertOk()->json('data');
+
+    expect(collect($all)->pluck('name'))->toContain('Aina Zulkifli')
+        ->and(collect($all)->pluck('email'))->toContain($vendor->user->email)
+        // Impersonation is offered on the accounts that allow it, and only those.
+        ->and(collect($all)->firstWhere('email', $customer->email)['impersonate_url'])->toBe(route('admin.users.impersonate', $customer))
+        ->and(collect($all)->firstWhere('email', $this->admin->email)['impersonate_url'])->toBeNull();
+
+    $customers = $this->actingAs($this->admin)->getJson(route('admin.users.data', ['role' => 'customer']))->assertOk()->json('data');
+
+    expect(collect($customers)->pluck('email'))->toContain($customer->email)
+        ->not->toContain($vendor->user->email);
 });
 
 it('searches bookings by reference and filters by status', function () {
@@ -29,19 +36,35 @@ it('searches bookings by reference and filters by status', function () {
     $confirmed = Booking::factory()->confirmed()->for($vendor)->create();
     $cancelled = Booking::factory()->cancelled()->for($vendor)->create();
 
-    $this->actingAs($this->admin)
-        ->get(route('admin.bookings.index', ['status' => 'confirmed']))
-        ->assertOk()
-        ->assertSee($confirmed->reference)
-        ->assertDontSee($cancelled->reference);
+    // The page is the shell; the rows come from the table's own endpoint.
+    $this->actingAs($this->admin)->get(route('admin.bookings.index'))->assertOk()->assertSee('data-vue="data-table"', false);
 
-    $this->actingAs($this->admin)
-        ->get(route('admin.bookings.index', ['q' => $cancelled->reference]))
+    $filtered = $this->actingAs($this->admin)
+        ->getJson(route('admin.bookings.data', ['status' => 'confirmed']))
         ->assertOk()
-        ->assertSee($cancelled->reference)
-        ->assertDontSee($confirmed->reference);
+        ->json('data');
 
-    $this->actingAs($this->admin)->get(route('admin.bookings.show', $confirmed))->assertOk()->assertSee('Payout vendor');
+    expect(collect($filtered)->pluck('reference'))->toContain($confirmed->reference)
+        ->not->toContain($cancelled->reference);
+
+    $searched = $this->actingAs($this->admin)
+        ->getJson(route('admin.bookings.data', ['search' => $cancelled->reference]))
+        ->assertOk()
+        ->assertJsonPath('meta.total', 1)
+        ->json('data');
+
+    expect($searched[0]['reference'])->toBe($cancelled->reference)
+        ->and($searched[0]['url'])->toBe(route('admin.bookings.show', $cancelled));
+
+    $detail = $this->actingAs($this->admin)->get(route('admin.bookings.show', $confirmed))->assertOk()->viewData('props');
+
+    // The payout is what the admin is here to check: total less commission.
+    expect($detail['booking']['payout'])
+        ->toBe('RM'.number_format((float) $confirmed->total_amount - (float) $confirmed->commission_amount, 2));
+});
+
+it('keeps the booking table endpoint to admins', function () {
+    $this->actingAs(User::factory()->create())->getJson(route('admin.bookings.data'))->assertForbidden();
 });
 
 it('creates, updates and deletes categories', function () {

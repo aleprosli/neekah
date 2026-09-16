@@ -26,10 +26,13 @@ $payload = [
 it('lets the customer review a completed booking and updates vendor stats', function () use ($payload) {
     $booking = Booking::factory()->completed()->for($this->customer)->for($this->vendor)->create();
 
-    $this->actingAs($this->customer)
-        ->get(route('bookings.show', $booking))
-        ->assertOk()
-        ->assertSee('Beri review');
+    // A completed booking offers the review form, with every score to give.
+    $props = $this->actingAs($this->customer)->get(route('bookings.show', $booking))->assertOk()->viewData('props');
+
+    expect($props['review'])->toBeNull()
+        ->and($props['reviewForm']['action'])->toBe(route('bookings.review.store', $booking))
+        ->and(collect($props['reviewForm']['fields'])->pluck('name')->all())
+        ->toBe(['rating', 'quality', 'service', 'communication', 'value', 'punctuality']);
 
     $this->actingAs($this->customer)
         ->post(route('bookings.review.store', $booking), $payload)

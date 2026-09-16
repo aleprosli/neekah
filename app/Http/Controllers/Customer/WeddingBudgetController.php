@@ -10,6 +10,7 @@ use App\Models\Category;
 use App\Models\Payment;
 use App\Models\Wedding;
 use App\Support\AnalyticsPeriod;
+use App\Support\VueProps;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -52,21 +53,76 @@ class WeddingBudgetController extends Controller
             ];
         });
 
+        $budget = (float) $wedding->budget;
+        $totalActual = (float) $rows->sum('actual');
+        $money = fn (float $value): string => 'RM'.number_format($value);
+
         return view('customer.budget', [
             'wedding' => $wedding,
-            'rows' => $rows,
-            'totalPlanned' => (float) $planned->sum(),
-            'totalActual' => (float) $rows->sum('actual'),
-            'totalPaid' => (float) $rows->sum('paid'),
-            'period' => $period,
-            'committedSeries' => $this->committedByMonth($bookings, $period),
-            'paidSeries' => $this->paidByMonth($bookings, $period),
-            'categoryMix' => $rows->filter(fn (array $row): bool => $row['actual'] > 0)
-                ->map(fn (array $row): array => ['label' => $row['category']->name, 'value' => $row['actual']])
-                ->sortByDesc('value')
-                ->values()
-                ->all(),
+            'props' => VueProps::for([
+                'action' => route('weddings.budget.update', $wedding),
+                'budget' => $budget,
+                'stats' => [
+                    ['label' => 'Jumlah bajet', 'value' => $money($budget), 'hint' => 'Diagih '.$money((float) $planned->sum())],
+                    ['label' => 'Ditempah', 'value' => $money($totalActual), 'hint' => 'Jumlah semua booking aktif'],
+                    ['label' => 'Dibayar', 'value' => $money((float) $rows->sum('paid')), 'hint' => 'Baki bayaran '.$money($totalActual - (float) $rows->sum('paid'))],
+                    ['label' => 'Baki bajet', 'value' => $money($budget - $totalActual), 'hint' => $budget - $totalActual < 0 ? 'Melebihi bajet' : 'Masih ada ruang'],
+                ],
+                'progress' => [
+                    'caption' => $money($totalActual).' / '.$money($budget),
+                    'percent' => $budget > 0 ? min(100, (int) round($totalActual / $budget * 100)) : 0,
+                    'over' => $totalActual > $budget,
+                ],
+                'charts' => [
+                    'committed' => $this->formatted($this->committedByMonth($bookings, $period), $money),
+                    'paid' => $this->formatted($this->paidByMonth($bookings, $period), $money),
+                    'categories' => $this->formatted(
+                        $rows->filter(fn (array $row): bool => $row['actual'] > 0)
+                            ->map(fn (array $row): array => ['label' => $row['category']->name, 'value' => $row['actual']])
+                            ->sortByDesc('value')
+                            ->values()
+                            ->all(),
+                        $money,
+                    ),
+                ],
+                'rows' => $rows->map(fn (array $row): array => [
+                    'id' => $row['category']->id,
+                    'category' => $row['category']->name,
+                    'icon' => $row['category']->icon,
+                    'illustration' => $row['category']->illustrationUrl(),
+                    'planned' => (int) $row['planned'],
+                    'actual' => $money($row['actual']),
+                    'paid' => $money($row['paid']),
+                    'has_bookings' => $row['actual'] > 0,
+                    'over' => $row['difference'] < 0,
+                    'difference' => ($row['difference'] < 0 ? '+' : '−').'RM'.number_format(abs($row['difference'])),
+                    'find_vendors_url' => route('vendors.index', ['category' => $row['category']->slug]),
+                    'bookings' => $row['bookings']->map(fn (Booking $booking): array => [
+                        'vendor' => $booking->vendor->name,
+                        'url' => route('bookings.show', $booking),
+                    ])->values(),
+                ])->values(),
+                'totals' => [
+                    'actual' => $money($totalActual),
+                    'over' => $budget - $totalActual < 0,
+                    'remaining' => $money(abs($budget - $totalActual)),
+                    'remaining_label' => $budget - $totalActual < 0 ? 'Lebih' : 'Baki',
+                ],
+            ]),
         ]);
+    }
+
+    /**
+     * A series with each value formatted the way the page shows it.
+     *
+     * @param  array<int, array{label: string, value: float}>  $series
+     * @return array<int, array{label: string, value: float, display: string}>
+     */
+    private function formatted(array $series, callable $format): array
+    {
+        return collect($series)
+            ->map(fn (array $row): array => [...$row, 'display' => $format((float) $row['value'])])
+            ->all();
     }
 
     /**

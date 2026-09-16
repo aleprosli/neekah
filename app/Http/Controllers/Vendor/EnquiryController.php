@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\ReplyEnquiryRequest;
 use App\Models\Enquiry;
 use App\Notifications\EnquiryReplied;
+use App\Support\VueProps;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -25,6 +26,16 @@ class EnquiryController extends Controller
             ->orderByDesc('id')
             ->paginate(15);
 
+        $enquiries->setCollection($enquiries->getCollection()->map(fn (Enquiry $enquiry): array => [
+            'id' => $enquiry->id,
+            'customer' => $enquiry->user->name,
+            'message' => $enquiry->message,
+            'is_open' => $enquiry->status === EnquiryStatus::Open,
+            'event_date' => $enquiry->event_date?->translatedFormat('j M Y'),
+            'received' => $enquiry->created_at->diffForHumans(),
+            'url' => route('vendor.enquiries.show', $enquiry),
+        ]));
+
         return view('vendor.enquiries.index', ['enquiries' => $enquiries]);
     }
 
@@ -34,7 +45,28 @@ class EnquiryController extends Controller
 
         $enquiry->load(['user', 'package', 'wedding']);
 
-        return view('vendor.enquiries.show', ['enquiry' => $enquiry]);
+        return view('vendor.enquiries.show', [
+            'enquiry' => $enquiry,
+            'props' => VueProps::for([
+                'action' => route('vendor.enquiries.update', $enquiry),
+                'recordBookingUrl' => route('vendor.bookings.create'),
+                'enquiry' => [
+                    'message' => $enquiry->message,
+                    'reply' => $enquiry->reply,
+                    'replied_at' => $enquiry->replied_at?->translatedFormat('j M Y, g:i A'),
+                    'event_date' => $enquiry->event_date?->translatedFormat('l, j F Y'),
+                    'package' => $enquiry->package?->name,
+                    'customer' => [
+                        'name' => $enquiry->user->name,
+                        'contact' => collect([$enquiry->user->email, $enquiry->user->phone])->filter()->implode(' · '),
+                    ],
+                    'wedding' => $enquiry->wedding ? [
+                        'title' => $enquiry->wedding->title,
+                        'summary' => $enquiry->wedding->city.', '.$enquiry->wedding->state.' · Bajet RM'.number_format((float) $enquiry->wedding->budget),
+                    ] : null,
+                ],
+            ]),
+        ]);
     }
 
     public function update(ReplyEnquiryRequest $request, Enquiry $enquiry, AwardVendorPoints $awardPoints): RedirectResponse

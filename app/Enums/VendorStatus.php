@@ -18,4 +18,14 @@ enum VendorStatus: string
             self::Suspended => 'Digantung',
         };
     }
+
+    /** The palette key the badge components use, in Blade and in Vue. */
+    public function tone(): string
+    {
+        return match ($this) {
+            self::Approved => 'emerald',
+            self::Pending => 'amber',
+            self::Rejected, self::Suspended => 'muted',
+        };
+    }
 }
