@@ -63,9 +63,19 @@ it('falls back to twelve months when the window is nonsense', function () {
 });
 
 it('says there is no data rather than drawing an empty chart', function () {
-    $this->actingAs($this->admin)->get(route('admin.analytics'))
-        ->assertOk()
-        ->assertSee('Tiada data untuk tempoh ini.');
+    $props = $this->actingAs($this->admin)->get(route('admin.analytics'))->assertOk()->viewData('props');
+
+    // No money moved in this window, so those series are empty, and the chart
+    // components say so in words instead of drawing a chart of nothing.
+    $money = collect($props['charts'])->whereIn('title', ['Nilai transaksi mengikut bulan', 'Komisen mengikut bulan']);
+
+    expect($money)->toHaveCount(2)
+        ->and($money->every(fn (array $chart): bool => collect($chart['series'])->sum('value') == 0))->toBeTrue();
+
+    foreach (['UiBarChart', 'UiLineChart', 'UiDonutChart'] as $chart) {
+        expect(file_get_contents(resource_path("js/components/ui/{$chart}.vue")))
+            ->toContain("default: 'Tiada data untuk tempoh ini.'");
+    }
 });
 
 it('keeps analytics to admins', function () {

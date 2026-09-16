@@ -9,14 +9,6 @@ import { mountIslands } from './vue.js';
 mountIslands();
 
 /**
- * The article editor only exists on the admin blog form, so TipTap and
- * ProseMirror load on demand instead of weighing down every public page.
- */
-if (document.querySelector('[data-rich-editor]')) {
-    import('./editor.js').then(({ mountEditors }) => mountEditors());
-}
-
-/**
  * Take the preloader down at whichever comes later, the minimum hold set in
  * config('neekah.preloader.seconds') or the page finishing loading. Also take
  * it down when the browser restores the page from its back/forward cache,

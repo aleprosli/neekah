@@ -7,14 +7,17 @@ use App\Support\TelegramSettings;
 use App\Support\TurnstileSettings;
 
 it('shows every settings section on one page', function () {
-    $this->actingAs(User::factory()->admin()->create())
+    $sections = $this->actingAs(User::factory()->admin()->create())
         ->get(route('admin.settings.edit'))
         ->assertOk()
-        ->assertSee('Maklumat perhubungan')
-        ->assertSee('SEO dan pratonton pautan')
-        ->assertSee('Cloudflare Turnstile')
-        ->assertSee('Makluman Telegram')
-        ->assertSee('Gambar');
+        ->viewData('props')['sections'];
+
+    expect(collect($sections)->pluck('id')->all())->toBe(['perhubungan', 'seo', 'keselamatan', 'telegram', 'gambar'])
+        // Each section posts on its own, so saving one cannot disturb another.
+        ->and(collect($sections)->pluck('action')->unique())->toHaveCount(5)
+        // A saved secret is never sent back to the browser.
+        ->and(collect(collect($sections)->firstWhere('id', 'keselamatan')['fields'])->firstWhere('name', 'secret_key')['value'])
+        ->toBe('');
 });
 
 it('lets an admin publish the contact details shown in the footer', function () {
