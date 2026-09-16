@@ -10,8 +10,17 @@
  */
 import { mountIslands } from './vue.js';
 
-/** Regions swapped on navigation. Everything else stays exactly as it is. */
+/**
+ * Regions swapped on navigation. Everything else stays exactly as it is.
+ *
+ * A dashboard page holds its <main> inside a grid beside a sidebar, and a
+ * public page does not, so swapping <main> alone between the two would leave
+ * the dashboard furniture standing around a public page. The shell meta tag
+ * below is what stops that: a different shell means an ordinary page load.
+ */
 const REGIONS = ['main', '[data-nav-region]'];
+
+const shellOf = (doc) => doc.querySelector('meta[name="page-shell"]')?.content ?? null;
 
 const currentUrl = () => window.location.href;
 
@@ -38,18 +47,30 @@ const showProgress = () => {
     return () => document.documentElement.classList.remove('nk-navigating');
 };
 
-/** Replace the changed regions of the page with the ones from the new document. */
+/**
+ * Replace the changed regions of the page with the ones from the new document.
+ *
+ * Regions are matched pairwise: a dashboard page has two navigations that both
+ * show an active item, and taking only the first would leave the sidebar
+ * pointing at the page the visitor just left.
+ */
 const swapRegions = (incoming) => {
+    if (shellOf(incoming) !== shellOf(document)) {
+        return false;
+    }
+
     let swapped = false;
 
     REGIONS.forEach((selector) => {
-        const next = incoming.querySelector(selector);
-        const current = document.querySelector(selector);
+        const next = incoming.querySelectorAll(selector);
+        const current = document.querySelectorAll(selector);
 
-        if (next && current) {
-            current.replaceWith(next);
-            swapped = true;
+        if (!next.length || next.length !== current.length) {
+            return;
         }
+
+        current.forEach((element, at) => element.replaceWith(next[at]));
+        swapped = true;
     });
 
     if (swapped) {

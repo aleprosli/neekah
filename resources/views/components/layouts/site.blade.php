@@ -1,6 +1,6 @@
 @props(['site', 'template', 'preview' => false, 'sample' => false])
 
-<x-layouts.app :title="$site->coupleNames()" :description="'Jemputan majlis perkahwinan '.$site->coupleNames()" :preloader="false">
+<x-layouts.app :title="$site->coupleNames()" :description="'Jemputan majlis perkahwinan '.$site->coupleNames()" :preloader="false" shell="card">
     {{-- The invitation opens with the couple's own names in their own colours.
          The Neekah brand has no business standing in front of their card. --}}
     <x-site.preloader class="nk-card" :style="$template->cssVariables()" :label="$site->coupleNames()">

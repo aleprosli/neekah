@@ -2,7 +2,7 @@
 
 @php app(App\Support\Seo::class)->noindex(); @endphp
 
-<x-layouts.app :title="$title">
+<x-layouts.app :title="$title" shell="dashboard">
     <x-site.header />
 
     <div class="mx-auto max-w-7xl px-4 pt-24 pb-24 sm:px-6 lg:px-10 lg:pt-28 md:pb-12">
