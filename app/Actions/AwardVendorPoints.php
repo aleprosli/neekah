@@ -53,6 +53,25 @@ class AwardVendorPoints
     }
 
     /**
+     * Take back every award tied to one subject, such as a booking the couple
+     * cancelled minutes after making it by mistake.
+     */
+    public function revokeFor(Vendor $vendor, Model $subject): void
+    {
+        $points = $vendor->points()
+            ->where('pointable_type', $subject->getMorphClass())
+            ->where('pointable_id', $subject->getKey())
+            ->get();
+
+        if ($points->isEmpty()) {
+            return;
+        }
+
+        $vendor->decrement('points_total', $points->sum('points'));
+        $vendor->points()->whereKey($points->modelKeys())->delete();
+    }
+
+    /**
      * Keep the profile and catalogue milestones in step with the vendor's current state.
      */
     public function syncMilestones(Vendor $vendor): void

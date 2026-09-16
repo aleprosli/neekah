@@ -18,7 +18,7 @@ class TransactionController extends Controller
         ['key' => 'reference', 'label' => 'Rujukan', 'sortable' => true],
         ['key' => 'booking', 'label' => 'Booking'],
         ['key' => 'vendor', 'label' => 'Vendor'],
-        ['key' => 'type', 'label' => 'Jenis'],
+        ['key' => 'recorded_by', 'label' => 'Direkod oleh'],
         ['key' => 'amount', 'label' => 'Amaun', 'sortable' => true, 'align' => 'right'],
         ['key' => 'status', 'label' => 'Status', 'type' => 'html'],
         ['key' => 'date', 'label' => 'Tarikh', 'sort' => 'paid_at', 'sortable' => true],
@@ -39,9 +39,9 @@ class TransactionController extends Controller
                 ['label' => 'Gross transaction value', 'value' => 'RM'.number_format($gross, 2), 'hint' => 'Semua bayaran diterima'],
                 ['label' => 'Komisen platform', 'value' => 'RM'.number_format($commission, 2), 'hint' => '8% daripada booking aktif'],
                 ['label' => 'Payout vendor', 'value' => 'RM'.number_format($gross - $commission, 2), 'hint' => 'Selepas komisen'],
-                ['label' => 'Belum dibayar', 'value' => 'RM'.number_format((float) Payment::where('status', PaymentStatus::Pending)
+                ['label' => 'Menunggu pengesahan', 'value' => 'RM'.number_format((float) Payment::where('status', PaymentStatus::AwaitingVerification)
                     ->whereHas('booking', fn ($query) => $query->whereNot('status', BookingStatus::Cancelled))
-                    ->sum('amount'), 2), 'hint' => 'Deposit & baki tertunggak'],
+                    ->sum('amount'), 2), 'hint' => 'Direkod pengantin, belum disahkan vendor'],
             ],
         ]);
     }
@@ -56,7 +56,7 @@ class TransactionController extends Controller
         $direction = $request->string('direction')->toString() === 'asc' ? 'asc' : 'desc';
 
         $payments = Payment::query()
-            ->with(['booking.vendor', 'booking.user'])
+            ->with(['booking.vendor', 'booking.user', 'recorder'])
             ->when($status, fn ($query) => $query->where('status', $status))
             ->when($request->string('search')->trim()->toString(), function ($query, string $keyword): void {
                 $like = '%'.$keyword.'%';
@@ -74,7 +74,7 @@ class TransactionController extends Controller
                 'reference' => $payment->reference,
                 'booking' => $payment->booking->reference,
                 'vendor' => $payment->booking->vendor->name,
-                'type' => $payment->type->label(),
+                'recorded_by' => $payment->recorder?->name ?? $payment->booking->user->name,
                 'amount' => 'RM'.number_format((float) $payment->amount, 2),
                 'status' => view('components.admin.status-pill', ['label' => $payment->status->label(), 'tone' => $payment->status->tone()])->render(),
                 'date' => ($payment->paid_at ?? $payment->created_at)->translatedFormat('j M Y'),

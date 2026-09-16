@@ -2,43 +2,66 @@
 
 namespace App\Http\Controllers\Customer;
 
-use App\Actions\RecordSuccessfulPayment;
-use App\Enums\PaymentStatus;
-use App\Enums\PaymentType;
+use App\Actions\RecordManualPayment;
+use App\Actions\StoreOptimizedImage;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\RecordManualPaymentRequest;
 use App\Models\Booking;
 use App\Models\Payment;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Str;
 
 /**
- * Sandbox payment gateway: settles a pending payment immediately.
- * Replace with a real gateway redirect + callback when one is chosen.
+ * The couple's own record of what they paid the vendor.
+ *
+ * Money never passes through Neekah: the two sides deal directly, and this is
+ * where the couple writes down what changed hands so both of them — and later,
+ * an admin — are looking at the same numbers.
  */
 class PaymentController extends Controller
 {
-    public function store(Request $request, Booking $booking, Payment $payment, RecordSuccessfulPayment $recordPayment): RedirectResponse
+    public function store(RecordManualPaymentRequest $request, Booking $booking, RecordManualPayment $recordPayment, StoreOptimizedImage $storeImage): RedirectResponse|JsonResponse
     {
-        Gate::authorize('pay', $booking);
-
+        // An admin looking through a couple's eyes must not leave a payment
+        // record behind in their name.
         if ($request->user()->isImpersonated()) {
-            return back()->withErrors(['payment' => 'Pembayaran dimatikan semasa mod impersonate.']);
+            return back()->withErrors(['payment' => 'Rekod bayaran dimatikan semasa mod impersonate.']);
         }
 
-        if ($payment->status !== PaymentStatus::Pending) {
-            return back()->with('status', 'Bayaran ini telah diselesaikan.');
+        $payment = $recordPayment->handle($booking, $request->user(), [
+            'amount' => $request->float('amount'),
+            'paid_on' => $request->date('paid_on')->toDateString(),
+            'note' => $request->string('note')->toString() ?: null,
+            'receipt_image' => $request->hasFile('receipt')
+                ? $storeImage->handle($request->file('receipt'), 'receipts/'.$booking->id)
+                : null,
+        ]);
+
+        return $this->redirectOrJson(
+            $request,
+            route('bookings.show', $booking),
+            'Bayaran RM'.number_format((float) $payment->amount, 2).' direkod. Vendor akan mengesahkannya setelah menyemak akaun mereka.',
+        );
+    }
+
+    /**
+     * Take back a record the vendor has not confirmed yet. Once it is verified
+     * it is the vendor's word too, and no longer the couple's to erase.
+     */
+    public function destroy(Request $request, Booking $booking, Payment $payment, StoreOptimizedImage $storeImage): RedirectResponse
+    {
+        Gate::authorize('recordPayment', $booking);
+
+        abort_unless($payment->isAwaitingVerification(), 403);
+
+        if ($payment->receipt_image) {
+            $storeImage->delete($payment->receipt_image);
         }
 
-        if ($payment->type === PaymentType::Balance && ! $booking->depositPayment?->isPaid()) {
-            return back()->withErrors(['payment' => 'Sila bayar deposit terlebih dahulu.']);
-        }
+        $payment->delete();
 
-        $recordPayment->handle($payment, 'SBX-'.Str::upper(Str::random(10)));
-
-        return redirect()
-            ->route('bookings.show', $booking)
-            ->with('status', $payment->type->label().' RM'.number_format((float) $payment->amount, 2).' diterima (sandbox).');
+        return redirect()->route('bookings.show', $booking)->with('status', 'Rekod bayaran dibuang.');
     }
 }

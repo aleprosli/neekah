@@ -6,8 +6,6 @@ use App\Actions\AwardVendorPoints;
 use App\Actions\RecalculateVendorStats;
 use App\Actions\SeedWeddingChecklist;
 use App\Enums\EnquiryStatus;
-use App\Enums\PaymentStatus;
-use App\Enums\PaymentType;
 use App\Enums\PointReason;
 use App\Enums\PriceUnit;
 use App\Enums\VendorStatus;
@@ -193,18 +191,16 @@ class DemoSeeder extends Seeder
                     'package_id' => $package->id,
                     'package_name' => $package->name,
                     'total_amount' => $package->price,
-                    'deposit_amount' => round($package->price * Booking::DEPOSIT_RATE, 2),
                     'commission_amount' => round($package->price * Booking::COMMISSION_RATE / 100, 2),
                 ]);
 
-                foreach ([[PaymentType::Deposit, $booking->deposit_amount], [PaymentType::Balance, $booking->balanceAmount()]] as [$type, $amount]) {
-                    Payment::factory()->paid()->create([
-                        'booking_id' => $booking->id,
-                        'type' => $type,
-                        'amount' => $amount,
-                        'paid_at' => $booking->completed_at->subDays(10),
-                    ]);
-                }
+                Payment::factory()->paid()->create([
+                    'booking_id' => $booking->id,
+                    'recorded_by' => $customer->id,
+                    'amount' => $package->price,
+                    'paid_on' => $booking->completed_at->subDays(10)->toDateString(),
+                    'paid_at' => $booking->completed_at->subDays(10),
+                ]);
 
                 $award->award($vendor, PointReason::PlatformBooking, $booking);
                 $award->award($vendor, PointReason::DepositPaid, $booking);
@@ -238,11 +234,11 @@ class DemoSeeder extends Seeder
             'package_name' => $package->name,
             'event_date' => $wedding->event_date,
             'total_amount' => $package->price,
-            'deposit_amount' => round($package->price * Booking::DEPOSIT_RATE, 2),
             'commission_amount' => round($package->price * Booking::COMMISSION_RATE / 100, 2),
         ]);
-        Payment::factory()->paid()->create(['booking_id' => $booking->id, 'type' => PaymentType::Deposit, 'amount' => $booking->deposit_amount]);
-        Payment::factory()->create(['booking_id' => $booking->id, 'type' => PaymentType::Balance, 'amount' => $booking->balanceAmount(), 'status' => PaymentStatus::Pending]);
+        // One payment already confirmed, one still waiting on the vendor to check their account.
+        Payment::factory()->paid()->create(['booking_id' => $booking->id, 'recorded_by' => $couple->id, 'amount' => round((float) $package->price / 2, 2)]);
+        Payment::factory()->create(['booking_id' => $booking->id, 'recorded_by' => $couple->id, 'amount' => round((float) $package->price / 2, 2)]);
 
         $this->seedTimeline($wedding, $vendor);
         $this->seedInvitationCard($wedding);

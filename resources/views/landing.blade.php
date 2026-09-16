@@ -52,7 +52,7 @@
                         <p class="text-xs font-medium text-ink-muted">Status booking</p>
                         <p class="mt-1 flex items-center gap-2 text-sm font-semibold">
                             <span class="size-2 rounded-full bg-emerald-500"></span>
-                            Deposit diterima · Confirmed
+                            Bayaran disahkan · Confirmed
                         </p>
                     </div>
 
@@ -201,11 +201,11 @@
                 <div class="flex flex-col gap-4">
                     <p class="text-sm font-semibold tracking-wide text-brand-600 uppercase">Selamat & telus</p>
                     <h2 class="font-display text-3xl font-semibold tracking-tight">Bincang di mana-mana. Tempah & bayar di Neekah.</h2>
-                    <p class="text-ink-muted">WhatsApp, panggilan, site visit, food tasting, fitting dan negotiation semuanya dibenarkan di luar platform. Tetapi booking dan pembayaran direkod dalam Neekah supaya setiap transaksi dijejak, setiap deposit dilindungi, dan setiap vendor dinilai berdasarkan prestasi sebenar.</p>
+                    <p class="text-ink-muted">WhatsApp, panggilan, site visit, food tasting, fitting dan negotiation semuanya dibenarkan di luar platform. Tetapi booking dan bayaran direkod dalam Neekah supaya setiap transaksi dijejak, kedua-dua pihak melihat rekod yang sama, dan setiap vendor dinilai berdasarkan prestasi sebenar.</p>
                 </div>
 
                 <ol class="flex flex-col gap-3 text-sm">
-                    @foreach (['Enquiry', 'Discussion', 'Quotation', 'Booking', 'Deposit Payment', 'Booking Confirmed', 'Balance Payment', 'Wedding Completed', 'Review'] as $index => $stage)
+                    @foreach (['Enquiry', 'Discussion', 'Quotation', 'Booking', 'Bayaran direkod', 'Disahkan vendor', 'Booking Confirmed', 'Wedding Completed', 'Review'] as $index => $stage)
                         <li class="flex items-center gap-3">
                             <span class="flex size-7 shrink-0 items-center justify-center rounded-full bg-brand-50 text-xs font-semibold text-brand-700">{{ $index + 1 }}</span>
                             <span class="font-medium">{{ $stage }}</span>

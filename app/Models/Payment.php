@@ -3,15 +3,19 @@
 namespace App\Models;
 
 use App\Enums\PaymentStatus;
-use App\Enums\PaymentType;
 use Database\Factories\PaymentFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
-#[Fillable(['reference', 'booking_id', 'type', 'amount', 'status', 'gateway', 'gateway_reference', 'paid_at'])]
+#[Fillable([
+    'reference', 'booking_id', 'recorded_by', 'amount', 'paid_on', 'method',
+    'receipt_image', 'note', 'status', 'gateway', 'gateway_reference', 'paid_at',
+    'verified_at', 'verified_by',
+])]
 class Payment extends Model
 {
     /** @use HasFactory<PaymentFactory> */
@@ -23,10 +27,11 @@ class Payment extends Model
     protected function casts(): array
     {
         return [
-            'type' => PaymentType::class,
             'amount' => 'decimal:2',
             'status' => PaymentStatus::class,
             'paid_at' => 'datetime',
+            'paid_on' => 'date',
+            'verified_at' => 'datetime',
         ];
     }
 
@@ -49,8 +54,29 @@ class Payment extends Model
         return $this->belongsTo(Booking::class);
     }
 
+    public function recorder(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'recorded_by');
+    }
+
+    public function verifier(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'verified_by');
+    }
+
     public function isPaid(): bool
     {
         return $this->status === PaymentStatus::Paid;
+    }
+
+    public function isAwaitingVerification(): bool
+    {
+        return $this->status === PaymentStatus::AwaitingVerification;
+    }
+
+    /** The receipt the couple uploaded, if they attached one. */
+    public function receiptUrl(): ?string
+    {
+        return $this->receipt_image ? Storage::disk('public')->url($this->receipt_image) : null;
     }
 }

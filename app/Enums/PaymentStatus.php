@@ -9,10 +9,14 @@ enum PaymentStatus: string
     case Failed = 'failed';
     case Refunded = 'refunded';
 
+    /** Recorded by the couple, waiting for the vendor to check their account. */
+    case AwaitingVerification = 'awaiting_verification';
+
     public function label(): string
     {
         return match ($this) {
             self::Pending => 'Belum dibayar',
+            self::AwaitingVerification => 'Menunggu pengesahan',
             self::Paid => 'Dibayar',
             self::Failed => 'Gagal',
             self::Refunded => 'Dipulangkan',
@@ -24,6 +28,7 @@ enum PaymentStatus: string
     {
         return match ($this) {
             self::Paid => 'emerald',
+            self::AwaitingVerification => 'amber',
             self::Pending => 'amber',
             self::Failed, self::Refunded => 'muted',
         };

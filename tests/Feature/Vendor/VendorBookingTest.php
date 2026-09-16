@@ -33,11 +33,12 @@ it('lets a vendor record a booking for a registered customer', function () {
     $booking = Booking::sole();
 
     expect($booking->user_id)->toBe($this->customer->id)
-        ->and((float) $booking->deposit_amount)->toBe(1200.0)
         ->and((float) $booking->commission_amount)->toBe(240.0)
+        ->and($booking->payments)->toBeEmpty()
         ->and($booking->status)->toBe(BookingStatus::PendingPayment);
 
-    $this->actingAs($this->customer)->get(route('bookings.show', $booking))->assertOk()->assertSee('Bayar Deposit sekarang');
+    $props = $this->actingAs($this->customer)->get(route('bookings.show', $booking))->assertOk()->viewData('props');
+    expect($props['paymentForm']['action'])->toBe(route('bookings.payments.store', $booking));
     // The list page is the shell; its rows come from the table's own endpoint.
     $this->actingAs($this->vendor->user)->get(route('vendor.bookings.index'))->assertOk()->assertSee('data-vue="data-table"', false);
 

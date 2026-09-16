@@ -1,9 +1,25 @@
 <script setup>
-/** One booking as the vendor sees it: who, when, what they are owed. */
+/**
+ * One booking as the vendor sees it: who, when, what they are owed, and the
+ * payments the couple says they have made.
+ *
+ * Nothing the couple records counts until the vendor confirms it here, because
+ * the vendor is the only one who can see their own account.
+ */
+import UiConfirm from '../ui/UiConfirm.vue';
+
 defineProps({
     booking: { type: Object, required: true },
     timeline: { type: Array, default: () => [] },
+    csrf: { type: String, required: true },
 });
+
+const tones = {
+    emerald: 'bg-emerald-50 text-emerald-700',
+    amber: 'bg-amber-50 text-amber-700',
+    sky: 'bg-sky-50 text-sky-700',
+    muted: 'bg-surface-muted text-ink-muted',
+};
 </script>
 
 <template>
@@ -47,17 +63,45 @@ defineProps({
             <p class="text-xs font-semibold tracking-wide text-ink-muted uppercase">Pembayaran</p>
             <p class="font-display text-2xl font-semibold">{{ booking.total }}</p>
 
-            <ul class="flex flex-col gap-2 text-sm">
-                <li v-for="payment in booking.payments" :key="payment.label" class="flex items-center justify-between rounded-xl border border-line px-3 py-2">
-                    <span>{{ payment.label }}</span>
-                    <span class="text-right">
-                        <span class="font-medium">{{ payment.amount }}</span>
-                        <span :class="['block text-xs', payment.is_paid ? 'text-emerald-600' : 'text-ink-muted']">{{ payment.status }}</span>
-                    </span>
+            <ul v-if="booking.payments.length" class="flex flex-col gap-3 text-sm">
+                <li v-for="payment in booking.payments" :key="payment.reference" class="flex flex-col gap-2 rounded-xl border border-line p-3">
+                    <div class="flex items-center justify-between gap-3">
+                        <span class="font-semibold">{{ payment.amount }}</span>
+                        <span :class="['rounded-full px-2.5 py-0.5 text-[11px] font-medium', tones[payment.status_tone] || tones.muted]">{{ payment.status_label }}</span>
+                    </div>
+
+                    <p class="text-xs text-ink-muted">{{ payment.paid_on }} · direkod oleh {{ payment.recorded_by }}</p>
+                    <p v-if="payment.note" class="text-xs break-words text-ink-muted">{{ payment.note }}</p>
+
+                    <a v-if="payment.receipt_url" :href="payment.receipt_url" target="_blank" rel="noopener" class="text-xs font-medium text-brand-700 underline underline-offset-4">Lihat resit</a>
+
+                    <div v-if="payment.awaiting" class="flex flex-wrap gap-2 pt-1">
+                        <UiConfirm
+                            :action="payment.verify_url"
+                            title="Sahkan bayaran ini diterima?"
+                            :message="`Pastikan ${payment.amount} benar-benar masuk ke akaun anda. Booking akan disahkan dan pengantin dimaklumkan.`"
+                            confirm-label="Ya, saya telah terima"
+                            trigger-class="rounded-full bg-emerald-600 px-4 py-1.5 text-xs font-semibold text-white transition hover:bg-emerald-700"
+                            :csrf="csrf"
+                        >Sahkan diterima</UiConfirm>
+
+                        <UiConfirm
+                            :action="payment.reject_url"
+                            method="DELETE"
+                            title="Tanda bayaran ini tidak diterima?"
+                            message="Pengantin akan diminta menyemak resit dan tarikh, kemudian merekodkannya semula."
+                            confirm-label="Ya, saya tidak jumpa"
+                            tone="danger"
+                            :csrf="csrf"
+                        >Tidak diterima</UiConfirm>
+                    </div>
                 </li>
             </ul>
 
+            <p v-else class="rounded-xl bg-surface-muted p-3 text-xs text-ink-muted">Pengantin belum merekodkan sebarang bayaran. Berbincang terus dengan mereka; setelah mereka bayar dan merekodkannya, ia muncul di sini untuk anda sahkan.</p>
+
             <dl class="flex flex-col gap-1 border-t border-line pt-3 text-sm">
+                <div class="flex justify-between text-ink-muted"><dt>Belum disahkan</dt><dd>{{ booking.outstanding }}</dd></div>
                 <div class="flex justify-between text-ink-muted"><dt>Komisen platform ({{ booking.commission_rate }}%)</dt><dd>- {{ booking.commission }}</dd></div>
                 <div class="flex justify-between font-semibold"><dt>Anda terima</dt><dd>{{ booking.payout }}</dd></div>
             </dl>

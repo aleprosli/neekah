@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Admin;
 
 use App\Enums\BookingStatus;
 use App\Enums\PaymentStatus;
-use App\Enums\PaymentType;
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
 use App\Models\Payment;
@@ -107,9 +106,9 @@ class BookingController extends Controller
                     'commission' => 'RM'.number_format((float) $booking->commission_amount, 2),
                     'payout' => 'RM'.number_format((float) $booking->total_amount - (float) $booking->commission_amount, 2),
                     'payments' => $booking->payments
-                        ->sortBy(fn (Payment $payment): int => $payment->type === PaymentType::Deposit ? 0 : 1)
+                        ->sortBy('created_at')
                         ->map(fn (Payment $payment): array => [
-                            'label' => $payment->type->label(),
+                            'label' => $payment->paid_on?->translatedFormat('j M Y') ?? 'Tarikh tidak direkod',
                             'reference' => $payment->reference,
                             'amount' => 'RM'.number_format((float) $payment->amount, 2),
                             'status' => $payment->status->label(),

@@ -93,6 +93,8 @@ Route::middleware(['auth', 'role:vendor'])->prefix('vendor')->name('vendor.')->g
     Route::post('/bookings', [VendorArea\BookingController::class, 'store'])->name('bookings.store');
     Route::get('/bookings/{booking}', [VendorArea\BookingController::class, 'show'])->name('bookings.show');
     Route::post('/bookings/{booking}/complete', [VendorArea\BookingCompletionController::class, 'store'])->name('bookings.complete');
+    Route::post('/bookings/{booking}/payments/{payment}/verify', [VendorArea\PaymentVerificationController::class, 'store'])->name('bookings.payments.verify')->scopeBindings();
+    Route::delete('/bookings/{booking}/payments/{payment}/verify', [VendorArea\PaymentVerificationController::class, 'destroy'])->name('bookings.payments.reject')->scopeBindings();
     Route::get('/points', [VendorArea\PointController::class, 'index'])->name('points.index');
     Route::get('/enquiries', [VendorArea\EnquiryController::class, 'index'])->name('enquiries.index');
     Route::get('/enquiries/{enquiry}', [VendorArea\EnquiryController::class, 'show'])->name('enquiries.show');
@@ -111,7 +113,9 @@ Route::middleware('auth')->group(function (): void {
     Route::post('/vendors/{vendor}/bookings', [BookingController::class, 'store'])->name('vendors.bookings.store');
     Route::get('/bookings', [BookingController::class, 'index'])->name('bookings.index');
     Route::get('/bookings/{booking}', [BookingController::class, 'show'])->name('bookings.show');
-    Route::post('/bookings/{booking}/payments/{payment}', [PaymentController::class, 'store'])->name('bookings.payments.store')->scopeBindings();
+    Route::post('/bookings/{booking}/cancel', [CustomerArea\BookingCancellationController::class, 'store'])->name('bookings.cancel');
+    Route::post('/bookings/{booking}/payments', [PaymentController::class, 'store'])->name('bookings.payments.store');
+    Route::delete('/bookings/{booking}/payments/{payment}', [PaymentController::class, 'destroy'])->name('bookings.payments.destroy')->scopeBindings();
     Route::post('/bookings/{booking}/review', [CustomerArea\ReviewController::class, 'store'])->name('bookings.review.store');
 
     Route::get('/dashboard', CustomerArea\DashboardController::class)->name('dashboard');
@@ -192,4 +196,5 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::put('/settings/seo', [AdminArea\SettingController::class, 'updateSeo'])->name('settings.seo');
     Route::put('/settings/telegram', [AdminArea\SettingController::class, 'updateTelegram'])->name('settings.telegram');
     Route::put('/settings/turnstile', [AdminArea\SettingController::class, 'updateTurnstile'])->name('settings.turnstile');
+    Route::put('/settings/payments', [AdminArea\SettingController::class, 'updatePayments'])->name('settings.payments');
 });

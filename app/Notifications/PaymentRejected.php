@@ -7,7 +7,11 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class PaymentReceived extends Notification
+/**
+ * The vendor looked and could not find the money. Said plainly, because the
+ * usual reason is a typo in the amount or a transfer that never went through.
+ */
+class PaymentRejected extends Notification
 {
     use Queueable;
 
@@ -27,9 +31,9 @@ class PaymentReceived extends Notification
     public function toDatabase(object $notifiable): array
     {
         return [
-            'icon' => '💰',
-            'title' => 'Bayaran RM'.number_format((float) $this->payment->amount, 2).' disahkan',
-            'body' => "Vendor mengesahkan bayaran anda untuk booking {$this->payment->booking->reference}.",
+            'icon' => '⚠️',
+            'title' => 'Bayaran RM'.number_format((float) $this->payment->amount, 2).' tidak ditemui',
+            'body' => 'Vendor tidak menemui bayaran ini dalam akaun mereka. Sila semak dan rekod semula.',
             'url' => route('bookings.show', $this->payment->booking),
         ];
     }
@@ -39,10 +43,10 @@ class PaymentReceived extends Notification
         $booking = $this->payment->booking;
 
         return (new MailMessage)
-            ->subject('Bayaran '.$this->payment->reference.' disahkan')
+            ->subject('Bayaran '.$this->payment->reference.' tidak dapat disahkan')
             ->greeting('Hai '.$notifiable->name.',')
-            ->line($booking->vendor->name.' mengesahkan bayaran RM'.number_format((float) $this->payment->amount, 2).' untuk booking '.$booking->reference.'.')
-            ->line('Majlis: '.$booking->event_date->translatedFormat('j F Y').' · Rujukan bayaran: '.$this->payment->reference)
+            ->line($booking->vendor->name.' tidak menemui bayaran RM'.number_format((float) $this->payment->amount, 2).' yang anda rekodkan untuk booking '.$booking->reference.'.')
+            ->line('Semak resit dan tarikh bayaran anda, hubungi vendor jika perlu, kemudian rekodkan semula.')
             ->action('Lihat booking', route('bookings.show', $booking))
             ->salutation('Terima kasih, Neekah');
     }

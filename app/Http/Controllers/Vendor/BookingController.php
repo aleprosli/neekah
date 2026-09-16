@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Vendor;
 use App\Actions\CreateBooking;
 use App\Enums\BookingStatus;
 use App\Enums\PaymentStatus;
-use App\Enums\PaymentType;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreVendorBookingRequest;
 use App\Models\Booking;
@@ -98,7 +97,6 @@ class BookingController extends Controller
                         'name' => $package->name,
                         'price' => (float) $package->price,
                     ])->values(),
-                'depositRate' => Booking::DEPOSIT_RATE,
                 'commissionRate' => Booking::COMMISSION_RATE / 100,
                 'old' => old(),
             ]),
@@ -120,14 +118,14 @@ class BookingController extends Controller
 
         return redirect()
             ->route('vendor.bookings.show', $booking)
-            ->with('status', 'Booking '.$booking->reference.' direkod. Pelanggan boleh bayar deposit dari akaun mereka.');
+            ->with('status', 'Booking '.$booking->reference.' direkod. Pelanggan boleh merekodkan bayaran mereka dari akaun mereka.');
     }
 
     public function show(Booking $booking): View
     {
         Gate::authorize('view', $booking);
 
-        $booking->load(['user', 'package', 'payments', 'review']);
+        $booking->load(['user', 'package', 'payments.recorder', 'review']);
 
         // Vendors see only the timeline slots assigned to them, as the kertas kerja specifies.
         $timeline = $booking->wedding_id
@@ -150,13 +148,21 @@ class BookingController extends Controller
                     'commission_rate' => number_format((float) $booking->commission_rate, 0),
                     'commission' => 'RM'.number_format((float) $booking->commission_amount, 2),
                     'payout' => 'RM'.number_format((float) $booking->total_amount - (float) $booking->commission_amount, 2),
+                    'outstanding' => 'RM'.number_format($booking->outstandingAmount(), 2),
                     'payments' => $booking->payments
-                        ->sortBy(fn (Payment $payment): int => $payment->type === PaymentType::Deposit ? 0 : 1)
+                        ->sortBy('created_at')
                         ->map(fn (Payment $payment): array => [
-                            'label' => $payment->type->label(),
+                            'reference' => $payment->reference,
                             'amount' => 'RM'.number_format((float) $payment->amount, 2),
-                            'status' => $payment->status->label(),
-                            'is_paid' => $payment->isPaid(),
+                            'paid_on' => $payment->paid_on?->translatedFormat('j M Y'),
+                            'note' => $payment->note,
+                            'recorded_by' => $payment->recorder?->name ?? $booking->user->name,
+                            'receipt_url' => $payment->receiptUrl(),
+                            'status_label' => $payment->status->label(),
+                            'status_tone' => $payment->status->tone(),
+                            'awaiting' => $payment->isAwaitingVerification(),
+                            'verify_url' => $payment->isAwaitingVerification() ? route('vendor.bookings.payments.verify', [$booking, $payment]) : null,
+                            'reject_url' => $payment->isAwaitingVerification() ? route('vendor.bookings.payments.reject', [$booking, $payment]) : null,
                         ])->values(),
                     'review' => $booking->review ? [
                         'rating' => $booking->review->rating,

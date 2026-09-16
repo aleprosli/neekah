@@ -33,10 +33,16 @@ it('awards the kertas kerja points across a full booking lifecycle', function ()
     $booking = Booking::sole();
     expect($this->vendor->fresh()->points_total)->toBe(PointReason::PlatformBooking->points());
 
-    $this->actingAs($this->customer)->post(route('bookings.payments.store', [$booking, $booking->depositPayment]));
-    $this->actingAs($this->customer)->post(route('bookings.payments.store', [$booking, $booking->balancePayment]));
+    $this->actingAs($this->customer)->post(route('bookings.payments.store', $booking), [
+        'amount' => 2500,
+        'paid_on' => now()->toDateString(),
+    ])->assertRedirect();
 
-    // Booking + deposit + full payment.
+    $this->actingAs($this->vendor->user)
+        ->post(route('vendor.bookings.payments.verify', [$booking, Payment::sole()]))
+        ->assertRedirect();
+
+    // Booking + payment verified + full payment.
     expect($this->vendor->fresh()->points_total)->toBe(100 + 100 + 150);
 
     $booking->update(['event_date' => now()->subDay()]);

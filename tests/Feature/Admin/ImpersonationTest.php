@@ -2,7 +2,6 @@
 
 use App\Models\Booking;
 use App\Models\Category;
-use App\Models\Payment;
 use App\Models\User;
 use App\Models\Vendor;
 use Database\Seeders\CategorySeeder;
@@ -62,15 +61,15 @@ it('sends a guest to login rather than impersonating', function () {
     $this->assertGuest();
 });
 
-it('blocks payments while impersonating', function () {
-    $booking = Booking::factory()->for($this->customer)->for($this->vendor)->create(['deposit_amount' => 1000]);
-    $deposit = Payment::factory()->for($booking)->create(['amount' => 1000]);
+it('blocks recording a payment while impersonating', function () {
+    $booking = Booking::factory()->for($this->customer)->for($this->vendor)->create(['total_amount' => 2500]);
 
     $this->actingAs($this->admin)->post(route('admin.users.impersonate', $this->customer));
 
-    $this->post(route('bookings.payments.store', [$booking, $deposit]))->assertSessionHasErrors('payment');
+    $this->post(route('bookings.payments.store', $booking), ['amount' => 1000, 'paid_on' => now()->toDateString()])
+        ->assertSessionHasErrors('payment');
 
-    expect($deposit->fresh()->isPaid())->toBeFalse();
+    expect($booking->payments()->count())->toBe(0);
 });
 
 it('shows an impersonate button only for impersonatable users', function () {

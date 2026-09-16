@@ -28,7 +28,6 @@ it('shows platform totals, gross value and commission', function () {
 
     $booking = Booking::factory()->confirmed()->for($customer)->for($vendor)->create([
         'total_amount' => 2500,
-        'deposit_amount' => 1000,
         'commission_amount' => 200,
     ]);
     Payment::factory()->for($booking)->paid()->create(['amount' => 1000]);

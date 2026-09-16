@@ -26,7 +26,6 @@ it('shows planned against actual per category from real bookings', function () {
     $booking = Booking::factory()->confirmed()->for($this->aina)->for($vendor)->create([
         'wedding_id' => $this->wedding->id,
         'total_amount' => 9500,
-        'deposit_amount' => 3800,
     ]);
     Payment::factory()->for($booking)->paid()->create(['amount' => 3800]);
 
