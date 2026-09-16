@@ -165,10 +165,12 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/', AdminArea\DashboardController::class)->name('dashboard');
     Route::get('/analytics', AdminArea\AnalyticsController::class)->name('analytics');
     Route::get('/vendors', [AdminArea\VendorController::class, 'index'])->name('vendors.index');
+    Route::get('/vendors/data', [AdminArea\VendorController::class, 'data'])->name('vendors.data');
     Route::get('/vendors/{vendor}', [AdminArea\VendorController::class, 'show'])->name('vendors.show');
     Route::post('/vendors/{vendor}/status', [AdminArea\VendorApprovalController::class, 'store'])->name('vendors.status');
     Route::put('/vendors/{vendor}/tier', [AdminArea\VendorTierController::class, 'update'])->name('vendors.tier');
     Route::get('/users', [AdminArea\UserController::class, 'index'])->name('users.index');
+    Route::get('/users/data', [AdminArea\UserController::class, 'data'])->name('users.data');
     Route::get('/categories', [AdminArea\CategoryController::class, 'index'])->name('categories.index');
     Route::post('/categories', [AdminArea\CategoryController::class, 'store'])->name('categories.store');
     Route::put('/categories/{category}', [AdminArea\CategoryController::class, 'update'])->name('categories.update');

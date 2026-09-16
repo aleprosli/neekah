@@ -9,6 +9,7 @@ use App\Models\Package;
 use App\Support\ImageSettings;
 use App\Support\VueProps;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -38,7 +39,7 @@ class PackageController extends Controller
         return view('vendor.packages.form', $this->formData(new Package(['is_active' => true]), $images));
     }
 
-    public function store(StorePackageRequest $request, StoreOptimizedImage $storeImage): RedirectResponse
+    public function store(StorePackageRequest $request, StoreOptimizedImage $storeImage): RedirectResponse|JsonResponse
     {
         $vendor = $request->user()->vendor;
 
@@ -52,7 +53,7 @@ class PackageController extends Controller
 
         $this->syncPriceFrom($request);
 
-        return redirect()->route('vendor.packages.index')->with('status', 'Pakej ditambah.');
+        return $this->redirectOrJson($request, route('vendor.packages.index'), 'Pakej ditambah.');
     }
 
     public function edit(Package $package, ImageSettings $images): View
@@ -97,7 +98,7 @@ class PackageController extends Controller
         ];
     }
 
-    public function update(StorePackageRequest $request, Package $package, StoreOptimizedImage $storeImage): RedirectResponse
+    public function update(StorePackageRequest $request, Package $package, StoreOptimizedImage $storeImage): RedirectResponse|JsonResponse
     {
         $package->update([
             ...$request->safe()->except('features', 'is_active', 'image', 'remove_image'),
@@ -108,7 +109,7 @@ class PackageController extends Controller
 
         $this->syncPriceFrom($request);
 
-        return redirect()->route('vendor.packages.index')->with('status', 'Pakej dikemas kini.');
+        return $this->redirectOrJson($request, route('vendor.packages.index'), 'Pakej dikemas kini.');
     }
 
     public function destroy(Request $request, Package $package, StoreOptimizedImage $storeImage): RedirectResponse

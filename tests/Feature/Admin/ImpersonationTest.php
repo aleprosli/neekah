@@ -74,19 +74,23 @@ it('blocks payments while impersonating', function () {
 });
 
 it('shows an impersonate button only for impersonatable users', function () {
-    $response = $this->actingAs($this->admin)->get(route('admin.users.index'));
+    $rows = $this->actingAs($this->admin)->getJson(route('admin.users.data'))->assertOk()->json('data');
 
-    $response->assertOk()->assertSee(route('admin.users.impersonate', $this->customer), false);
-    $response->assertDontSee(route('admin.users.impersonate', $this->admin), false);
+    expect(collect($rows)->firstWhere('email', $this->customer->email)['impersonate_url'])
+        ->toBe(route('admin.users.impersonate', $this->customer))
+        ->and(collect($rows)->firstWhere('email', $this->admin->email)['impersonate_url'])->toBeNull();
 });
 
 it('confirms in an in-app dialog rather than a browser prompt', function () {
+    // The row action opens the shared confirm dialog; the page carries its text.
     $this->actingAs($this->admin)
         ->get(route('admin.users.index'))
         ->assertOk()
-        ->assertSee('<dialog id="confirm-', false)
-        ->assertSee('data-dialog-open="confirm-', false)
-        ->assertSee('Log masuk sebagai '.$this->customer->name.'?')
+        ->assertSee('Log masuk sebagai __ROW__?')
         ->assertSee('Ya, impersonate')
         ->assertDontSee('return confirm(', false);
+
+    expect(file_get_contents(resource_path('js/components/ui/UiConfirm.vue')))
+        ->toContain('<Teleport to="body">')
+        ->not->toContain('window.confirm');
 });

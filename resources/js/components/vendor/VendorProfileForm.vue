@@ -5,7 +5,9 @@
  * Vue is here for the live preview of the card a couple will see.
  */
 import { computed, ref } from 'vue';
+import { useUploadForm } from '../../composables/useUploadForm.js';
 import UiField from '../ui/UiField.vue';
+import UiUploadProgress from '../ui/UiUploadProgress.vue';
 import UiSelect from '../ui/UiSelect.vue';
 import UiTextarea from '../ui/UiTextarea.vue';
 
@@ -21,6 +23,7 @@ const props = defineProps({
     imageHint: { type: String, required: true },
 });
 
+const { uploading, percent: uploadPercent, error: uploadError, submit: submitUpload } = useUploadForm();
 const form = ref({ ...props.vendor });
 const coverPreview = ref(props.vendor.cover_image_url);
 
@@ -34,7 +37,7 @@ const stateOptions = computed(() => props.states.map((state) => ({ value: state,
 </script>
 
 <template>
-    <form :action="action" method="POST" enctype="multipart/form-data" class="flex flex-col gap-8">
+    <form :action="action" method="POST" enctype="multipart/form-data" class="flex flex-col gap-8" @submit="submitUpload">
         <input type="hidden" name="_token" :value="csrf">
         <input type="hidden" name="_method" value="PUT">
 
@@ -86,11 +89,14 @@ const stateOptions = computed(() => props.states.map((state) => ({ value: state,
                 <input type="file" name="cover_image" accept="image/jpeg,image/png,image/webp" class="text-sm file:mr-3 file:rounded-full file:border-0 file:bg-brand-50 file:px-4 file:py-2 file:text-sm file:font-medium file:text-brand-700" @change="onCoverChosen">
                 <span class="text-xs text-ink-muted">{{ imageHint }}</span>
                 <span v-if="errors.cover_image" class="text-xs text-brand-700">{{ errors.cover_image }}</span>
+                <UiUploadProgress :uploading="uploading" :percent="uploadPercent" :error="uploadError" />
             </div>
         </section>
 
         <div>
-            <button type="submit" class="rounded-full bg-brand-600 px-8 py-3 text-sm font-semibold text-white transition hover:bg-brand-700">Simpan profil</button>
+            <button type="submit" class="rounded-full bg-brand-600 px-8 py-3 text-sm font-semibold text-white transition hover:bg-brand-700 disabled:opacity-50" :disabled="uploading">
+                {{ uploading ? 'Memuat naik…' : 'Simpan profil' }}
+            </button>
         </div>
     </form>
 </template>

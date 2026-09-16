@@ -11,6 +11,7 @@ use App\Models\Vendor;
 use App\Support\ImageSettings;
 use App\Support\VueProps;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -49,7 +50,7 @@ class ProfileController extends Controller
         ]);
     }
 
-    public function update(UpdateVendorProfileRequest $request, StoreOptimizedImage $storeImage): RedirectResponse
+    public function update(UpdateVendorProfileRequest $request, StoreOptimizedImage $storeImage): RedirectResponse|JsonResponse
     {
         $vendor = $request->user()->vendor;
         $data = $request->safe()->except('cover_image');
@@ -61,6 +62,6 @@ class ProfileController extends Controller
 
         $vendor->update($data);
 
-        return redirect()->route('vendor.profile.edit')->with('status', 'Profil dikemas kini.');
+        return $this->redirectOrJson($request, route('vendor.profile.edit'), 'Profil dikemas kini.');
     }
 }

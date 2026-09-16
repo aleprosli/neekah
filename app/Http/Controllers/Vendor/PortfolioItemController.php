@@ -57,7 +57,7 @@ class PortfolioItemController extends Controller
         return response()->json(['status' => 'ok']);
     }
 
-    public function store(StorePortfolioItemRequest $request, StoreOptimizedImage $storeImage): RedirectResponse
+    public function store(StorePortfolioItemRequest $request, StoreOptimizedImage $storeImage): RedirectResponse|JsonResponse
     {
         $vendor = $request->user()->vendor;
         $position = $vendor->portfolioItems()->count();
@@ -70,7 +70,11 @@ class PortfolioItemController extends Controller
             ]);
         }
 
-        return redirect()->route('vendor.portfolio.index')->with('status', count($request->file('images')).' gambar dimuat naik.');
+        return $this->redirectOrJson(
+            $request,
+            route('vendor.portfolio.index'),
+            count($request->file('images')).' gambar dimuat naik.',
+        );
     }
 
     public function destroy(Request $request, PortfolioItem $item, StoreOptimizedImage $storeImage): RedirectResponse

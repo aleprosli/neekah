@@ -15,13 +15,20 @@ it('lists and filters users by role', function () {
     $customer = User::factory()->create(['name' => 'Aina Zulkifli']);
     $vendor = Vendor::factory()->for(Category::first())->create();
 
-    $this->actingAs($this->admin)->get(route('admin.users.index'))->assertOk()->assertSee('Aina Zulkifli')->assertSee($vendor->user->email);
+    $this->actingAs($this->admin)->get(route('admin.users.index'))->assertOk()->assertSee('data-vue="data-table"', false);
 
-    $this->actingAs($this->admin)
-        ->get(route('admin.users.index', ['role' => 'customer']))
-        ->assertOk()
-        ->assertSee($customer->email)
-        ->assertDontSee($vendor->user->email);
+    $all = $this->actingAs($this->admin)->getJson(route('admin.users.data'))->assertOk()->json('data');
+
+    expect(collect($all)->pluck('name'))->toContain('Aina Zulkifli')
+        ->and(collect($all)->pluck('email'))->toContain($vendor->user->email)
+        // Impersonation is offered on the accounts that allow it, and only those.
+        ->and(collect($all)->firstWhere('email', $customer->email)['impersonate_url'])->toBe(route('admin.users.impersonate', $customer))
+        ->and(collect($all)->firstWhere('email', $this->admin->email)['impersonate_url'])->toBeNull();
+
+    $customers = $this->actingAs($this->admin)->getJson(route('admin.users.data', ['role' => 'customer']))->assertOk()->json('data');
+
+    expect(collect($customers)->pluck('email'))->toContain($customer->email)
+        ->not->toContain($vendor->user->email);
 });
 
 it('searches bookings by reference and filters by status', function () {

@@ -9,6 +9,7 @@
  */
 import { FlexRender, getCoreRowModel, useVueTable } from '@tanstack/vue-table';
 import { computed, h, onMounted, ref, watch } from 'vue';
+import UiConfirm from './UiConfirm.vue';
 
 const props = defineProps({
     /** Endpoint returning { data: [], meta: { total, per_page, current_page, last_page } }. */
@@ -20,6 +21,12 @@ const props = defineProps({
     emptyMessage: { type: String, default: 'Tiada apa-apa untuk dipaparkan buat masa ini.' },
     initialSort: { type: String, default: '' },
     perPage: { type: Number, default: 15 },
+    /**
+     * An action offered on every row that carries the url it posts to:
+     * { urlKey, label, title, message, confirmLabel, method, tone }.
+     */
+    rowAction: { type: Object, default: null },
+    csrf: { type: String, default: '' },
 });
 
 const rows = ref([]);
@@ -159,15 +166,16 @@ onMounted(load);
                             </button>
                             <span v-else>{{ header.column.columnDef.header }}</span>
                         </th>
+                        <th v-if="rowAction" scope="col" class="px-4 py-3"><span class="sr-only">Tindakan</span></th>
                     </tr>
                 </thead>
 
                 <tbody class="divide-y divide-line">
                     <tr v-if="loading && !rows.length">
-                        <td :colspan="columns.length" class="px-4 py-10 text-center text-ink-muted">Memuatkan…</td>
+                        <td :colspan="columns.length + (rowAction ? 1 : 0)" class="px-4 py-10 text-center text-ink-muted">Memuatkan…</td>
                     </tr>
                     <tr v-else-if="!rows.length">
-                        <td :colspan="columns.length" class="px-4 py-12 text-center">
+                        <td :colspan="columns.length + (rowAction ? 1 : 0)" class="px-4 py-12 text-center">
                             <p class="font-medium">{{ emptyTitle }}</p>
                             <p class="mt-1 text-ink-muted">{{ emptyMessage }}</p>
                         </td>
@@ -184,6 +192,35 @@ onMounted(load);
                             :class="['px-4 py-3 align-middle', cell.column.columnDef.meta.align === 'right' ? 'text-right' : '']"
                         >
                             <FlexRender :render="cell.column.columnDef.cell" :props="cell.getContext()" />
+                        </td>
+
+                        <td v-if="rowAction" class="px-4 py-3 text-right whitespace-nowrap" @click.stop>
+                            <!-- An inline action posts straight away; the row says what it does. -->
+                            <form v-if="rowAction.inline && row.original.action" :action="row.original.action.url" method="POST" class="inline">
+                                <input type="hidden" name="_token" :value="csrf">
+                                <input v-for="(value, field) in row.original.action.fields || {}" :key="field" type="hidden" :name="field" :value="value">
+                                <button
+                                    type="submit"
+                                    :class="[
+                                        'rounded-full px-3 py-1.5 text-xs font-semibold transition',
+                                        row.original.action.tone === 'brand'
+                                            ? 'bg-brand-600 text-white hover:bg-brand-700'
+                                            : 'border border-line font-medium hover:border-brand-400',
+                                    ]"
+                                >{{ row.original.action.label }}</button>
+                            </form>
+
+                            <UiConfirm
+                                v-else-if="!rowAction.inline && row.original[rowAction.urlKey]"
+                                :action="row.original[rowAction.urlKey]"
+                                :method="rowAction.method || 'POST'"
+                                :tone="rowAction.tone || 'brand'"
+                                :title="rowAction.title.replace('__ROW__', row.original[rowAction.labelKey] || '')"
+                                :message="rowAction.message"
+                                :confirm-label="rowAction.confirmLabel"
+                                trigger-class="rounded-full border border-line px-3 py-1.5 text-xs font-medium whitespace-nowrap transition hover:border-brand-400 hover:text-brand-700"
+                                :csrf="csrf"
+                            >{{ rowAction.label }}</UiConfirm>
                         </td>
                     </tr>
                 </tbody>

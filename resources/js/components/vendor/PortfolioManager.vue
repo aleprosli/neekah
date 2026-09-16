@@ -8,7 +8,9 @@
  * not expect to hunt for a save button.
  */
 import { computed, ref } from 'vue';
+import { useUploadForm } from '../../composables/useUploadForm.js';
 import UiField from '../ui/UiField.vue';
+import UiUploadProgress from '../ui/UiUploadProgress.vue';
 
 const props = defineProps({
     items: { type: Array, required: true },
@@ -22,6 +24,7 @@ const props = defineProps({
 
 const HERO_COUNT = 5;
 
+const { uploading, percent: uploadPercent, error: uploadError, submit: submitUpload } = useUploadForm();
 const photos = ref([...props.items]);
 const dragging = ref(null);
 const saving = ref(false);
@@ -88,10 +91,16 @@ const confirmDelete = (event) => {
 
 <template>
     <div class="flex flex-col gap-8">
-        <form :action="storeUrl" method="POST" enctype="multipart/form-data" class="flex flex-col gap-4 rounded-2xl border border-line bg-surface-raised p-6 sm:flex-row sm:items-end">
+        <form
+            :action="storeUrl"
+            method="POST"
+            enctype="multipart/form-data"
+            class="flex flex-col gap-4 rounded-2xl border border-line bg-surface-raised p-6"
+            @submit="submitUpload"
+        >
             <input type="hidden" name="_token" :value="csrf">
 
-            <label class="flex min-w-0 flex-1 flex-col gap-1.5">
+            <label class="flex min-w-0 flex-col gap-1.5">
                 <span class="text-sm font-medium">Muat naik gambar</span>
                 <input type="file" name="images[]" accept="image/jpeg,image/png,image/webp" multiple required class="text-sm file:mr-3 file:rounded-full file:border-0 file:bg-brand-50 file:px-4 file:py-2 file:text-sm file:font-medium file:text-brand-700">
                 <span class="text-xs text-ink-muted">{{ imageHint }}</span>
@@ -99,9 +108,15 @@ const confirmDelete = (event) => {
                 <span v-if="errors.images" class="text-xs text-brand-700">{{ errors.images }}</span>
             </label>
 
-            <UiField name="caption" label="Kapsyen (pilihan)" placeholder="Majlis Aina & Hakim, Alor Setar" class="sm:w-64" :error="errors.caption" />
+            <div class="flex flex-col gap-4 sm:flex-row sm:items-end">
+                <UiField name="caption" label="Kapsyen (pilihan)" placeholder="Majlis Aina & Hakim, Alor Setar" class="min-w-0 flex-1" :error="errors.caption" />
 
-            <button type="submit" class="rounded-full bg-brand-600 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700">Muat naik</button>
+                <button type="submit" class="rounded-full bg-brand-600 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700 disabled:opacity-50" :disabled="uploading">
+                    {{ uploading ? 'Memuat naik…' : 'Muat naik' }}
+                </button>
+            </div>
+
+            <UiUploadProgress :uploading="uploading" :percent="uploadPercent" :error="uploadError" />
         </form>
 
         <p v-if="!photos.length" class="rounded-2xl border border-dashed border-line p-6 text-center text-sm text-ink-muted">
