@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Support\VueProps;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -12,9 +13,26 @@ class NotificationController extends Controller
     {
         $user = $request->user();
 
+        $notifications = $user->notifications()->paginate(20);
+
+        $notifications->setCollection($notifications->getCollection()->map(fn ($notification): array => [
+            'id' => $notification->id,
+            'url' => route('notifications.show', $notification->id),
+            'icon' => $notification->data['icon'] ?? '🔔',
+            'title' => $notification->data['title'] ?? 'Notifikasi',
+            'body' => $notification->data['body'] ?? '',
+            'at' => $notification->created_at->translatedFormat('j M Y, g:i A'),
+            'unread' => $notification->unread(),
+        ]));
+
         return view('notifications.index', [
-            'notifications' => $user->notifications()->paginate(20),
-            'unreadCount' => $user->unreadNotifications()->count(),
+            'props' => VueProps::for([
+                'notifications' => $notifications->items(),
+                'unreadCount' => $user->unreadNotifications()->count(),
+                'readAllUrl' => route('notifications.read'),
+                'notice' => session('status'),
+                'pagination' => $notifications->hasPages() ? (string) $notifications->links() : '',
+            ]),
         ]);
     }
 

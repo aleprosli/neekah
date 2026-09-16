@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Support\AuthForm;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
@@ -17,7 +18,18 @@ class NewPasswordController extends Controller
 {
     public function create(Request $request, string $token): View
     {
-        return view('auth.reset-password', ['token' => $token, 'email' => $request->string('email')->toString()]);
+        return view('auth.reset-password', [
+            'props' => AuthForm::for([
+                'action' => route('password.store'),
+                'submitLabel' => 'Simpan kata laluan',
+                'hidden' => ['token' => $token],
+                'fields' => [
+                    ['name' => 'email', 'label' => 'Emel', 'type' => 'email', 'autocomplete' => 'email', 'required' => true, 'value' => old('email', $request->string('email')->toString())],
+                    ['name' => 'password', 'label' => 'Kata laluan baharu', 'type' => 'password', 'autocomplete' => 'new-password', 'help' => 'Sekurang-kurangnya 8 aksara.', 'required' => true],
+                    ['name' => 'password_confirmation', 'label' => 'Sahkan kata laluan', 'type' => 'password', 'autocomplete' => 'new-password', 'required' => true],
+                ],
+            ]),
+        ]);
     }
 
     public function store(Request $request): RedirectResponse

@@ -34,22 +34,20 @@ it('does not ask for a token while Turnstile is switched off', function () use (
 it('shows the widget on the register form once Turnstile is on', function () {
     enableTurnstile();
 
-    $this->get(route('register'))
-        ->assertSee('cf-turnstile')
-        ->assertSee('data-sitekey="site-key"', false)
-        ->assertSee('challenges.cloudflare.com/turnstile/v0/api.js');
+    // The key travels in the form's props; UiTurnstile loads Cloudflare's
+    // script itself, in the explicit mode that can draw a widget Vue added.
+    $props = $this->get(route('register'))->assertOk()->viewData('props');
+
+    expect($props['turnstileSiteKey'])->toBe('site-key');
 });
 
 it('puts the widget on the vendor register form too', function () {
     enableTurnstile();
     $this->seed(CategorySeeder::class);
 
-    $response = $this->get(route('vendor.register'))->assertOk();
+    $props = $this->get(route('vendor.register'))->assertOk()->viewData('props');
 
-    // The form is a Vue component now, so the key travels in its props and the
-    // loader script still has to be on the page for the widget to appear.
-    expect($response->viewData('props')['turnstileSiteKey'])->toBe('site-key');
-    $response->assertSee('challenges.cloudflare.com/turnstile/v0/api.js');
+    expect($props['turnstileSiteKey'])->toBe('site-key');
 });
 
 it('turns a missing token into a form error', function () use ($registration) {
@@ -59,6 +57,22 @@ it('turns a missing token into a form error', function () use ($registration) {
     $this->post(route('register'), $registration())->assertSessionHasErrors('cf-turnstile-response');
 
     Http::assertNothingSent();
+});
+
+it('renders the widget explicitly, because automatic mode never sees it', function () {
+    enableTurnstile();
+
+    // Turnstile's automatic mode scans the document once as its script loads.
+    // Every widget in this application is added by Vue after that, so the
+    // component must load the script in explicit mode and render the widget
+    // itself; automatic mode would leave the form with no token and refuse
+    // every submission.
+    $component = file_get_contents(resource_path('js/components/ui/UiTurnstile.vue'));
+
+    expect($component)->toContain('api.js?render=explicit')
+        ->toContain('turnstile.render(')
+        ->and(file_get_contents(resource_path('views/components/turnstile.blade.php')))
+        ->toContain('data-vue="ui-turnstile"');
 });
 
 it('rejects a token Cloudflare does not recognise', function () use ($registration) {

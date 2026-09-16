@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Post;
 use App\Support\Seo;
+use App\Support\VueProps;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -20,7 +21,14 @@ class BlogController extends Controller
             ->canonical(route('blog.index', $page > 1 ? ['page' => $page] : []))
             ->breadcrumbs(['Neekah' => route('vendors.index'), 'Blog' => route('blog.index')]);
 
-        return view('blog.index', ['posts' => $posts]);
+        $posts->setCollection($posts->getCollection()->map(fn (Post $post): array => $this->card($post)));
+
+        return view('blog.index', [
+            'props' => VueProps::for([
+                'posts' => $posts->items(),
+                'pagination' => $posts->hasPages() ? (string) $posts->links() : '',
+            ]),
+        ]);
     }
 
     /**
@@ -62,7 +70,43 @@ class BlogController extends Controller
 
         return view('blog.show', [
             'post' => $post,
-            'related' => Post::query()->published()->whereKeyNot($post->getKey())->latest('published_at')->orderByDesc('id')->limit(3)->get(),
+            'props' => VueProps::for([
+                'blogUrl' => route('blog.index'),
+                'post' => [
+                    'title' => $post->title,
+                    'draft' => ! $post->isPublished(),
+                    'published' => $post->published_at ? $post->localPublishedAt()->translatedFormat('j F Y') : null,
+                    'published_iso' => $post->published_at?->toAtomString(),
+                    'reading' => $post->readingMinutes(),
+                    'cover' => $post->cover_image ? $post->coverUrl() : null,
+                    // Cleaned by App\Support\HtmlSanitizer when the article was saved.
+                    'body' => $post->body,
+                ],
+                'related' => Post::query()->published()->whereKeyNot($post->getKey())->latest('published_at')->orderByDesc('id')->limit(3)->get()
+                    ->map(fn (Post $other): array => [
+                        'title' => $other->title,
+                        'url' => $other->url(),
+                        'cover' => $other->cover_image ? $other->coverThumbnailUrl() : null,
+                    ])->values(),
+            ]),
         ]);
+    }
+
+    /**
+     * One article as the listing shows it.
+     *
+     * @return array<string, mixed>
+     */
+    private function card(Post $post): array
+    {
+        return [
+            'title' => $post->title,
+            'url' => $post->url(),
+            'summary' => $post->summary(),
+            'reading' => $post->readingMinutes(),
+            'published' => $post->localPublishedAt()->translatedFormat('j F Y'),
+            'published_iso' => $post->published_at->toAtomString(),
+            'cover' => $post->cover_image ? $post->coverThumbnailUrl() : null,
+        ];
     }
 }

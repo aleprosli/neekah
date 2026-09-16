@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Actions\AcceptWeddingInvitation;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\LoginRequest;
+use App\Support\AuthForm;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -14,7 +15,24 @@ class LoginController extends Controller
 {
     public function create(): View
     {
-        return view('auth.login');
+        return view('auth.login', [
+            'props' => AuthForm::for([
+                'action' => route('login'),
+                'submitLabel' => 'Log masuk',
+                'captcha' => true,
+                'remember' => true,
+                'forgotUrl' => route('password.request'),
+                'googleUrl' => route('auth.google'),
+                'notice' => session('status'),
+                'fields' => [
+                    ['name' => 'email', 'label' => 'Emel', 'type' => 'email', 'autocomplete' => 'email', 'required' => true, 'value' => old('email')],
+                    ['name' => 'password', 'label' => 'Kata laluan', 'type' => 'password', 'autocomplete' => 'current-password', 'required' => true],
+                ],
+                'links' => [
+                    ['prefix' => 'Belum ada akaun?', 'label' => 'Daftar percuma', 'url' => route('register')],
+                ],
+            ]),
+        ]);
     }
 
     public function store(LoginRequest $request, AcceptWeddingInvitation $accept): RedirectResponse

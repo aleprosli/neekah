@@ -2,6 +2,7 @@
 /** Vendor signup: the business, then the owner's account. */
 import { computed, ref } from 'vue';
 import UiField from '../ui/UiField.vue';
+import UiTurnstile from '../ui/UiTurnstile.vue';
 import UiSelect from '../ui/UiSelect.vue';
 
 const props = defineProps({
@@ -71,10 +72,7 @@ const stateOptions = computed(() => props.states.map((state) => ({ value: state,
         </section>
 
         <div class="flex flex-col items-center gap-3">
-            <!-- Turnstile renders itself into this element once its script loads. -->
-            <div v-if="turnstileSiteKey" class="min-w-0 overflow-hidden">
-                <div class="cf-turnstile" :data-sitekey="turnstileSiteKey" data-language="ms" data-size="flexible"></div>
-            </div>
+            <UiTurnstile v-if="turnstileSiteKey" :site-key="turnstileSiteKey" />
 
             <button type="submit" class="w-full rounded-full bg-brand-600 py-3.5 text-sm font-semibold text-white transition hover:bg-brand-700 sm:w-auto sm:px-10">Daftar sebagai vendor</button>
             <p class="text-sm text-ink-muted">Sudah ada akaun? <a :href="loginUrl" class="font-medium text-brand-600 underline underline-offset-4">Log masuk</a></p>

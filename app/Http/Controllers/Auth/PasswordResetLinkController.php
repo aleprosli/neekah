@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Support\AuthForm;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -12,7 +13,19 @@ class PasswordResetLinkController extends Controller
 {
     public function create(): View
     {
-        return view('auth.forgot-password');
+        return view('auth.forgot-password', [
+            'props' => AuthForm::for([
+                'action' => route('password.email'),
+                'submitLabel' => 'Hantar pautan',
+                'notice' => session('status'),
+                'fields' => [
+                    ['name' => 'email', 'label' => 'Emel', 'type' => 'email', 'autocomplete' => 'email', 'required' => true, 'value' => old('email')],
+                ],
+                'links' => [
+                    ['prefix' => 'Ingat kata laluan anda?', 'label' => 'Log masuk', 'url' => route('login')],
+                ],
+            ]),
+        ]);
     }
 
     /**
