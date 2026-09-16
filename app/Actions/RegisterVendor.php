@@ -5,8 +5,10 @@ namespace App\Actions;
 use App\Enums\UserRole;
 use App\Enums\VendorStatus;
 use App\Enums\VendorTier;
+use App\Jobs\SendTelegramAlert;
 use App\Models\User;
 use App\Models\Vendor;
+use App\Notifications\VendorRegistered;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -19,7 +21,7 @@ class RegisterVendor
      */
     public function handle(array $data): Vendor
     {
-        return DB::transaction(function () use ($data): Vendor {
+        $vendor = DB::transaction(function () use ($data): Vendor {
             $owner = User::create([
                 'name' => $data['name'],
                 'email' => $data['email'],
@@ -42,6 +44,21 @@ class RegisterVendor
                 'tier' => VendorTier::New,
             ]);
         });
+
+        $vendor->user->notify(new VendorRegistered($vendor));
+
+        SendTelegramAlert::about('🏪 <b>New vendor has been registered</b>', [
+            'Perniagaan' => $vendor->name,
+            'Kategori' => $vendor->category->name,
+            'Lokasi' => $vendor->city.', '.$vendor->state,
+            'Nama' => $vendor->user->name,
+            'Emel' => $vendor->user->email,
+            'Telefon' => $vendor->phone,
+            'WhatsApp' => $vendor->whatsappUrl(),
+            'Profil' => route('admin.vendors.show', $vendor),
+        ]);
+
+        return $vendor;
     }
 
     private function uniqueSlug(string $name): string

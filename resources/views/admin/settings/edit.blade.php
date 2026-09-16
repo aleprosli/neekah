@@ -3,11 +3,12 @@
         'perhubungan' => ['label' => 'Perhubungan', 'icon' => '📞'],
         'seo' => ['label' => 'SEO', 'icon' => '🔍'],
         'keselamatan' => ['label' => 'Keselamatan', 'icon' => '🛡️'],
+        'telegram' => ['label' => 'Telegram', 'icon' => '📣'],
         'gambar' => ['label' => 'Gambar', 'icon' => '🖼️'],
     ];
 @endphp
 
-<x-layouts.admin title="Tetapan" heading="Tetapan" subheading="Maklumat perhubungan, SEO, keselamatan borang dan pemprosesan gambar untuk seluruh laman.">
+<x-layouts.admin title="Tetapan" heading="Tetapan" subheading="Maklumat perhubungan, SEO, keselamatan borang, makluman Telegram dan pemprosesan gambar untuk seluruh laman.">
     <div class="flex max-w-3xl min-w-0 flex-col gap-6">
         {{-- A scrollable row of jump links on a phone, a plain row on a laptop. --}}
         <nav class="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4 sm:mx-0 sm:flex-wrap sm:px-0" aria-label="Bahagian tetapan">
@@ -78,7 +79,7 @@
                     {{ $turnstileActive ? 'Aktif' : 'Tidak aktif' }}
                 </span>
             </div>
-            <p class="mt-1 text-sm text-ink-muted">Semakan tanpa teka-teki pada borang pendaftaran pengantin dan vendor. Dapatkan kunci di dash.cloudflare.com → Turnstile.</p>
+            <p class="mt-1 text-sm text-ink-muted">Semakan tanpa teka-teki pada borang log masuk, pendaftaran pengantin dan vendor, serta borang tempahan. Dapatkan kunci di dash.cloudflare.com → Turnstile.</p>
 
             <form method="POST" action="{{ route('admin.settings.turnstile') }}" class="mt-5 flex flex-col gap-4">
                 @csrf
@@ -98,6 +99,37 @@
 
                 <div>
                     <button type="submit" class="w-full rounded-full bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700 sm:w-auto">Simpan tetapan Turnstile</button>
+                </div>
+            </form>
+        </section>
+
+        <section id="telegram" class="scroll-mt-28 rounded-2xl border border-line bg-surface-raised p-5 sm:p-6">
+            <div class="flex flex-wrap items-start justify-between gap-2">
+                <h2 class="font-semibold">Makluman Telegram</h2>
+                <span @class(['rounded-full px-3 py-1 text-xs font-medium', 'bg-emerald-100 text-emerald-800' => $telegramActive, 'bg-surface-muted text-ink-muted' => ! $telegramActive])>
+                    {{ $telegramActive ? 'Aktif' : 'Tidak aktif' }}
+                </span>
+            </div>
+            <p class="mt-1 text-sm text-ink-muted">Setiap pendaftaran vendor dan pengantin dihantar ke chat admin, lengkap dengan emel dan pautan WhatsApp lead itu. Cipta bot dengan @BotFather, kemudian ambil chat id chat atau kumpulan admin.</p>
+
+            <form method="POST" action="{{ route('admin.settings.telegram') }}" class="mt-5 flex flex-col gap-4">
+                @csrf
+                @method('PUT')
+
+                <label class="flex items-start gap-3">
+                    <input type="hidden" name="enabled" value="0">
+                    <input type="checkbox" name="enabled" value="1" class="mt-1 accent-brand-600" @checked(old('enabled', $telegram['enabled']))>
+                    <span>
+                        <span class="text-sm font-medium">Hantar makluman ke Telegram</span>
+                        <span class="block text-xs text-ink-muted">Dihantar melalui queue, jadi pendaftaran tidak pernah menunggu Telegram.</span>
+                    </span>
+                </label>
+
+                <x-form.field label="Bot token" name="bot_token" type="password" placeholder="{{ $telegram['bot_token'] ? 'Tersimpan — biarkan kosong untuk kekalkan' : '123456:ABC-DEF...' }}" autocomplete="off" help="Tidak pernah dipaparkan semula selepas disimpan." />
+                <x-form.field label="Chat id" name="chat_id" :value="$telegram['chat_id']" placeholder="-1001234567890" autocomplete="off" help="Chat peribadi admin atau kumpulan. Kumpulan bermula dengan tanda tolak." />
+
+                <div>
+                    <button type="submit" class="w-full rounded-full bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700 sm:w-auto">Simpan tetapan Telegram</button>
                 </div>
             </form>
         </section>

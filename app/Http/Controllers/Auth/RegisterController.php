@@ -6,6 +6,7 @@ use App\Actions\AcceptWeddingInvitation;
 use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\RegisterRequest;
+use App\Jobs\SendTelegramAlert;
 use App\Models\User;
 use App\Models\WeddingInvitation;
 use Illuminate\Contracts\View\View;
@@ -31,6 +32,13 @@ class RegisterController extends Controller
 
         Auth::login($user);
         $request->session()->regenerate();
+
+        SendTelegramAlert::about('💍 <b>New user has been registered</b>', [
+            'Nama' => $user->name,
+            'Emel' => $user->email,
+            'Telefon' => $user->phone,
+            'WhatsApp' => $user->whatsappUrl(),
+        ]);
 
         if ($invitation = $accept->fromSession($user)) {
             return redirect()

@@ -12,6 +12,8 @@
             <a href="{{ route('password.request') }}" class="font-medium text-brand-600 underline underline-offset-4">Lupa kata laluan?</a>
         </div>
 
+        <x-turnstile />
+
         <button type="submit" class="rounded-full bg-brand-600 py-3 text-sm font-semibold text-white transition hover:bg-brand-700">Log masuk</button>
     </form>
 

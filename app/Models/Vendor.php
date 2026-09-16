@@ -6,6 +6,7 @@ use App\Enums\BookingStatus;
 use App\Enums\PriceUnit;
 use App\Enums\VendorStatus;
 use App\Enums\VendorTier;
+use App\Support\PhoneNumber;
 use Database\Factories\VendorFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Scope;
@@ -102,6 +103,22 @@ class Vendor extends Model
     public function points(): HasMany
     {
         return $this->hasMany(VendorPoint::class);
+    }
+
+    /**
+     * The vendor's own WhatsApp link, for a couple who would rather talk before
+     * they book. Falls back to the phone number, which is what registration
+     * seeds whatsapp with anyway.
+     */
+    public function whatsappUrl(?string $message = null): ?string
+    {
+        $number = PhoneNumber::normalise($this->whatsapp ?: $this->phone);
+
+        if (! $number) {
+            return null;
+        }
+
+        return 'https://wa.me/'.$number.($message ? '?text='.rawurlencode($message) : '');
     }
 
     /**

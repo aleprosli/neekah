@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Actions\AcceptWeddingInvitation;
 use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
+use App\Jobs\SendTelegramAlert;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
@@ -59,6 +60,13 @@ class GoogleController extends Controller
             ]);
 
             $user->forceFill(['email_verified_at' => now()])->save();
+
+            SendTelegramAlert::about('💍 <b>New user has been registered</b>', [
+                'Nama' => $user->name,
+                'Emel' => $user->email,
+                'Telefon' => $user->phone,
+                'WhatsApp' => $user->whatsappUrl(),
+            ]);
         }
 
         Auth::login($user, true);

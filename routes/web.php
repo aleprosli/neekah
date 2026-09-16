@@ -181,5 +181,6 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::put('/settings', [AdminArea\SettingController::class, 'update'])->name('settings.update');
     Route::put('/settings/contact', [AdminArea\SettingController::class, 'updateContact'])->name('settings.contact');
     Route::put('/settings/seo', [AdminArea\SettingController::class, 'updateSeo'])->name('settings.seo');
+    Route::put('/settings/telegram', [AdminArea\SettingController::class, 'updateTelegram'])->name('settings.telegram');
     Route::put('/settings/turnstile', [AdminArea\SettingController::class, 'updateTurnstile'])->name('settings.turnstile');
 });

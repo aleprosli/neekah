@@ -107,6 +107,21 @@ it('shows a vendor profile with packages, reviews and related vendors', function
         ->assertSee('Log masuk untuk tempah');
 });
 
+it('offers the vendor\'s own WhatsApp and phone beside the booking form', function () {
+    $vendor = Vendor::factory()->for($this->photography)->create([
+        'name' => 'ABC Wedding Photography',
+        'phone' => '012-345 6789',
+        'whatsapp' => '012-345 6789',
+    ]);
+    Package::factory()->for($vendor)->create();
+
+    $this->get(route('vendors.show', $vendor))
+        ->assertOk()
+        ->assertSee('WhatsApp vendor')
+        ->assertSee('https://wa.me/60123456789', false)
+        ->assertSee('012-345 6789');
+});
+
 it('returns 404 for unknown or unapproved vendors', function () {
     $pending = Vendor::factory()->pending()->for($this->photography)->create();
 

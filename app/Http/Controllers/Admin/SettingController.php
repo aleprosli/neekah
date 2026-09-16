@@ -6,19 +6,23 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\UpdateContactSettingsRequest;
 use App\Http\Requests\UpdateImageSettingsRequest;
 use App\Http\Requests\UpdateSeoSettingsRequest;
+use App\Http\Requests\UpdateTelegramSettingsRequest;
 use App\Http\Requests\UpdateTurnstileSettingsRequest;
 use App\Support\ContactSettings;
 use App\Support\ImageSettings;
 use App\Support\SeoSettings;
+use App\Support\TelegramSettings;
 use App\Support\TurnstileSettings;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 
 class SettingController extends Controller
 {
-    public function edit(ContactSettings $contact, SeoSettings $seo, TurnstileSettings $turnstile, ImageSettings $images): View
+    public function edit(ContactSettings $contact, SeoSettings $seo, TurnstileSettings $turnstile, TelegramSettings $telegram, ImageSettings $images): View
     {
         return view('admin.settings.edit', [
+            'telegram' => $telegram->all(),
+            'telegramActive' => $telegram->isEnabled(),
             'contact' => $contact->all(),
             'seo' => $seo->all(),
             'turnstile' => $turnstile->all(),
@@ -47,6 +51,13 @@ class SettingController extends Controller
         $turnstile->save($request->settings());
 
         return $this->saved('Tetapan Turnstile disimpan.');
+    }
+
+    public function updateTelegram(UpdateTelegramSettingsRequest $request, TelegramSettings $telegram): RedirectResponse
+    {
+        $telegram->save($request->settings());
+
+        return $this->saved('Tetapan Telegram disimpan.');
     }
 
     public function update(UpdateImageSettingsRequest $request, ImageSettings $images): RedirectResponse

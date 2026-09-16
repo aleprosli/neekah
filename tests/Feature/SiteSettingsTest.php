@@ -3,6 +3,7 @@
 use App\Models\User;
 use App\Support\ContactSettings;
 use App\Support\SeoSettings;
+use App\Support\TelegramSettings;
 use App\Support\TurnstileSettings;
 
 it('shows every settings section on one page', function () {
@@ -12,6 +13,7 @@ it('shows every settings section on one page', function () {
         ->assertSee('Maklumat perhubungan')
         ->assertSee('SEO dan pratonton pautan')
         ->assertSee('Cloudflare Turnstile')
+        ->assertSee('Makluman Telegram')
         ->assertSee('Gambar');
 });
 
@@ -75,6 +77,23 @@ it('keeps the saved Turnstile secret when the field is left blank', function () 
     expect($turnstile->secretKey())->toBe('secret-key')
         ->and($turnstile->siteKey())->toBe('site-key-2')
         ->and($turnstile->isEnabled())->toBeTrue();
+});
+
+it('keeps the saved Telegram bot token when the field is left blank', function () {
+    $admin = User::factory()->admin()->create();
+
+    $this->actingAs($admin)
+        ->put(route('admin.settings.telegram'), ['enabled' => '1', 'bot_token' => 'bot-token', 'chat_id' => '-100123'])
+        ->assertSessionHasNoErrors();
+
+    $this->actingAs($admin)
+        ->put(route('admin.settings.telegram'), ['enabled' => '1', 'bot_token' => '', 'chat_id' => '-100999'])
+        ->assertSessionHasNoErrors();
+
+    $telegram = app(TelegramSettings::class);
+    expect($telegram->botToken())->toBe('bot-token')
+        ->and($telegram->chatId())->toBe('-100999')
+        ->and($telegram->isEnabled())->toBeTrue();
 });
 
 it('keeps settings away from anyone who is not an admin', function () {

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\UserRole;
+use App\Support\PhoneNumber;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
@@ -97,6 +98,16 @@ class User extends Authenticatable
     public function canBeImpersonated(): bool
     {
         return ! $this->isAdmin();
+    }
+
+    /**
+     * A wa.me link for the number this user signed up with, if they gave one.
+     */
+    public function whatsappUrl(): ?string
+    {
+        $number = PhoneNumber::normalise($this->phone);
+
+        return $number ? 'https://wa.me/'.$number : null;
     }
 
     /**

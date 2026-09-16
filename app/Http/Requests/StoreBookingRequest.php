@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use App\Models\Package;
 use App\Models\Vendor;
+use App\Rules\Turnstile;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator;
@@ -28,6 +29,7 @@ class StoreBookingRequest extends FormRequest
             'event_date' => ['required', 'date', 'after:today'],
             'wedding_id' => ['nullable', Rule::in($this->user()->weddings()->pluck('weddings.id'))],
             'notes' => ['nullable', 'string', 'max:500'],
+            'cf-turnstile-response' => [app(Turnstile::class)],
         ];
     }
 

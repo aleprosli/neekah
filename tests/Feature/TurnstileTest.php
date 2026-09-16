@@ -1,6 +1,12 @@
 <?php
 
+use App\Models\Booking;
+use App\Models\Category;
+use App\Models\Package;
+use App\Models\User;
+use App\Models\Vendor;
 use App\Support\TurnstileSettings;
+use Database\Seeders\CategorySeeder;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
 
@@ -67,4 +73,40 @@ it('lets the form through when Cloudflare cannot be reached', function () use ($
 
     $this->post(route('register'), $registration(['cf-turnstile-response' => 'any-token']))
         ->assertSessionHasNoErrors();
+});
+
+it('guards the login form as well', function () {
+    enableTurnstile();
+    $user = User::factory()->create();
+    Http::fake([TurnstileSettings::VERIFY_URL => Http::response(['success' => true])]);
+
+    $this->post(route('login'), ['email' => $user->email, 'password' => 'password'])
+        ->assertSessionHasErrors('cf-turnstile-response');
+
+    $this->assertGuest();
+
+    $this->post(route('login'), ['email' => $user->email, 'password' => 'password', 'cf-turnstile-response' => 'good-token'])
+        ->assertSessionHasNoErrors();
+
+    $this->assertAuthenticatedAs($user);
+});
+
+it('guards the booking form on a vendor page', function () {
+    $this->seed(CategorySeeder::class);
+    $customer = User::factory()->create();
+    $vendor = Vendor::factory()->for(Category::first())->create();
+    $package = Package::factory()->for($vendor)->create();
+
+    enableTurnstile();
+    Http::fake([TurnstileSettings::VERIFY_URL => Http::response(['success' => false])]);
+
+    $this->actingAs($customer)
+        ->post(route('vendors.bookings.store', $vendor), [
+            'package_id' => $package->id,
+            'event_date' => now()->addMonths(3)->toDateString(),
+            'cf-turnstile-response' => 'bad-token',
+        ])
+        ->assertSessionHasErrors('cf-turnstile-response');
+
+    expect(Booking::count())->toBe(0);
 });

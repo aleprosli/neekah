@@ -166,9 +166,25 @@
                         </label>
                     </div>
 
+                    <x-turnstile />
+
                     <button type="submit" class="rounded-full bg-brand-600 py-3.5 text-sm font-semibold text-white transition hover:bg-brand-700 disabled:opacity-50" @disabled($vendor->packages->isEmpty())>
                         {{ auth()->check() ? 'Tempah sekarang' : 'Log masuk untuk tempah' }}
                     </button>
+
+                    @if ($whatsapp = $vendor->whatsappUrl('Hai '.$vendor->name.', saya jumpa anda di Neekah. Boleh saya tanya tentang pakej untuk majlis saya?'))
+                        {{-- Some couples want to talk before they book. Let them, then bring the deal back here. --}}
+                        <a href="{{ $whatsapp }}" target="_blank" rel="noopener" class="flex items-center justify-center gap-2 rounded-full border border-brand-600 py-3.5 text-sm font-semibold text-brand-700 transition hover:bg-brand-50">
+                            <span aria-hidden="true">💬</span> WhatsApp vendor
+                        </a>
+                    @endif
+
+                    @if ($vendor->phone)
+                        <p class="text-center text-sm text-ink-muted">
+                            Atau hubungi terus di <a href="tel:{{ preg_replace('/[^0-9+]/', '', $vendor->phone) }}" class="font-medium text-ink underline underline-offset-4">{{ $vendor->phone }}</a>
+                        </p>
+                    @endif
+
                     <p class="text-center text-sm text-ink-muted">Anda belum dicaj lagi. Deposit dibayar selepas booking dibuat.</p>
 
                     <dl class="flex flex-col gap-2 text-sm">
