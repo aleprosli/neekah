@@ -2,7 +2,9 @@
 
 use App\Jobs\SendTelegramAlert;
 use App\Models\Category;
+use App\Models\User;
 use App\Models\Vendor;
+use App\Notifications\CustomerRegistered;
 use App\Notifications\VendorRegistered;
 use App\Support\ContactSettings;
 use App\Support\TelegramSettings;
@@ -65,6 +67,27 @@ it('tells the admin Telegram chat about a new vendor, with a WhatsApp link', fun
             && str_contains($text, 'New vendor has been registered')
             && str_contains($text, 'https://wa.me/60123456789')
             && str_contains($text, 'abc@example.com');
+    });
+});
+
+it('welcomes a new couple by email', function () {
+    Notification::fake();
+    app(ContactSettings::class)->save(['email' => 'hello@neekah.my']);
+
+    $this->post(route('register'), [
+        'name' => 'Aina',
+        'email' => 'aina@example.com',
+        'password' => 'kata-laluan-kuat',
+        'password_confirmation' => 'kata-laluan-kuat',
+    ])->assertSessionHasNoErrors();
+
+    $user = User::where('email', 'aina@example.com')->sole();
+
+    Notification::assertSentTo($user, CustomerRegistered::class, function (CustomerRegistered $notification) use ($user) {
+        $mail = $notification->toMail($user);
+
+        return $mail->subject === 'Selamat datang ke Neekah'
+            && str_contains(implode(' ', $mail->outroLines), 'hello@neekah.my');
     });
 });
 

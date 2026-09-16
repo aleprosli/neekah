@@ -48,6 +48,20 @@ class ContactSettings extends SettingGroup
     }
 
     /**
+     * One sentence telling someone how to reach us, using whatever the admin
+     * has filled in. Falls back to the site address, so an email never ends
+     * without a way back to us.
+     */
+    public function supportSentence(): string
+    {
+        $channels = array_filter([$this->email() ?: null, $this->phone() ?: null, $this->whatsappUrl()]);
+
+        return $channels === []
+            ? 'Ada sebarang pertanyaan? Hubungi kami melalui '.config('app.url').'.'
+            : 'Ada sebarang pertanyaan? Hubungi kami di '.implode(' · ', $channels).'.';
+    }
+
+    /**
      * Every social account that has been filled in, ready to render.
      *
      * @return array<int, array{label: string, url: string}>

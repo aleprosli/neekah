@@ -9,6 +9,7 @@ use App\Http\Requests\RegisterRequest;
 use App\Jobs\SendTelegramAlert;
 use App\Models\User;
 use App\Models\WeddingInvitation;
+use App\Notifications\CustomerRegistered;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -32,6 +33,8 @@ class RegisterController extends Controller
 
         Auth::login($user);
         $request->session()->regenerate();
+
+        $user->notify(new CustomerRegistered);
 
         SendTelegramAlert::about('💍 <b>New user has been registered</b>', [
             'Nama' => $user->name,

@@ -7,6 +7,7 @@ use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
 use App\Jobs\SendTelegramAlert;
 use App\Models\User;
+use App\Notifications\CustomerRegistered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
@@ -60,6 +61,8 @@ class GoogleController extends Controller
             ]);
 
             $user->forceFill(['email_verified_at' => now()])->save();
+
+            $user->notify(new CustomerRegistered);
 
             SendTelegramAlert::about('💍 <b>New user has been registered</b>', [
                 'Nama' => $user->name,

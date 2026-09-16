@@ -41,38 +41,15 @@ class VendorRegistered extends Notification
 
     public function toMail(object $notifiable): MailMessage
     {
-        $contact = app(ContactSettings::class);
-
         $message = (new MailMessage)
             ->subject('Terima kasih kerana mendaftar dengan Neekah')
             ->greeting('Terima kasih, '.$notifiable->name.'!')
             ->line('Permohonan '.$this->vendor->name.' telah kami terima dan kini menunggu semakan admin.')
             ->line('Sementara menunggu, lengkapkan profil, pakej dan portfolio anda. Profil yang lengkap disemak dengan lebih cepat dan muncul lebih tinggi dalam carian pengantin.')
             ->action('Lengkapkan profil', route('vendor.profile.edit'))
-            ->line('Kami akan emel anda sebaik sahaja permohonan diluluskan.');
-
-        foreach ($this->supportLines($contact) as $line) {
-            $message->line($line);
-        }
+            ->line('Kami akan emel anda sebaik sahaja permohonan diluluskan.')
+            ->line(app(ContactSettings::class)->supportSentence());
 
         return $message->salutation('Terima kasih, Neekah');
-    }
-
-    /**
-     * How to reach us, using whatever the admin has filled in under Tetapan.
-     *
-     * @return array<int, string>
-     */
-    private function supportLines(ContactSettings $contact): array
-    {
-        $channels = array_filter([
-            $contact->email() ?: null,
-            $contact->phone() ?: null,
-            $contact->whatsappUrl(),
-        ]);
-
-        return $channels === []
-            ? ['Ada sebarang pertanyaan? Hubungi kami melalui '.config('app.url').'.']
-            : ['Ada sebarang pertanyaan? Hubungi kami di '.implode(' · ', $channels).'.'];
     }
 }
