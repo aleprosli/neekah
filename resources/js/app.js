@@ -249,3 +249,93 @@ document.addEventListener('click', async (event) => {
         reveals.forEach((node) => node.classList.add('is-visible'));
     }
 })();
+
+/**
+ * Package contents repeater on the vendor package form: one input per item,
+ * with add, remove, Enter to continue and drag to reorder. Rows are cloned
+ * from the first one, so the markup lives in the Blade view only.
+ */
+(() => {
+    const list = document.querySelector('[data-feature-list]');
+    if (!list) {
+        return;
+    }
+
+    const items = list.querySelector('[data-feature-items]');
+    const blank = items.querySelector('[data-feature-item]').cloneNode(true);
+    blank.querySelector('input').value = '';
+
+    const refresh = () => {
+        const rows = items.querySelectorAll('[data-feature-item]');
+        list.querySelector('[data-feature-count]').textContent = rows.length;
+        // The last row cannot go: an empty list would leave nothing to submit.
+        rows.forEach((row) => (row.querySelector('[data-feature-remove]').disabled = rows.length === 1));
+    };
+
+    const addRow = (after = null) => {
+        const row = blank.cloneNode(true);
+        after ? after.after(row) : items.append(row);
+        row.querySelector('input').focus();
+        refresh();
+    };
+
+    list.querySelector('[data-feature-add]').addEventListener('click', () => addRow());
+
+    items.addEventListener('click', (event) => {
+        const remove = event.target.closest('[data-feature-remove]');
+        if (!remove || items.querySelectorAll('[data-feature-item]').length === 1) {
+            return;
+        }
+
+        remove.closest('[data-feature-item]').remove();
+        refresh();
+    });
+
+    items.addEventListener('keydown', (event) => {
+        if (event.key !== 'Enter' || !event.target.matches('input')) {
+            return;
+        }
+
+        event.preventDefault();
+        addRow(event.target.closest('[data-feature-item]'));
+    });
+
+    // Drag to reorder. The handle turns its row draggable only while held, so
+    // text selection inside the inputs keeps working.
+    let dragging = null;
+
+    items.addEventListener('pointerdown', (event) => {
+        const handle = event.target.closest('[data-feature-handle]');
+        if (handle) {
+            handle.closest('[data-feature-item]').draggable = true;
+        }
+    });
+
+    items.addEventListener('dragstart', (event) => {
+        dragging = event.target.closest('[data-feature-item]');
+        dragging.classList.add('opacity-50');
+    });
+
+    items.addEventListener('dragover', (event) => {
+        if (!dragging) {
+            return;
+        }
+
+        event.preventDefault();
+        const over = event.target.closest('[data-feature-item]');
+        if (!over || over === dragging) {
+            return;
+        }
+
+        const after = over.getBoundingClientRect().top + over.offsetHeight / 2 < event.clientY;
+        after ? over.after(dragging) : over.before(dragging);
+    });
+
+    items.addEventListener('dragend', () => {
+        dragging.classList.remove('opacity-50');
+        dragging.draggable = false;
+        dragging = null;
+    });
+
+    refresh();
+})();

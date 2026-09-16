@@ -16,6 +16,16 @@ class StorePackageRequest extends FormRequest
     }
 
     /**
+     * The form posts one input per item; older clients post one item per line.
+     */
+    protected function prepareForValidation(): void
+    {
+        if (is_array($features = $this->input('features'))) {
+            $this->merge(['features' => implode(PHP_EOL, array_filter($features, 'is_string'))]);
+        }
+    }
+
+    /**
      * @return array<string, array<int, mixed>>
      */
     public function rules(): array

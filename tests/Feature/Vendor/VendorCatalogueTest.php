@@ -14,6 +14,19 @@ beforeEach(function () {
     $this->vendor = Vendor::factory()->for(Category::first())->create(['price_from' => 9999]);
 });
 
+it('accepts package contents as one field per item', function () {
+    $this->actingAs($this->vendor->user)
+        ->post(route('vendor.packages.store'), [
+            'name' => 'Premium Package',
+            'price' => 2500,
+            'features' => ['2 photographers', '  ', 'Highlight video'],
+            'is_active' => 1,
+        ])
+        ->assertRedirect(route('vendor.packages.index'));
+
+    expect(Package::sole()->features)->toBe(['2 photographers', 'Highlight video']);
+});
+
 it('creates, updates and deletes packages and syncs the starting price', function () {
     $this->actingAs($this->vendor->user)
         ->post(route('vendor.packages.store'), [
