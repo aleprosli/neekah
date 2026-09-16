@@ -18,7 +18,7 @@ class BookingController extends Controller
         ['key' => 'event_date', 'label' => 'Majlis', 'sortable' => true],
         ['key' => 'vendor', 'label' => 'Vendor'],
         ['key' => 'customer', 'label' => 'Pengantin'],
-        ['key' => 'total', 'label' => 'Jumlah', 'sortable' => true, 'align' => 'right'],
+        ['key' => 'total', 'label' => 'Jumlah', 'sort' => 'total_amount', 'sortable' => true, 'align' => 'right'],
         ['key' => 'paid', 'label' => 'Dibayar', 'align' => 'right'],
         ['key' => 'status', 'label' => 'Status', 'type' => 'html'],
     ];
@@ -39,7 +39,7 @@ class BookingController extends Controller
     public function data(Request $request): JsonResponse
     {
         $status = BookingStatus::tryFrom($request->string('status')->toString());
-        $sort = in_array($request->string('sort')->toString(), ['reference', 'event_date', 'total'], true)
+        $sort = in_array($request->string('sort')->toString(), ['reference', 'event_date', 'total_amount'], true)
             ? $request->string('sort')->toString()
             : 'id';
         $direction = $request->string('direction')->toString() === 'asc' ? 'asc' : 'desc';
@@ -64,7 +64,7 @@ class BookingController extends Controller
                 'event_date' => $booking->event_date->translatedFormat('j M Y'),
                 'vendor' => $booking->vendor->name,
                 'customer' => $booking->user->name,
-                'total' => 'RM'.number_format((float) $booking->total, 2),
+                'total' => 'RM'.number_format((float) $booking->total_amount, 2),
                 'paid' => 'RM'.number_format((float) $booking->payments->where('status', PaymentStatus::Paid)->sum('amount'), 2),
                 'status' => view('components.booking-status', ['status' => $booking->status])->render(),
             ])->all(),

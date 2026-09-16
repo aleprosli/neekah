@@ -48,7 +48,13 @@ it('lets a vendor record a booking for a registered customer', function () {
         ->json('data');
 
     expect($rows[0]['customer'])->toBe($this->customer->name)
-        ->and($rows[0]['url'])->toBe(route('vendor.bookings.show', $booking));
+        ->and($rows[0]['url'])->toBe(route('vendor.bookings.show', $booking))
+        // The money column reads total_amount; "total" is not a column at all.
+        ->and($rows[0]['total'])->toBe('RM3,000.00');
+
+    $this->actingAs($this->vendor->user)
+        ->getJson(route('vendor.bookings.data', ['sort' => 'total_amount', 'direction' => 'asc']))
+        ->assertOk();
 });
 
 it('rejects a booking for an unknown customer email', function () {

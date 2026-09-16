@@ -31,20 +31,20 @@ it('shows revenue and completed majlis by month', function () {
         ]);
     }
 
-    $this->actingAs($this->owner)->get(route('vendor.points.index'))
-        ->assertOk()
-        ->assertSee('RM4,000')
-        ->assertSee('Pendapatan mengikut bulan')
-        ->assertSee('Majlis selesai');
+    $props = $this->actingAs($this->owner)->get(route('vendor.points.index'))->assertOk()->viewData('props');
+
+    expect(collect($props['periodStats'])->firstWhere('label', 'Pendapatan')['value'])->toBe('RM4,000')
+        ->and(collect($props['charts']['revenue'])->sum('value'))->toBe(4000.0)
+        ->and(collect($props['charts']['completed'])->sum('value'))->toBe(2.0);
 });
 
 it('reports enquiries received against enquiries replied', function () {
     Enquiry::factory()->count(3)->for($this->vendor)->create(['created_at' => now()->subDays(3), 'replied_at' => now()->subDays(2)]);
     Enquiry::factory()->count(1)->for($this->vendor)->create(['created_at' => now()->subDays(3), 'replied_at' => null]);
 
-    $this->actingAs($this->owner)->get(route('vendor.points.index'))
-        ->assertOk()
-        ->assertSee('3 / 4');
+    $props = $this->actingAs($this->owner)->get(route('vendor.points.index'))->assertOk()->viewData('props');
+
+    expect(collect($props['periodStats'])->firstWhere('label', 'Enquiry dibalas')['value'])->toBe('3 / 4');
 });
 
 it('says a response rate is not measured yet instead of claiming one hundred percent', function (RecalculateVendorStats $recalculate) {
@@ -56,7 +56,9 @@ it('says a response rate is not measured yet instead of claiming one hundred per
     expect($this->vendor->fresh()->response_rate)->toBeNull()
         ->and($this->vendor->fresh()->responseRateLabel())->toBe('Belum diukur');
 
-    $this->actingAs($this->owner)->get(route('vendor.points.index'))->assertOk()->assertSee('Belum diukur');
+    $props = $this->actingAs($this->owner)->get(route('vendor.points.index'))->assertOk()->viewData('props');
+
+    expect(collect($props['stats'])->firstWhere('label', 'Response rate')['value'])->toBe('Belum diukur');
 })->with([fn () => app(RecalculateVendorStats::class)]);
 
 it('measures the response rate once there are enough enquiries to judge', function () {
@@ -88,9 +90,11 @@ it('no longer lets an admin type a response rate in by hand', function () {
 });
 
 it('lets the points table scroll rather than clipping the vendor own totals', function () {
-    $response = $this->actingAs($this->owner)->get(route('vendor.points.index'))->assertOk();
+    $this->actingAs($this->owner)->get(route('vendor.points.index'))->assertOk();
 
     // The wrapper used to be overflow-hidden, which cut the right-hand column
-    // off on a phone with no way to scroll it back into view.
-    expect($response->getContent())->toMatch('/<div class="overflow-x-auto[^"]*">\s*<table/');
+    // off on a phone with no way to scroll it back into view. The table now
+    // lives in the Vue component, so that is where the guarantee is checked.
+    expect(file_get_contents(resource_path('js/components/vendor/VendorPointsPage.vue')))
+        ->toMatch('/<div class="overflow-x-auto[^"]*">\s*<table/');
 });

@@ -8,6 +8,8 @@ use App\Http\Requests\RegisterVendorRequest;
 use App\Models\Category;
 use App\Models\Vendor;
 use App\Support\Seo;
+use App\Support\TurnstileSettings;
+use App\Support\VueProps;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
@@ -19,9 +21,17 @@ class RegisterController extends Controller
         $seo->title('Daftar sebagai vendor perkahwinan')
             ->description('Sertai Neekah dan terima tempahan daripada pasangan di seluruh Malaysia. Profil percuma, bayaran direkod dalam platform, ranking ikut prestasi sebenar.');
 
+        $turnstile = app(TurnstileSettings::class);
+
         return view('vendor.register', [
-            'categories' => Category::active()->ordered()->get(),
-            'states' => Vendor::STATES,
+            'props' => VueProps::for([
+                'action' => route('vendor.register'),
+                'loginUrl' => route('login'),
+                'categories' => Category::active()->ordered()->get(['id', 'name', 'icon']),
+                'states' => Vendor::STATES,
+                'old' => old(),
+                'turnstileSiteKey' => $turnstile->isEnabled() ? $turnstile->siteKey() : null,
+            ]),
         ]);
     }
 

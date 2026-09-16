@@ -80,11 +80,14 @@ const load = async () => {
     }
 };
 
+/** A column may sort by a different database column than the one it shows. */
+const sortKey = (column) => column.sort || column.key;
+
 const sortBy = (column) => {
     if (!column.sortable) return;
 
-    direction.value = sort.value === column.key && direction.value === 'asc' ? 'desc' : 'asc';
-    sort.value = column.key;
+    direction.value = sort.value === sortKey(column) && direction.value === 'asc' ? 'desc' : 'asc';
+    sort.value = sortKey(column);
     page.value = 1;
     load();
 };
@@ -152,7 +155,7 @@ onMounted(load);
                                 @click="sortBy(header.column.columnDef.meta)"
                             >
                                 {{ header.column.columnDef.header }}
-                                <span aria-hidden="true" class="text-[10px]">{{ sort === header.column.columnDef.meta.key ? (direction === 'asc' ? '▲' : '▼') : '↕' }}</span>
+                                <span aria-hidden="true" class="text-[10px]">{{ sort === sortKey(header.column.columnDef.meta) ? (direction === 'asc' ? '▲' : '▼') : '↕' }}</span>
                             </button>
                             <span v-else>{{ header.column.columnDef.header }}</span>
                         </th>

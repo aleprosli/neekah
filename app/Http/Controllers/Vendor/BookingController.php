@@ -5,10 +5,14 @@ namespace App\Http\Controllers\Vendor;
 use App\Actions\CreateBooking;
 use App\Enums\BookingStatus;
 use App\Enums\PaymentStatus;
+use App\Enums\PaymentType;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreVendorBookingRequest;
 use App\Models\Booking;
 use App\Models\Package;
+use App\Models\Payment;
+use App\Models\WeddingTimelineItem;
+use App\Support\VueProps;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -22,7 +26,7 @@ class BookingController extends Controller
         ['key' => 'event_date', 'label' => 'Tarikh', 'sortable' => true],
         ['key' => 'customer', 'label' => 'Pelanggan'],
         ['key' => 'package_name', 'label' => 'Pakej'],
-        ['key' => 'total', 'label' => 'Jumlah', 'sortable' => true, 'align' => 'right'],
+        ['key' => 'total', 'label' => 'Jumlah', 'sort' => 'total_amount', 'sortable' => true, 'align' => 'right'],
         ['key' => 'paid', 'label' => 'Dibayar', 'align' => 'right'],
         ['key' => 'status', 'label' => 'Status', 'type' => 'html'],
     ];
@@ -44,7 +48,7 @@ class BookingController extends Controller
     public function data(Request $request): JsonResponse
     {
         $status = BookingStatus::tryFrom($request->string('status')->toString());
-        $sort = in_array($request->string('sort')->toString(), ['event_date', 'total'], true)
+        $sort = in_array($request->string('sort')->toString(), ['event_date', 'total_amount'], true)
             ? $request->string('sort')->toString()
             : 'event_date';
         $direction = $request->string('direction')->toString() === 'asc' ? 'asc' : 'desc';
@@ -68,7 +72,7 @@ class BookingController extends Controller
                 'event_date' => $booking->event_date->translatedFormat('j M Y'),
                 'customer' => $booking->user->name,
                 'package_name' => $booking->package_name,
-                'total' => 'RM'.number_format((float) $booking->total, 2),
+                'total' => 'RM'.number_format((float) $booking->total_amount, 2),
                 'paid' => 'RM'.number_format((float) $booking->payments->where('status', PaymentStatus::Paid)->sum('amount'), 2),
                 'status' => view('components.booking-status', ['status' => $booking->status])->render(),
             ])->all(),
@@ -84,7 +88,20 @@ class BookingController extends Controller
     public function create(Request $request): View
     {
         return view('vendor.bookings.create', [
-            'packages' => $request->user()->vendor->packages()->active()->get(),
+            'props' => VueProps::for([
+                'action' => route('vendor.bookings.store'),
+                'cancelUrl' => route('vendor.bookings.index'),
+                'createPackageUrl' => route('vendor.packages.create'),
+                'packages' => $request->user()->vendor->packages()->active()->get()
+                    ->map(fn (Package $package): array => [
+                        'id' => $package->id,
+                        'name' => $package->name,
+                        'price' => (float) $package->price,
+                    ])->values(),
+                'depositRate' => Booking::DEPOSIT_RATE,
+                'commissionRate' => Booking::COMMISSION_RATE / 100,
+                'old' => old(),
+            ]),
         ]);
     }
 
@@ -112,12 +129,48 @@ class BookingController extends Controller
 
         $booking->load(['user', 'package', 'payments', 'review']);
 
+        // Vendors see only the timeline slots assigned to them, as the kertas kerja specifies.
+        $timeline = $booking->wedding_id
+            ? $booking->wedding->timelineItems()->where('vendor_id', $booking->vendor_id)->get()
+            : collect();
+
         return view('vendor.bookings.show', [
             'booking' => $booking,
-            // Vendors see only the timeline slots assigned to them, as the kertas kerja specifies.
-            'timelineItems' => $booking->wedding_id
-                ? $booking->wedding->timelineItems()->where('vendor_id', $booking->vendor_id)->get()
-                : collect(),
+            'props' => VueProps::for([
+                'booking' => [
+                    'package_name' => $booking->package_name,
+                    'event_date' => $booking->event_date->translatedFormat('l, j F Y'),
+                    'created_at' => $booking->created_at->translatedFormat('j M Y, g:i A'),
+                    'notes' => $booking->notes,
+                    'customer' => [
+                        'name' => $booking->user->name,
+                        'contact' => collect([$booking->user->email, $booking->user->phone])->filter()->implode(' · '),
+                    ],
+                    'total' => 'RM'.number_format((float) $booking->total_amount, 2),
+                    'commission_rate' => number_format((float) $booking->commission_rate, 0),
+                    'commission' => 'RM'.number_format((float) $booking->commission_amount, 2),
+                    'payout' => 'RM'.number_format((float) $booking->total_amount - (float) $booking->commission_amount, 2),
+                    'payments' => $booking->payments
+                        ->sortBy(fn (Payment $payment): int => $payment->type === PaymentType::Deposit ? 0 : 1)
+                        ->map(fn (Payment $payment): array => [
+                            'label' => $payment->type->label(),
+                            'amount' => 'RM'.number_format((float) $payment->amount, 2),
+                            'status' => $payment->status->label(),
+                            'is_paid' => $payment->isPaid(),
+                        ])->values(),
+                    'review' => $booking->review ? [
+                        'rating' => $booking->review->rating,
+                        'comment' => $booking->review->comment,
+                    ] : null,
+                ],
+                'timeline' => $timeline->map(fn (WeddingTimelineItem $item): array => [
+                    'id' => $item->id,
+                    'time' => $item->startsAtLabel(),
+                    'title' => $item->title,
+                    'location' => $item->location,
+                    'notes' => $item->notes,
+                ])->values(),
+            ]),
         ]);
     }
 }

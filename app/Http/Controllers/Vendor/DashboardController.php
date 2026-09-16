@@ -6,9 +6,11 @@ use App\Enums\BookingStatus;
 use App\Enums\EnquiryStatus;
 use App\Enums\PaymentStatus;
 use App\Http\Controllers\Controller;
+use App\Models\Booking;
 use App\Models\Payment;
 use App\Models\Vendor;
 use App\Support\ImageSettings;
+use App\Support\VueProps;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 
@@ -39,9 +41,25 @@ class DashboardController extends Controller
 
         return view('vendor.dashboard', [
             'vendor' => $vendor,
-            'stats' => $stats,
-            'upcomingBookings' => $upcomingBookings,
             'onboarding' => $this->onboarding($vendor),
+            'props' => VueProps::for([
+                'stats' => [
+                    ['label' => 'Majlis akan datang', 'value' => $stats['upcoming'], 'href' => route('vendor.bookings.index', ['status' => 'confirmed'])],
+                    ['label' => 'Menunggu deposit', 'value' => $stats['pending'], 'href' => route('vendor.bookings.index', ['status' => 'pending_payment'])],
+                    ['label' => 'Enquiry baru', 'value' => $stats['open_enquiries'], 'href' => route('vendor.enquiries.index')],
+                    ['label' => 'Bayaran diterima', 'value' => 'RM'.number_format($stats['paid_total'], 2), 'hint' => $stats['completed'].' majlis selesai'],
+                ],
+                'upcoming' => $upcomingBookings->map(fn (Booking $booking): array => [
+                    'reference' => $booking->reference,
+                    'url' => route('vendor.bookings.show', $booking),
+                    'day' => $booking->event_date->format('j'),
+                    'month' => $booking->event_date->translatedFormat('M'),
+                    'customer' => $booking->user->name,
+                    'package_name' => $booking->package_name,
+                    'status_label' => $booking->status->label(),
+                    'status_tone' => $booking->status->tone(),
+                ])->values(),
+            ]),
         ]);
     }
 

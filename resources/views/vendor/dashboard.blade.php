@@ -14,50 +14,8 @@
             'steps' => $onboarding,
             'publicUrl' => $vendor->isApproved() ? route('vendors.show', $vendor) : null,
         ]) }}"
-    >
-        <ul class="flex flex-col gap-2 rounded-2xl border border-line bg-surface-raised p-5 text-sm">
-            @foreach ($onboarding as $step)
-                <li><a href="{{ $step['href'] }}" class="flex items-center gap-3 py-1">
-                    <span @class(['flex size-6 shrink-0 items-center justify-center rounded-full text-xs font-semibold', 'bg-emerald-500 text-white' => $step['done'], 'border border-line text-ink-muted' => ! $step['done']])>{{ $step['done'] ? '✓' : '' }}</span>
-                    <span @class(['text-ink-muted line-through' => $step['done']])>{{ $step['label'] }}</span>
-                </a></li>
-            @endforeach
-        </ul>
-    </div>
+    ></div>
 
-    <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <x-stat-card label="Majlis akan datang" :value="$stats['upcoming']" :href="route('vendor.bookings.index', ['status' => 'confirmed'])" />
-        <x-stat-card label="Menunggu deposit" :value="$stats['pending']" :href="route('vendor.bookings.index', ['status' => 'pending_payment'])" />
-        <x-stat-card label="Enquiry baru" :value="$stats['open_enquiries']" :href="route('vendor.enquiries.index')" />
-        <x-stat-card label="Bayaran diterima" :value="'RM'.number_format($stats['paid_total'], 2)" :hint="$stats['completed'].' majlis selesai'" />
-    </div>
-
-    <div class="mt-8 grid gap-8">
-        <section class="flex flex-col gap-4">
-            <h2 class="font-display text-xl font-semibold">Tempahan terdekat</h2>
-            @if ($upcomingBookings->isEmpty())
-                <p class="rounded-2xl border border-dashed border-line p-6 text-sm text-ink-muted">Tiada tempahan akan datang. Booking yang dibuat pelanggan atau yang anda rekod akan muncul di sini.</p>
-            @else
-                <ul class="divide-y divide-line rounded-2xl border border-line">
-                    @foreach ($upcomingBookings as $booking)
-                        <li>
-                            <a href="{{ route('vendor.bookings.show', $booking) }}" class="flex items-center gap-4 p-4 transition hover:bg-surface-muted">
-                                <div class="w-14 shrink-0 text-center">
-                                    <p class="font-display text-xl font-semibold leading-none">{{ $booking->event_date->format('j') }}</p>
-                                    <p class="text-[11px] text-ink-muted uppercase">{{ $booking->event_date->translatedFormat('M') }}</p>
-                                </div>
-                                <div class="min-w-0 flex-1">
-                                    <p class="truncate font-medium">{{ $booking->user->name }}</p>
-                                    <p class="truncate text-sm text-ink-muted">{{ $booking->package_name }} · {{ $booking->reference }}</p>
-                                </div>
-                                <x-booking-status :status="$booking->status" />
-                            </a>
-                        </li>
-                    @endforeach
-                </ul>
-            @endif
-        </section>
-
-
-    </div>
+    {{-- resources/js/components/vendor/VendorDashboardPage.vue --}}
+    <div data-vue="vendor-dashboard-page" data-props="{{ json_encode($props) }}"></div>
 </x-layouts.vendor>

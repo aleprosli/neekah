@@ -6,6 +6,8 @@ use App\Actions\StoreOptimizedImage;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StorePackageRequest;
 use App\Models\Package;
+use App\Support\ImageSettings;
+use App\Support\VueProps;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -31,9 +33,9 @@ class PackageController extends Controller
         ]);
     }
 
-    public function create(): View
+    public function create(ImageSettings $images): View
     {
-        return view('vendor.packages.form', ['package' => new Package(['is_active' => true])]);
+        return view('vendor.packages.form', $this->formData(new Package(['is_active' => true]), $images));
     }
 
     public function store(StorePackageRequest $request, StoreOptimizedImage $storeImage): RedirectResponse
@@ -53,11 +55,46 @@ class PackageController extends Controller
         return redirect()->route('vendor.packages.index')->with('status', 'Pakej ditambah.');
     }
 
-    public function edit(Package $package): View
+    public function edit(Package $package, ImageSettings $images): View
     {
         Gate::authorize('update', $package);
 
-        return view('vendor.packages.form', ['package' => $package]);
+        return view('vendor.packages.form', $this->formData($package, $images));
+    }
+
+    /**
+     * What the form component needs, with anything the vendor already typed
+     * put back in place after a failed validation.
+     *
+     * @return array<string, mixed>
+     */
+    private function formData(Package $package, ImageSettings $images): array
+    {
+        $editing = $package->exists;
+        $submitted = old('features');
+
+        return [
+            'editing' => $editing,
+            'props' => VueProps::for([
+                'editing' => $editing,
+                'action' => $editing ? route('vendor.packages.update', $package) : route('vendor.packages.store'),
+                'cancelUrl' => route('vendor.packages.index'),
+                'imageHint' => $images->uploadHint('landskap 1600 × 1200px'),
+                'packageData' => [
+                    'name' => old('name', $package->name),
+                    'price' => old('price', $package->price),
+                    'duration' => old('duration', $package->duration),
+                    'description' => old('description', $package->description),
+                    'is_active' => (bool) old('is_active', $package->is_active),
+                    'image_url' => $package->imageUrl(),
+                    'features' => collect(is_string($submitted) ? preg_split('/\r\n|\r|\n/', $submitted) : $submitted ?? $package->features ?? [])
+                        ->map(fn ($feature): string => trim((string) $feature))
+                        ->filter()
+                        ->values()
+                        ->all(),
+                ],
+            ]),
+        ];
     }
 
     public function update(StorePackageRequest $request, Package $package, StoreOptimizedImage $storeImage): RedirectResponse

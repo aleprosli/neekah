@@ -7,6 +7,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\ReorderPortfolioRequest;
 use App\Http\Requests\StorePortfolioItemRequest;
 use App\Models\PortfolioItem;
+use App\Support\ImageSettings;
+use App\Support\VueProps;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -15,17 +17,23 @@ use Illuminate\Support\Facades\DB;
 
 class PortfolioItemController extends Controller
 {
-    public function index(Request $request): View
+    public function index(Request $request, ImageSettings $images): View
     {
         return view('vendor.portfolio.index', [
-            'items' => $request->user()->vendor->portfolioItems()->orderBy('sort_order')->get()
-                ->map(fn (PortfolioItem $item): array => [
-                    'id' => $item->id,
-                    'url' => $item->url(),
-                    'thumbnail' => $item->thumbnailUrl(),
-                    'caption' => $item->caption,
-                    'is_visible' => $item->is_visible,
-                ])->values(),
+            'props' => VueProps::for([
+                'reorderUrl' => route('vendor.portfolio.reorder'),
+                'storeUrl' => route('vendor.portfolio.store'),
+                'destroyUrlTemplate' => route('vendor.portfolio.destroy', ['item' => '__ID__']),
+                'imageHint' => $images->uploadHint('1600 × 1200px atau lebih'),
+                'items' => $request->user()->vendor->portfolioItems()->orderBy('sort_order')->get()
+                    ->map(fn (PortfolioItem $item): array => [
+                        'id' => $item->id,
+                        'url' => $item->url(),
+                        'thumbnail' => $item->thumbnailUrl(),
+                        'caption' => $item->caption,
+                        'is_visible' => $item->is_visible,
+                    ])->values(),
+            ]),
         ]);
     }
 
