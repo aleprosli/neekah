@@ -13,27 +13,26 @@
     @if ($items->isEmpty())
         <p class="mt-8 rounded-2xl border border-dashed border-line p-6 text-center text-sm text-ink-muted">Belum ada gambar. Portfolio yang menarik menaikkan kadar tempahan.</p>
     @else
-        <ul class="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-            @foreach ($items as $item)
-                <li class="group relative overflow-hidden rounded-2xl border border-line">
-                    <img src="{{ $item->url() }}" alt="{{ $item->caption }}" class="aspect-square w-full object-cover">
-                    @if ($item->caption)
-                        <p class="truncate px-3 py-2 text-xs text-ink-muted">{{ $item->caption }}</p>
-                    @endif
-                    <div class="absolute top-2 right-2">
-                        <x-confirm-action
-                            :action="route('vendor.portfolio.destroy', $item)"
-                            method="DELETE"
-                            tone="danger"
-                            title="Padam gambar ini?"
-                            message="Gambar akan dibuang daripada portfolio anda secara kekal."
-                            confirm="Padam gambar"
-                            trigger-class="flex size-8 items-center justify-center rounded-full bg-black/60 text-white opacity-0 transition group-hover:opacity-100 focus:opacity-100"
-                            aria-label="Padam"
-                        >✕</x-confirm-action>
-                    </div>
-                </li>
-            @endforeach
-        </ul>
+        {{-- resources/js/components/vendor/PortfolioManager.vue --}}
+        <div
+            class="mt-8"
+            data-vue="portfolio-manager"
+            data-props="{{ json_encode([
+                'items' => $items,
+                'reorderUrl' => route('vendor.portfolio.reorder'),
+                'destroyUrlTemplate' => route('vendor.portfolio.destroy', ['item' => '__ID__']),
+                'csrf' => csrf_token(),
+            ]) }}"
+        >
+            {{-- Without JavaScript the vendor still sees and can delete their photos. --}}
+            <ul class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+                @foreach ($items as $item)
+                    <li class="overflow-hidden rounded-2xl border border-line">
+                        <img src="{{ $item['thumbnail'] ?: $item['url'] }}" alt="{{ $item['caption'] }}" loading="lazy" class="aspect-square w-full object-cover">
+                    </li>
+                @endforeach
+            </ul>
+        </div>
     @endif
+
 </x-layouts.vendor>

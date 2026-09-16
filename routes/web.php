@@ -82,6 +82,7 @@ Route::middleware(['auth', 'role:vendor'])->prefix('vendor')->name('vendor.')->g
     Route::resource('packages', VendorArea\PackageController::class)->except('show');
     Route::get('/portfolio', [VendorArea\PortfolioItemController::class, 'index'])->name('portfolio.index');
     Route::post('/portfolio', [VendorArea\PortfolioItemController::class, 'store'])->name('portfolio.store');
+    Route::put('/portfolio/order', [VendorArea\PortfolioItemController::class, 'reorder'])->name('portfolio.reorder');
     Route::delete('/portfolio/{item}', [VendorArea\PortfolioItemController::class, 'destroy'])->name('portfolio.destroy');
     Route::get('/availability', [VendorArea\UnavailableDateController::class, 'index'])->name('availability.index');
     Route::post('/availability', [VendorArea\UnavailableDateController::class, 'store'])->name('availability.store');
@@ -172,6 +173,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::put('/categories/{category}', [AdminArea\CategoryController::class, 'update'])->name('categories.update');
     Route::delete('/categories/{category}', [AdminArea\CategoryController::class, 'destroy'])->name('categories.destroy');
     Route::get('/bookings', [AdminArea\BookingController::class, 'index'])->name('bookings.index');
+    Route::get('/bookings/data', [AdminArea\BookingController::class, 'data'])->name('bookings.data');
     Route::get('/bookings/{booking}', [AdminArea\BookingController::class, 'show'])->name('bookings.show');
     Route::get('/transactions', [AdminArea\TransactionController::class, 'index'])->name('transactions.index');
     Route::post('/users/{user}/impersonate', [AdminArea\ImpersonationController::class, 'store'])->name('users.impersonate');

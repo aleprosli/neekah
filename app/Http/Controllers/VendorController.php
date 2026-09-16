@@ -4,12 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Enums\VendorTier;
 use App\Models\Category;
+use App\Models\PortfolioItem;
 use App\Models\Vendor;
 use App\Support\Seo;
 use App\Support\SeoSettings;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
 class VendorController extends Controller
@@ -95,7 +97,7 @@ class VendorController extends Controller
         $vendor->load([
             'category',
             'packages' => fn ($query) => $query->active(),
-            'portfolioItems',
+            'portfolioItems' => fn ($query) => $query->visible(),
             'reviews' => fn ($query) => $query->with('user')->latest()->limit(6),
         ]);
 
@@ -140,10 +142,28 @@ class VendorController extends Controller
 
         return view('vendors.show', [
             'vendor' => $vendor,
+            'gallery' => $this->gallery($vendor),
             'category' => $vendor->category,
             'related' => $related,
             'defaultEventDate' => $request->user()?->weddings()->latest('event_date')->first()?->event_date->toDateString(),
         ]);
+    }
+
+    /**
+     * The photos the gallery component renders, in the order the vendor
+     * arranged them. Thumbnails ride along so the grid and the filmstrip never
+     * download a full-size photo they only show at 56 pixels.
+     *
+     * @return Collection<int, array{id: int, url: string, thumbnail: string|null, caption: string|null}>
+     */
+    private function gallery(Vendor $vendor): Collection
+    {
+        return $vendor->portfolioItems->map(fn (PortfolioItem $item): array => [
+            'id' => $item->id,
+            'url' => $item->url(),
+            'thumbnail' => $item->thumbnailUrl(),
+            'caption' => $item->caption,
+        ])->values();
     }
 
     /**

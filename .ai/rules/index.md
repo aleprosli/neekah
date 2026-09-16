@@ -10,6 +10,7 @@ Before planning or editing, find the row whose globs match the file's path and r
 | resources/views/errors/** | .ai/rules/errors.md |
 | ** | .ai/rules/general.md |
 | app/Jobs/** | .ai/rules/jobs.md |
+| resources/js/** | .ai/rules/js.md |
 | app/Models/WeddingGuest.php, app/Models/Vendor.php, app/Models/Post.php | .ai/rules/models.md |
 | app/Rules/** | .ai/rules/rules.md |
 | app/Support/Seo.php, app/Support/**, app/Support/ImageSettings.php | .ai/rules/support.md |

@@ -4,19 +4,49 @@ namespace App\Http\Controllers\Vendor;
 
 use App\Actions\StoreOptimizedImage;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\ReorderPortfolioRequest;
 use App\Http\Requests\StorePortfolioItemRequest;
 use App\Models\PortfolioItem;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class PortfolioItemController extends Controller
 {
     public function index(Request $request): View
     {
         return view('vendor.portfolio.index', [
-            'items' => $request->user()->vendor->portfolioItems()->get(),
+            'items' => $request->user()->vendor->portfolioItems()->orderBy('sort_order')->get()
+                ->map(fn (PortfolioItem $item): array => [
+                    'id' => $item->id,
+                    'url' => $item->url(),
+                    'thumbnail' => $item->thumbnailUrl(),
+                    'caption' => $item->caption,
+                    'is_visible' => $item->is_visible,
+                ])->values(),
         ]);
+    }
+
+    /**
+     * Save the arrangement the vendor dragged into place. The whole list is
+     * sent at once, so one request settles both the order and which photos are
+     * shown, and a half-applied arrangement is impossible.
+     */
+    public function reorder(ReorderPortfolioRequest $request): JsonResponse
+    {
+        $vendor = $request->user()->vendor;
+
+        DB::transaction(function () use ($request, $vendor): void {
+            foreach ($request->validated('items') as $item) {
+                $vendor->portfolioItems()
+                    ->whereKey($item['id'])
+                    ->update(['sort_order' => $item['sort_order'], 'is_visible' => $item['is_visible']]);
+            }
+        });
+
+        return response()->json(['status' => 'ok']);
     }
 
     public function store(StorePortfolioItemRequest $request, StoreOptimizedImage $storeImage): RedirectResponse

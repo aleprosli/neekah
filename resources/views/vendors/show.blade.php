@@ -16,24 +16,30 @@
             <h1 class="mt-1 font-display text-3xl font-semibold tracking-tight lg:text-4xl">{{ $vendor->name }}</h1>
         </div>
 
-        {{-- Photo grid --}}
+        {{-- Photo grid and lightbox, mounted from resources/js/components/public/PortfolioGallery.vue --}}
         <div class="-mx-4 mt-3 sm:mx-0 md:mt-5">
-            <div class="grid h-72 grid-cols-4 grid-rows-2 gap-2 sm:overflow-hidden sm:rounded-2xl md:h-[420px]">
-                @php $gallery = $vendor->portfolioItems->take(5); @endphp
-                @if ($gallery->isNotEmpty())
-                    @foreach ($gallery as $item)
-                        <div @class(['overflow-hidden', 'col-span-4 row-span-2 md:col-span-2' => $loop->first, 'hidden md:block' => ! $loop->first])>
-                            {{-- The large first photo is what the visitor sees first, so it loads at once and at full size; the small tiles take thumbnails. --}}
-                            <img src="{{ $loop->first ? $item->url() : \App\Actions\StoreOptimizedImage::thumbnailUrl($item->path) }}" alt="{{ $item->caption ?: $vendor->name }}" @if ($loop->first) fetchpriority="high" @else loading="lazy" @endif decoding="async" class="size-full object-cover">
+            <div
+                data-vue="portfolio-gallery"
+                data-props="{{ json_encode([
+                    'photos' => $gallery,
+                    'vendorName' => $vendor->name,
+                    'tone' => $vendor->cover_tone,
+                ]) }}"
+            >
+                {{-- Rendered server-side too, so the first photo is in the markup Google and a link preview read. --}}
+                <div class="grid h-72 grid-cols-4 grid-rows-2 gap-2 sm:overflow-hidden sm:rounded-2xl md:h-[420px]">
+                    @forelse ($gallery->take(5) as $index => $item)
+                        <div @class(['overflow-hidden', 'col-span-4 row-span-2 md:col-span-2' => $index === 0, 'hidden md:block' => $index !== 0])>
+                            <img src="{{ $index === 0 ? $item['url'] : $item['thumbnail'] }}" alt="{{ $item['caption'] ?: $vendor->name }}" @if ($index === 0) fetchpriority="high" @else loading="lazy" @endif decoding="async" class="size-full object-cover">
                         </div>
-                    @endforeach
-                @else
-                    <div class="col-span-4 row-span-2 bg-linear-to-br md:col-span-2 {{ $vendor->cover_tone }}"></div>
-                    <div class="hidden bg-linear-to-br opacity-80 md:block {{ $vendor->cover_tone }}"></div>
-                    <div class="hidden bg-linear-to-tr opacity-60 md:block {{ $vendor->cover_tone }}"></div>
-                    <div class="hidden bg-linear-to-tl opacity-70 md:block {{ $vendor->cover_tone }}"></div>
-                    <div class="hidden bg-linear-to-bl opacity-50 md:block {{ $vendor->cover_tone }}"></div>
-                @endif
+                    @empty
+                        <div class="col-span-4 row-span-2 bg-linear-to-br md:col-span-2 {{ $vendor->cover_tone }}"></div>
+                        <div class="hidden bg-linear-to-br opacity-80 md:block {{ $vendor->cover_tone }}"></div>
+                        <div class="hidden bg-linear-to-tr opacity-60 md:block {{ $vendor->cover_tone }}"></div>
+                        <div class="hidden bg-linear-to-tl opacity-70 md:block {{ $vendor->cover_tone }}"></div>
+                        <div class="hidden bg-linear-to-bl opacity-50 md:block {{ $vendor->cover_tone }}"></div>
+                    @endforelse
+                </div>
             </div>
         </div>
 

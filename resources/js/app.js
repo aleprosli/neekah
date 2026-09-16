@@ -1,4 +1,13 @@
 /**
+ * Vue components declared with data-vue are mounted first, so an island is
+ * interactive as early as possible. Everything below is the plain-JavaScript
+ * behaviour that does not need a component.
+ */
+import { mountIslands } from './vue.js';
+
+mountIslands();
+
+/**
  * The article editor only exists on the admin blog form, so TipTap and
  * ProseMirror load on demand instead of weighing down every public page.
  */

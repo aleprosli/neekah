@@ -29,19 +29,31 @@ it('searches bookings by reference and filters by status', function () {
     $confirmed = Booking::factory()->confirmed()->for($vendor)->create();
     $cancelled = Booking::factory()->cancelled()->for($vendor)->create();
 
-    $this->actingAs($this->admin)
-        ->get(route('admin.bookings.index', ['status' => 'confirmed']))
-        ->assertOk()
-        ->assertSee($confirmed->reference)
-        ->assertDontSee($cancelled->reference);
+    // The page is the shell; the rows come from the table's own endpoint.
+    $this->actingAs($this->admin)->get(route('admin.bookings.index'))->assertOk()->assertSee('data-vue="data-table"', false);
 
-    $this->actingAs($this->admin)
-        ->get(route('admin.bookings.index', ['q' => $cancelled->reference]))
+    $filtered = $this->actingAs($this->admin)
+        ->getJson(route('admin.bookings.data', ['status' => 'confirmed']))
         ->assertOk()
-        ->assertSee($cancelled->reference)
-        ->assertDontSee($confirmed->reference);
+        ->json('data');
+
+    expect(collect($filtered)->pluck('reference'))->toContain($confirmed->reference)
+        ->not->toContain($cancelled->reference);
+
+    $searched = $this->actingAs($this->admin)
+        ->getJson(route('admin.bookings.data', ['search' => $cancelled->reference]))
+        ->assertOk()
+        ->assertJsonPath('meta.total', 1)
+        ->json('data');
+
+    expect($searched[0]['reference'])->toBe($cancelled->reference)
+        ->and($searched[0]['url'])->toBe(route('admin.bookings.show', $cancelled));
 
     $this->actingAs($this->admin)->get(route('admin.bookings.show', $confirmed))->assertOk()->assertSee('Payout vendor');
+});
+
+it('keeps the booking table endpoint to admins', function () {
+    $this->actingAs(User::factory()->create())->getJson(route('admin.bookings.data'))->assertForbidden();
 });
 
 it('creates, updates and deletes categories', function () {
