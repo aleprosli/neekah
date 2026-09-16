@@ -88,6 +88,7 @@ Route::middleware(['auth', 'role:vendor'])->prefix('vendor')->name('vendor.')->g
     Route::post('/availability', [VendorArea\UnavailableDateController::class, 'store'])->name('availability.store');
     Route::delete('/availability/{date}', [VendorArea\UnavailableDateController::class, 'destroy'])->name('availability.destroy');
     Route::get('/bookings', [VendorArea\BookingController::class, 'index'])->name('bookings.index');
+    Route::get('/bookings/data', [VendorArea\BookingController::class, 'data'])->name('bookings.data');
     Route::get('/bookings/create', [VendorArea\BookingController::class, 'create'])->name('bookings.create');
     Route::post('/bookings', [VendorArea\BookingController::class, 'store'])->name('bookings.store');
     Route::get('/bookings/{booking}', [VendorArea\BookingController::class, 'show'])->name('bookings.show');

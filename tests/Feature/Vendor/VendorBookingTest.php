@@ -38,7 +38,17 @@ it('lets a vendor record a booking for a registered customer', function () {
         ->and($booking->status)->toBe(BookingStatus::PendingPayment);
 
     $this->actingAs($this->customer)->get(route('bookings.show', $booking))->assertOk()->assertSee('Bayar Deposit sekarang');
-    $this->actingAs($this->vendor->user)->get(route('vendor.bookings.index'))->assertOk()->assertSee($booking->reference);
+    // The list page is the shell; its rows come from the table's own endpoint.
+    $this->actingAs($this->vendor->user)->get(route('vendor.bookings.index'))->assertOk()->assertSee('data-vue="data-table"', false);
+
+    $rows = $this->actingAs($this->vendor->user)
+        ->getJson(route('vendor.bookings.data'))
+        ->assertOk()
+        ->assertJsonPath('meta.total', 1)
+        ->json('data');
+
+    expect($rows[0]['customer'])->toBe($this->customer->name)
+        ->and($rows[0]['url'])->toBe(route('vendor.bookings.show', $booking));
 });
 
 it('rejects a booking for an unknown customer email', function () {

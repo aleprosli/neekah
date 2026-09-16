@@ -16,7 +16,18 @@ class PackageController extends Controller
     public function index(Request $request): View
     {
         return view('vendor.packages.index', [
-            'packages' => $request->user()->vendor->packages()->get(),
+            'packages' => $request->user()->vendor->packages()->get()
+                ->map(fn (Package $package): array => [
+                    'id' => $package->id,
+                    'name' => $package->name,
+                    'duration' => $package->duration,
+                    'price' => 'RM'.number_format((float) $package->price, 2),
+                    'features' => $package->features ?? [],
+                    'is_active' => $package->is_active,
+                    'thumbnail' => $package->thumbnailUrl(),
+                    'edit_url' => route('vendor.packages.edit', $package),
+                    'destroy_url' => route('vendor.packages.destroy', $package),
+                ])->values(),
         ]);
     }
 
