@@ -85,22 +85,27 @@
                     <h2 class="font-display text-2xl font-semibold">Pakej yang ditawarkan</h2>
                     <div class="grid gap-4 sm:grid-cols-2">
                         @forelse ($vendor->packages as $package)
-                            <article class="flex flex-col gap-3 rounded-2xl border border-line p-5 transition hover:border-brand-300">
-                                <div class="flex items-start justify-between gap-3">
-                                    <div>
-                                        <h3 class="font-semibold">{{ $package->name }}</h3>
-                                        <p class="text-sm text-ink-muted">{{ $package->duration }}</p>
-                                    </div>
-                                    <p class="text-right font-semibold">RM{{ number_format($package->price) }}@if ($vendor->price_unit === PriceUnit::Pax)<span class="block text-xs font-normal text-ink-muted">/ pax</span>@endif</p>
-                                </div>
-                                @if ($package->description)
-                                    <p class="text-sm text-ink-muted">{{ $package->description }}</p>
+                            <article class="flex flex-col overflow-hidden rounded-2xl border border-line transition hover:border-brand-300">
+                                @if ($package->imageUrl())
+                                    <img src="{{ $package->imageUrl() }}" alt="{{ $package->name }}" loading="lazy" class="aspect-[4/3] w-full object-cover">
                                 @endif
-                                <ul class="flex flex-col gap-1.5 text-sm text-ink-muted">
-                                    @foreach ($package->features as $feature)
-                                        <li class="flex gap-2"><span class="text-brand-600">✓</span>{{ $feature }}</li>
-                                    @endforeach
-                                </ul>
+                                <div class="flex flex-1 flex-col gap-3 p-5">
+                                    <div class="flex items-start justify-between gap-3">
+                                        <div>
+                                            <h3 class="font-semibold">{{ $package->name }}</h3>
+                                            <p class="text-sm text-ink-muted">{{ $package->duration }}</p>
+                                        </div>
+                                        <p class="text-right font-semibold">RM{{ number_format($package->price) }}@if ($vendor->price_unit === PriceUnit::Pax)<span class="block text-xs font-normal text-ink-muted">/ pax</span>@endif</p>
+                                    </div>
+                                    @if ($package->description)
+                                        <p class="text-sm text-ink-muted">{{ $package->description }}</p>
+                                    @endif
+                                    <ul class="flex flex-col gap-1.5 text-sm text-ink-muted">
+                                        @foreach ($package->features as $feature)
+                                            <li class="flex gap-2"><span class="text-brand-600">✓</span>{{ $feature }}</li>
+                                        @endforeach
+                                    </ul>
+                                </div>
                             </article>
                         @empty
                             <p class="text-sm text-ink-muted">Vendor ini belum menambah pakej.</p>
@@ -172,18 +177,28 @@
                         {{ auth()->check() ? 'Tempah sekarang' : 'Log masuk untuk tempah' }}
                     </button>
 
-                    @if ($whatsapp = $vendor->whatsappUrl('Hai '.$vendor->name.', saya jumpa anda di Neekah. Boleh saya tanya tentang pakej untuk majlis saya?'))
-                        {{-- Some couples want to talk before they book. Let them, then bring the deal back here. --}}
-                        <a href="{{ $whatsapp }}" target="_blank" rel="noopener" class="flex items-center justify-center gap-2 rounded-full border border-brand-600 py-3.5 text-sm font-semibold text-brand-700 transition hover:bg-brand-50">
-                            <span aria-hidden="true">💬</span> WhatsApp vendor
-                        </a>
-                    @endif
+                    @auth
+                        {{-- The vendor's own number is only ever rendered for a signed-in
+                             visitor, so it cannot be scraped from the public markup. --}}
+                        @if ($whatsapp = $vendor->whatsappUrl('Hai '.$vendor->name.', saya jumpa anda di Neekah. Boleh saya tanya tentang pakej untuk majlis saya?'))
+                            <a href="{{ $whatsapp }}" target="_blank" rel="noopener" class="flex items-center justify-center gap-2 rounded-full border border-brand-600 py-3.5 text-sm font-semibold text-brand-700 transition hover:bg-brand-50">
+                                <span aria-hidden="true">💬</span> WhatsApp vendor
+                            </a>
+                        @endif
 
-                    @if ($vendor->phone)
-                        <p class="text-center text-sm text-ink-muted">
-                            Atau hubungi terus di <a href="tel:{{ preg_replace('/[^0-9+]/', '', $vendor->phone) }}" class="font-medium text-ink underline underline-offset-4">{{ $vendor->phone }}</a>
-                        </p>
-                    @endif
+                        @if ($vendor->phone)
+                            <p class="text-center text-sm text-ink-muted">
+                                Atau hubungi terus di <a href="tel:{{ preg_replace('/[^0-9+]/', '', $vendor->phone) }}" class="font-medium text-ink underline underline-offset-4">{{ $vendor->phone }}</a>
+                            </p>
+                        @endif
+                    @else
+                        @if ($vendor->phone || $vendor->whatsapp)
+                            <a href="{{ route('login') }}" class="flex items-center justify-center gap-2 rounded-full border border-brand-600 py-3.5 text-sm font-semibold text-brand-700 transition hover:bg-brand-50">
+                                <span aria-hidden="true">💬</span> Log masuk untuk WhatsApp vendor
+                            </a>
+                            <p class="text-center text-sm text-ink-muted">Nombor vendor hanya dipaparkan kepada pengguna berdaftar.</p>
+                        @endif
+                    @endauth
 
                     <p class="text-center text-sm text-ink-muted">Anda belum dicaj lagi. Deposit dibayar selepas booking dibuat.</p>
 

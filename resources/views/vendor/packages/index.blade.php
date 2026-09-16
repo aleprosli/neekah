@@ -13,35 +13,40 @@
     @else
         <ul class="grid gap-4 md:grid-cols-2">
             @foreach ($packages as $package)
-                <li class="flex flex-col gap-3 rounded-2xl border border-line bg-surface-raised p-5">
-                    <div class="flex items-start justify-between gap-3">
-                        <div>
-                            <h2 class="font-semibold">{{ $package->name }}</h2>
-                            <p class="text-sm text-ink-muted">{{ $package->duration }}</p>
+                <li class="flex flex-col overflow-hidden rounded-2xl border border-line bg-surface-raised">
+                    @if ($package->thumbnailUrl())
+                        <img src="{{ $package->thumbnailUrl() }}" alt="" loading="lazy" class="aspect-[4/3] w-full object-cover">
+                    @endif
+                    <div class="flex flex-1 flex-col gap-3 p-5">
+                        <div class="flex items-start justify-between gap-3">
+                            <div>
+                                <h2 class="font-semibold">{{ $package->name }}</h2>
+                                <p class="text-sm text-ink-muted">{{ $package->duration }}</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="font-semibold">RM{{ number_format((float) $package->price, 2) }}</p>
+                                @unless ($package->is_active)
+                                    <span class="text-xs text-ink-muted">Tidak aktif</span>
+                                @endunless
+                            </div>
                         </div>
-                        <div class="text-right">
-                            <p class="font-semibold">RM{{ number_format((float) $package->price, 2) }}</p>
-                            @unless ($package->is_active)
-                                <span class="text-xs text-ink-muted">Tidak aktif</span>
-                            @endunless
+                        <ul class="flex flex-col gap-1 text-sm text-ink-muted">
+                            @foreach ($package->features as $feature)
+                                <li class="flex gap-2"><span class="text-brand-600">✓</span>{{ $feature }}</li>
+                            @endforeach
+                        </ul>
+                        <div class="mt-auto flex gap-2 border-t border-line pt-3 text-sm">
+                            <a href="{{ route('vendor.packages.edit', $package) }}" class="rounded-full border border-line px-4 py-1.5 font-medium transition hover:border-brand-400">Edit</a>
+                            <x-confirm-action
+                                :action="route('vendor.packages.destroy', $package)"
+                                method="DELETE"
+                                tone="danger"
+                                :title="'Padam pakej '.$package->name.'?'"
+                                message="Pakej ini tidak akan dipaparkan lagi pada profil anda. Tempahan sedia ada tidak terjejas."
+                                confirm="Padam pakej"
+                                trigger-class="rounded-full px-4 py-1.5 font-medium text-ink-muted transition hover:bg-surface-muted hover:text-ink"
+                            >Padam</x-confirm-action>
                         </div>
-                    </div>
-                    <ul class="flex flex-col gap-1 text-sm text-ink-muted">
-                        @foreach ($package->features as $feature)
-                            <li class="flex gap-2"><span class="text-brand-600">✓</span>{{ $feature }}</li>
-                        @endforeach
-                    </ul>
-                    <div class="mt-auto flex gap-2 border-t border-line pt-3 text-sm">
-                        <a href="{{ route('vendor.packages.edit', $package) }}" class="rounded-full border border-line px-4 py-1.5 font-medium transition hover:border-brand-400">Edit</a>
-                        <x-confirm-action
-                            :action="route('vendor.packages.destroy', $package)"
-                            method="DELETE"
-                            tone="danger"
-                            :title="'Padam pakej '.$package->name.'?'"
-                            message="Pakej ini tidak akan dipaparkan lagi pada profil anda. Tempahan sedia ada tidak terjejas."
-                            confirm="Padam pakej"
-                            trigger-class="rounded-full px-4 py-1.5 font-medium text-ink-muted transition hover:bg-surface-muted hover:text-ink"
-                        >Padam</x-confirm-action>
                     </div>
                 </li>
             @endforeach

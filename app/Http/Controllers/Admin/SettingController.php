@@ -28,6 +28,7 @@ class SettingController extends Controller
             'turnstile' => $turnstile->all(),
             'turnstileActive' => $turnstile->isEnabled(),
             'images' => $images->all(),
+            'serverUploadLimit' => $images->isLimitedByServer() ? $images->serverUploadMegabytes() : null,
             'formats' => ImageSettings::FORMATS,
         ]);
     }

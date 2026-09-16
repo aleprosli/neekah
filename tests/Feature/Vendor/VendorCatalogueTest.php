@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\VendorStatus;
 use App\Models\Category;
 use App\Models\Package;
 use App\Models\PortfolioItem;
@@ -12,6 +13,69 @@ use Illuminate\Support\Facades\Storage;
 beforeEach(function () {
     $this->seed(CategorySeeder::class);
     $this->vendor = Vendor::factory()->for(Category::first())->create(['price_from' => 9999]);
+});
+
+it('stores, replaces and removes a package image', function () {
+    Storage::fake('public');
+
+    $this->actingAs($this->vendor->user)
+        ->post(route('vendor.packages.store'), [
+            'name' => 'Premium Package',
+            'price' => 2500,
+            'features' => '2 photographers',
+            'image' => UploadedFile::fake()->image('pakej.jpg', 1600, 1200),
+        ])
+        ->assertSessionHasNoErrors();
+
+    $package = Package::sole();
+    $first = $package->image;
+
+    expect($first)->toEndWith('.webp')
+        ->and(Storage::disk('public')->exists($first))->toBeTrue()
+        ->and($package->thumbnailUrl())->toContain('-thumb');
+
+    $this->actingAs($this->vendor->user)
+        ->put(route('vendor.packages.update', $package), [
+            'name' => 'Premium Package',
+            'price' => 2500,
+            'features' => '2 photographers',
+            'image' => UploadedFile::fake()->image('pakej-baharu.jpg', 1600, 1200),
+        ])
+        ->assertSessionHasNoErrors();
+
+    $replaced = $package->fresh()->image;
+
+    // The old file goes with it, so a replaced image does not linger on disk.
+    expect($replaced)->not->toBe($first)
+        ->and(Storage::disk('public')->exists($first))->toBeFalse();
+
+    $this->actingAs($this->vendor->user)
+        ->put(route('vendor.packages.update', $package), [
+            'name' => 'Premium Package',
+            'price' => 2500,
+            'features' => '2 photographers',
+            'remove_image' => '1',
+        ])
+        ->assertSessionHasNoErrors();
+
+    expect($package->fresh()->image)->toBeNull()
+        ->and(Storage::disk('public')->exists($replaced))->toBeFalse();
+});
+
+it('shows a package image on the public vendor page', function () {
+    Storage::fake('public');
+    $this->vendor->update(['status' => VendorStatus::Approved]);
+
+    $this->actingAs($this->vendor->user)->post(route('vendor.packages.store'), [
+        'name' => 'Premium Package',
+        'price' => 2500,
+        'features' => '2 photographers',
+        'image' => UploadedFile::fake()->image('pakej.jpg', 1600, 1200),
+    ]);
+
+    $this->get(route('vendors.show', $this->vendor))
+        ->assertOk()
+        ->assertSee(Package::sole()->imageUrl(), false);
 });
 
 it('accepts package contents as one field per item', function () {

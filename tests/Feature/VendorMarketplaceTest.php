@@ -4,6 +4,7 @@ use App\Enums\VendorTier;
 use App\Models\Category;
 use App\Models\Package;
 use App\Models\Review;
+use App\Models\User;
 use App\Models\Vendor;
 use Database\Seeders\CategorySeeder;
 
@@ -107,7 +108,7 @@ it('shows a vendor profile with packages, reviews and related vendors', function
         ->assertSee('Log masuk untuk tempah');
 });
 
-it('offers the vendor\'s own WhatsApp and phone beside the booking form', function () {
+it('shows the vendor\'s WhatsApp and phone only to a signed-in visitor', function () {
     $vendor = Vendor::factory()->for($this->photography)->create([
         'name' => 'ABC Wedding Photography',
         'phone' => '012-345 6789',
@@ -115,8 +116,15 @@ it('offers the vendor\'s own WhatsApp and phone beside the booking form', functi
     ]);
     Package::factory()->for($vendor)->create();
 
+    // A number in the markup is a number a scraper can take, signed in or not.
     $this->get(route('vendors.show', $vendor))
         ->assertOk()
+        ->assertDontSee('wa.me')
+        ->assertDontSee('012-345 6789')
+        ->assertSee('Log masuk untuk WhatsApp vendor');
+
+    $this->actingAs(User::factory()->create())
+        ->get(route('vendors.show', $vendor))
         ->assertSee('WhatsApp vendor')
         ->assertSee('https://wa.me/60123456789', false)
         ->assertSee('012-345 6789');

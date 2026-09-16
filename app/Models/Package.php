@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Actions\StoreOptimizedImage;
 use Database\Factories\PackageFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Scope;
@@ -9,8 +10,9 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Storage;
 
-#[Fillable(['vendor_id', 'name', 'description', 'price', 'duration', 'features', 'is_active', 'sort_order'])]
+#[Fillable(['vendor_id', 'name', 'description', 'image', 'price', 'duration', 'features', 'is_active', 'sort_order'])]
 class Package extends Model
 {
     /** @use HasFactory<PackageFactory> */
@@ -26,6 +28,22 @@ class Package extends Model
             'features' => 'array',
             'is_active' => 'boolean',
         ];
+    }
+
+    /**
+     * The full-size image, for the package card on the vendor's public page.
+     */
+    public function imageUrl(): ?string
+    {
+        return $this->image ? Storage::disk('public')->url($this->image) : null;
+    }
+
+    /**
+     * The narrower copy, for the vendor's own package list.
+     */
+    public function thumbnailUrl(): ?string
+    {
+        return StoreOptimizedImage::thumbnailUrl($this->image);
     }
 
     public function vendor(): BelongsTo

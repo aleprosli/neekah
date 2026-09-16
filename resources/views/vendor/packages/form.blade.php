@@ -19,6 +19,7 @@
     <form
         method="POST"
         action="{{ $editing ? route('vendor.packages.update', $package) : route('vendor.packages.store') }}"
+        enctype="multipart/form-data"
         class="flex max-w-3xl flex-col gap-6"
     >
         @csrf
@@ -44,6 +45,23 @@
                 rows="3"
                 placeholder="Satu atau dua ayat tentang pakej ini."
             />
+            <div class="flex flex-col gap-2">
+                <span class="text-sm font-medium">Gambar pakej</span>
+                <p class="text-xs text-ink-muted">Setiap pakej boleh ada gambarnya sendiri. Ia dipaparkan pada kad pakej di halaman awam anda.</p>
+
+                @if ($package->imageUrl())
+                    <div class="flex flex-wrap items-center gap-4">
+                        <img src="{{ $package->imageUrl() }}" alt="" class="h-28 w-44 rounded-xl border border-line object-cover">
+                        <label class="flex items-center gap-2 text-sm">
+                            <input type="checkbox" name="remove_image" value="1" class="accent-brand-600">
+                            Buang gambar ini
+                        </label>
+                    </div>
+                @endif
+
+                <input type="file" name="image" accept="image/jpeg,image/png,image/webp" class="text-sm file:mr-3 file:rounded-full file:border-0 file:bg-brand-50 file:px-4 file:py-2 file:text-sm file:font-medium file:text-brand-700">
+                <x-form.image-hint recommended="landskap 1600 × 1200px atau lebih" />
+            </div>
         </section>
 
         <section class="flex flex-col gap-4 rounded-2xl border border-line bg-surface-raised p-6" data-feature-list>

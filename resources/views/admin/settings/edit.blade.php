@@ -157,6 +157,14 @@
                     <x-form.field label="Had saiz muat naik (MB)" name="max_upload_mb" type="number" :value="$images['max_upload_mb']" min="1" max="15" required help="Saiz fail asal yang dibenarkan sebelum diproses. Maksimum 15 MB." />
                 </div>
 
+                @if ($serverUploadLimit)
+                    <p class="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs break-words text-amber-900">
+                        Server ini hanya menerima <strong>{{ $serverUploadLimit }}MB</strong> setiap muat naik, jadi had di atas tidak digunakan sepenuhnya.
+                        Naikkan <code class="font-mono">upload_max_filesize</code> dan <code class="font-mono">post_max_size</code> dalam php.ini
+                        (serta <code class="font-mono">client_max_body_size</code> pada nginx), kemudian mulakan semula PHP.
+                    </p>
+                @endif
+
                 <p class="rounded-xl bg-surface-muted px-4 py-3 text-xs break-words text-ink-muted">
                     Tetapan ini digunakan untuk gambar yang dimuat naik selepas ini. Gambar lama diproses dengan menjalankan
                     <code class="font-mono">php artisan neekah:optimize-images</code> pada server.

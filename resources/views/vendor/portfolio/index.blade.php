@@ -3,8 +3,8 @@
         @csrf
         <label class="flex flex-1 flex-col gap-1.5">
             <span class="text-sm font-medium">Muat naik gambar</span>
-            <input type="file" name="images[]" accept="image/*" multiple required class="text-sm file:mr-3 file:rounded-full file:border-0 file:bg-brand-50 file:px-4 file:py-2 file:text-sm file:font-medium file:text-brand-700">
-            <span class="text-xs text-ink-muted">Sehingga 10 gambar sekali gus, maksimum 4MB setiap satu.</span>
+            <input type="file" name="images[]" accept="image/jpeg,image/png,image/webp" multiple required class="text-sm file:mr-3 file:rounded-full file:border-0 file:bg-brand-50 file:px-4 file:py-2 file:text-sm file:font-medium file:text-brand-700">
+            <x-form.image-hint recommended="1600 × 1200px atau lebih" note="Sehingga 10 gambar sekali gus. Gambar pertama menjadi gambar utama." />
         </label>
         <x-form.field label="Kapsyen (pilihan)" name="caption" placeholder="Majlis Aina & Hakim, Alor Setar" class="sm:w-64" />
         <button type="submit" class="rounded-full bg-brand-600 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700">Muat naik</button>

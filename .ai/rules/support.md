@@ -2,6 +2,7 @@
 paths:
   - app/Support/Seo.php
   - 'app/Support/**'
+  - app/Support/ImageSettings.php
 ---
 
 # Support
@@ -20,3 +21,6 @@ Structured data is added with Seo::schema([...]) / breadcrumbs([name => url]) / 
 
 ## Admin-editable settings extend SettingGroup
 Anything an admin can change under Admin → Tetapan lives in a class extending App\Support\SettingGroup (ContactSettings, SeoSettings, TurnstileSettings, ImageSettings). Each declares defaults() and a prefix(); values are stored one row per "prefix.key" in the settings table and read through Setting::values(), which is cached forever and forgotten on save. Never read a settings row directly, and never add a key without a default — defaults() is what makes a fresh install work and lets a group gain keys without a migration. config/neekah.php and config/services.php hold the defaults these groups fall back to, not the live values.
+
+## Upload limits are capped by php.ini, not by the admin setting
+ImageSettings::maxUploadMegabytes() is what the admin saved; uploadRules() and every page hint use effectiveUploadMegabytes(), which is the smaller of that and serverUploadMegabytes() (upload_max_filesize vs post_max_size). A POST above post_max_size is discarded by PHP before any controller runs, so bootstrap/app.php renders PostTooLargeException as a redirect back with a readable error instead of a bare "page expired". Never print a limit from the raw admin value, and show upload rules through <x-form.image-hint />.

@@ -59,8 +59,8 @@
                 @if ($vendor->cover_image)
                     <img src="{{ Storage::disk('public')->url($vendor->cover_image) }}" alt="" class="h-40 w-full max-w-xs rounded-xl object-cover">
                 @endif
-                <input type="file" name="cover_image" accept="image/*" class="text-sm file:mr-3 file:rounded-full file:border-0 file:bg-brand-50 file:px-4 file:py-2 file:text-sm file:font-medium file:text-brand-700">
-                <span class="text-xs text-ink-muted">JPG, PNG atau WebP, maksimum 4MB. Jika tiada gambar, warna latar digunakan.</span>
+                <input type="file" name="cover_image" accept="image/jpeg,image/png,image/webp" class="text-sm file:mr-3 file:rounded-full file:border-0 file:bg-brand-50 file:px-4 file:py-2 file:text-sm file:font-medium file:text-brand-700">
+                <x-form.image-hint recommended="landskap 1920 × 1080px" note="Jika tiada gambar, warna latar digunakan." />
             </div>
         </section>
 

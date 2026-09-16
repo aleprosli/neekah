@@ -103,6 +103,25 @@ it('refuses an upload above the admin size limit', function () {
     expect(PortfolioItem::count())->toBe(0);
 });
 
+it('never validates against a limit the server itself will refuse', function () {
+    app(ImageSettings::class)->save(['max_upload_mb' => 15]);
+    $images = app(ImageSettings::class);
+
+    // php.ini decides; the admin's number can only lower it, never raise it.
+    expect($images->effectiveUploadMegabytes())->toBe(min(15, $images->serverUploadMegabytes()))
+        ->and($images->uploadRules())->toContain('max:'.($images->effectiveUploadMegabytes() * 1024));
+});
+
+it('tells the vendor which formats and size are accepted', function () {
+    $vendor = Vendor::factory()->for(Category::first())->create();
+
+    $this->actingAs($vendor->user)
+        ->get(route('vendor.portfolio.index'))
+        ->assertOk()
+        ->assertSee('JPG, PNG atau WebP')
+        ->assertSee('maksimum '.app(ImageSettings::class)->effectiveUploadMegabytes().'MB');
+});
+
 it('keeps a lossless image as png so a qr code still scans', function () {
     Storage::fake('public');
 

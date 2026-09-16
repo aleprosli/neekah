@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Support\ImageSettings;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StorePackageRequest extends FormRequest
@@ -28,9 +29,11 @@ class StorePackageRequest extends FormRequest
     /**
      * @return array<string, array<int, mixed>>
      */
-    public function rules(): array
+    public function rules(ImageSettings $images): array
     {
         return [
+            'image' => ['nullable', ...$images->uploadRules()],
+            'remove_image' => ['nullable', 'boolean'],
             'name' => ['required', 'string', 'max:120'],
             'description' => ['nullable', 'string', 'max:1000'],
             'price' => ['required', 'numeric', 'min:0', 'max:9999999'],
@@ -64,6 +67,7 @@ class StorePackageRequest extends FormRequest
             'price' => 'harga',
             'duration' => 'tempoh',
             'features' => 'kandungan pakej',
+            'image' => 'gambar pakej',
         ];
     }
 }
