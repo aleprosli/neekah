@@ -19,6 +19,17 @@ enum BookingStatus: string
         };
     }
 
+    /** The palette key the badge components use, in Blade and in Vue. */
+    public function tone(): string
+    {
+        return match ($this) {
+            self::PendingPayment => 'amber',
+            self::Confirmed => 'emerald',
+            self::Completed => 'sky',
+            self::Cancelled => 'muted',
+        };
+    }
+
     public function isActive(): bool
     {
         return $this === self::PendingPayment || $this === self::Confirmed;

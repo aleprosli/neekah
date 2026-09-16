@@ -100,6 +100,19 @@ class ImageSettings extends SettingGroup
     }
 
     /**
+     * The one sentence every upload field shows: formats, the real size limit
+     * and, when it matters, the dimensions worth aiming for.
+     */
+    public function uploadHint(?string $recommended = null): string
+    {
+        return implode(' · ', array_filter([
+            $this->acceptedFormatsLabel(),
+            'maksimum '.$this->effectiveUploadMegabytes().'MB',
+            $recommended ? 'disyorkan '.$recommended : null,
+        ]));
+    }
+
+    /**
      * "1M", "512K", "2G" or a plain byte count as whole megabytes; 0 when the
      * directive is empty or unlimited.
      */
