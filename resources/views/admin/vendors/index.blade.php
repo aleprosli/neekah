@@ -11,7 +11,7 @@
     {{-- resources/js/components/ui/DataTable.vue --}}
     <div
         data-vue="data-table"
-        data-props="{{ json_encode([
+        data-props="@vueProps([
             'dataUrl' => route('admin.vendors.data', ['status' => $status?->value]),
             'columns' => $columns,
             'searchPlaceholder' => 'Cari nama vendor atau bandar…',
@@ -19,6 +19,6 @@
             'emptyMessage' => 'Cuba status lain, atau kosongkan carian.',
             'csrf' => csrf_token(),
             'rowAction' => ['inline' => true],
-        ]) }}"
+        ])"
     ></div>
 </x-layouts.admin>

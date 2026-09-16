@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Support\Seo;
 use Illuminate\Auth\Middleware\RedirectIfAuthenticated;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
@@ -26,6 +27,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Every Vue island hands its props over the same way.
+        Blade::directive('vueProps', fn (string $expression): string => "<?php echo e(App\\Support\\VueProps::encode({$expression})); ?>");
+
         RedirectIfAuthenticated::redirectUsing(
             fn (Request $request) => $request->user()->homeRoute(),
         );

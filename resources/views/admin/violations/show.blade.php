@@ -4,5 +4,5 @@
     </x-slot:actions>
 
     {{-- resources/js/components/admin/AdminViolationDetail.vue --}}
-    <div data-vue="admin-violation-detail" data-props="{{ json_encode($props) }}"></div>
+    <div data-vue="admin-violation-detail" data-props="@vueProps($props)"></div>
 </x-layouts.admin>

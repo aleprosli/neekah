@@ -9,7 +9,7 @@
         </div>
 
         {{-- resources/js/components/vendor/VendorRegisterForm.vue --}}
-        <div data-vue="vendor-register-form" data-props="{{ json_encode($props) }}"></div>
+        <div data-vue="vendor-register-form" data-props="@vueProps($props)"></div>
     </main>
 
     {{-- Turnstile's own script, which finds the widget the component renders. --}}

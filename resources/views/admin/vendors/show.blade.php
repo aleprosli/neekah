@@ -13,5 +13,5 @@
     </x-slot:actions>
 
     {{-- resources/js/components/admin/AdminVendorDetail.vue --}}
-    <div data-vue="admin-vendor-detail" data-props="{{ json_encode($props) }}"></div>
+    <div data-vue="admin-vendor-detail" data-props="@vueProps($props)"></div>
 </x-layouts.admin>

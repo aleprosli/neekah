@@ -6,11 +6,11 @@
     {{-- resources/js/components/admin/AdminPostsPage.vue --}}
     <div
         data-vue="admin-posts-page"
-        data-props="{{ json_encode([
+        data-props="@vueProps([
             'posts' => $posts->items(),
             'createUrl' => route('admin.posts.create'),
             'pagination' => $posts->hasPages() ? (string) $posts->links() : '',
             'csrf' => csrf_token(),
-        ]) }}"
+        ])"
     ></div>
 </x-layouts.admin>

@@ -6,10 +6,10 @@
     {{-- resources/js/components/vendor/VendorPackagesPage.vue --}}
     <div
         data-vue="vendor-packages-page"
-        data-props="{{ json_encode([
+        data-props="@vueProps([
             'packages' => $packages,
             'createUrl' => route('vendor.packages.create'),
             'csrf' => csrf_token(),
-        ]) }}"
+        ])"
     ></div>
 </x-layouts.vendor>

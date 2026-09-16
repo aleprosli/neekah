@@ -10,12 +10,12 @@
     <div
         class="mb-8"
         data-vue="vendor-onboarding"
-        data-props="{{ json_encode([
+        data-props="@vueProps([
             'steps' => $onboarding,
             'publicUrl' => $vendor->isApproved() ? route('vendors.show', $vendor) : null,
-        ]) }}"
+        ])"
     ></div>
 
     {{-- resources/js/components/vendor/VendorDashboardPage.vue --}}
-    <div data-vue="vendor-dashboard-page" data-props="{{ json_encode($props) }}"></div>
+    <div data-vue="vendor-dashboard-page" data-props="@vueProps($props)"></div>
 </x-layouts.vendor>

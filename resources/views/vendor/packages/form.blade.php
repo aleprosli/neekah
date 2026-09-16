@@ -4,5 +4,5 @@
     subheading="Pakej yang jelas memudahkan pengantin membandingkan dan terus menempah."
 >
     {{-- resources/js/components/vendor/VendorPackageForm.vue --}}
-    <div data-vue="vendor-package-form" data-props="{{ json_encode($props) }}"></div>
+    <div data-vue="vendor-package-form" data-props="@vueProps($props)"></div>
 </x-layouts.vendor>

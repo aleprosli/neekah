@@ -8,6 +8,7 @@ use App\Http\Requests\StoreEnquiryRequest;
 use App\Models\Enquiry;
 use App\Models\Vendor;
 use App\Notifications\EnquiryReceived;
+use App\Support\VueProps;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -23,7 +24,27 @@ class EnquiryController extends Controller
             ->orderByDesc('id')
             ->paginate(15);
 
-        return view('customer.enquiries.index', ['enquiries' => $enquiries]);
+        $enquiries->setCollection($enquiries->getCollection()->map(fn (Enquiry $enquiry): array => [
+            'id' => $enquiry->id,
+            'url' => route('enquiries.show', $enquiry),
+            'vendor' => $enquiry->vendor->name,
+            'message' => $enquiry->message,
+            'replied' => $enquiry->status === EnquiryStatus::Replied,
+            'sent' => $enquiry->created_at->diffForHumans(),
+            'category' => [
+                'tone' => $enquiry->vendor->cover_tone,
+                'icon' => $enquiry->vendor->category->icon,
+                'illustration' => $enquiry->vendor->category->illustrationUrl(),
+            ],
+        ]));
+
+        return view('customer.enquiries.index', [
+            'props' => VueProps::for([
+                'enquiries' => $enquiries->items(),
+                'findVendorsUrl' => route('vendors.index'),
+                'pagination' => $enquiries->hasPages() ? (string) $enquiries->links() : '',
+            ]),
+        ]);
     }
 
     public function store(StoreEnquiryRequest $request, Vendor $vendor): RedirectResponse

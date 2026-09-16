@@ -12,5 +12,5 @@
     </x-slot:actions>
 
     {{-- resources/js/components/vendor/VendorBookingDetail.vue --}}
-    <div data-vue="vendor-booking-detail" data-props="{{ json_encode($props) }}"></div>
+    <div data-vue="vendor-booking-detail" data-props="@vueProps($props)"></div>
 </x-layouts.vendor>

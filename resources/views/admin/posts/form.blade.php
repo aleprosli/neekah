@@ -6,5 +6,5 @@
     @endunless
 
     {{-- resources/js/components/admin/AdminPostForm.vue --}}
-    <div data-vue="admin-post-form" data-props="{{ json_encode($props) }}"></div>
+    <div data-vue="admin-post-form" data-props="@vueProps($props)"></div>
 </x-layouts.admin>

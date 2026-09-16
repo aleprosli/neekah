@@ -11,7 +11,7 @@
     {{-- resources/js/components/ui/DataTable.vue --}}
     <div
         data-vue="data-table"
-        data-props="{{ json_encode([
+        data-props="@vueProps([
             'dataUrl' => route('admin.users.data', ['role' => $role?->value]),
             'columns' => $columns,
             'searchPlaceholder' => 'Cari nama atau emel…',
@@ -26,6 +26,6 @@
                 'message' => 'Anda akan melihat Neekah persis seperti pengguna ini. Pembayaran dimatikan, dan tindakan ini direkod dalam log sistem.',
                 'confirmLabel' => 'Ya, impersonate',
             ],
-        ]) }}"
+        ])"
     ></div>
 </x-layouts.admin>

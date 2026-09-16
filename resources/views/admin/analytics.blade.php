@@ -10,5 +10,5 @@
     </x-slot:actions>
 
     {{-- resources/js/components/admin/AdminAnalyticsPage.vue --}}
-    <div data-vue="admin-analytics-page" data-props="{{ json_encode($props) }}"></div>
+    <div data-vue="admin-analytics-page" data-props="@vueProps($props)"></div>
 </x-layouts.admin>

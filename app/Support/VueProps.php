@@ -28,6 +28,20 @@ class VueProps
     }
 
     /**
+     * The props as the JSON a data-props attribute carries.
+     *
+     * Slashes and unicode are left alone: escaping them is only needed inside a
+     * <script> tag, and here it turns every URL into "http:\/\/" and every
+     * Malay word with an accent into an escape sequence.
+     *
+     * @param  array<string, mixed>  $props
+     */
+    public static function encode(array $props): string
+    {
+        return (string) json_encode($props, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+    }
+
+    /**
      * One message per field, which is what a form field can show.
      *
      * @return object|array<string, string>

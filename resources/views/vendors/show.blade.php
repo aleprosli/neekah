@@ -20,11 +20,11 @@
         <div class="-mx-4 mt-3 sm:mx-0 md:mt-5">
             <div
                 data-vue="portfolio-gallery"
-                data-props="{{ json_encode([
+                data-props="@vueProps([
                     'photos' => $gallery,
                     'vendorName' => $vendor->name,
                     'tone' => $vendor->cover_tone,
-                ]) }}"
+                ])"
             >
                 {{-- Rendered server-side too, so the first photo is in the markup Google and a link preview read. --}}
                 <div class="grid h-72 grid-cols-4 grid-rows-2 gap-2 sm:overflow-hidden sm:rounded-2xl md:h-[420px]">

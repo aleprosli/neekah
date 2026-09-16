@@ -11,9 +11,9 @@
     {{-- resources/js/components/admin/AdminViolationsPage.vue --}}
     <div
         data-vue="admin-violations-page"
-        data-props="{{ json_encode([
+        data-props="@vueProps([
             'violations' => $violations->items(),
             'pagination' => $violations->hasPages() ? (string) $violations->links() : '',
-        ]) }}"
+        ])"
     ></div>
 </x-layouts.admin>

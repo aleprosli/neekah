@@ -15,14 +15,14 @@
     {{-- resources/js/components/ui/DataTable.vue --}}
     <div
         data-vue="data-table"
-        data-props="{{ json_encode([
+        data-props="@vueProps([
             'dataUrl' => route('vendor.bookings.data', ['status' => $status?->value]),
             'columns' => $columns,
             'searchPlaceholder' => 'Cari rujukan, pakej atau pelanggan…',
             'emptyTitle' => 'Tiada tempahan dalam kategori ini',
             'emptyMessage' => 'Booking yang dibuat pengantin atau yang anda rekod akan muncul di sini.',
             'initialSort' => 'event_date',
-        ]) }}"
+        ])"
     ></div>
 
 </x-layouts.vendor>

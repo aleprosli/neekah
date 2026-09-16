@@ -8,6 +8,7 @@ use App\Http\Requests\StoreBookingRequest;
 use App\Models\Booking;
 use App\Models\Package;
 use App\Models\Vendor;
+use App\Support\VueProps;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -24,7 +25,29 @@ class BookingController extends Controller
             ->orderByDesc('id')
             ->paginate(10);
 
-        return view('customer.bookings.index', ['bookings' => $bookings]);
+        $bookings->setCollection($bookings->getCollection()->map(fn (Booking $booking): array => [
+            'reference' => $booking->reference,
+            'url' => route('bookings.show', $booking),
+            'vendor' => $booking->vendor->name,
+            'summary' => $booking->package_name.' · '.$booking->event_date->translatedFormat('j M Y').' · '.$booking->reference,
+            'total' => 'RM'.number_format((float) $booking->total_amount, 2),
+            'paid' => 'RM'.number_format($booking->paidAmount(), 2),
+            'status_label' => $booking->status->label(),
+            'status_tone' => $booking->status->tone(),
+            'category' => [
+                'tone' => $booking->vendor->cover_tone,
+                'icon' => $booking->vendor->category->icon,
+                'illustration' => $booking->vendor->category->illustrationUrl(),
+            ],
+        ]));
+
+        return view('customer.bookings.index', [
+            'props' => VueProps::for([
+                'bookings' => $bookings->items(),
+                'findVendorsUrl' => route('vendors.index'),
+                'pagination' => $bookings->hasPages() ? (string) $bookings->links() : '',
+            ]),
+        ]);
     }
 
     public function store(StoreBookingRequest $request, Vendor $vendor, CreateBooking $createBooking): RedirectResponse
