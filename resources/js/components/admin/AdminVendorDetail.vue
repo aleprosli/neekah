@@ -1,0 +1,96 @@
+<script setup>
+/** Everything an admin weighs before approving, suspending or re-ranking. */
+import { ref } from 'vue';
+import UiSelect from '../ui/UiSelect.vue';
+
+const props = defineProps({
+    vendor: { type: Object, required: true },
+    facts: { type: Array, required: true },
+    packages: { type: Array, required: true },
+    portfolio: { type: Array, required: true },
+    statusActions: { type: Array, required: true },
+    tiers: { type: Array, required: true },
+    csrf: { type: String, required: true },
+    errors: { type: Object, default: () => ({}) },
+});
+
+const tier = ref(props.vendor.tier);
+</script>
+
+<template>
+    <div class="grid gap-6 lg:grid-cols-[1fr_320px]">
+        <div class="flex flex-col gap-6">
+            <dl class="grid gap-3 rounded-2xl border border-line p-5 text-sm sm:grid-cols-2">
+                <div v-for="fact in facts" :key="fact.label" :class="fact.wide ? 'sm:col-span-2' : ''">
+                    <dt class="text-ink-muted">{{ fact.label }}</dt>
+                    <dd :class="fact.wide ? 'leading-relaxed' : 'font-semibold'">{{ fact.value }}</dd>
+                    <dd v-if="fact.detail" class="break-words text-ink-muted">{{ fact.detail }}</dd>
+                </div>
+            </dl>
+
+            <section class="rounded-2xl border border-line p-5">
+                <h2 class="font-semibold">Pakej ({{ packages.length }})</h2>
+                <p v-if="!packages.length" class="mt-2 text-sm text-ink-muted">Vendor belum menambah pakej.</p>
+                <ul v-else class="mt-3 divide-y divide-line text-sm">
+                    <li v-for="item in packages" :key="item.name" class="flex items-center justify-between gap-3 py-2">
+                        <span class="min-w-0">{{ item.name }} <span class="text-ink-muted">· {{ item.duration }}</span></span>
+                        <span class="shrink-0 font-medium">{{ item.price }}</span>
+                    </li>
+                </ul>
+            </section>
+
+            <section class="rounded-2xl border border-line p-5">
+                <h2 class="font-semibold">Portfolio ({{ portfolio.length }})</h2>
+                <p v-if="!portfolio.length" class="mt-2 text-sm text-ink-muted">Belum ada gambar portfolio.</p>
+                <ul v-else class="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-5">
+                    <li v-for="photo in portfolio" :key="photo.url">
+                        <img :src="photo.thumbnail || photo.url" alt="" loading="lazy" class="aspect-square w-full rounded-xl object-cover">
+                    </li>
+                </ul>
+            </section>
+        </div>
+
+        <aside class="flex flex-col gap-4">
+            <div class="flex flex-col gap-3 rounded-2xl border border-line bg-surface-raised p-5">
+                <h2 class="text-sm font-semibold">Status: {{ vendor.status }}</h2>
+                <div class="flex flex-wrap gap-2">
+                    <form v-for="option in statusActions" :key="option.value" :action="option.url" method="POST">
+                        <input type="hidden" name="_token" :value="csrf">
+                        <input type="hidden" name="status" :value="option.value">
+                        <button
+                            type="submit"
+                            :class="[
+                                'rounded-full px-4 py-2 text-sm font-medium transition',
+                                option.primary ? 'bg-brand-600 text-white hover:bg-brand-700' : 'border border-line hover:border-brand-400',
+                            ]"
+                        >{{ option.label }}</button>
+                    </form>
+                </div>
+            </div>
+
+            <form :action="vendor.tier_url" method="POST" class="flex flex-col gap-3 rounded-2xl border border-line bg-surface-raised p-5">
+                <input type="hidden" name="_token" :value="csrf">
+                <input type="hidden" name="_method" value="PUT">
+
+                <h2 class="text-sm font-semibold">Ranking</h2>
+
+                <UiSelect v-model="tier" label="Tahap vendor" name="tier" :options="tiers" :error="errors.tier" required />
+
+                <p class="text-xs text-ink-muted">Response rate dikira dari enquiry yang vendor ini balas, jadi ia tidak boleh ditetapkan secara manual.</p>
+
+                <label class="flex items-start gap-2 text-sm">
+                    <input type="hidden" name="tier_locked" value="0">
+                    <input type="checkbox" name="tier_locked" value="1" class="mt-0.5 accent-brand-600" :checked="vendor.tier_locked">
+                    <span>
+                        Kunci tahap ini
+                        <span class="block text-xs text-ink-muted">Pengiraan automatik tidak akan menaik atau menurunkan tahap vendor ini.</span>
+                    </span>
+                </label>
+
+                <button type="submit" class="rounded-full bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700">Simpan ranking</button>
+
+                <p class="text-xs text-ink-muted">Vendor Score: rating 30%, booking selesai 20%, completion rate 15%, response rate 15%, transaksi platform 10%, kualiti profil 10%.</p>
+            </form>
+        </aside>
+    </div>
+</template>

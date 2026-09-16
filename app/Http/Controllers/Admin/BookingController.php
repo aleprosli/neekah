@@ -4,8 +4,11 @@ namespace App\Http\Controllers\Admin;
 
 use App\Enums\BookingStatus;
 use App\Enums\PaymentStatus;
+use App\Enums\PaymentType;
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
+use App\Models\Payment;
+use App\Support\VueProps;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -81,6 +84,43 @@ class BookingController extends Controller
     {
         $booking->load(['vendor.category', 'user', 'payments', 'review', 'wedding']);
 
-        return view('admin.bookings.show', ['booking' => $booking]);
+        return view('admin.bookings.show', [
+            'booking' => $booking,
+            'props' => VueProps::for([
+                'booking' => [
+                    'package_name' => $booking->package_name,
+                    'created_at' => $booking->created_at->translatedFormat('j M Y, g:i A'),
+                    'notes' => $booking->notes,
+                    'wedding' => $booking->wedding?->title,
+                    'vendor' => [
+                        'name' => $booking->vendor->name,
+                        'category' => $booking->vendor->category->name,
+                        'url' => route('admin.vendors.show', $booking->vendor),
+                    ],
+                    'customer' => [
+                        'name' => $booking->user->name,
+                        'email' => $booking->user->email,
+                    ],
+                    'total' => 'RM'.number_format((float) $booking->total_amount, 2),
+                    'paid' => 'RM'.number_format($booking->paidAmount(), 2),
+                    'commission_rate' => number_format((float) $booking->commission_rate, 0),
+                    'commission' => 'RM'.number_format((float) $booking->commission_amount, 2),
+                    'payout' => 'RM'.number_format((float) $booking->total_amount - (float) $booking->commission_amount, 2),
+                    'payments' => $booking->payments
+                        ->sortBy(fn (Payment $payment): int => $payment->type === PaymentType::Deposit ? 0 : 1)
+                        ->map(fn (Payment $payment): array => [
+                            'label' => $payment->type->label(),
+                            'reference' => $payment->reference,
+                            'amount' => 'RM'.number_format((float) $payment->amount, 2),
+                            'status' => $payment->status->label(),
+                            'is_paid' => $payment->isPaid(),
+                        ])->values(),
+                    'review' => $booking->review ? [
+                        'rating' => $booking->review->rating,
+                        'comment' => $booking->review->comment,
+                    ] : null,
+                ],
+            ]),
+        ]);
     }
 }

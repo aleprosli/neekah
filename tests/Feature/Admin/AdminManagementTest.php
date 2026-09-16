@@ -56,7 +56,11 @@ it('searches bookings by reference and filters by status', function () {
     expect($searched[0]['reference'])->toBe($cancelled->reference)
         ->and($searched[0]['url'])->toBe(route('admin.bookings.show', $cancelled));
 
-    $this->actingAs($this->admin)->get(route('admin.bookings.show', $confirmed))->assertOk()->assertSee('Payout vendor');
+    $detail = $this->actingAs($this->admin)->get(route('admin.bookings.show', $confirmed))->assertOk()->viewData('props');
+
+    // The payout is what the admin is here to check: total less commission.
+    expect($detail['booking']['payout'])
+        ->toBe('RM'.number_format((float) $confirmed->total_amount - (float) $confirmed->commission_amount, 2));
 });
 
 it('keeps the booking table endpoint to admins', function () {

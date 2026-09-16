@@ -148,5 +148,10 @@ it('keeps customers and vendors out of the violation queue', function () {
     $this->actingAs($this->vendor->user)->put(route('admin.violations.update', $violation), ['decision' => 'dismiss'])->assertForbidden();
 
     $this->actingAs($this->admin)->get(route('admin.violations.index'))->assertOk()->assertSee($this->vendor->name);
-    $this->actingAs($this->admin)->get(route('admin.violations.show', $violation))->assertOk()->assertSee('Tolak laporan');
+    // An open report reaches the admin with the decision still to make.
+    $props = $this->actingAs($this->admin)->get(route('admin.violations.show', $violation))->assertOk()->viewData('props');
+
+    expect($props['violation']['is_open'])->toBeTrue()
+        ->and($props['violation']['update_url'])->toBe(route('admin.violations.update', $violation))
+        ->and($props['action'])->toBe('Amaran');
 });

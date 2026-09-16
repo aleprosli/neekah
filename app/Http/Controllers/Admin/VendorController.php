@@ -3,9 +3,12 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Enums\VendorStatus;
+use App\Enums\VendorTier;
 use App\Http\Controllers\Controller;
-use App\Models\Category;
+use App\Models\Package;
+use App\Models\PortfolioItem;
 use App\Models\Vendor;
+use App\Support\VueProps;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -81,8 +84,46 @@ class VendorController extends Controller
 
         return view('admin.vendors.show', [
             'vendor' => $vendor,
-            'categories' => Category::active()->ordered()->get(),
-            'bookingCount' => $vendor->bookings()->count(),
+            'props' => VueProps::for([
+                'vendor' => [
+                    'status' => $vendor->status->label(),
+                    'tier' => $vendor->tier->value,
+                    'tier_locked' => (bool) $vendor->tier_locked,
+                    'tier_url' => route('admin.vendors.tier', $vendor),
+                ],
+                'facts' => [
+                    ['label' => 'Pemilik', 'value' => $vendor->user->name, 'detail' => collect([$vendor->user->email, $vendor->user->phone])->filter()->implode(' · ')],
+                    ['label' => 'Didaftar', 'value' => $vendor->created_at->translatedFormat('j M Y')],
+                    ['label' => 'Rating', 'value' => '★ '.number_format((float) $vendor->rating_avg, 2).' ('.$vendor->reviews_count.' review)'],
+                    ['label' => 'Booking', 'value' => $vendor->bookings()->count().' jumlah · '.$vendor->completed_bookings_count.' selesai'],
+                    ['label' => 'Harga bermula', 'value' => 'RM'.number_format((float) $vendor->price_from, 2).' / '.$vendor->price_unit->label()],
+                    ['label' => 'Vendor Score', 'value' => number_format((float) $vendor->score, 2).($vendor->tier_locked ? ' · tahap dikunci' : '')],
+                    ['label' => 'Performance points', 'value' => number_format($vendor->points_total).($vendor->penalty_points ? ' − '.$vendor->penalty_points.' penalti' : '')],
+                    ['label' => 'Completion rate', 'value' => $vendor->completion_rate.'% · response '.$vendor->responseRateLabel()],
+                    ...($vendor->tagline ? [['label' => 'Tagline', 'value' => $vendor->tagline, 'wide' => true]] : []),
+                    ...($vendor->description ? [['label' => 'Penerangan', 'value' => $vendor->description, 'wide' => true]] : []),
+                ],
+                'packages' => $vendor->packages->map(fn (Package $package): array => [
+                    'name' => $package->name,
+                    'duration' => $package->duration,
+                    'price' => 'RM'.number_format((float) $package->price, 2),
+                ])->values(),
+                'portfolio' => $vendor->portfolioItems->take(10)->map(fn (PortfolioItem $item): array => [
+                    'url' => $item->url(),
+                    'thumbnail' => $item->thumbnailUrl(),
+                ])->values(),
+                'statusActions' => collect(VendorStatus::cases())
+                    ->reject(fn (VendorStatus $case): bool => $case === $vendor->status)
+                    ->map(fn (VendorStatus $case): array => [
+                        'value' => $case->value,
+                        'label' => $case->label(),
+                        'url' => route('admin.vendors.status', $vendor),
+                        'primary' => $case === VendorStatus::Approved,
+                    ])->values(),
+                'tiers' => collect(VendorTier::cases())
+                    ->map(fn (VendorTier $case): array => ['value' => $case->value, 'label' => $case->label()])
+                    ->all(),
+            ]),
         ]);
     }
 }
