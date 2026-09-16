@@ -237,16 +237,16 @@
 
                 <div class="rounded-3xl border border-brand-700 bg-brand-800/60 p-6 sm:p-8">
                     <p class="text-xs font-semibold tracking-wide text-gold-400 uppercase">Vendor Performance Point</p>
-                    <table class="mt-4 w-full text-sm">
-                        <tbody class="divide-y divide-brand-700">
-                            @foreach ($vendorPoints as $row)
-                                <tr>
-                                    <td class="py-3 text-brand-100">{{ $row['activity'] }}</td>
-                                    <td class="py-3 text-right font-display text-lg font-semibold text-gold-300">{{ $row['points'] }}</td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                    {{-- A list, not a table: two values per row, and it has to
+                         read well inside a narrow marketing card on a phone. --}}
+                    <dl class="mt-4 divide-y divide-brand-700 text-sm">
+                        @foreach ($vendorPoints as $row)
+                            <div class="flex items-center justify-between gap-4 py-3">
+                                <dt class="min-w-0 text-brand-100">{{ $row['activity'] }}</dt>
+                                <dd class="shrink-0 font-display text-lg font-semibold text-gold-300">{{ $row['points'] }}</dd>
+                            </div>
+                        @endforeach
+                    </dl>
                     <p class="mt-4 text-xs text-brand-200">Point tidak diberikan hanya kerana enquiry. Booking sebenar, pembayaran dan perkhidmatan selesai menjadi faktor utama.</p>
                 </div>
             </div>

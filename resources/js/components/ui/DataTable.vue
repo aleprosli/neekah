@@ -12,8 +12,13 @@ import { computed, h, onMounted, ref, watch } from 'vue';
 import UiConfirm from './UiConfirm.vue';
 
 const props = defineProps({
-    /** Endpoint returning { data: [], meta: { total, per_page, current_page, last_page } }. */
-    dataUrl: { type: String, required: true },
+    /**
+     * Endpoint returning { data: [], meta: { total, per_page, current_page, last_page } }.
+     * Leave it out and pass `rows` instead for a list that is already in hand.
+     */
+    dataUrl: { type: String, default: null },
+    /** Rows to show as they are, for a table that does not page or search. */
+    rows: { type: Array, default: null },
     /** [{ key, label, sortable?, align?, type? }] — type "html" renders trusted markup from the server. */
     columns: { type: Array, required: true },
     searchPlaceholder: { type: String, default: 'Cari…' },
@@ -29,9 +34,11 @@ const props = defineProps({
     csrf: { type: String, default: '' },
 });
 
-const rows = ref([]);
+const fetched = ref([]);
+const rows = computed(() => props.rows ?? fetched.value);
+const isStatic = computed(() => props.rows !== null);
 const meta = ref({ total: 0, current_page: 1, last_page: 1 });
-const loading = ref(true);
+const loading = ref(false);
 const failed = ref(false);
 const search = ref('');
 const sort = ref(props.initialSort);
@@ -61,6 +68,8 @@ const table = useVueTable({
 });
 
 const load = async () => {
+    if (isStatic.value) return;
+
     loading.value = true;
     failed.value = false;
 
@@ -76,11 +85,11 @@ const load = async () => {
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
         const payload = await response.json();
-        rows.value = payload.data ?? [];
+        fetched.value = payload.data ?? [];
         meta.value = payload.meta ?? meta.value;
     } catch (problem) {
         failed.value = true;
-        rows.value = [];
+        fetched.value = [];
         console.error(problem);
     } finally {
         loading.value = false;
@@ -89,6 +98,15 @@ const load = async () => {
 
 /** A column may sort by a different database column than the one it shows. */
 const sortKey = (column) => column.sort || column.key;
+
+/** The card layout has no headers to click, so it sorts from a select. */
+const sortFromSelect = (value) => {
+    const [key, chosen] = value.split(':');
+    sort.value = key;
+    direction.value = chosen;
+    page.value = 1;
+    load();
+};
 
 const sortBy = (column) => {
     if (!column.sortable) return;
@@ -103,6 +121,16 @@ const sortBy = (column) => {
 const openRow = (row) => {
     if (row.url) window.location.href = row.url;
 };
+
+const cardColumns = computed(() => {
+    const last = props.columns.at(-1);
+
+    return props.columns.filter(
+        (column, at) => at !== 0 && !(column === last && last.type === 'html'),
+    );
+});
+
+const sortableColumns = computed(() => props.columns.filter((column) => column.sortable));
 
 const go = (to) => {
     page.value = Math.min(Math.max(1, to), meta.value.last_page);
@@ -124,8 +152,8 @@ onMounted(load);
 
 <template>
     <div class="flex min-w-0 flex-col gap-4">
-        <div class="flex flex-wrap items-center gap-3">
-            <label class="relative min-w-0 flex-1 sm:max-w-xs">
+        <div v-if="!isStatic || $slots.actions" class="flex flex-wrap items-center gap-3">
+            <label v-if="!isStatic" class="relative min-w-0 flex-1 sm:max-w-xs">
                 <span class="sr-only">{{ searchPlaceholder }}</span>
                 <input
                     v-model="search"
@@ -134,7 +162,19 @@ onMounted(load);
                     class="w-full rounded-xl border border-line bg-surface px-4 py-2.5 text-sm focus:border-brand-400 focus:ring-2 focus:ring-brand-400/40 focus:outline-none"
                 >
             </label>
-            <p class="text-xs text-ink-muted" aria-live="polite">
+            <label v-if="sortableColumns.length && !isStatic" class="min-w-0 md:hidden">
+                <span class="sr-only">Susun ikut</span>
+                <select
+                    class="rounded-xl border border-line bg-surface px-3 py-2.5 text-sm focus:border-brand-400 focus:outline-none"
+                    :value="`${sort}:${direction}`"
+                    @change="sortFromSelect($event.target.value)"
+                >
+                    <option v-for="column in sortableColumns" :key="column.key" :value="`${sortKey(column)}:desc`">{{ column.label }} ↓</option>
+                    <option v-for="column in sortableColumns" :key="`${column.key}-asc`" :value="`${sortKey(column)}:asc`">{{ column.label }} ↑</option>
+                </select>
+            </label>
+
+            <p v-if="!isStatic" class="text-xs text-ink-muted" aria-live="polite">
                 <span v-if="loading">Memuatkan…</span>
                 <span v-else>{{ meta.total }} rekod</span>
             </p>
@@ -145,7 +185,75 @@ onMounted(load);
             Senarai tidak dapat dimuatkan. Muat semula halaman untuk cuba lagi.
         </p>
 
-        <div class="min-w-0 overflow-x-auto rounded-2xl border border-line">
+        <!-- Cards on a phone, a table from md up: a row with seven columns is
+             unreadable on a 390px screen however far it scrolls. -->
+        <ul v-if="rows.length" class="flex flex-col gap-3 md:hidden">
+            <li v-for="row in table.getRowModel().rows" :key="`card-${row.id}`" class="rounded-2xl border border-line bg-surface-raised p-4">
+                <component
+                    :is="row.original.url ? 'a' : 'div'"
+                    :href="row.original.url"
+                    class="flex flex-col gap-2"
+                >
+                    <div class="flex items-start justify-between gap-3">
+                        <p class="min-w-0 font-medium">
+                            <slot :name="`cell-${columns[0].key}`" :row="row.original">
+                                <span v-if="columns[0].type === 'html'" v-html="row.original[columns[0].key]"></span>
+                                <span v-else>{{ row.original[columns[0].key] }}</span>
+                            </slot>
+                        </p>
+                        <span v-if="columns.at(-1).type === 'html'" class="shrink-0" v-html="row.original[columns.at(-1).key]"></span>
+                    </div>
+
+                    <dl class="flex flex-col gap-1 text-sm">
+                        <div v-for="column in cardColumns" :key="column.key" class="flex justify-between gap-3">
+                            <dt class="shrink-0 text-ink-muted">{{ column.label }}</dt>
+                            <dd class="min-w-0 truncate text-right">
+                                <slot :name="`cell-${column.key}`" :row="row.original">
+                                    <span v-if="column.type === 'html'" v-html="row.original[column.key]"></span>
+                                    <span v-else>{{ row.original[column.key] ?? '—' }}</span>
+                                </slot>
+                            </dd>
+                        </div>
+                    </dl>
+                </component>
+
+                <div v-if="rowAction || $slots.action" class="mt-3 flex items-center justify-end gap-3 border-t border-line pt-3">
+                    <slot name="action" :row="row.original" />
+                    <form v-if="rowAction?.inline && row.original.action" :action="row.original.action.url" method="POST">
+                        <input type="hidden" name="_token" :value="csrf">
+                        <input v-for="(value, field) in row.original.action.fields || {}" :key="field" type="hidden" :name="field" :value="value">
+                        <button
+                            type="submit"
+                            :class="[
+                                'rounded-full px-4 py-2 text-xs font-semibold transition',
+                                row.original.action.tone === 'brand' ? 'bg-brand-600 text-white' : 'border border-line font-medium',
+                            ]"
+                        >{{ row.original.action.label }}</button>
+                    </form>
+
+                    <UiConfirm
+                        v-else-if="rowAction && !rowAction.inline && row.original[rowAction.urlKey]"
+                        :action="row.original[rowAction.urlKey]"
+                        :method="rowAction.method || 'POST'"
+                        :tone="rowAction.tone || 'brand'"
+                        :title="rowAction.title.replace('__ROW__', row.original[rowAction.labelKey] || '')"
+                        :message="rowAction.message"
+                        :confirm-label="rowAction.confirmLabel"
+                        trigger-class="rounded-full border border-line px-4 py-2 text-xs font-medium transition hover:border-brand-400"
+                        :csrf="csrf"
+                    >{{ rowAction.label }}</UiConfirm>
+                </div>
+            </li>
+        </ul>
+
+        <p v-else-if="loading" class="rounded-2xl border border-dashed border-line p-8 text-center text-sm text-ink-muted md:hidden">Memuatkan…</p>
+
+        <div v-else class="rounded-2xl border border-dashed border-line p-8 text-center md:hidden">
+            <p class="font-medium">{{ emptyTitle }}</p>
+            <p class="mt-1 text-sm text-ink-muted">{{ emptyMessage }}</p>
+        </div>
+
+        <div class="hidden min-w-0 overflow-x-auto rounded-2xl border border-line md:block">
             <table class="w-full min-w-[640px] text-left text-sm">
                 <thead class="border-b border-line bg-surface-muted/60">
                     <tr>
@@ -156,7 +264,7 @@ onMounted(load);
                             :class="['px-4 py-3 font-medium whitespace-nowrap', header.column.columnDef.meta.align === 'right' ? 'text-right' : '']"
                         >
                             <button
-                                v-if="header.column.columnDef.meta.sortable"
+                                v-if="header.column.columnDef.meta.sortable && !isStatic"
                                 type="button"
                                 class="inline-flex items-center gap-1 transition hover:text-brand-700"
                                 @click="sortBy(header.column.columnDef.meta)"
@@ -166,16 +274,16 @@ onMounted(load);
                             </button>
                             <span v-else>{{ header.column.columnDef.header }}</span>
                         </th>
-                        <th v-if="rowAction" scope="col" class="px-4 py-3"><span class="sr-only">Tindakan</span></th>
+                        <th v-if="rowAction || $slots.action" scope="col" class="px-4 py-3"><span class="sr-only">Tindakan</span></th>
                     </tr>
                 </thead>
 
                 <tbody class="divide-y divide-line">
                     <tr v-if="loading && !rows.length">
-                        <td :colspan="columns.length + (rowAction ? 1 : 0)" class="px-4 py-10 text-center text-ink-muted">Memuatkan…</td>
+                        <td :colspan="columns.length + (rowAction || $slots.action ? 1 : 0)" class="px-4 py-10 text-center text-ink-muted">Memuatkan…</td>
                     </tr>
                     <tr v-else-if="!rows.length">
-                        <td :colspan="columns.length + (rowAction ? 1 : 0)" class="px-4 py-12 text-center">
+                        <td :colspan="columns.length + (rowAction || $slots.action ? 1 : 0)" class="px-4 py-12 text-center">
                             <p class="font-medium">{{ emptyTitle }}</p>
                             <p class="mt-1 text-ink-muted">{{ emptyMessage }}</p>
                         </td>
@@ -191,12 +299,15 @@ onMounted(load);
                             :key="cell.id"
                             :class="['px-4 py-3 align-middle', cell.column.columnDef.meta.align === 'right' ? 'text-right' : '']"
                         >
-                            <FlexRender :render="cell.column.columnDef.cell" :props="cell.getContext()" />
+                            <slot :name="`cell-${cell.column.columnDef.meta.key}`" :row="row.original">
+                                <FlexRender :render="cell.column.columnDef.cell" :props="cell.getContext()" />
+                            </slot>
                         </td>
 
-                        <td v-if="rowAction" class="px-4 py-3 text-right whitespace-nowrap" @click.stop>
+                        <td v-if="rowAction || $slots.action" class="px-4 py-3 text-right whitespace-nowrap" @click.stop>
+                            <slot name="action" :row="row.original" />
                             <!-- An inline action posts straight away; the row says what it does. -->
-                            <form v-if="rowAction.inline && row.original.action" :action="row.original.action.url" method="POST" class="inline">
+                            <form v-if="rowAction?.inline && row.original.action" :action="row.original.action.url" method="POST" class="inline">
                                 <input type="hidden" name="_token" :value="csrf">
                                 <input v-for="(value, field) in row.original.action.fields || {}" :key="field" type="hidden" :name="field" :value="value">
                                 <button
@@ -211,7 +322,7 @@ onMounted(load);
                             </form>
 
                             <UiConfirm
-                                v-else-if="!rowAction.inline && row.original[rowAction.urlKey]"
+                                v-else-if="rowAction && !rowAction.inline && row.original[rowAction.urlKey]"
                                 :action="row.original[rowAction.urlKey]"
                                 :method="rowAction.method || 'POST'"
                                 :tone="rowAction.tone || 'brand'"

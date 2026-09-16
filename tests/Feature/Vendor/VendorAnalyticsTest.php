@@ -93,8 +93,14 @@ it('lets the points table scroll rather than clipping the vendor own totals', fu
     $this->actingAs($this->owner)->get(route('vendor.points.index'))->assertOk();
 
     // The wrapper used to be overflow-hidden, which cut the right-hand column
-    // off on a phone with no way to scroll it back into view. The table now
-    // lives in the Vue component, so that is where the guarantee is checked.
+    // off on a phone with no way to scroll it back into view. Every table in
+    // the application now renders through DataTable, so the guarantee lives
+    // there: cards on a phone, and a table that scrolls on a wider screen.
+    $table = file_get_contents(resource_path('js/components/ui/DataTable.vue'));
+
+    expect($table)->toMatch('/<div class="hidden min-w-0 overflow-x-auto[^"]*">\s*<table/')
+        ->and($table)->toContain('md:hidden');
+
     expect(file_get_contents(resource_path('js/components/vendor/VendorPointsPage.vue')))
-        ->toMatch('/<div class="overflow-x-auto[^"]*">\s*<table/');
+        ->toContain('<DataTable :rows="earnable"');
 });

@@ -39,6 +39,8 @@
         @csrf
         @method('PUT')
 
+        {{-- TODO: this table joins components/ui/DataTable.vue when the couple's
+             area is converted, like every other table in the application. --}}
         <div class="overflow-x-auto rounded-2xl border border-line">
             <table class="w-full text-sm">
                 <thead class="bg-surface-muted text-left text-xs tracking-wide text-ink-muted uppercase">

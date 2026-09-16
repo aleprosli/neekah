@@ -1,7 +1,17 @@
 <script setup>
 /** The platform at a glance: the numbers, what needs approving, what just sold. */
+import DataTable from '../ui/DataTable.vue';
 import UiBadge from '../ui/UiBadge.vue';
 import UiStatCard from '../ui/UiStatCard.vue';
+
+const BOOKING_COLUMNS = [
+    { key: 'reference', label: 'Rujukan' },
+    { key: 'vendor', label: 'Vendor' },
+    { key: 'customer', label: 'Pengantin' },
+    { key: 'total', label: 'Jumlah', align: 'right' },
+    { key: 'commission', label: 'Komisen', align: 'right' },
+    { key: 'status_label', label: 'Status' },
+];
 
 defineProps({
     stats: { type: Array, required: true },
@@ -76,29 +86,13 @@ defineProps({
             <a :href="bookingsUrl" class="text-sm font-medium text-brand-600 hover:underline">Semua</a>
         </div>
 
-        <div class="min-w-0 overflow-x-auto rounded-2xl border border-line">
-            <table class="w-full min-w-[640px] text-sm">
-                <thead class="bg-surface-muted text-left text-xs tracking-wide text-ink-muted uppercase">
-                    <tr>
-                        <th class="px-4 py-3 font-semibold">Rujukan</th>
-                        <th class="px-4 py-3 font-semibold">Vendor</th>
-                        <th class="px-4 py-3 font-semibold">Pengantin</th>
-                        <th class="px-4 py-3 text-right font-semibold">Jumlah</th>
-                        <th class="px-4 py-3 text-right font-semibold">Komisen</th>
-                        <th class="px-4 py-3 font-semibold">Status</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-line">
-                    <tr v-for="booking in recentBookings" :key="booking.reference" class="transition hover:bg-surface-muted/60">
-                        <td class="px-4 py-3"><a :href="booking.url" class="font-medium hover:text-brand-700">{{ booking.reference }}</a></td>
-                        <td class="px-4 py-3">{{ booking.vendor }}</td>
-                        <td class="px-4 py-3">{{ booking.customer }}</td>
-                        <td class="px-4 py-3 text-right whitespace-nowrap">{{ booking.total }}</td>
-                        <td class="px-4 py-3 text-right whitespace-nowrap">{{ booking.commission }}</td>
-                        <td class="px-4 py-3"><UiBadge :label="booking.status_label" :tone="booking.status_tone" /></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+        <DataTable :rows="recentBookings" :columns="BOOKING_COLUMNS" :csrf="csrf">
+            <template #cell-reference="{ row }">
+                <a :href="row.url" class="font-medium hover:text-brand-700">{{ row.reference }}</a>
+            </template>
+            <template #cell-status_label="{ row }">
+                <UiBadge :label="row.status_label" :tone="row.status_tone" />
+            </template>
+        </DataTable>
     </section>
 </template>

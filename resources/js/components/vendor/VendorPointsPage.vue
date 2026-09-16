@@ -4,9 +4,16 @@
  * actually went. Everything here is already computed on the server; the page
  * only chooses how to show it.
  */
+import DataTable from '../ui/DataTable.vue';
 import UiBarChart from '../ui/UiBarChart.vue';
 import UiLineChart from '../ui/UiLineChart.vue';
 import UiStatCard from '../ui/UiStatCard.vue';
+
+const POINT_COLUMNS = [
+    { key: 'label', label: 'Aktiviti' },
+    { key: 'points', label: 'Point', align: 'right' },
+    { key: 'earned', label: 'Anda', align: 'right' },
+];
 
 defineProps({
     stats: { type: Array, required: true },
@@ -106,30 +113,16 @@ defineProps({
     <div class="mt-8 grid gap-8 lg:grid-cols-2">
         <section class="flex flex-col gap-4">
             <h2 class="font-display text-xl font-semibold">Cara point diberi</h2>
-            <div class="overflow-x-auto rounded-2xl border border-line">
-                <table class="w-full text-sm">
-                    <thead class="bg-surface-muted text-left text-xs tracking-wide text-ink-muted uppercase">
-                        <tr>
-                            <th class="px-4 py-3 font-semibold">Aktiviti</th>
-                            <th class="px-4 py-3 text-right font-semibold">Point</th>
-                            <th class="px-4 py-3 text-right font-semibold">Anda</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-line">
-                        <tr v-for="reason in earnable" :key="reason.label">
-                            <td class="px-4 py-3">{{ reason.label }}</td>
-                            <td class="px-4 py-3 text-right text-ink-muted">+{{ reason.points }}</td>
-                            <td class="px-4 py-3 text-right font-medium">
-                                <template v-if="reason.earned !== null">
-                                    +{{ reason.earned }}
-                                    <span v-if="reason.awards" class="text-xs font-normal text-ink-muted">({{ reason.awards }}×)</span>
-                                </template>
-                                <span v-else class="text-ink-muted">—</span>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+            <DataTable :rows="earnable" :columns="POINT_COLUMNS">
+                <template #cell-earned="{ row }">
+                    <template v-if="row.earned !== null">
+                        +{{ row.earned }}
+                        <span v-if="row.awards" class="text-xs font-normal text-ink-muted">({{ row.awards }}×)</span>
+                    </template>
+                    <span v-else class="text-ink-muted">—</span>
+                </template>
+            </DataTable>
+
             <p class="text-xs text-ink-muted">Point tidak diberikan hanya kerana menerima enquiry. Booking sebenar, pembayaran dan perkhidmatan yang selesai menjadi faktor utama.</p>
         </section>
 

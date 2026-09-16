@@ -1,5 +1,6 @@
 <script setup>
 /** The blog list: what is live, what is scheduled, what is still a draft. */
+import DataTable from '../ui/DataTable.vue';
 import UiConfirm from '../ui/UiConfirm.vue';
 
 defineProps({
@@ -8,6 +9,12 @@ defineProps({
     pagination: { type: String, default: '' },
     csrf: { type: String, required: true },
 });
+
+const COLUMNS = [
+    { key: 'title', label: 'Artikel' },
+    { key: 'status_label', label: 'Status' },
+    { key: 'updated', label: 'Dikemas kini' },
+];
 
 const tones = {
     published: 'bg-emerald-100 text-emerald-800',
@@ -22,49 +29,32 @@ const tones = {
     </div>
 
     <template v-else>
-        <div class="min-w-0 overflow-x-auto rounded-2xl border border-line">
-            <table class="w-full min-w-[640px] text-sm">
-                <thead class="bg-surface-muted text-left text-xs tracking-wide text-ink-muted uppercase">
-                    <tr>
-                        <th class="px-4 py-3 font-semibold">Artikel</th>
-                        <th class="px-4 py-3 font-semibold">Status</th>
-                        <th class="px-4 py-3 font-semibold">Dikemas kini</th>
-                        <th class="px-4 py-3"><span class="sr-only">Tindakan</span></th>
-                    </tr>
-                </thead>
+        <DataTable :rows="posts" :columns="COLUMNS" :csrf="csrf">
+            <template #cell-title="{ row }">
+                <a :href="row.edit_url" class="font-medium hover:text-brand-700">{{ row.title }}</a>
+                <p class="text-xs text-ink-muted">/blog/{{ row.slug }}</p>
+            </template>
 
-                <tbody class="divide-y divide-line">
-                    <tr v-for="post in posts" :key="post.id">
-                        <td class="px-4 py-3">
-                            <a :href="post.edit_url" class="font-medium hover:text-brand-700">{{ post.title }}</a>
-                            <p class="text-xs text-ink-muted">/blog/{{ post.slug }}</p>
-                        </td>
+            <template #cell-status_label="{ row }">
+                <span :class="['inline-flex rounded-full px-2.5 py-1 text-xs font-semibold', tones[row.state]]">{{ row.status_label }}</span>
+            </template>
 
-                        <td class="px-4 py-3">
-                            <span :class="['inline-flex rounded-full px-2.5 py-1 text-xs font-semibold', tones[post.state]]">{{ post.status_label }}</span>
-                        </td>
-
-                        <td class="px-4 py-3 text-ink-muted">{{ post.updated }}</td>
-
-                        <td class="space-x-3 px-4 py-3 text-right whitespace-nowrap">
-                            <a :href="post.public_url" target="_blank" rel="noopener" class="text-xs font-medium text-ink-muted hover:text-brand-700">
-                                {{ post.state === 'published' ? 'Lihat' : 'Pratonton' }}
-                            </a>
-                            <UiConfirm
-                                :action="post.destroy_url"
-                                method="DELETE"
-                                tone="danger"
-                                :title="`Padam artikel ${post.title}?`"
-                                message="Artikel dan gambar utamanya akan dipadam. Tindakan ini tidak boleh dibatalkan."
-                                confirm-label="Padam artikel"
-                                trigger-class="text-xs font-medium text-ink-muted hover:text-brand-700"
-                                :csrf="csrf"
-                            >Padam</UiConfirm>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+            <template #action="{ row }">
+                <a :href="row.public_url" target="_blank" rel="noopener" class="text-xs font-medium text-ink-muted hover:text-brand-700">
+                    {{ row.state === 'published' ? 'Lihat' : 'Pratonton' }}
+                </a>
+                <UiConfirm
+                    :action="row.destroy_url"
+                    method="DELETE"
+                    tone="danger"
+                    :title="`Padam artikel ${row.title}?`"
+                    message="Artikel dan gambar utamanya akan dipadam. Tindakan ini tidak boleh dibatalkan."
+                    confirm-label="Padam artikel"
+                    trigger-class="ml-3 text-xs font-medium text-ink-muted hover:text-brand-700"
+                    :csrf="csrf"
+                >Padam</UiConfirm>
+            </template>
+        </DataTable>
 
         <div v-if="pagination" class="mt-6" v-html="pagination"></div>
     </template>
