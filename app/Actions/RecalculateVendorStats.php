@@ -17,6 +17,12 @@ class RecalculateVendorStats
      */
     public function handle(Vendor $vendor): Vendor
     {
+        // A score or a counter is not a change to the vendor's page. Letting
+        // these writes bump updated_at made the sitemap's lastmod move every
+        // time a vendor opened their own points page, which teaches a crawler
+        // that our lastmod means nothing.
+        $vendor->timestamps = false;
+
         $vendor->fill([
             'rating_avg' => round((float) $vendor->reviews()->avg('rating'), 2),
             'reviews_count' => $vendor->reviews()->count(),
@@ -29,6 +35,7 @@ class RecalculateVendorStats
 
         $this->awardPoints->syncMilestones($vendor);
         $vendor->refresh();
+        $vendor->timestamps = false;
 
         if (! $vendor->tier_locked) {
             $vendor->tier = $this->tierFor($vendor);
@@ -36,6 +43,8 @@ class RecalculateVendorStats
 
         $vendor->score = $vendor->calculateScore();
         $vendor->save();
+
+        $vendor->timestamps = true;
 
         return $vendor;
     }

@@ -8,6 +8,7 @@ use App\Models\SiteTemplate;
 use App\Models\Vendor;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 
 /**
@@ -18,17 +19,22 @@ use Illuminate\Support\Collection;
  */
 class SitemapController extends Controller
 {
-    /** Points Googlebot at the separate lists rather than one long file. */
+    /**
+     * Points Googlebot at the separate lists rather than one long file.
+     *
+     * Each one carries the date its newest entry changed, so a crawler can see
+     * which list is worth fetching again instead of re-reading all four.
+     */
     public function index(Request $request): Response
     {
         $this->refuseOnCardHost($request);
 
         return $this->xml('sitemaps.index', [
             'sitemaps' => [
-                route('sitemap.pages'),
-                route('sitemap.vendors'),
-                route('sitemap.templates'),
-                route('sitemap.blog'),
+                ['loc' => route('sitemap.pages'), 'lastmod' => null],
+                ['loc' => route('sitemap.vendors'), 'lastmod' => $this->vendorsChangedAt()],
+                ['loc' => route('sitemap.templates'), 'lastmod' => SiteTemplate::active()->max('updated_at')],
+                ['loc' => route('sitemap.blog'), 'lastmod' => Post::query()->published()->max('updated_at')],
             ],
         ]);
     }
@@ -76,19 +82,56 @@ class SitemapController extends Controller
         ]);
     }
 
+    /**
+     * Approved vendors only: a vendor awaiting review has no public page yet,
+     * and listing an address that answers 404 is how a sitemap loses a
+     * crawler's trust.
+     */
     public function vendors(Request $request): Response
     {
         $this->refuseOnCardHost($request);
 
         return $this->xml('sitemaps.urls', [
-            'urls' => Vendor::query()->approved()->orderBy('id')->get()
+            'urls' => Vendor::query()
+                ->approved()
+                ->withMax('packages', 'updated_at')
+                ->withMax('portfolioItems', 'updated_at')
+                ->orderBy('id')
+                ->get()
                 ->map(fn (Vendor $vendor): array => [
                     'loc' => route('vendors.show', $vendor),
-                    'lastmod' => $vendor->updated_at?->toAtomString(),
+                    'lastmod' => $this->contentChangedAt($vendor)?->toAtomString(),
                     'priority' => '0.9',
                     'changefreq' => 'weekly',
                 ]),
         ]);
+    }
+
+    /**
+     * When this vendor's page last actually changed: their own profile, their
+     * packages or their portfolio. The score and the counters are deliberately
+     * not part of it — they move on their own and say nothing about the page.
+     */
+    private function contentChangedAt(Vendor $vendor): ?Carbon
+    {
+        return collect([
+            $vendor->updated_at,
+            $vendor->packages_max_updated_at ? Carbon::parse($vendor->packages_max_updated_at) : null,
+            $vendor->portfolio_items_max_updated_at ? Carbon::parse($vendor->portfolio_items_max_updated_at) : null,
+        ])->filter()->max();
+    }
+
+    /** The newest change across every approved vendor's page. */
+    private function vendorsChangedAt(): ?Carbon
+    {
+        return Vendor::query()
+            ->approved()
+            ->withMax('packages', 'updated_at')
+            ->withMax('portfolioItems', 'updated_at')
+            ->get()
+            ->map(fn (Vendor $vendor): ?Carbon => $this->contentChangedAt($vendor))
+            ->filter()
+            ->max();
     }
 
     public function templates(Request $request): Response
