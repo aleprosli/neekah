@@ -19,13 +19,13 @@ const note = ref('');
 </script>
 
 <template>
-    <div class="grid gap-6 lg:grid-cols-[1fr_340px]">
-        <div class="flex flex-col gap-6">
+    <div class="grid gap-6 break-words lg:grid-cols-[minmax(0,1fr)_340px]">
+        <div class="flex min-w-0 flex-col gap-6">
             <div class="rounded-2xl border border-line p-5">
                 <p class="text-xs font-semibold tracking-wide text-ink-muted uppercase">Laporan</p>
                 <p class="mt-2 text-sm leading-relaxed whitespace-pre-line">{{ violation.description }}</p>
 
-                <dl class="mt-4 grid gap-2 border-t border-line pt-4 text-sm sm:grid-cols-2">
+                <dl class="mt-4 grid gap-2 border-t border-line pt-4 text-sm sm:grid-cols-2 [&>div]:min-w-0">
                     <div>
                         <dt class="text-ink-muted">Pelapor</dt>
                         <dd class="font-medium">{{ violation.reporter.name }}</dd>
@@ -49,7 +49,7 @@ const note = ref('');
             </section>
         </div>
 
-        <aside class="flex flex-col gap-4">
+        <aside class="flex min-w-0 flex-col gap-4">
             <form v-if="violation.is_open" :action="violation.update_url" method="POST" class="flex flex-col gap-3 rounded-2xl border border-line bg-surface-raised p-5">
                 <input type="hidden" name="_token" :value="csrf">
                 <input type="hidden" name="_method" value="PUT">

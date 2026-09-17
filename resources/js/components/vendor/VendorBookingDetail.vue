@@ -23,9 +23,11 @@ const tones = {
 </script>
 
 <template>
-    <div class="grid gap-6 lg:grid-cols-[1fr_320px]">
-        <div class="flex flex-col gap-6">
-            <dl class="grid gap-3 rounded-2xl border border-line p-5 text-sm sm:grid-cols-2">
+    <!-- min-w-0 and break-words together keep one long email or location from
+         widening the page past a phone's screen. -->
+    <div class="grid gap-6 break-words lg:grid-cols-[minmax(0,1fr)_320px]">
+        <div class="flex min-w-0 flex-col gap-6">
+            <dl class="grid gap-3 rounded-2xl border border-line p-5 text-sm sm:grid-cols-2 [&>div]:min-w-0">
                 <div>
                     <dt class="text-ink-muted">Pelanggan</dt>
                     <dd class="font-semibold">{{ booking.customer.name }}</dd>
@@ -59,7 +61,7 @@ const tones = {
             </div>
         </div>
 
-        <aside class="flex flex-col gap-3 rounded-2xl border border-line bg-surface-raised p-5">
+        <aside class="flex min-w-0 flex-col gap-3 rounded-2xl border border-line bg-surface-raised p-5">
             <p class="text-xs font-semibold tracking-wide text-ink-muted uppercase">Pembayaran</p>
             <p class="font-display text-2xl font-semibold">{{ booking.total }}</p>
 

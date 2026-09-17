@@ -22,8 +22,8 @@ const COLUMNS = [
 </script>
 
 <template>
-    <div class="grid gap-8 lg:grid-cols-[1fr_320px]">
-        <DataTable :rows="categories" :columns="COLUMNS" :csrf="csrf">
+    <div class="grid gap-8 break-words lg:grid-cols-[minmax(0,1fr)_320px]">
+        <DataTable class="min-w-0" :rows="categories" :columns="COLUMNS" :csrf="csrf">
             <template #cell-name="{ row }">
                 <form :action="row.update_url" method="POST" class="flex flex-wrap items-center gap-2">
                     <input type="hidden" name="_token" :value="csrf">
@@ -68,7 +68,7 @@ const COLUMNS = [
             </template>
         </DataTable>
 
-        <form :action="storeUrl" method="POST" class="flex h-fit flex-col gap-3 rounded-2xl border border-line bg-surface-raised p-5">
+        <form :action="storeUrl" method="POST" class="flex min-w-0 h-fit flex-col gap-3 rounded-2xl border border-line bg-surface-raised p-5">
             <input type="hidden" name="_token" :value="csrf">
             <h2 class="font-semibold">Tambah kategori</h2>
 

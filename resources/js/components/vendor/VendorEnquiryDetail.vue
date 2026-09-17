@@ -15,8 +15,8 @@ const reply = ref(props.enquiry.reply ?? '');
 </script>
 
 <template>
-    <div class="grid gap-6 lg:grid-cols-[1fr_300px]">
-        <div class="flex flex-col gap-4">
+    <div class="grid gap-6 break-words lg:grid-cols-[minmax(0,1fr)_300px]">
+        <div class="flex min-w-0 flex-col gap-4">
             <div class="rounded-2xl border border-line p-5">
                 <p class="text-xs font-semibold tracking-wide text-ink-muted uppercase">Mesej</p>
                 <p class="mt-2 text-sm leading-relaxed whitespace-pre-line">{{ enquiry.message }}</p>
@@ -45,7 +45,7 @@ const reply = ref(props.enquiry.reply ?? '');
             </form>
         </div>
 
-        <aside class="flex flex-col gap-3 rounded-2xl border border-line p-5 text-sm lg:self-start">
+        <aside class="flex min-w-0 flex-col gap-3 rounded-2xl border border-line p-5 text-sm lg:self-start">
             <div>
                 <p class="text-ink-muted">Pelanggan</p>
                 <p class="font-medium">{{ enquiry.customer.name }}</p>

@@ -49,7 +49,7 @@ defineProps({
 
         <slot name="couple" />
 
-        <div class="mt-8 grid gap-8 lg:grid-cols-[1fr_320px]">
+        <div class="mt-8 grid gap-8 break-words lg:grid-cols-[minmax(0,1fr)_320px]">
             <section class="flex min-w-0 flex-col gap-4">
                 <h2 class="font-display text-xl font-semibold">Vendor majlis anda</h2>
 

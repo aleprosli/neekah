@@ -6,8 +6,8 @@ defineProps({
 </script>
 
 <template>
-    <div class="grid gap-6 lg:grid-cols-[1fr_320px]">
-        <dl class="grid gap-3 rounded-2xl border border-line p-5 text-sm sm:grid-cols-2">
+    <div class="grid gap-6 break-words lg:grid-cols-[minmax(0,1fr)_320px]">
+        <dl class="grid min-w-0 gap-3 rounded-2xl border border-line p-5 text-sm sm:grid-cols-2 [&>div]:min-w-0">
             <div>
                 <dt class="text-ink-muted">Vendor</dt>
                 <dd class="font-semibold"><a :href="booking.vendor.url" class="hover:text-brand-700">{{ booking.vendor.name }}</a></dd>
@@ -33,7 +33,7 @@ defineProps({
             </div>
         </dl>
 
-        <aside class="flex flex-col gap-3 rounded-2xl border border-line bg-surface-raised p-5">
+        <aside class="flex min-w-0 flex-col gap-3 rounded-2xl border border-line bg-surface-raised p-5">
             <p class="text-xs font-semibold tracking-wide text-ink-muted uppercase">Kewangan</p>
             <p class="font-display text-2xl font-semibold">{{ booking.total }}</p>
 

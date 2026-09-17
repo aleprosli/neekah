@@ -1,6 +1,7 @@
 <?php
 
 use App\Enums\BookingStatus;
+use App\Enums\PaymentMethod;
 use App\Enums\PaymentStatus;
 use App\Models\Booking;
 use App\Models\Category;
@@ -122,23 +123,36 @@ it('hides the record form when an admin turns manual transfer off', function () 
     expect($props['paymentForm'])->toBeNull();
 });
 
-it('lets an admin publish the bank details a couple pays into', function () {
+it('lets an admin switch each payment method on and off', function () {
     $this->actingAs(User::factory()->admin()->create())
         ->put(route('admin.settings.payments'), [
-            'manual_transfer_enabled' => '1',
-            'bank_name' => 'Maybank',
-            'account_holder' => 'Neekah Enterprise',
-            'account_number' => '512345678901',
+            'manual_transfer_enabled' => '0',
+            'billplz_enabled' => '1',
+            'bayarcash_enabled' => '0',
+            'stripe_enabled' => '1',
             'instructions' => 'Bayar terus kepada vendor, kemudian rekodkan di sini.',
         ])
         ->assertRedirect()
         ->assertSessionHasNoErrors();
 
+    $settings = app(PaymentSettings::class);
+
+    expect($settings->isEnabled(PaymentMethod::ManualTransfer))->toBeFalse()
+        ->and($settings->isEnabled(PaymentMethod::Billplz))->toBeTrue()
+        ->and($settings->isEnabled(PaymentMethod::Bayarcash))->toBeFalse()
+        ->and($settings->isEnabled(PaymentMethod::Stripe))->toBeTrue()
+        ->and($settings->instructions())->toContain('rekodkan di sini');
+});
+
+it('does not offer a gateway that is switched on before it is built', function () {
+    app(PaymentSettings::class)->save(['manual_transfer_enabled' => false, 'stripe_enabled' => true]);
+
+    expect(app(PaymentSettings::class)->offeredMethods())->toBe([]);
+});
+
+it('shows the couple the instructions and no platform bank account', function () {
     $props = $this->actingAs($this->customer)->get(route('bookings.show', $this->booking))->viewData('props');
 
-    expect($props['paymentForm']['bank'])->toBe([
-        'bank' => 'Maybank',
-        'holder' => 'Neekah Enterprise',
-        'number' => '512345678901',
-    ])->and($props['paymentForm']['instructions'])->toContain('rekodkan di sini');
+    expect($props['paymentForm'])->not->toHaveKey('bank')
+        ->and($props['paymentForm']['instructions'])->toBe(app(PaymentSettings::class)->instructions());
 });

@@ -25,8 +25,8 @@
 
             <main class="min-w-0">
                 @if ($heading)
-                    <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-                        <div>
+                    <div class="mb-6 flex flex-col gap-3 break-words sm:flex-row sm:items-end sm:justify-between">
+                        <div class="min-w-0">
                             <h1 class="font-display text-3xl font-semibold tracking-tight">{{ $heading }}</h1>
                             @if ($subheading)
                                 <p class="mt-1 text-sm text-ink-muted">{{ $subheading }}</p>
