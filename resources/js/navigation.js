@@ -22,6 +22,30 @@ const REGIONS = ['main', '[data-nav-region]'];
 
 const shellOf = (doc) => doc.querySelector('meta[name="page-shell"]')?.content ?? null;
 
+/**
+ * What sits around the swapped regions: the top-level elements of <body>, by
+ * tag, id and data attributes, but not their content.
+ *
+ * Only <main> and the navigations are swapped, so a page whose furniture
+ * differs cannot be swapped into — the vendor list's search bar, compare tray
+ * and filter dialog would stay standing on a blog post. Read from the server's
+ * markup, never the live DOM, because Vue teleports its dialogs into <body>.
+ */
+const furnitureOf = (doc) =>
+    [...doc.body.children]
+        .filter((element) => !['SCRIPT', 'TEMPLATE'].includes(element.tagName))
+        .map((element) =>
+            [
+                element.tagName,
+                element.id,
+                ...element.getAttributeNames().filter((name) => name.startsWith('data-')),
+            ].join(' '),
+        )
+        .join('|');
+
+/** Evaluated before any island mounts, so this is still the server's markup. */
+let currentFurniture = furnitureOf(document);
+
 const currentUrl = () => window.location.href;
 
 const isSwappable = (link, event) => {
@@ -55,30 +79,27 @@ const showProgress = () => {
  * pointing at the page the visitor just left.
  */
 const swapRegions = (incoming) => {
-    if (shellOf(incoming) !== shellOf(document)) {
+    const incomingFurniture = furnitureOf(incoming);
+
+    if (shellOf(incoming) !== shellOf(document) || incomingFurniture !== currentFurniture) {
         return false;
     }
 
-    let swapped = false;
+    const pairs = REGIONS.map((selector) => [document.querySelectorAll(selector), incoming.querySelectorAll(selector)]);
 
-    REGIONS.forEach((selector) => {
-        const next = incoming.querySelectorAll(selector);
-        const current = document.querySelectorAll(selector);
-
-        if (!next.length || next.length !== current.length) {
-            return;
-        }
-
-        current.forEach((element, at) => element.replaceWith(next[at]));
-        swapped = true;
-    });
-
-    if (swapped) {
-        document.title = incoming.title;
-        mountIslands();
+    // A region on one page and not the other would be left behind, or never
+    // arrive, so a mismatch anywhere means an ordinary page load.
+    if (pairs.some(([current, next]) => current.length !== next.length) || !pairs[0][1].length) {
+        return false;
     }
 
-    return swapped;
+    pairs.forEach(([current, next]) => current.forEach((element, at) => element.replaceWith(next[at])));
+
+    currentFurniture = incomingFurniture;
+    document.title = incoming.title;
+    mountIslands();
+
+    return true;
 };
 
 const visit = async (url, { push = true } = {}) => {
