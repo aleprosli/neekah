@@ -15,7 +15,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Lab404\Impersonate\Models\Impersonate;
 
-#[Fillable(['name', 'email', 'password', 'role', 'phone', 'google_id', 'avatar_url'])]
+#[Fillable(['name', 'email', 'password', 'role', 'phone', 'google_id', 'avatar_url', 'deactivated_at'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -31,6 +31,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'role' => UserRole::class,
+            'deactivated_at' => 'datetime',
         ];
     }
 
@@ -84,6 +85,11 @@ class User extends Authenticatable
         return $this->role === UserRole::Customer;
     }
 
+    public function isDeactivated(): bool
+    {
+        return $this->deactivated_at !== null;
+    }
+
     /**
      * A couple's account may switch to a vendor account only while it has
      * done nothing as a couple — someone who signed up on the wrong side.
@@ -109,10 +115,11 @@ class User extends Authenticatable
 
     /**
      * Admins are never impersonated, so one admin cannot borrow another's access.
+     * A deactivated account would be signed straight back out, so it is not offered.
      */
     public function canBeImpersonated(): bool
     {
-        return ! $this->isAdmin();
+        return ! $this->isAdmin() && ! $this->isDeactivated();
     }
 
     /**

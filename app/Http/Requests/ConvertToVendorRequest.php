@@ -3,15 +3,23 @@
 namespace App\Http\Requests;
 
 use App\Models\Category;
+use App\Models\User;
 use App\Models\Vendor;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
 class ConvertToVendorRequest extends FormRequest
 {
+    /**
+     * The owner switching themselves, or an admin switching {user} for them.
+     */
     public function authorize(): bool
     {
-        return $this->user()->canBecomeVendor();
+        $user = $this->route('user');
+
+        return $user instanceof User
+            ? $this->user()->can('switchToVendor', $user)
+            : $this->user()->canBecomeVendor();
     }
 
     /**
