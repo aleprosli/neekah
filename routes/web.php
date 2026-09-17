@@ -108,6 +108,8 @@ Route::middleware('auth')->group(function (): void {
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
     Route::get('/notifications/{notification}', [NotificationController::class, 'show'])->name('notifications.show');
     Route::put('/notifications', [NotificationController::class, 'update'])->name('notifications.read');
+    Route::get('/vendor/tukar-akaun', [VendorArea\AccountConversionController::class, 'create'])->name('vendor.convert');
+    Route::post('/vendor/tukar-akaun', [VendorArea\AccountConversionController::class, 'store']);
     Route::post('/impersonate/stop', [AdminArea\ImpersonationController::class, 'destroy'])->name('impersonate.stop');
 
     Route::post('/vendors/{vendor}/bookings', [BookingController::class, 'store'])->name('vendors.bookings.store');

@@ -85,6 +85,21 @@ class User extends Authenticatable
     }
 
     /**
+     * A couple's account may switch to a vendor account only while it has
+     * done nothing as a couple — someone who signed up on the wrong side.
+     * Anything with a wedding, booking, enquiry or review goes through admin.
+     */
+    public function canBecomeVendor(): bool
+    {
+        return $this->isCustomer()
+            && ! $this->weddings()->exists()
+            && ! $this->createdWeddings()->exists()
+            && ! $this->bookings()->exists()
+            && ! $this->enquiries()->exists()
+            && ! $this->reviews()->exists();
+    }
+
+    /**
      * Only admins impersonate, so support can reproduce a complaint.
      */
     public function canImpersonate(): bool

@@ -3,6 +3,9 @@
         @if ($wedding)
             <a href="{{ route('weddings.edit', $wedding) }}" class="rounded-full border border-line px-4 py-2 text-sm font-medium transition hover:border-brand-400">Edit majlis</a>
         @endif
+        @if (auth()->user()->canBecomeVendor())
+            <a href="{{ route('vendor.convert') }}" class="rounded-full border border-line px-4 py-2 text-sm font-medium transition hover:border-brand-400">Saya vendor</a>
+        @endif
         <a href="{{ route('vendors.index') }}" class="rounded-full bg-brand-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-700">Cari vendor</a>
     </x-slot:actions>
 
