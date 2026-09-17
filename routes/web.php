@@ -177,6 +177,12 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::put('/vendors/{vendor}/tier', [AdminArea\VendorTierController::class, 'update'])->name('vendors.tier');
     Route::get('/users', [AdminArea\UserController::class, 'index'])->name('users.index');
     Route::get('/users/data', [AdminArea\UserController::class, 'data'])->name('users.data');
+    Route::get('/users/{user}', [AdminArea\UserController::class, 'show'])->name('users.show');
+    Route::delete('/users/{user}', [AdminArea\UserController::class, 'destroy'])->name('users.destroy');
+    Route::post('/users/{user}/vendor', [AdminArea\UserVendorController::class, 'store'])->name('users.vendor.store');
+    Route::delete('/users/{user}/vendor', [AdminArea\UserVendorController::class, 'destroy'])->name('users.vendor.destroy');
+    Route::post('/users/{user}/deactivation', [AdminArea\UserDeactivationController::class, 'store'])->name('users.deactivate');
+    Route::delete('/users/{user}/deactivation', [AdminArea\UserDeactivationController::class, 'destroy'])->name('users.reactivate');
     Route::get('/categories', [AdminArea\CategoryController::class, 'index'])->name('categories.index');
     Route::post('/categories', [AdminArea\CategoryController::class, 'store'])->name('categories.store');
     Route::put('/categories/{category}', [AdminArea\CategoryController::class, 'update'])->name('categories.update');

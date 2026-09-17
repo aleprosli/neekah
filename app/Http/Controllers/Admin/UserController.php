@@ -2,12 +2,18 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Actions\DeleteUserAccount;
 use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
+use App\Models\Category;
 use App\Models\User;
+use App\Models\Vendor;
+use App\Support\VueProps;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class UserController extends Controller
 {
@@ -53,9 +59,10 @@ class UserController extends Controller
 
         return response()->json([
             'data' => $users->getCollection()->map(fn (User $user): array => [
+                'url' => route('admin.users.show', $user),
                 'name' => $user->name,
                 'email' => $user->email,
-                'role' => $user->role->label(),
+                'role' => $user->role->label().($user->isDeactivated() ? ' · dinyahaktif' : ''),
                 'bookings' => $user->bookings_count,
                 'joined' => $user->created_at->translatedFormat('j M Y'),
                 'impersonate_url' => $user->canBeImpersonated() ? route('admin.users.impersonate', $user) : null,
@@ -67,5 +74,45 @@ class UserController extends Controller
                 'last_page' => $users->lastPage(),
             ],
         ]);
+    }
+
+    /**
+     * One account: what it has done, and the fixes an admin may apply to it.
+     * Each action says why it is unavailable rather than simply disappearing.
+     */
+    public function show(Request $request, User $user): View
+    {
+        $user->loadCount(['weddings', 'createdWeddings', 'bookings', 'enquiries', 'reviews'])->load('vendor');
+        $admin = $request->user();
+
+        return view('admin.users.show', [
+            'user' => $user,
+            'can' => [
+                'switchToVendor' => $admin->can('switchToVendor', $user),
+                'switchToCouple' => $admin->can('switchToCouple', $user),
+                'deactivate' => $admin->can('deactivate', $user),
+                'reactivate' => $admin->can('reactivate', $user),
+                'delete' => $admin->can('delete', $user),
+            ],
+            'vendorForm' => VueProps::for([
+                'action' => route('admin.users.vendor.store', $user),
+                'loginUrl' => route('login'),
+                'categories' => Category::active()->ordered()->get(['id', 'name', 'icon']),
+                'states' => Vendor::STATES,
+                'old' => ['phone' => $user->phone, ...old()],
+                'account' => ['name' => $user->name, 'email' => $user->email],
+            ]),
+        ]);
+    }
+
+    public function destroy(Request $request, User $user, DeleteUserAccount $deleteUserAccount): RedirectResponse
+    {
+        Gate::authorize('delete', $user);
+
+        $deleteUserAccount->handle($user, $request->user());
+
+        return redirect()
+            ->route('admin.users.index')
+            ->with('status', 'Akaun '.$user->name.' ('.$user->email.') telah dipadam.');
     }
 }

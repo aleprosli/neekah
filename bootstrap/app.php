@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\BeginPageMetadata;
+use App\Http\Middleware\EnsureAccountIsActive;
 use App\Http\Middleware\EnsurePhoneNumber;
 use App\Http\Middleware\EnsureUserHasRole;
 use App\Http\Middleware\EnsureUserHasWedding;
@@ -19,6 +20,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->prepend(BeginPageMetadata::class);
+        $middleware->appendToGroup('web', EnsureAccountIsActive::class);
         $middleware->appendToGroup('web', EnsurePhoneNumber::class);
 
         $middleware->alias([
