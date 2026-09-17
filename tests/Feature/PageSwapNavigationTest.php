@@ -43,14 +43,26 @@ it('marks a dashboard and a public page as different shells', function () {
 it('gives a dashboard page both navigations a swap has to update', function () {
     $vendor = Vendor::factory()->for(Category::first())->create();
 
-    // The site header and the dashboard sidebar both show an active item.
-    // navigation.js pairs them by position, so the count has to match between
-    // any two pages of the same shell.
+    // The site header, the dashboard sidebar and the phone's bottom bar all
+    // show an active item. navigation.js pairs them by position, so the count
+    // has to match between any two pages of the same shell.
     $dashboard = $this->actingAs($vendor->user)->get(route('vendor.dashboard'))->assertOk()->getContent();
     $packages = $this->actingAs($vendor->user)->get(route('vendor.packages.index'))->assertOk()->getContent();
 
-    expect(substr_count($dashboard, 'data-nav-region'))->toBe(2)
-        ->and(substr_count($packages, 'data-nav-region'))->toBe(2);
+    expect(substr_count($dashboard, 'data-nav-region'))->toBe(3)
+        ->and(substr_count($packages, 'data-nav-region'))->toBe(3);
+});
+
+it('gives the vendor list furniture outside main that a blog post does not have', function () {
+    // Only <main> and the navigations are swapped, so navigation.js refuses to
+    // swap between pages whose top-level furniture differs. Without that the
+    // vendor search bar, compare tray and filter dialog stayed on a blog post.
+    $vendorList = $this->get(route('vendors.index'))->assertOk()->getContent();
+    $blog = $this->get(route('blog.index'))->assertOk()->getContent();
+    $outsideMain = fn (string $html): string => preg_replace('/<main\b.*<\/main>/s', '', $html);
+
+    expect($outsideMain($vendorList))->toContain('data-compare-tray')->toContain('id="filters"')
+        ->and($outsideMain($blog))->not->toContain('data-compare-tray')->not->toContain('id="filters"');
 });
 
 it('serves a swap request the same page a browser would get', function () {
