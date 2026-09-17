@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\PaymentMethod;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\UpdateContactSettingsRequest;
 use App\Http\Requests\UpdateImageSettingsRequest;
@@ -31,7 +32,7 @@ class SettingController extends Controller
                     $this->seoSection($seo->all()),
                     $this->turnstileSection($turnstile->all(), $turnstile->isEnabled()),
                     $this->telegramSection($telegram->all(), $telegram->isEnabled()),
-                    $this->paymentSection($payments->all(), $payments->manualTransferEnabled()),
+                    $this->paymentSection($payments),
                     $this->imageSection($images),
                 ],
             ]),
@@ -136,27 +137,36 @@ class SettingController extends Controller
     }
 
     /**
-     * @param  array<string, mixed>  $values
      * @return array<string, mixed>
      */
-    private function paymentSection(array $values, bool $active): array
+    private function paymentSection(PaymentSettings $payments): array
     {
+        $values = $payments->all();
+        $offered = $payments->offeredMethods();
+
         return [
             'id' => 'bayaran',
-            'icon' => '🏦',
+            'icon' => '💳',
             'label' => 'Bayaran',
             'title' => 'Kaedah bayaran',
-            'description' => 'Wang tidak melalui Neekah. Pengantin berurusan terus dengan vendor, merekodkan bayaran yang telah dibuat berserta resit, dan vendor mengesahkannya. Booking hanya menjadi Confirmed selepas pengesahan itu.',
+            'description' => 'Hidupkan kaedah yang boleh digunakan oleh pengantin. Neekah tidak menyimpan akaun bank sendiri: untuk bayaran manual, pengantin membayar terus kepada vendor dan vendor mengesahkannya.',
             'action' => route('admin.settings.payments'),
             'submit' => 'Simpan tetapan bayaran',
-            'badge' => ['active' => $active, 'label' => $active ? 'Manual transfer aktif' : 'Tiada kaedah bayaran'],
-            'columns' => true,
+            'badge' => [
+                'active' => $offered !== [],
+                'label' => $offered === [] ? 'Tiada kaedah bayaran' : collect($offered)->map->label()->join(', ').' aktif',
+            ],
             'fields' => [
-                ['name' => 'manual_transfer_enabled', 'label' => 'Benarkan rekod bayaran manual', 'type' => 'checkbox', 'value' => $values['manual_transfer_enabled'], 'wide' => true, 'help' => 'Apabila dimatikan, pengantin tidak boleh merekodkan sebarang bayaran pada booking mereka.'],
-                ['name' => 'bank_name', 'label' => 'Nama bank', 'value' => $values['bank_name'], 'placeholder' => 'Maybank'],
-                ['name' => 'account_holder', 'label' => 'Nama pemegang akaun', 'value' => $values['account_holder'], 'placeholder' => 'Neekah Enterprise'],
-                ['name' => 'account_number', 'label' => 'Nombor akaun', 'value' => $values['account_number'], 'placeholder' => '512345678901', 'help' => 'Biarkan kosong jika bayaran dibuat terus kepada akaun vendor.'],
-                ['name' => 'instructions', 'label' => 'Arahan bayaran', 'type' => 'textarea', 'rows' => 3, 'wide' => true, 'value' => $values['instructions'], 'help' => 'Dipaparkan kepada pengantin di borang rekod bayaran.'],
+                ...collect(PaymentMethod::cases())->map(fn (PaymentMethod $method): array => [
+                    'name' => $method->settingKey(),
+                    'label' => $method->label(),
+                    'type' => 'checkbox',
+                    'value' => $values[$method->settingKey()],
+                    'help' => $method->isIntegrated()
+                        ? $method->description()
+                        : $method->description().' Integrasi belum dibina, jadi ia belum dipaparkan kepada pengantin walaupun dihidupkan.',
+                ])->all(),
+                ['name' => 'instructions', 'label' => 'Arahan bayaran manual', 'type' => 'textarea', 'rows' => 3, 'value' => $values['instructions'], 'help' => 'Dipaparkan kepada pengantin di borang rekod bayaran.'],
             ],
         ];
     }

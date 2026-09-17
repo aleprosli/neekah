@@ -195,7 +195,6 @@ class BookingController extends Controller
         return [
             'action' => route('bookings.payments.store', $booking),
             'instructions' => $settings->instructions(),
-            'bank' => $settings->bankAccount(),
             'imageHint' => $images->uploadHint('gambar resit penuh'),
             'today' => now()->toDateString(),
             'outstanding' => round($booking->outstandingAmount() - $awaiting, 2),

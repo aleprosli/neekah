@@ -2,35 +2,43 @@
 
 namespace App\Support;
 
+use App\Enums\PaymentMethod;
+
 /**
- * How couples may pay. Only manual bank transfer exists today: the couple pays
- * the vendor directly and records what they paid, with a receipt.
+ * Which payment methods couples may use, each switched on or off by an admin.
  *
- * The bank details here are the platform's own, shown to a couple when they
- * record a payment, so an admin can change them without a deploy.
+ * Neekah holds no bank details of its own: with manual transfer the couple pays
+ * the vendor directly, so the only thing to configure is what they are told.
  */
 class PaymentSettings extends SettingGroup
 {
+    public function isEnabled(PaymentMethod $method): bool
+    {
+        return (bool) $this->value($method->settingKey());
+    }
+
+    /** Switched on by an admin and actually built, so a couple can use it. */
+    public function isOffered(PaymentMethod $method): bool
+    {
+        return $method->isIntegrated() && $this->isEnabled($method);
+    }
+
+    /**
+     * @return list<PaymentMethod>
+     */
+    public function offeredMethods(): array
+    {
+        return array_values(array_filter(PaymentMethod::cases(), $this->isOffered(...)));
+    }
+
     public function manualTransferEnabled(): bool
     {
-        return (bool) $this->value('manual_transfer_enabled');
+        return $this->isOffered(PaymentMethod::ManualTransfer);
     }
 
     public function instructions(): string
     {
         return $this->string('instructions');
-    }
-
-    /** The account a couple transfers to, when one has been filled in. */
-    public function bankAccount(): ?array
-    {
-        $account = [
-            'bank' => $this->string('bank_name'),
-            'holder' => $this->string('account_holder'),
-            'number' => $this->string('account_number'),
-        ];
-
-        return array_filter($account) === [] ? null : $account;
     }
 
     /**
@@ -39,10 +47,9 @@ class PaymentSettings extends SettingGroup
     public static function defaults(): array
     {
         return [
-            'manual_transfer_enabled' => true,
-            'bank_name' => '',
-            'account_holder' => '',
-            'account_number' => '',
+            ...collect(PaymentMethod::cases())
+                ->mapWithKeys(fn (PaymentMethod $method): array => [$method->settingKey() => $method === PaymentMethod::ManualTransfer])
+                ->all(),
             'instructions' => 'Bayar terus kepada vendor mengikut persetujuan anda, kemudian rekodkan bayaran itu di sini supaya kedua-dua pihak ada rekod yang sama.',
         ];
     }

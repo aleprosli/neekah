@@ -2,6 +2,7 @@
 
 namespace App\Actions;
 
+use App\Enums\PaymentMethod;
 use App\Enums\PaymentStatus;
 use App\Models\Booking;
 use App\Models\Payment;
@@ -31,7 +32,7 @@ class RecordManualPayment
                 'paid_on' => $attributes['paid_on'],
                 'note' => $attributes['note'] ?? null,
                 'receipt_image' => $attributes['receipt_image'] ?? null,
-                'method' => 'manual_transfer',
+                'method' => PaymentMethod::ManualTransfer->value,
                 'gateway' => 'manual',
                 'status' => PaymentStatus::AwaitingVerification,
             ]);

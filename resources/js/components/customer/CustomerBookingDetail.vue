@@ -79,12 +79,6 @@ const tones = {
                     <p class="mt-1 text-sm text-ink-muted">{{ paymentForm.instructions }}</p>
                 </div>
 
-                <dl v-if="paymentForm.bank" class="grid gap-2 rounded-xl bg-surface-muted p-4 text-sm sm:grid-cols-3">
-                    <div v-if="paymentForm.bank.bank"><dt class="text-xs text-ink-muted">Bank</dt><dd class="font-medium">{{ paymentForm.bank.bank }}</dd></div>
-                    <div v-if="paymentForm.bank.holder"><dt class="text-xs text-ink-muted">Nama akaun</dt><dd class="font-medium">{{ paymentForm.bank.holder }}</dd></div>
-                    <div v-if="paymentForm.bank.number"><dt class="text-xs text-ink-muted">Nombor akaun</dt><dd class="font-mono font-medium">{{ paymentForm.bank.number }}</dd></div>
-                </dl>
-
                 <form :action="paymentForm.action" method="POST" enctype="multipart/form-data" class="flex flex-col gap-4" @submit="submitUpload">
                     <input type="hidden" name="_token" :value="csrf">
 
