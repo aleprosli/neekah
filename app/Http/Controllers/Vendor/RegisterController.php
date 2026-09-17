@@ -27,6 +27,7 @@ class RegisterController extends Controller
             'props' => VueProps::for([
                 'action' => route('vendor.register'),
                 'loginUrl' => route('login'),
+                'convertUrl' => route('vendor.convert'),
                 'categories' => Category::active()->ordered()->get(['id', 'name', 'icon']),
                 'states' => Vendor::STATES,
                 'old' => old(),
