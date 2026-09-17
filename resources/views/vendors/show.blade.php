@@ -43,8 +43,8 @@
             </div>
         </div>
 
-        <div class="mt-6 grid gap-10 lg:grid-cols-[1fr_360px] lg:gap-16">
-            <div class="flex flex-col divide-y divide-line">
+        <div class="mt-6 grid gap-10 break-words lg:grid-cols-[minmax(0,1fr)_360px] lg:gap-16">
+            <div class="flex min-w-0 flex-col divide-y divide-line">
                 {{-- Summary --}}
                 <div class="flex flex-col gap-2 pb-6">
                     <h1 class="font-display text-2xl font-semibold tracking-tight md:hidden">{{ $vendor->name }}</h1>
@@ -62,7 +62,7 @@
                 {{-- Vendor identity --}}
                 <div class="flex items-center gap-4 py-6">
                     <span class="flex size-12 shrink-0 items-center justify-center rounded-full bg-linear-to-br text-lg font-semibold text-white {{ $vendor->cover_tone }}">{{ mb_substr($vendor->name, 0, 1) }}</span>
-                    <div>
+                    <div class="min-w-0">
                         <p class="font-semibold">Dikendalikan oleh {{ $vendor->name }}</p>
                         <p class="text-sm text-ink-muted">@if ($vendor->tier === VendorTier::Recommended)🏆 @endif{{ $vendor->tier->label() }} Vendor · Response rate {{ $vendor->responseRateLabel() }}</p>
                     </div>
@@ -73,7 +73,7 @@
                     @foreach ([['🔒', 'Booking & rekod bayaran di Neekah', 'Setiap bayaran direkod dan disahkan vendor, jadi kedua-dua pihak ada rekod yang sama.'], ['⚡', 'Response rate '.$vendor->responseRateLabel(), $vendor->response_rate === null ? 'Vendor ini belum menerima cukup enquiry untuk kami mengukur kadar balasan mereka.' : 'Diukur dari enquiry yang diterima melalui Neekah.'], ['✓', $vendor->completed_bookings_count.' majlis selesai', 'Review di bawah datang daripada pasangan yang benar-benar menempah.']] as [$icon, $title, $text])
                         <li class="flex gap-4">
                             <span class="w-6 shrink-0 text-center text-xl leading-6">{{ $icon }}</span>
-                            <div>
+                            <div class="min-w-0">
                                 <p class="font-medium">{{ $title }}</p>
                                 <p class="text-sm text-ink-muted">{{ $text }}</p>
                             </div>
@@ -89,7 +89,7 @@
                 {{-- Packages --}}
                 <section id="pakej" class="flex flex-col gap-4 py-6">
                     <h2 class="font-display text-2xl font-semibold">Pakej yang ditawarkan</h2>
-                    <div class="grid gap-4 sm:grid-cols-2">
+                    <div class="grid gap-4 sm:grid-cols-2 [&>article]:min-w-0">
                         @forelse ($vendor->packages as $package)
                             <article class="flex flex-col overflow-hidden rounded-2xl border border-line transition hover:border-brand-300">
                                 @if ($package->imageUrl())
@@ -97,7 +97,7 @@
                                 @endif
                                 <div class="flex flex-1 flex-col gap-3 p-5">
                                     <div class="flex items-start justify-between gap-3">
-                                        <div>
+                                        <div class="min-w-0">
                                             <h3 class="font-semibold">{{ $package->name }}</h3>
                                             <p class="text-sm text-ink-muted">{{ $package->duration }}</p>
                                         </div>
@@ -108,7 +108,7 @@
                                     @endif
                                     <ul class="flex flex-col gap-1.5 text-sm text-ink-muted">
                                         @foreach ($package->features as $feature)
-                                            <li class="flex gap-2"><span class="text-brand-600">✓</span>{{ $feature }}</li>
+                                            <li class="flex gap-2"><span class="shrink-0 text-brand-600">✓</span><span class="min-w-0">{{ $feature }}</span></li>
                                         @endforeach
                                     </ul>
                                 </div>
@@ -125,12 +125,12 @@
                     @if ($vendor->reviews->isEmpty())
                         <p class="text-sm text-ink-muted">Belum ada review. Review hanya boleh diberi selepas booking selesai.</p>
                     @else
-                        <ul class="grid gap-8 sm:grid-cols-2">
+                        <ul class="grid gap-8 sm:grid-cols-2 [&>li]:min-w-0">
                             @foreach ($vendor->reviews as $review)
                                 <li class="flex flex-col gap-2">
                                     <div class="flex items-center gap-3">
-                                        <span class="flex size-10 items-center justify-center rounded-full bg-surface-muted text-sm font-semibold">{{ mb_substr($review->user->name, 0, 1) }}</span>
-                                        <div>
+                                        <span class="flex size-10 shrink-0 items-center justify-center rounded-full bg-surface-muted text-sm font-semibold">{{ mb_substr($review->user->name, 0, 1) }}</span>
+                                        <div class="min-w-0">
                                             <p class="text-sm font-semibold">{{ $review->user->name }}</p>
                                             <p class="text-xs text-ink-muted">{{ $review->created_at->translatedFormat('F Y') }} · ✓ Verified booking</p>
                                         </div>
@@ -145,7 +145,7 @@
             </div>
 
             {{-- Booking card --}}
-            <aside id="tempah" class="lg:sticky lg:top-28 lg:self-start">
+            <aside id="tempah" class="min-w-0 lg:sticky lg:top-28 lg:self-start">
                 <form method="POST" action="{{ route('vendors.bookings.store', $vendor) }}" class="flex flex-col gap-4 rounded-2xl border border-line bg-surface-raised p-6 shadow-xl shadow-brand-900/10">
                     @csrf
                     <p class="text-sm text-ink-muted">Dari <span class="font-display text-2xl font-semibold text-ink">RM{{ number_format($vendor->price_from) }}</span> / {{ $vendor->price_unit->label() }}</p>

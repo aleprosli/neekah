@@ -18,9 +18,9 @@ const tier = ref(props.vendor.tier);
 </script>
 
 <template>
-    <div class="grid gap-6 lg:grid-cols-[1fr_320px]">
-        <div class="flex flex-col gap-6">
-            <dl class="grid gap-3 rounded-2xl border border-line p-5 text-sm sm:grid-cols-2">
+    <div class="grid gap-6 break-words lg:grid-cols-[minmax(0,1fr)_320px]">
+        <div class="flex min-w-0 flex-col gap-6">
+            <dl class="grid gap-3 rounded-2xl border border-line p-5 text-sm sm:grid-cols-2 [&>div]:min-w-0">
                 <div v-for="fact in facts" :key="fact.label" :class="fact.wide ? 'sm:col-span-2' : ''">
                     <dt class="text-ink-muted">{{ fact.label }}</dt>
                     <dd :class="fact.wide ? 'leading-relaxed' : 'font-semibold'">{{ fact.value }}</dd>
@@ -50,7 +50,7 @@ const tier = ref(props.vendor.tier);
             </section>
         </div>
 
-        <aside class="flex flex-col gap-4">
+        <aside class="flex min-w-0 flex-col gap-4">
             <div class="flex flex-col gap-3 rounded-2xl border border-line bg-surface-raised p-5">
                 <h2 class="text-sm font-semibold">Status: {{ vendor.status }}</h2>
                 <div class="flex flex-wrap gap-2">

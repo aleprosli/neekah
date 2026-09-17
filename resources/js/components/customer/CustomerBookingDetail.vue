@@ -53,9 +53,9 @@ const tones = {
 <template>
     <p v-if="errors.payment" class="mb-6 rounded-2xl bg-brand-50 px-5 py-4 text-sm text-brand-800">{{ errors.payment }}</p>
 
-    <div class="grid gap-8 lg:grid-cols-[1fr_340px]">
-        <div class="flex flex-col gap-6">
-            <dl class="grid gap-3 rounded-2xl border border-line p-5 text-sm sm:grid-cols-2">
+    <div class="grid gap-8 break-words lg:grid-cols-[minmax(0,1fr)_340px]">
+        <div class="flex min-w-0 flex-col gap-6">
+            <dl class="grid gap-3 rounded-2xl border border-line p-5 text-sm sm:grid-cols-2 [&>div]:min-w-0">
                 <div><dt class="text-ink-muted">Rujukan</dt><dd class="font-semibold">{{ booking.reference }}</dd></div>
                 <div><dt class="text-ink-muted">Tarikh majlis</dt><dd class="font-semibold">{{ booking.event_date }}</dd></div>
                 <div><dt class="text-ink-muted">Pakej</dt><dd class="font-semibold">{{ booking.package_name }}</dd></div>
@@ -197,7 +197,7 @@ const tones = {
             </section>
         </div>
 
-        <aside class="flex flex-col gap-4 rounded-2xl border border-line bg-surface-raised p-5 shadow-xl shadow-brand-900/5 lg:sticky lg:top-28 lg:self-start">
+        <aside class="flex min-w-0 flex-col gap-4 rounded-2xl border border-line bg-surface-raised p-5 shadow-xl shadow-brand-900/5 lg:sticky lg:top-28 lg:self-start">
             <div>
                 <p class="text-xs font-semibold tracking-wide text-ink-muted uppercase">Jumlah pakej</p>
                 <p class="font-display text-3xl font-semibold">{{ booking.total }}</p>
