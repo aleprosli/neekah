@@ -29,6 +29,7 @@
         'rings' => '<circle cx="9" cy="14" r="5.5"/><circle cx="16" cy="14" r="5.5"/><path d="m9 5 1.5 2.5h-3L9 5Z"/>',
         'check' => '<path d="M4 5h16v15H4z"/><path d="m8 12 3 3 5-6"/>',
         'mail' => '<path d="M3 6h18v12H3z"/><path d="m3 7 9 6 9-6"/>',
+        'user' => '<circle cx="12" cy="8" r="3.5"/><path d="M5 20a7 7 0 0 1 14 0"/>',
         'search' => '<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>',
     ];
 @endphp

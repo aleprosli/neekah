@@ -15,6 +15,7 @@
         ['label' => 'Tempahan', 'icon' => 'receipt', 'href' => route('bookings.index'), 'active' => request()->routeIs('bookings.*')],
         ['label' => 'Enquiry', 'icon' => 'chat', 'href' => route('enquiries.index'), 'active' => request()->routeIs('enquiries.*'), 'badge' => $repliedEnquiries ?: null],
         ['label' => 'Cari vendor', 'icon' => 'search', 'href' => route('vendors.index'), 'active' => false],
+        ['label' => 'Akaun', 'icon' => 'user', 'href' => route('account.edit'), 'active' => request()->routeIs('account.*')],
     ];
 @endphp
 

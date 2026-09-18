@@ -21,15 +21,27 @@ const props = defineProps({
     priceUnits: { type: Array, required: true },
     errors: { type: Object, default: () => ({}) },
     imageHint: { type: String, required: true },
+    logoHint: { type: String, required: true },
 });
 
 const { uploading, percent: uploadPercent, error: uploadError, submit: submitUpload } = useUploadForm();
 const form = ref({ ...props.vendor });
 const coverPreview = ref(props.vendor.cover_image_url);
+const logoPreview = ref(props.vendor.logo_url);
+const removeLogo = ref(false);
 
 const onCoverChosen = (event) => {
     const file = event.target.files?.[0];
     if (file) coverPreview.value = URL.createObjectURL(file);
+};
+
+const onLogoChosen = (event) => {
+    const file = event.target.files?.[0];
+
+    if (file) {
+        logoPreview.value = URL.createObjectURL(file);
+        removeLogo.value = false;
+    }
 };
 
 const categoryOptions = computed(() => props.categories.map((c) => ({ value: c.id, label: `${c.icon} ${c.name}` })));
@@ -81,6 +93,25 @@ const stateOptions = computed(() => props.states.map((state) => ({ value: state,
                         <span :class="['block size-12 rounded-xl bg-linear-to-br ring-2 ring-transparent ring-offset-2 ring-offset-surface transition peer-checked:ring-brand-600', tone]"></span>
                     </label>
                 </div>
+            </div>
+
+            <div class="flex flex-col gap-2">
+                <span class="text-sm font-medium">Logo perniagaan</span>
+                <div class="flex items-center gap-4">
+                    <img v-if="logoPreview && !removeLogo" :src="logoPreview" alt="" class="size-16 shrink-0 rounded-full object-cover">
+                    <span v-else :class="['flex size-16 shrink-0 items-center justify-center rounded-full bg-linear-to-br text-xl font-semibold text-white', form.cover_tone]">{{ vendor.initial }}</span>
+
+                    <div class="flex min-w-0 flex-col gap-1">
+                        <input type="file" name="logo" accept="image/jpeg,image/png,image/webp" class="text-sm file:mr-3 file:rounded-full file:border-0 file:bg-brand-50 file:px-4 file:py-2 file:text-sm file:font-medium file:text-brand-700" @change="onLogoChosen">
+                        <label v-if="vendor.logo_url" class="flex items-center gap-2 text-xs text-ink-muted">
+                            <input type="hidden" name="remove_logo" value="0">
+                            <input v-model="removeLogo" type="checkbox" name="remove_logo" value="1" class="accent-brand-600">
+                            Buang logo, guna huruf nama perniagaan
+                        </label>
+                    </div>
+                </div>
+                <span class="text-xs text-ink-muted">{{ logoHint }}</span>
+                <span v-if="errors.logo" class="text-xs text-brand-700">{{ errors.logo }}</span>
             </div>
 
             <div class="flex flex-col gap-2">

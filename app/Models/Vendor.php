@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Actions\StoreOptimizedImage;
 use App\Enums\BookingStatus;
 use App\Enums\PriceUnit;
 use App\Enums\VendorStatus;
@@ -19,7 +20,7 @@ use Illuminate\Support\Carbon;
 
 #[Fillable([
     'user_id', 'category_id', 'name', 'slug', 'tagline', 'description', 'city', 'state',
-    'phone', 'whatsapp', 'price_from', 'price_unit', 'cover_image', 'cover_tone',
+    'phone', 'whatsapp', 'price_from', 'price_unit', 'cover_image', 'logo', 'cover_tone',
     'status', 'tier', 'rating_avg', 'reviews_count', 'completed_bookings_count',
     'response_rate', 'completion_rate', 'score', 'points_total', 'tier_locked', 'penalty_points', 'violations_count', 'approved_at',
 ])]
@@ -103,6 +104,16 @@ class Vendor extends Model
     public function points(): HasMany
     {
         return $this->hasMany(VendorPoint::class);
+    }
+
+    /**
+     * The business logo, if the vendor uploaded one. Everywhere it is shown
+     * falls back to the initial in a tinted circle, which is what a vendor
+     * without a logo has always had.
+     */
+    public function logoUrl(): ?string
+    {
+        return StoreOptimizedImage::thumbnailUrl($this->logo);
     }
 
     /**

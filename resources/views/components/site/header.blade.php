@@ -39,6 +39,8 @@
                             <a href="{{ route('bookings.index') }}" class="block rounded-xl px-3 py-2 hover:bg-surface-muted">Tempahan saya</a>
                             <a href="{{ route('enquiries.index') }}" class="block rounded-xl px-3 py-2 hover:bg-surface-muted">Enquiry</a>
                         @endif
+                        <a href="{{ route('account.edit') }}" class="block rounded-xl px-3 py-2 hover:bg-surface-muted">Akaun saya</a>
+
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
                             <button type="submit" class="w-full rounded-xl px-3 py-2 text-left hover:bg-surface-muted">Log keluar</button>

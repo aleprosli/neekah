@@ -41,6 +41,8 @@ class UpdateVendorProfileRequest extends FormRequest
             'price_unit' => ['required', Rule::enum(PriceUnit::class)],
             'cover_tone' => ['required', Rule::in(self::TONES)],
             'cover_image' => ['nullable', ...$images->uploadRules()],
+            'logo' => ['nullable', ...$images->uploadRules()],
+            'remove_logo' => ['nullable', 'boolean'],
         ];
     }
 
@@ -58,6 +60,7 @@ class UpdateVendorProfileRequest extends FormRequest
             'price_unit' => 'unit harga',
             'cover_tone' => 'warna',
             'cover_image' => 'gambar muka depan',
+            'logo' => 'logo perniagaan',
         ];
     }
 }
