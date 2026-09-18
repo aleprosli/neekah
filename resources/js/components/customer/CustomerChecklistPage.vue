@@ -236,7 +236,8 @@ const tone = (progress) => {
             </p>
         </section>
 
-        <div v-if="unsaved" class="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-surface-raised p-4 shadow-2xl">
+        <!-- lg:left-64 keeps the bar beside the dashboard sidebar, not over it. -->
+        <div v-if="unsaved" class="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-surface-raised p-4 shadow-2xl lg:left-64">
             <div class="mx-auto flex max-w-3xl flex-wrap items-center justify-between gap-3">
                 <p class="text-sm">
                     <span class="font-semibold">{{ unsaved }} perubahan</span>

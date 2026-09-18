@@ -40,17 +40,31 @@ it('marks a dashboard and a public page as different shells', function () {
         ->and($public->getContent())->toContain('<meta name="page-shell" content="site">');
 });
 
-it('gives a dashboard page both navigations a swap has to update', function () {
+it('gives every dashboard page the same navigation region to swap', function () {
     $vendor = Vendor::factory()->for(Category::first())->create();
 
-    // The site header, the dashboard sidebar and the phone's bottom bar all
-    // show an active item. navigation.js pairs them by position, so the count
-    // has to match between any two pages of the same shell.
+    // The dashboard shell has one navigation that shows an active item: the
+    // sidebar, which on a phone is the drawer. navigation.js pairs regions by
+    // position, so the count has to match between any two dashboard pages —
+    // and the drawer's checkbox lives inside it, so every swap closes it.
     $dashboard = $this->actingAs($vendor->user)->get(route('vendor.dashboard'))->assertOk()->getContent();
     $packages = $this->actingAs($vendor->user)->get(route('vendor.packages.index'))->assertOk()->getContent();
 
-    expect(substr_count($dashboard, 'data-nav-region'))->toBe(3)
-        ->and(substr_count($packages, 'data-nav-region'))->toBe(3);
+    expect(substr_count($dashboard, 'data-nav-region'))->toBe(1)
+        ->and(substr_count($packages, 'data-nav-region'))->toBe(1)
+        ->and($dashboard)->toContain('id="dashboard-drawer"');
+});
+
+it('keeps the public site furniture out of the dashboard shell', function () {
+    $vendor = Vendor::factory()->for(Category::first())->create();
+
+    // A web app, not a page of the marketplace: no floating site header, no
+    // footer, no phone bottom bar.
+    $dashboard = $this->actingAs($vendor->user)->get(route('vendor.dashboard'))->assertOk()->getContent();
+
+    expect($dashboard)->not->toContain('Cara Ia Berfungsi')
+        ->not->toContain('aria-label="Navigasi mudah alih"')
+        ->not->toContain('aria-label="Footer"');
 });
 
 it('gives the vendor list furniture outside main that a blog post does not have', function () {

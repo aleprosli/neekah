@@ -36,7 +36,8 @@ it('shows the widget on the register form once Turnstile is on', function () {
 
     // The key travels in the form's props; UiTurnstile loads Cloudflare's
     // script itself, in the explicit mode that can draw a widget Vue added.
-    $props = $this->get(route('register'))->assertOk()->viewData('props');
+    // /register asks pengantin or vendor first; the couple's form is one step in.
+    $props = $this->get(route('register', ['as' => 'pengantin']))->assertOk()->viewData('props');
 
     expect($props['turnstileSiteKey'])->toBe('site-key');
 });

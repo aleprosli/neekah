@@ -16,7 +16,7 @@
     ];
 @endphp
 
-<x-layouts.dashboard :title="$title" :nav="$nav" :heading="$heading" :subheading="$subheading">
+<x-layouts.dashboard :title="$title" :nav="$nav" area="Dashboard vendor" :heading="$heading" :subheading="$subheading">
     @isset($actions)
         <x-slot:actions>{{ $actions }}</x-slot:actions>
     @endisset
