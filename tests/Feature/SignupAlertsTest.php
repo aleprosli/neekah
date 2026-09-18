@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Auth\PhoneNumberController;
 use App\Jobs\SendTelegramAlert;
 use App\Models\Category;
 use App\Models\User;
@@ -128,4 +129,29 @@ it('sends the alert to the Telegram bot API', function () {
     Http::assertSent(fn ($request) => $request->url() === 'https://api.telegram.org/botbot-token/sendMessage'
         && $request['chat_id'] === '-100123'
         && str_contains($request['text'], 'abc@example.com'));
+});
+
+it('finishes a Google signup once when the phone form is sent twice', function () {
+    enableTelegram();
+    Notification::fake();
+    Queue::fake();
+
+    $couple = User::factory()->create(['google_id' => 'g-123', 'phone' => null]);
+
+    // Both requests carry the signup flag: a second tap arrives while the first
+    // is still running, before it has written the session back. That is what
+    // sent two welcome emails and two Telegram alerts on production.
+    $this->actingAs($couple)
+        ->withSession([PhoneNumberController::NEW_SIGNUP_KEY => true])
+        ->post(route('phone.store'), ['phone' => '012-345 6789'])
+        ->assertRedirect();
+
+    $this->actingAs($couple)
+        ->withSession([PhoneNumberController::NEW_SIGNUP_KEY => true])
+        ->post(route('phone.store'), ['phone' => '012-345 6789'])
+        ->assertRedirect();
+
+    Notification::assertSentToTimes($couple, CustomerRegistered::class, 1);
+    Queue::assertPushed(SendTelegramAlert::class, 1);
+    expect($couple->fresh()->phone)->toBe('012-345 6789');
 });

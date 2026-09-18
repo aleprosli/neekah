@@ -162,7 +162,9 @@ class AnnouncementController extends Controller
             'status' => AnnouncementStatus::Draft,
         ]);
 
-        $request->user()->notify(new AnnouncementPublished($draft, mailOnly: true));
+        // Sent now, not queued: the draft is never saved, and a queued job can
+        // only carry a model it can load back from the database.
+        $request->user()->notifyNow(new AnnouncementPublished($draft, mailOnly: true));
 
         return back()->with('status', 'Ujian dihantar ke '.$request->user()->email.'.');
     }

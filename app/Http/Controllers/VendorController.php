@@ -6,6 +6,7 @@ use App\Enums\VendorTier;
 use App\Models\Category;
 use App\Models\PortfolioItem;
 use App\Models\Vendor;
+use App\Support\ContactSettings;
 use App\Support\Seo;
 use App\Support\SeoSettings;
 use Illuminate\Contracts\View\View;
@@ -84,7 +85,28 @@ class VendorController extends Controller
             'tiers' => VendorTier::cases(),
             'sorts' => self::SORTS,
             'activeFilterCount' => count(array_filter([$filters['state'], $filters['min_price'], $filters['max_price'], $filters['min_rating'], $filters['tier']], fn ($value) => $value !== null)),
+            'helpUrl' => $vendors->isEmpty() ? $this->helpUrl($activeCategory, $filters) : null,
         ]);
+    }
+
+    /**
+     * When the list comes up empty, a WhatsApp to Neekah already saying what
+     * the couple was looking for, so the team can pass it on to vendors in the
+     * network. Null when no number is set under Admin → Tetapan.
+     *
+     * @param  array<string, mixed>  $filters
+     */
+    private function helpUrl(?Category $category, array $filters): ?string
+    {
+        $looking = trim(implode(' ', array_filter([
+            $category ? 'vendor '.$category->name : 'vendor',
+            $filters['q'] ? '"'.$filters['q'].'"' : null,
+            $filters['state'] ? 'di '.$filters['state'] : null,
+        ])));
+
+        return app(ContactSettings::class)->whatsappUrl(
+            'Salam Neekah, saya sedang mencari '.$looking.' untuk majlis saya tetapi belum jumpa di laman web. Boleh bantu kongsikan kepada vendor lain?'
+        );
     }
 
     /**

@@ -5,6 +5,7 @@ namespace App\Notifications;
 use App\Models\Vendor;
 use App\Support\ContactSettings;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
@@ -12,7 +13,7 @@ use Illuminate\Notifications\Notification;
  * The welcome a vendor gets the moment they sign up, while their profile is
  * still pending review.
  */
-class VendorRegistered extends Notification
+class VendorRegistered extends Notification implements ShouldQueue
 {
     use Queueable;
 

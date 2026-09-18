@@ -4,25 +4,31 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\Vendor;
+use App\Support\ContactSettings;
 use App\Support\Seo;
 use Illuminate\Contracts\View\View;
 
 class LandingController extends Controller
 {
     /**
-     * Show the promotional landing page.
+     * The About page. Neekah is a network for now: couples find vendors here
+     * and deal with them directly, and the platform takes no payment and no
+     * commission. Nothing on this page may promise otherwise.
      */
-    public function __invoke(Seo $seo): View
+    public function __invoke(Seo $seo, ContactSettings $contact): View
     {
-        $seo->title('Rancang majlis anda dari mula hingga hari bahagia')
-            ->description('Checklist, bajet, timeline, kad jemputan digital dan vendor yang disahkan. Semua urusan majlis anda dalam satu platform.');
+        $seo->title('Cari vendor kahwin dan hubungi mereka terus')
+            ->description('Cari vendor kahwin ikut kategori, lokasi dan bajet, dan berurusan terus dengan mereka. Checklist, bajet dan kad jemputan digital percuma.');
+
+        $categories = Category::active()->ordered()->get();
 
         return view('landing', [
             'flow' => $this->flow(),
-            'categories' => Category::active()->ordered()->get(),
+            'categories' => $categories,
             'vendors' => Vendor::query()->approved()->with('category')->orderByDesc('score')->orderBy('id')->limit(6)->get(),
             'features' => $this->features(),
-            'vendorPoints' => $this->vendorPoints(),
+            'vendorBenefits' => $this->vendorBenefits(),
+            'helpUrl' => $contact->whatsappUrl('Salam Neekah, saya sedang mencari vendor untuk majlis saya. Boleh bantu?'),
         ]);
     }
 
@@ -32,12 +38,12 @@ class LandingController extends Controller
     private function flow(): array
     {
         return [
-            ['label' => 'Plan', 'description' => 'Cipta wedding project & checklist'],
-            ['label' => 'Discover', 'description' => 'Cari vendor ikut lokasi & bajet'],
-            ['label' => 'Book', 'description' => 'Tempah pakej terus dalam platform'],
-            ['label' => 'Pay', 'description' => 'Bayar deposit & baki dengan selamat'],
-            ['label' => 'Manage', 'description' => 'Urus timeline, bajet & vendor'],
-            ['label' => 'Celebrate', 'description' => 'Nikmati hari bahagia anda'],
+            ['label' => 'Rancang', 'description' => 'Cipta majlis & ikut checklist'],
+            ['label' => 'Cari', 'description' => 'Vendor ikut kategori, lokasi & bajet'],
+            ['label' => 'Hubungi', 'description' => 'WhatsApp vendor terus dari profil'],
+            ['label' => 'Deal', 'description' => 'Bincang & bayar terus dengan vendor'],
+            ['label' => 'Jemput', 'description' => 'Kongsi kad digital dengan tetamu'],
+            ['label' => 'Raikan', 'description' => 'Nikmati hari bahagia anda'],
         ];
     }
 
@@ -47,27 +53,30 @@ class LandingController extends Controller
     private function features(): array
     {
         return [
-            ['icon' => '📋', 'title' => 'Wedding Planner & Checklist', 'description' => 'Cipta wedding project, tetapkan tarikh, lokasi dan bajet. Sistem sediakan checklist lengkap dan jejak progress anda.'],
-            ['icon' => '🗓️', 'title' => 'Wedding Timeline', 'description' => 'Susun perjalanan majlis dari makeup pagi hingga majlis tamat. Setiap vendor nampak slot mereka sendiri.'],
-            ['icon' => '💰', 'title' => 'Budget Management', 'description' => 'Pecahkan bajet ikut kategori, bandingkan budget lawan actual, dan tahu baki anda setiap masa.'],
-            ['icon' => '🔒', 'title' => 'Booking & Payment Berpusat', 'description' => 'Deposit dan baki direkod dalam platform. Setiap transaksi dijejak, setiap booking disahkan.'],
-            ['icon' => '⭐', 'title' => 'Verified Reviews', 'description' => 'Review hanya daripada pasangan yang benar-benar menempah. Tiada fake review.'],
-            ['icon' => '🏆', 'title' => 'Vendor Ranking Sebenar', 'description' => 'Ranking berdasarkan booking selesai, completion rate dan response rate, bukan rating semata-mata.'],
+            ['icon' => '🔎', 'title' => 'Cari & hubungi vendor terus', 'description' => 'Senarai vendor ikut kategori dan lokasi. Lihat pakej dan portfolio, kemudian WhatsApp mereka terus. Tiada orang tengah.'],
+            ['icon' => '✉️', 'title' => 'Kad jemputan digital', 'description' => 'Pilih reka bentuk, isi butiran majlis dan kongsi dengan satu pautan. Tetamu boleh RSVP terus dari kad.'],
+            ['icon' => '📋', 'title' => 'Checklist persiapan', 'description' => 'Langkah demi langkah, termasuk borang nikah, kursus dan urusan wali. Tandakan bersama pasangan.'],
+            ['icon' => '💰', 'title' => 'Bajet majlis', 'description' => 'Pecahkan bajet ikut kategori dan tahu baki anda setiap masa.'],
+            ['icon' => '🗓️', 'title' => 'Timeline hari majlis', 'description' => 'Susun perjalanan hari majlis, dari makeup pagi hingga majlis tamat.'],
+            ['icon' => '👥', 'title' => 'Senarai tetamu', 'description' => 'Urus tetamu, kumpulan dan jawapan RSVP di satu tempat.'],
         ];
     }
 
     /**
-     * @return array<int, array{activity: string, points: string}>
+     * What a vendor gets from being listed. Only what is true today: no
+     * commission and no payment through Neekah, so nothing here is about
+     * bookings recorded or payments made on the platform.
+     *
+     * @return array<int, string>
      */
-    private function vendorPoints(): array
+    private function vendorBenefits(): array
     {
         return [
-            ['activity' => 'Booking melalui platform', 'points' => '+100'],
-            ['activity' => 'Deposit dibayar', 'points' => '+100'],
-            ['activity' => 'Booking selesai', 'points' => '+150'],
-            ['activity' => 'Full payment', 'points' => '+150'],
-            ['activity' => 'Positive review', 'points' => '+20'],
-            ['activity' => 'Fast response', 'points' => '+20'],
+            'Senarai dan profil perniagaan, percuma',
+            'Pengantin WhatsApp anda terus',
+            'Pakej, harga dan portfolio dipaparkan',
+            'Kalendar tarikh yang sudah penuh',
+            'Enquiry pengantin dalam satu tempat',
         ];
     }
 }

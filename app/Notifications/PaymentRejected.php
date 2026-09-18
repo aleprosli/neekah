@@ -4,6 +4,7 @@ namespace App\Notifications;
 
 use App\Models\Payment;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
@@ -11,7 +12,7 @@ use Illuminate\Notifications\Notification;
  * The vendor looked and could not find the money. Said plainly, because the
  * usual reason is a typo in the amount or a transfer that never went through.
  */
-class PaymentRejected extends Notification
+class PaymentRejected extends Notification implements ShouldQueue
 {
     use Queueable;
 

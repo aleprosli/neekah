@@ -4,10 +4,11 @@ namespace App\Notifications;
 
 use App\Models\Enquiry;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class EnquiryReplied extends Notification
+class EnquiryReplied extends Notification implements ShouldQueue
 {
     use Queueable;
 
