@@ -5,21 +5,45 @@
     $repliedEnquiries = $user->enquiries()->where('status', \App\Enums\EnquiryStatus::Replied)->count();
     $wedding = $user->weddings()->latest('event_date')->first();
     $outstandingTasks = $wedding?->tasks()->outstanding()->whereNotNull('due_date')->whereDate('due_date', '<=', today())->count();
-    $nav = [
-        ['label' => 'Majlis saya', 'icon' => 'rings', 'href' => route('dashboard'), 'active' => request()->routeIs('dashboard', 'weddings.*')],
-        ['label' => 'Checklist', 'icon' => 'check', 'href' => route('checklist.index'), 'active' => request()->routeIs('checklist.*'), 'badge' => $outstandingTasks ?: null],
-        ['label' => 'Timeline', 'icon' => 'calendar', 'href' => route('timeline.index'), 'active' => request()->routeIs('timeline.*')],
-        ['label' => 'Bajet', 'icon' => 'wallet', 'href' => route('budget.index'), 'active' => request()->routeIs('budget.*')],
-        ['label' => 'Tetamu', 'icon' => 'users', 'href' => route('guests.index'), 'active' => request()->routeIs('guests.*')],
-        ['label' => 'Kad jemputan', 'icon' => 'mail', 'href' => route('site.edit'), 'active' => request()->routeIs('site.*')],
-        ['label' => 'Tempahan', 'icon' => 'receipt', 'href' => route('bookings.index'), 'active' => request()->routeIs('bookings.*')],
-        ['label' => 'Enquiry', 'icon' => 'chat', 'href' => route('enquiries.index'), 'active' => request()->routeIs('enquiries.*'), 'badge' => $repliedEnquiries ?: null],
-        ['label' => 'Cari vendor', 'icon' => 'search', 'href' => route('vendors.index'), 'active' => false],
-        ['label' => 'Akaun', 'icon' => 'user', 'href' => route('account.edit'), 'active' => request()->routeIs('account.*')],
+    $item = fn (string $label, string $icon, string $route, string|array $pattern, ?int $badge = null): array => [
+        'label' => $label, 'icon' => $icon, 'href' => route($route), 'active' => request()->routeIs($pattern), 'badge' => $badge ?: null,
     ];
+    $nav = [
+        ['label' => null, 'items' => [
+            $item('Majlis saya', 'rings', 'dashboard', ['dashboard', 'weddings.*']),
+        ]],
+        ['label' => 'Perancangan', 'items' => [
+            $item('Checklist', 'check', 'checklist.index', 'checklist.*', $outstandingTasks),
+            $item('Timeline', 'calendar', 'timeline.index', 'timeline.*'),
+            $item('Bajet', 'wallet', 'budget.index', 'budget.*'),
+        ]],
+        ['label' => 'Tetamu', 'items' => [
+            $item('Senarai tetamu', 'users', 'guests.index', 'guests.*'),
+            $item('Kad jemputan', 'mail', 'site.edit', 'site.*'),
+        ]],
+        ['label' => 'Vendor', 'items' => [
+            ['label' => 'Cari vendor', 'icon' => 'search', 'href' => route('vendors.index'), 'active' => false, 'badge' => null],
+            $item('Tempahan', 'receipt', 'bookings.index', 'bookings.*'),
+            $item('Enquiry', 'chat', 'enquiries.index', 'enquiries.*', $repliedEnquiries),
+        ]],
+    ];
+
+    // The one number every couple wants to see on every page.
+    $daysLeft = $wedding ? (int) today()->diffInDays($wedding->event_date, false) : null;
+    $context = $wedding
+        ? [
+            'title' => $wedding->title,
+            'detail' => $wedding->event_date->translatedFormat('j F Y').' · '.match (true) {
+                $daysLeft > 0 => $daysLeft.' hari lagi',
+                $daysLeft === 0 => 'Hari ini!',
+                default => 'Selamat pengantin baru',
+            },
+            'wedding' => true,
+        ]
+        : ['title' => 'Perancang majlis', 'detail' => 'Cipta majlis anda untuk bermula', 'wedding' => true];
 @endphp
 
-<x-layouts.dashboard :title="$title" :nav="$nav" area="Perancang majlis" :heading="$heading" :subheading="$subheading">
+<x-layouts.dashboard :title="$title" :nav="$nav" :context="$context" :heading="$heading" :subheading="$subheading">
     @isset($actions)
         <x-slot:actions>{{ $actions }}</x-slot:actions>
     @endisset

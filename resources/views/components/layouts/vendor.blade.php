@@ -3,20 +3,33 @@
 @php
     $vendor = auth()->user()->vendor;
     $openEnquiries = $vendor?->enquiries()->where('status', \App\Enums\EnquiryStatus::Open)->count();
-    $nav = [
-        ['label' => 'Ringkasan', 'icon' => 'chart', 'href' => route('vendor.dashboard'), 'active' => request()->routeIs('vendor.dashboard')],
-        ['label' => 'Profil', 'icon' => 'store', 'href' => route('vendor.profile.edit'), 'active' => request()->routeIs('vendor.profile.*')],
-        ['label' => 'Pakej', 'icon' => 'box', 'href' => route('vendor.packages.index'), 'active' => request()->routeIs('vendor.packages.*')],
-        ['label' => 'Portfolio', 'icon' => 'image', 'href' => route('vendor.portfolio.index'), 'active' => request()->routeIs('vendor.portfolio.*')],
-        ['label' => 'Kalendar', 'icon' => 'calendar', 'href' => route('vendor.availability.index'), 'active' => request()->routeIs('vendor.availability.*')],
-        ['label' => 'Tempahan', 'icon' => 'receipt', 'href' => route('vendor.bookings.index'), 'active' => request()->routeIs('vendor.bookings.*')],
-        ['label' => 'Enquiry', 'icon' => 'chat', 'href' => route('vendor.enquiries.index'), 'active' => request()->routeIs('vendor.enquiries.*'), 'badge' => $openEnquiries ?: null],
-        ['label' => 'Point & Ranking', 'icon' => 'trophy', 'href' => route('vendor.points.index'), 'active' => request()->routeIs('vendor.points.*')],
-        ['label' => 'Akaun', 'icon' => 'user', 'href' => route('account.edit'), 'active' => request()->routeIs('account.*')],
+    $item = fn (string $label, string $icon, string $route, string $pattern, ?int $badge = null): array => [
+        'label' => $label, 'icon' => $icon, 'href' => route($route), 'active' => request()->routeIs($pattern), 'badge' => $badge ?: null,
     ];
+    $nav = [
+        ['label' => null, 'items' => [
+            $item('Ringkasan', 'chart', 'vendor.dashboard', 'vendor.dashboard'),
+        ]],
+        ['label' => 'Perniagaan', 'items' => [
+            $item('Profil', 'store', 'vendor.profile.edit', 'vendor.profile.*'),
+            $item('Pakej', 'box', 'vendor.packages.index', 'vendor.packages.*'),
+            $item('Portfolio', 'image', 'vendor.portfolio.index', 'vendor.portfolio.*'),
+            $item('Kalendar', 'calendar', 'vendor.availability.index', 'vendor.availability.*'),
+        ]],
+        ['label' => 'Pelanggan', 'items' => [
+            $item('Tempahan', 'receipt', 'vendor.bookings.index', 'vendor.bookings.*'),
+            $item('Enquiry', 'chat', 'vendor.enquiries.index', 'vendor.enquiries.*', $openEnquiries),
+        ]],
+        ['label' => 'Prestasi', 'items' => [
+            $item('Point & Ranking', 'trophy', 'vendor.points.index', 'vendor.points.*'),
+        ]],
+    ];
+    $context = $vendor
+        ? ['title' => $vendor->name, 'detail' => $vendor->status->label().' · '.$vendor->tier->label().' Vendor']
+        : ['title' => 'Dashboard vendor', 'detail' => null];
 @endphp
 
-<x-layouts.dashboard :title="$title" :nav="$nav" area="Dashboard vendor" :heading="$heading" :subheading="$subheading">
+<x-layouts.dashboard :title="$title" :nav="$nav" :context="$context" :heading="$heading" :subheading="$subheading">
     @isset($actions)
         <x-slot:actions>{{ $actions }}</x-slot:actions>
     @endisset
