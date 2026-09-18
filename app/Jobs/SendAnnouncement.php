@@ -35,10 +35,17 @@ class SendAnnouncement implements ShouldQueue
 
         $sent = 0;
 
-        $this->announcement->audience->recipients()->chunkById(200, function (Collection $recipients) use (&$sent): void {
+        $this->announcement->recipientQuery()->chunkById(200, function (Collection $recipients) use (&$sent): void {
             Notification::send($recipients, new AnnouncementPublished($this->announcement));
             $sent += $recipients->count();
         });
+
+        // Addresses typed in by hand that belong to no account: email only,
+        // because there is no bell to put anything in.
+        foreach ($this->announcement->addressesWithoutAccounts() as $address) {
+            Notification::route('mail', $address)->notify(new AnnouncementPublished($this->announcement));
+            $sent++;
+        }
 
         $this->announcement->update([
             'status' => AnnouncementStatus::Sent,

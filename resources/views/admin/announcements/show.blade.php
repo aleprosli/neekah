@@ -43,6 +43,21 @@
                 <dt class="text-ink-muted">Ditulis oleh</dt>
                 <dd class="font-medium">{{ $announcement->author?->name ?? 'Admin' }}</dd>
             </div>
+
+            @if ($announcement->audience->isCustom())
+                <div>
+                    <dt class="text-ink-muted">Senarai pilihan</dt>
+                    <dd class="mt-1 flex flex-col gap-1">
+                        @foreach ($announcement->users as $user)
+                            <span class="truncate">{{ $user->name }} <span class="text-ink-muted">· {{ $user->email }}</span></span>
+                        @endforeach
+
+                        @foreach ($announcement->custom_emails ?? [] as $email)
+                            <span class="truncate">{{ $email }} <span class="text-ink-muted">· tiada akaun</span></span>
+                        @endforeach
+                    </dd>
+                </div>
+            @endif
         </dl>
     </div>
 </x-layouts.admin>

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Customer;
 use App\Actions\SeedWeddingChecklist;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreWeddingTaskRequest;
+use App\Http\Requests\UpdateWeddingTasksRequest;
 use App\Models\Category;
 use App\Models\Wedding;
 use App\Models\WeddingTask;
@@ -13,6 +14,7 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 
 class WeddingTaskController extends Controller
@@ -30,23 +32,13 @@ class WeddingTaskController extends Controller
 
         $tasks = $wedding->tasks()->with('category', 'completer', 'checklistItem', 'checklistSection')->get();
 
-        $total = $tasks->count();
-        $done = $tasks->whereNotNull('completed_at')->count();
-        $overdue = $tasks->filter->isOverdue()->count();
-
         return view('customer.checklist', [
             'wedding' => $wedding,
             'props' => VueProps::for([
                 'storeUrl' => route('weddings.tasks.store', $wedding),
-                'stats' => [
-                    ['label' => 'Progress', 'value' => ($total ? (int) round($done / $total * 100) : 0).'%', 'hint' => $done.' daripada '.$total.' selesai'],
-                    ['label' => 'Belum selesai', 'value' => $total - $done, 'hint' => 'Termasuk tugasan akan datang'],
-                    ['label' => 'Lewat', 'value' => $overdue, 'hint' => $overdue ? 'Perlu perhatian segera' : 'Semua mengikut jadual'],
-                ],
-                'progress' => [
-                    'caption' => $done.' / '.$total,
-                    'percent' => $total > 0 ? min(100, round($done / $total * 100)) : 0,
-                ],
+                'updateUrl' => route('weddings.tasks.update', $wedding),
+                // Progress is counted in the browser, so the cards move as the
+                // couple ticks rather than waiting for the save.
                 'sections' => $this->sections($wedding, $tasks),
                 'categories' => Category::active()->ordered()->get(['id', 'name', 'icon']),
             ]),
@@ -108,7 +100,6 @@ class WeddingTaskController extends Controller
             'completed' => $task->completed_at
                 ? 'Selesai '.$task->completed_at->translatedFormat('j M Y').($task->completer ? ' oleh '.$task->completer->name : '')
                 : null,
-            'update_url' => route('weddings.tasks.update', [$wedding, $task]),
             'destroy_url' => route('weddings.tasks.destroy', [$wedding, $task]),
             'category' => $task->category ? [
                 'name' => $task->category->name,
@@ -130,21 +121,33 @@ class WeddingTaskController extends Controller
     }
 
     /**
-     * Tick or untick a task. Either partner may do it, and we record who.
+     * Tick and untick whatever the couple worked through, in one go. Either
+     * partner may do it, and we record who — nobody ticks fifteen documents one
+     * page reload at a time.
      */
-    public function update(Request $request, Wedding $wedding, WeddingTask $task): RedirectResponse
+    public function update(UpdateWeddingTasksRequest $request, Wedding $wedding): RedirectResponse
     {
-        Gate::authorize('update', $wedding);
-        abort_unless($task->wedding_id === $wedding->id, 404);
+        ['done' => $done, 'undone' => $undone] = $request->changes();
 
-        $done = $request->boolean('done');
+        $changed = 0;
 
-        $task->update([
-            'completed_at' => $done ? now() : null,
-            'completed_by' => $done ? $request->user()->id : null,
-        ]);
+        DB::transaction(function () use ($wedding, $request, $done, $undone, &$changed): void {
+            if ($done !== []) {
+                $changed += $wedding->tasks()->whereIn('id', $done)->whereNull('completed_at')
+                    ->update(['completed_at' => now(), 'completed_by' => $request->user()->id]);
+            }
 
-        return back();
+            if ($undone !== []) {
+                $changed += $wedding->tasks()->whereIn('id', $undone)->whereNotNull('completed_at')
+                    ->update(['completed_at' => null, 'completed_by' => null]);
+            }
+        });
+
+        return back()->with('status', match (true) {
+            $changed === 0 => 'Tiada perubahan untuk disimpan.',
+            $changed === 1 => '1 tugasan dikemas kini.',
+            default => $changed.' tugasan dikemas kini.',
+        });
     }
 
     public function destroy(Wedding $wedding, WeddingTask $task): RedirectResponse

@@ -43,9 +43,12 @@ class AnnouncementPublished extends Notification
 
     public function toMail(object $notifiable): MailMessage
     {
+        // A typed-in address has no account, so there is no name to greet.
+        $name = $notifiable->name ?? null;
+
         $message = (new MailMessage)
             ->subject($this->announcement->subject)
-            ->greeting('Hai '.$notifiable->name.',');
+            ->greeting($name ? 'Hai '.$name.',' : 'Hai,');
 
         foreach ($this->announcement->paragraphs() as $paragraph) {
             $message->line($paragraph);

@@ -47,27 +47,63 @@ it('keeps a short-notice wedding from having overdue tasks on day one', function
     expect(WeddingTask::query()->whereDate('due_date', '<', today())->count())->toBe(0);
 });
 
-it('shows progress and lets either partner tick a task', function () {
+it('ticks a handful of tasks in one save, and records who did it', function () {
     app(SeedWeddingChecklist::class)->handle($this->wedding);
     $hakim = User::factory()->create();
     $this->wedding->addMember($hakim, WeddingRole::Partner);
-    $task = $this->wedding->tasks()->first();
+    $tasks = $this->wedding->tasks()->take(3)->get();
 
     $this->actingAs($hakim)
-        ->put(route('weddings.tasks.update', [$this->wedding, $task]), ['done' => 1])
-        ->assertRedirect();
+        ->put(route('weddings.tasks.update', $this->wedding), ['done' => $tasks->pluck('id')->all()])
+        ->assertRedirect()
+        ->assertSessionHas('status', '3 tugasan dikemas kini.');
 
-    $task->refresh();
-    expect($task->isDone())->toBeTrue()->and($task->completed_by)->toBe($hakim->id);
+    expect($this->wedding->tasks()->whereNotNull('completed_at')->count())->toBe(3)
+        ->and($this->wedding->tasks()->where('completed_by', $hakim->id)->count())->toBe(3);
 
-    // Aina sees who ticked it.
+    // Aina sees who ticked them, and unticks two of them in one go.
     $this->actingAs($this->aina)->get(route('checklist.index'))->assertOk()->assertSee('oleh '.$hakim->name);
 
     $this->actingAs($this->aina)
-        ->put(route('weddings.tasks.update', [$this->wedding, $task]), ['done' => 0])
+        ->put(route('weddings.tasks.update', $this->wedding), ['undone' => $tasks->take(2)->pluck('id')->all()])
         ->assertRedirect();
 
-    expect($task->fresh()->isDone())->toBeFalse();
+    expect($this->wedding->tasks()->whereNotNull('completed_at')->count())->toBe(1);
+});
+
+it('saves a tick and an untick together, and says when nothing changed', function () {
+    app(SeedWeddingChecklist::class)->handle($this->wedding);
+    [$ticked, $untouched] = $this->wedding->tasks()->take(2)->get()->all();
+    $ticked->update(['completed_at' => now(), 'completed_by' => $this->aina->id]);
+
+    $this->actingAs($this->aina)
+        ->put(route('weddings.tasks.update', $this->wedding), [
+            'done' => [$untouched->id],
+            'undone' => [$ticked->id],
+        ])
+        ->assertRedirect()
+        ->assertSessionHas('status', '2 tugasan dikemas kini.');
+
+    expect($ticked->fresh()->isDone())->toBeFalse()
+        ->and($untouched->fresh()->isDone())->toBeTrue();
+
+    // Saving the same state again changes nothing and says so.
+    $this->actingAs($this->aina)
+        ->put(route('weddings.tasks.update', $this->wedding), ['done' => [$untouched->id]])
+        ->assertRedirect()
+        ->assertSessionHas('status', 'Tiada perubahan untuk disimpan.');
+});
+
+it('refuses to tick a task that belongs to another wedding', function () {
+    app(SeedWeddingChecklist::class)->handle($this->wedding);
+    $stranger = Wedding::factory()->for(User::factory()->create())->create();
+    $theirs = $stranger->tasks()->create(['title' => 'Tugasan orang lain', 'sort_order' => 0]);
+
+    $this->actingAs($this->aina)
+        ->put(route('weddings.tasks.update', $this->wedding), ['done' => [$theirs->id]])
+        ->assertRedirect();
+
+    expect($theirs->fresh()->isDone())->toBeFalse();
 });
 
 it('adds and deletes a custom task', function () {

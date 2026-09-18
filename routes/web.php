@@ -136,7 +136,7 @@ Route::middleware('auth')->group(function (): void {
 
     Route::get('/checklist', [CustomerArea\WeddingTaskController::class, 'index'])->middleware('wedding')->name('checklist.index');
     Route::post('/weddings/{wedding}/tasks', [CustomerArea\WeddingTaskController::class, 'store'])->name('weddings.tasks.store');
-    Route::put('/weddings/{wedding}/tasks/{task}', [CustomerArea\WeddingTaskController::class, 'update'])->name('weddings.tasks.update');
+    Route::put('/weddings/{wedding}/tasks', [CustomerArea\WeddingTaskController::class, 'update'])->name('weddings.tasks.update');
     Route::delete('/weddings/{wedding}/tasks/{task}', [CustomerArea\WeddingTaskController::class, 'destroy'])->name('weddings.tasks.destroy');
 
     Route::get('/tetamu', [CustomerArea\WeddingGuestController::class, 'index'])->middleware('wedding')->name('guests.index');
@@ -203,6 +203,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/announcements', [AdminArea\AnnouncementController::class, 'index'])->name('announcements.index');
     Route::post('/announcements', [AdminArea\AnnouncementController::class, 'store'])->name('announcements.store');
     Route::post('/announcements/test', [AdminArea\AnnouncementController::class, 'test'])->name('announcements.test');
+    Route::get('/announcements/recipients', [AdminArea\AnnouncementController::class, 'recipients'])->name('announcements.recipients');
     Route::get('/announcements/{announcement}', [AdminArea\AnnouncementController::class, 'show'])->name('announcements.show');
     Route::get('/bookings', [AdminArea\BookingController::class, 'index'])->name('bookings.index');
     Route::get('/bookings/data', [AdminArea\BookingController::class, 'data'])->name('bookings.data');
