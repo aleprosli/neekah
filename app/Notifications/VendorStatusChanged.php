@@ -5,10 +5,11 @@ namespace App\Notifications;
 use App\Enums\VendorStatus;
 use App\Models\Vendor;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class VendorStatusChanged extends Notification
+class VendorStatusChanged extends Notification implements ShouldQueue
 {
     use Queueable;
 

@@ -41,7 +41,11 @@ return [
             'table' => env('DB_QUEUE_TABLE', 'jobs'),
             'queue' => env('DB_QUEUE', 'default'),
             'retry_after' => (int) env('DB_QUEUE_RETRY_AFTER', 90),
-            'after_commit' => false,
+            // Every notification is queued, and several are sent from inside a
+            // DB::transaction (bookings, payments, vendor sign-up). Holding the
+            // job until the commit stops the worker picking it up before the
+            // booking it is about exists — or after the transaction rolled back.
+            'after_commit' => true,
         ],
 
         'beanstalkd' => [

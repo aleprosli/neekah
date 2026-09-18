@@ -3,6 +3,7 @@
  * interactive as early as possible. Everything below is the plain-JavaScript
  * behaviour that does not need a component.
  */
+import './form-guard.js';
 import './navigation.js';
 import { mountIslands } from './vue.js';
 

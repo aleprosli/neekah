@@ -4,6 +4,7 @@ namespace App\Notifications;
 
 use App\Models\Payment;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
@@ -11,7 +12,7 @@ use Illuminate\Notifications\Notification;
  * A couple says they have paid. Only the vendor can check their own account, so
  * this asks them to look and confirm.
  */
-class PaymentRecorded extends Notification
+class PaymentRecorded extends Notification implements ShouldQueue
 {
     use Queueable;
 

@@ -4,6 +4,7 @@ namespace App\Notifications;
 
 use App\Support\ContactSettings;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
@@ -11,7 +12,7 @@ use Illuminate\Notifications\Notification;
  * The welcome a couple gets when they sign up, pointing them at the first
  * thing to do rather than leaving them on an empty dashboard.
  */
-class CustomerRegistered extends Notification
+class CustomerRegistered extends Notification implements ShouldQueue
 {
     use Queueable;
 

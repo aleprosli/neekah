@@ -490,3 +490,42 @@ html {
         opacity: 0.6;
     }
 }
+
+/*
+| Form submitting
+| resources/js/form-guard.js marks the pressed button busy while its form is on
+| its way. The button keeps its label and gains a spinner, and stops taking
+| clicks, so it is plain that the first tap was heard.
+*/
+[data-busy] {
+    position: relative;
+    cursor: progress;
+    pointer-events: none;
+    opacity: 0.85;
+}
+
+[data-busy]::before {
+    content: '';
+    display: inline-block;
+    width: 0.9em;
+    height: 0.9em;
+    margin-right: 0.5em;
+    vertical-align: -0.12em;
+    border: 2px solid currentColor;
+    border-right-color: transparent;
+    border-radius: 9999px;
+    animation: nk-busy-spin 0.7s linear infinite;
+}
+
+@keyframes nk-busy-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    [data-busy]::before {
+        animation-duration: 2s;
+    }
+}
+

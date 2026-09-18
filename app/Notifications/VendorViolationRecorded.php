@@ -5,10 +5,11 @@ namespace App\Notifications;
 use App\Enums\ViolationAction;
 use App\Models\VendorViolation;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class VendorViolationRecorded extends Notification
+class VendorViolationRecorded extends Notification implements ShouldQueue
 {
     use Queueable;
 
