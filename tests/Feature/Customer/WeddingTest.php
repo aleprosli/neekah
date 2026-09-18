@@ -115,3 +115,16 @@ it('offers no card button before there is a wedding to make one for', function (
         ->assertDontSee('Buat kad digital')
         ->assertDontSee('Kad digital saya');
 });
+
+it('puts the partner invitation right under the buttons, and the digital card first among them', function () {
+    $couple = User::factory()->create();
+    Wedding::factory()->for($couple)->create();
+
+    // The invitation used to sit at the foot of the dashboard, where it went
+    // unseen. In the markup the card button also comes first, which is the
+    // order a phone shows them in.
+    $this->actingAs($couple)
+        ->get(route('dashboard'))
+        ->assertOk()
+        ->assertSeeInOrder(['Buat kad digital', 'Edit majlis', 'Cari vendor', 'Uruskan majlis berdua', 'data-vue="customer-dashboard-page"'], false);
+});
