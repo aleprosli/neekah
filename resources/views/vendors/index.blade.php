@@ -146,11 +146,24 @@
         </div>
 
         @if ($vendors->isEmpty())
+            {{-- Neekah is a network first: when the list has nobody, the team
+                 can still pass the request on to vendors who are not listed. --}}
             <div class="flex flex-col items-center gap-3 py-24 text-center">
                 <span class="text-4xl">🔍</span>
-                <h1 class="text-lg font-semibold">Tiada vendor sepadan</h1>
-                <p class="max-w-sm text-sm text-ink-muted">Cuba longgarkan bajet atau rating, atau pilih negeri lain.</p>
-                <a href="{{ route('vendors.index') }}" class="rounded-full bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700">Buang semua filter</a>
+                <h1 class="text-lg font-semibold">Maaf, belum ada vendor yang sepadan</h1>
+                <p class="max-w-md text-sm text-ink-muted">
+                    Cuba longgarkan penapis, atau beritahu kami apa yang anda cari: kategori, lokasi dan tarikh majlis.
+                    Kami akan kongsikan kepada rangkaian vendor kami dan bantu hubungkan anda.
+                </p>
+                <div class="mt-2 flex flex-col gap-2 sm:flex-row">
+                    @if ($helpUrl)
+                        <a href="{{ $helpUrl }}" target="_blank" rel="noopener" class="inline-flex items-center justify-center gap-2 rounded-full bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700">
+                            <svg class="size-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .1-3.3-.8-2.8-1.1-4.5-3.9-4.7-4.1-.1-.2-1.1-1.5-1.1-2.8s.7-2 1-2.3c.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.4 0 .5l-.4.6-.4.4c-.1.1-.3.3-.1.6.2.3.8 1.3 1.6 2 1.1 1 2 1.3 2.3 1.4.3.1.5.1.6-.1l.9-1.1c.2-.3.4-.2.7-.1l1.9.9c.3.1.5.2.5.3.1.2.1.7-.1 1.3Z"/></svg>
+                            WhatsApp kami
+                        </a>
+                    @endif
+                    <a href="{{ route('vendors.index') }}" class="inline-flex items-center justify-center rounded-full border border-line px-5 py-2.5 text-sm font-semibold transition hover:border-brand-400">Buang semua filter</a>
+                </div>
             </div>
         @else
             <h1 class="sr-only">{{ $activeCategory?->name ?? 'Semua vendor' }}</h1>

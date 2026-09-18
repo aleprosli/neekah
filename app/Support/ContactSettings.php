@@ -34,12 +34,20 @@ class ContactSettings extends SettingGroup
         return $this->string('hours');
     }
 
-    /** The number in wa.me form: digits only, with the country code. */
-    public function whatsappUrl(): ?string
+    /**
+     * The number in wa.me form: digits only, with the country code. A message
+     * is pre-filled when given, so someone asking for help does not open an
+     * empty chat and have to work out what to say.
+     */
+    public function whatsappUrl(?string $message = null): ?string
     {
         $number = PhoneNumber::normalise($this->whatsapp() ?: $this->phone());
 
-        return $number ? 'https://wa.me/'.$number : null;
+        if (! $number) {
+            return null;
+        }
+
+        return 'https://wa.me/'.$number.($message ? '?text='.rawurlencode($message) : '');
     }
 
     public function telUrl(): ?string

@@ -6,6 +6,7 @@ use App\Models\Package;
 use App\Models\Review;
 use App\Models\User;
 use App\Models\Vendor;
+use App\Support\ContactSettings;
 use Database\Seeders\CategorySeeder;
 
 beforeEach(function () {
@@ -77,7 +78,7 @@ it('filters vendors by price, rating and tier', function () {
 it('shows an empty state when nothing matches', function () {
     $this->get(route('vendors.index', ['q' => 'tiada-vendor-begini']))
         ->assertOk()
-        ->assertSee('Tiada vendor sepadan');
+        ->assertSee('Maaf, belum ada vendor yang sepadan');
 });
 
 it('sorts vendors by price ascending', function () {
@@ -164,4 +165,23 @@ it('falls back to the category emoji when no illustration exists', function () {
     Category::where('slug', 'photography')->update(['slug' => 'sewa-kereta', 'icon' => '🚗']);
 
     $this->get('/')->assertOk()->assertSee('🚗', escape: false);
+});
+
+it('apologises for an empty search and offers to pass the request on', function () {
+    app(ContactSettings::class)->save(['whatsapp' => '012-345 6789']);
+
+    $this->get(route('vendors.index', ['q' => 'kereta kuda']))
+        ->assertOk()
+        ->assertSee('Maaf, belum ada vendor yang sepadan')
+        ->assertSee('Kami akan kongsikan kepada rangkaian vendor kami')
+        // The chat opens already saying what they were looking for.
+        ->assertSee('https://wa.me/60123456789?text=', false)
+        ->assertSee(rawurlencode('"kereta kuda"'), false);
+});
+
+it('leaves the WhatsApp button out of an empty search when no number is set', function () {
+    $this->get(route('vendors.index', ['q' => 'kereta kuda']))
+        ->assertOk()
+        ->assertSee('Maaf, belum ada vendor yang sepadan')
+        ->assertDontSee('WhatsApp kami');
 });

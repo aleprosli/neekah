@@ -10,15 +10,15 @@
                 <div class="flex flex-col gap-6">
                     <span class="inline-flex w-fit items-center gap-2 rounded-full border border-brand-200 bg-brand-50 px-3 py-1 text-xs font-semibold tracking-wide text-brand-700 uppercase">
                         <span class="size-1.5 rounded-full bg-brand-500"></span>
-                        Wedding Operating System untuk Malaysia
+                        Rangkaian vendor kahwin Malaysia
                     </span>
 
                     <h1 class="font-display text-4xl leading-tight font-semibold tracking-tight text-balance sm:text-5xl lg:text-6xl">
-                        Semua Urusan Majlis, <span class="text-brand-600">Satu Platform.</span>
+                        Cari vendor kahwin, <span class="text-brand-600">terus berurusan dengan mereka.</span>
                     </h1>
 
                     <p class="max-w-xl text-lg text-ink-muted text-pretty">
-                        Rancang majlis, cari vendor, bandingkan pakej, tempah dan bayar, kemudian urus timeline dan bajet, semuanya dalam satu tempat. Tidak perlu lagi 10 aplikasi berbeza.
+                        Neekah bantu anda cari vendor yang sesuai ikut kategori, lokasi dan bajet, kemudian hubungi mereka terus. Sambil itu, rancang majlis anda dengan checklist, bajet dan kad jemputan digital, semuanya percuma.
                     </p>
 
                     <div class="flex flex-col gap-3 sm:flex-row">
@@ -33,26 +33,26 @@
                     <dl class="grid grid-cols-3 gap-4 border-t border-line pt-6 text-sm">
                         <div>
                             <dt class="text-ink-muted">Kategori vendor</dt>
-                            <dd class="font-display text-2xl font-semibold">12</dd>
+                            <dd class="font-display text-2xl font-semibold">{{ $categories->count() }}</dd>
                         </div>
                         <div>
                             <dt class="text-ink-muted">Yuran platform</dt>
                             <dd class="font-display text-2xl font-semibold">Percuma</dd>
                         </div>
                         <div>
-                            <dt class="text-ink-muted">Fake review</dt>
-                            <dd class="font-display text-2xl font-semibold">0</dd>
+                            <dt class="text-ink-muted">Orang tengah</dt>
+                            <dd class="font-display text-2xl font-semibold">Tiada</dd>
                         </div>
                     </dl>
                 </div>
 
                 {{-- Mock wedding dashboard --}}
                 <div class="relative">
-                    <div class="absolute -top-6 -right-6 hidden rounded-2xl border border-line bg-surface-raised p-4 shadow-xl lg:block">
-                        <p class="text-xs font-medium text-ink-muted">Status booking</p>
+                    <div class="absolute -top-14 right-8 z-10 hidden rounded-2xl border border-line bg-surface-raised p-4 shadow-xl lg:block">
+                        <p class="text-xs font-medium text-ink-muted">Kad jemputan digital</p>
                         <p class="mt-1 flex items-center gap-2 text-sm font-semibold">
                             <span class="size-2 rounded-full bg-emerald-500"></span>
-                            Bayaran disahkan · Confirmed
+                            186 tetamu sahkan hadir
                         </p>
                     </div>
 
@@ -73,11 +73,11 @@
                             </div>
                             <div class="rounded-2xl bg-surface-muted p-4">
                                 <dt class="text-ink-muted">Vendor</dt>
-                                <dd class="mt-1 font-semibold">8 <span class="font-normal text-ink-muted">/ 10 ditempah</span></dd>
+                                <dd class="mt-1 font-semibold">8 <span class="font-normal text-ink-muted">/ 10 sudah deal</span></dd>
                             </div>
                             <div class="rounded-2xl bg-surface-muted p-4">
-                                <dt class="text-ink-muted">Pembayaran</dt>
-                                <dd class="mt-1 font-semibold">RM18,000 <span class="font-normal text-ink-muted">dibayar</span></dd>
+                                <dt class="text-ink-muted">Checklist</dt>
+                                <dd class="mt-1 font-semibold">81 <span class="font-normal text-ink-muted">/ 99 selesai</span></dd>
                             </div>
                             <div class="rounded-2xl bg-surface-muted p-4">
                                 <dt class="text-ink-muted">Baki bajet</dt>
@@ -90,15 +90,15 @@
                             <ul class="mt-3 flex flex-col gap-2 text-sm">
                                 <li class="flex items-center justify-between rounded-xl border border-line px-3 py-2">
                                     <span><x-category-icon class="inline-block size-5 shrink-0 align-[-0.3em]" slug="photography" fallback="📸" /> Photographer</span>
-                                    <span class="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-semibold text-emerald-700">Confirmed</span>
+                                    <span class="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-semibold text-emerald-700">Sudah deal</span>
                                 </li>
                                 <li class="flex items-center justify-between rounded-xl border border-line px-3 py-2">
                                     <span><x-category-icon class="inline-block size-5 shrink-0 align-[-0.3em]" slug="catering" fallback="🍽️" /> Catering</span>
-                                    <span class="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-semibold text-emerald-700">Confirmed</span>
+                                    <span class="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-semibold text-emerald-700">Sudah deal</span>
                                 </li>
                                 <li class="flex items-center justify-between rounded-xl border border-line px-3 py-2">
                                     <span><x-category-icon class="inline-block size-5 shrink-0 align-[-0.3em]" slug="makeup" fallback="💄" /> Makeup</span>
-                                    <span class="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-700">Pending</span>
+                                    <span class="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-700">Sedang berbincang</span>
                                 </li>
                             </ul>
                         </div>
@@ -125,9 +125,9 @@
         {{-- Features --}}
         <section id="ciri" class="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
             <div class="max-w-2xl">
-                <p class="text-sm font-semibold tracking-wide text-brand-600 uppercase">Lebih daripada marketplace</p>
-                <h2 class="mt-2 font-display text-3xl font-semibold tracking-tight sm:text-4xl">Dari perancangan hingga hari majlis</h2>
-                <p class="mt-4 text-lg text-ink-muted">Marketplace hanyalah permulaan. Neekah kekal bersama anda sepanjang perjalanan, dari checklist pertama hingga review terakhir.</p>
+                <p class="text-sm font-semibold tracking-wide text-brand-600 uppercase">Percuma untuk pengantin</p>
+                <h2 class="mt-2 font-display text-3xl font-semibold tracking-tight sm:text-4xl">Semua persiapan, satu tempat</h2>
+                <p class="mt-4 text-lg text-ink-muted">Cari vendor hanyalah permulaan. Neekah bantu anda bersiap, dari checklist pertama hingga kad jemputan terakhir.</p>
             </div>
 
             <div class="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -148,7 +148,7 @@
                     <div class="max-w-2xl">
                         <p class="text-sm font-semibold tracking-wide text-brand-600 uppercase">Marketplace</p>
                         <h2 class="mt-2 font-display text-3xl font-semibold tracking-tight sm:text-4xl">Cari vendor ikut kategori, lokasi & bajet</h2>
-                        <p class="mt-4 text-lg text-ink-muted">Bandingkan pakej, portfolio dan rating sebelum berhubung. Semua vendor disahkan oleh platform.</p>
+                        <p class="mt-4 text-lg text-ink-muted">Bandingkan pakej dan portfolio, kemudian hubungi vendor terus. Setiap vendor disemak oleh pasukan Neekah sebelum disenaraikan.</p>
                     </div>
 
                     {{-- Search --}}
@@ -178,9 +178,8 @@
                     @endforeach
                 </ul>
 
-                <div class="mt-14 flex items-center justify-between gap-4">
+                <div class="mt-14">
                     <h3 class="font-display text-2xl font-semibold">Vendor pilihan</h3>
-                    <span class="rounded-full border border-line bg-surface-raised px-3 py-1 text-xs font-medium text-ink-muted">Data contoh · listing sebenar akan datang</span>
                 </div>
 
                 <ul class="mt-6 grid gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
@@ -189,8 +188,11 @@
                     @endforeach
                 </ul>
 
-                <div class="mt-8 text-center">
+                <div class="mt-8 flex flex-col items-center gap-3 text-center">
                     <a href="{{ route('vendors.index') }}" class="inline-flex items-center justify-center rounded-full border border-line bg-surface-raised px-6 py-3 text-sm font-semibold transition hover:border-brand-300 hover:text-brand-700">Lihat semua vendor →</a>
+                    @if ($helpUrl)
+                        <p class="text-sm text-ink-muted">Tak jumpa vendor yang anda cari? <a href="{{ $helpUrl }}" target="_blank" rel="noopener" class="font-semibold text-brand-600 hover:underline">WhatsApp kami</a>, kami bantu kongsikan kepada vendor lain.</p>
+                    @endif
                 </div>
             </div>
         </section>
@@ -199,18 +201,18 @@
         <section class="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
             <div class="grid gap-10 rounded-3xl border border-line bg-surface-raised p-8 lg:grid-cols-2 lg:p-12">
                 <div class="flex flex-col gap-4">
-                    <p class="text-sm font-semibold tracking-wide text-brand-600 uppercase">Selamat & telus</p>
-                    <h2 class="font-display text-3xl font-semibold tracking-tight">Bincang di mana-mana. Tempah & bayar di Neekah.</h2>
-                    <p class="text-ink-muted">WhatsApp, panggilan, site visit, food tasting, fitting dan negotiation semuanya dibenarkan di luar platform. Tetapi booking dan bayaran direkod dalam Neekah supaya setiap transaksi dijejak, kedua-dua pihak melihat rekod yang sama, dan setiap vendor dinilai berdasarkan prestasi sebenar.</p>
+                    <p class="text-sm font-semibold tracking-wide text-brand-600 uppercase">Tanpa orang tengah</p>
+                    <h2 class="font-display text-3xl font-semibold tracking-tight">Deal terus dengan vendor. Kami cuma jambatan.</h2>
+                    <p class="text-ink-muted">Neekah tidak mengambil sebarang bayaran, sama ada daripada anda atau vendor. Hubungi vendor terus, bincang pakej, buat site visit, dan bayar mengikut cara yang anda berdua setuju. Tugas kami ialah pastikan anda jumpa vendor yang tepat, dengan lebih cepat.</p>
                 </div>
 
                 <ol class="flex flex-col gap-3 text-sm">
-                    @foreach (['Enquiry', 'Discussion', 'Quotation', 'Booking', 'Bayaran direkod', 'Disahkan vendor', 'Booking Confirmed', 'Wedding Completed', 'Review'] as $index => $stage)
+                    @foreach (['Cari vendor', 'Lihat profil & pakej', 'Hubungi terus', 'Bincang & deal', 'Hari bahagia'] as $index => $stage)
                         <li class="flex items-center gap-3">
                             <span class="flex size-7 shrink-0 items-center justify-center rounded-full bg-brand-50 text-xs font-semibold text-brand-700">{{ $index + 1 }}</span>
                             <span class="font-medium">{{ $stage }}</span>
-                            @if ($index === 5)
-                                <span class="ml-auto rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-semibold text-emerald-700">🟢 Confirmed</span>
+                            @if ($loop->last)
+                                <span class="ml-auto text-lg" aria-hidden="true">💍</span>
                             @endif
                         </li>
                     @endforeach
@@ -223,8 +225,8 @@
             <div class="mx-auto grid max-w-7xl gap-12 px-4 py-20 sm:px-6 lg:grid-cols-2 lg:px-8">
                 <div class="flex flex-col gap-5">
                     <p class="text-sm font-semibold tracking-wide text-gold-400 uppercase">Untuk vendor</p>
-                    <h2 class="font-display text-3xl font-semibold tracking-tight sm:text-4xl">Exposure untuk vendor yang aktif dan dipercayai</h2>
-                    <p class="text-brand-100">Ranking Neekah bukan ikut rating semata-mata. Vendor Score mengambil kira booking selesai, completion rate, response rate dan rekod pembayaran platform. Buat kerja dengan baik, naik ke tahap Recommended Vendor.</p>
+                    <h2 class="font-display text-3xl font-semibold tracking-tight sm:text-4xl">Senarai percuma. Pengantin hubungi anda terus.</h2>
+                    <p class="text-brand-100">Tiada komisen, tiada yuran. Lengkapkan profil, pakej dan portfolio, dan pengantin yang mencari di kawasan anda akan WhatsApp anda secara terus. Vendor yang lengkap profilnya dan cepat membalas enquiry dipaparkan lebih tinggi.</p>
 
                     <ul class="mt-2 flex flex-wrap gap-2 text-sm">
                         @foreach (['New', 'Verified', 'Trusted', 'Top', '🏆 Recommended'] as $tier)
@@ -236,18 +238,16 @@
                 </div>
 
                 <div class="rounded-3xl border border-brand-700 bg-brand-800/60 p-6 sm:p-8">
-                    <p class="text-xs font-semibold tracking-wide text-gold-400 uppercase">Vendor Performance Point</p>
-                    {{-- A list, not a table: two values per row, and it has to
-                         read well inside a narrow marketing card on a phone. --}}
-                    <dl class="mt-4 divide-y divide-brand-700 text-sm">
-                        @foreach ($vendorPoints as $row)
-                            <div class="flex items-center justify-between gap-4 py-3">
-                                <dt class="min-w-0 text-brand-100">{{ $row['activity'] }}</dt>
-                                <dd class="shrink-0 font-display text-lg font-semibold text-gold-300">{{ $row['points'] }}</dd>
-                            </div>
+                    <p class="text-xs font-semibold tracking-wide text-gold-400 uppercase">Apa yang anda dapat</p>
+                    <ul class="mt-4 divide-y divide-brand-700 text-sm">
+                        @foreach ($vendorBenefits as $benefit)
+                            <li class="flex items-center gap-3 py-3">
+                                <svg class="size-4 shrink-0 text-gold-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+                                <span class="min-w-0 text-brand-100">{{ $benefit }}</span>
+                            </li>
                         @endforeach
-                    </dl>
-                    <p class="mt-4 text-xs text-brand-200">Point tidak diberikan hanya kerana enquiry. Booking sebenar, pembayaran dan perkhidmatan selesai menjadi faktor utama.</p>
+                    </ul>
+                    <p class="mt-4 text-xs text-brand-200">Neekah tidak mengambil sebarang komisen. Apa yang anda deal dengan pengantin adalah milik anda sepenuhnya.</p>
                 </div>
             </div>
         </section>
@@ -256,13 +256,12 @@
         <section id="cta" class="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
             <div class="relative overflow-hidden rounded-3xl border border-line bg-surface-raised px-6 py-14 text-center sm:px-12">
                 <div class="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_center,var(--color-brand-100),transparent_65%)] opacity-70"></div>
-                <h2 class="font-display text-3xl font-semibold tracking-tight text-balance sm:text-4xl">Sedia untuk merancang majlis anda?</h2>
-                <p class="mx-auto mt-4 max-w-xl text-lg text-ink-muted">Neekah sedang dibangunkan. Daftar minat anda dan jadi antara pasangan serta vendor pertama di platform.</p>
-                <form class="mx-auto mt-8 flex max-w-md flex-col gap-3 sm:flex-row" action="#cta">
-                    <label class="sr-only" for="cta-email">Emel</label>
-                    <input id="cta-email" type="email" placeholder="nama@emel.com" class="flex-1 rounded-full border border-line bg-surface px-5 py-3 text-sm focus:border-brand-400 focus:ring-2 focus:ring-brand-400 focus:outline-none">
-                    <button type="submit" class="rounded-full bg-brand-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-brand-700">Beritahu saya</button>
-                </form>
+                <h2 class="font-display text-3xl font-semibold tracking-tight text-balance sm:text-4xl">Majlis impian bermula dengan vendor yang tepat.</h2>
+                <p class="mx-auto mt-4 max-w-xl text-lg text-ink-muted">Daftar percuma untuk lihat nombor vendor, cipta checklist dan buat kad jemputan digital.</p>
+                <div class="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
+                    <a href="{{ route('register') }}" class="inline-flex items-center justify-center rounded-full bg-brand-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-brand-600/20 transition hover:bg-brand-700">Daftar percuma</a>
+                    <a href="{{ route('vendors.index') }}" class="inline-flex items-center justify-center rounded-full border border-line bg-surface-raised px-6 py-3 text-sm font-semibold transition hover:border-brand-300 hover:text-brand-700">Cari vendor</a>
+                </div>
             </div>
         </section>
     </main>
