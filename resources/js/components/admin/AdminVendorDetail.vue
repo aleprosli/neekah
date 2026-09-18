@@ -1,6 +1,7 @@
 <script setup>
 /** Everything an admin weighs before approving, suspending or re-ranking. */
 import { ref } from 'vue';
+import UiConfirm from '../ui/UiConfirm.vue';
 import UiSelect from '../ui/UiSelect.vue';
 
 const props = defineProps({
@@ -53,18 +54,24 @@ const tier = ref(props.vendor.tier);
         <aside class="flex min-w-0 flex-col gap-4">
             <div class="flex flex-col gap-3 rounded-2xl border border-line bg-surface-raised p-5">
                 <h2 class="text-sm font-semibold">Status: {{ vendor.status }}</h2>
+                <!-- Every one of these emails the vendor and changes what the
+                     marketplace shows, so none of them fires on one tap. -->
                 <div class="flex flex-wrap gap-2">
-                    <form v-for="option in statusActions" :key="option.value" :action="option.url" method="POST">
-                        <input type="hidden" name="_token" :value="csrf">
-                        <input type="hidden" name="status" :value="option.value">
-                        <button
-                            type="submit"
-                            :class="[
-                                'rounded-full px-4 py-2 text-sm font-medium transition',
-                                option.primary ? 'bg-brand-600 text-white hover:bg-brand-700' : 'border border-line hover:border-brand-400',
-                            ]"
-                        >{{ option.label }}</button>
-                    </form>
+                    <UiConfirm
+                        v-for="option in statusActions"
+                        :key="option.value"
+                        :action="option.url"
+                        :fields="{ status: option.value }"
+                        :tone="option.tone || 'brand'"
+                        :title="option.confirm_title"
+                        :message="option.confirm_message"
+                        :confirm-label="option.label"
+                        :trigger-class="[
+                            'rounded-full px-4 py-2 text-sm font-medium transition',
+                            option.primary ? 'bg-brand-600 text-white hover:bg-brand-700' : 'border border-line hover:border-brand-400',
+                        ].join(' ')"
+                        :csrf="csrf"
+                    >{{ option.label }}</UiConfirm>
                 </div>
             </div>
 

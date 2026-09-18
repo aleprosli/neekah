@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\UpdateAccountPasswordRequest;
 use App\Http\Requests\UpdateAccountRequest;
+use App\Support\VueProps;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -18,7 +19,22 @@ class AccountController extends Controller
 {
     public function edit(Request $request): View
     {
-        return view('account.edit', ['user' => $request->user()]);
+        $user = $request->user();
+
+        return view('account.edit', [
+            'user' => $user,
+            'props' => VueProps::for([
+                'user' => [
+                    'name' => $user->name,
+                    'phone' => $user->phone,
+                    'email' => $user->email,
+                    'has_password' => $user->hasPassword(),
+                ],
+                'updateUrl' => route('account.update'),
+                'passwordUrl' => route('account.password'),
+                'profileUrl' => $user->isVendor() ? route('vendor.profile.edit') : null,
+            ]),
+        ]);
     }
 
     public function update(UpdateAccountRequest $request): RedirectResponse

@@ -136,3 +136,37 @@ it('never lets an admin manage another admin account', function () {
     $this->actingAs($this->admin)->post(route('admin.users.deactivate', $otherAdmin))->assertForbidden();
     $this->actingAs($this->admin)->delete(route('admin.users.destroy', $otherAdmin))->assertForbidden();
 });
+
+it('hands the page every account tool, each with its own question or its reason', function () {
+    $admin = User::factory()->admin()->create();
+    $couple = User::factory()->create(['name' => 'Aina']);
+
+    $this->actingAs($admin)
+        ->get(route('admin.users.show', $couple))
+        ->assertOk()
+        ->assertViewHas('props', function (array $props): bool {
+            $actions = collect($props['actions']);
+            $delete = $actions->firstWhere('key', 'delete');
+
+            return $actions->pluck('key')->contains('switchToVendor')
+                && $actions->every(fn (array $action): bool => filled($action['heading']) && filled($action['body']))
+                && $delete['confirm_title'] === 'Padam akaun Aina?'
+                && $delete['tone'] === 'danger'
+                && $props['user']['is_admin'] === false;
+        });
+});
+
+it('tells the page why an account cannot be deleted instead of hiding the card', function () {
+    $admin = User::factory()->admin()->create();
+    $couple = User::factory()->create();
+    Booking::factory()->for($couple)->create();
+
+    $this->actingAs($admin)
+        ->get(route('admin.users.show', $couple))
+        ->assertOk()
+        ->assertViewHas('props', function (array $props): bool {
+            $delete = collect($props['actions'])->firstWhere('key', 'delete');
+
+            return $delete['allowed'] === false && str_contains($delete['body'], 'Tidak boleh dipadam');
+        });
+});

@@ -162,10 +162,12 @@ onMounted(load);
                     class="w-full rounded-xl border border-line bg-surface px-4 py-2.5 text-sm focus:border-brand-400 focus:ring-2 focus:ring-brand-400/40 focus:outline-none"
                 >
             </label>
-            <label v-if="sortableColumns.length && !isStatic" class="min-w-0 md:hidden">
+            <!-- w-full, because a select is otherwise as wide as its longest
+                 option, and "Nama perniagaan ↓" is wider than a phone. -->
+            <label v-if="sortableColumns.length && !isStatic" class="min-w-0 flex-1 md:hidden">
                 <span class="sr-only">Susun ikut</span>
                 <select
-                    class="rounded-xl border border-line bg-surface px-3 py-2.5 text-sm focus:border-brand-400 focus:outline-none"
+                    class="w-full rounded-xl border border-line bg-surface px-3 py-2.5 text-sm focus:border-brand-400 focus:outline-none"
                     :value="`${sort}:${direction}`"
                     @change="sortFromSelect($event.target.value)"
                 >
@@ -187,15 +189,17 @@ onMounted(load);
 
         <!-- Cards on a phone, a table from md up: a row with seven columns is
              unreadable on a 390px screen however far it scrolls. -->
-        <ul v-if="rows.length" class="flex flex-col gap-3 md:hidden">
-            <li v-for="row in table.getRowModel().rows" :key="`card-${row.id}`" class="rounded-2xl border border-line bg-surface-raised p-4">
+        <!-- min-w-0 the whole way down: a flex child sizes to its content by
+             default, so one long business name pushes the card past the screen. -->
+        <ul v-if="rows.length" class="flex min-w-0 flex-col gap-3 md:hidden">
+            <li v-for="row in table.getRowModel().rows" :key="`card-${row.id}`" class="min-w-0 rounded-2xl border border-line bg-surface-raised p-4">
                 <component
                     :is="row.original.url ? 'a' : 'div'"
                     :href="row.original.url"
-                    class="flex flex-col gap-2"
+                    class="flex min-w-0 flex-col gap-2"
                 >
-                    <div class="flex items-start justify-between gap-3">
-                        <p class="min-w-0 font-medium">
+                    <div class="flex min-w-0 items-start justify-between gap-3">
+                        <p class="min-w-0 font-medium break-words">
                             <slot :name="`cell-${columns[0].key}`" :row="row.original">
                                 <span v-if="columns[0].type === 'html'" v-html="row.original[columns[0].key]"></span>
                                 <span v-else>{{ row.original[columns[0].key] }}</span>
@@ -204,8 +208,8 @@ onMounted(load);
                         <span v-if="columns.at(-1).type === 'html'" class="shrink-0" v-html="row.original[columns.at(-1).key]"></span>
                     </div>
 
-                    <dl class="flex flex-col gap-1 text-sm">
-                        <div v-for="column in cardColumns" :key="column.key" class="flex justify-between gap-3">
+                    <dl class="flex min-w-0 flex-col gap-1 text-sm">
+                        <div v-for="column in cardColumns" :key="column.key" class="flex min-w-0 justify-between gap-3">
                             <dt class="shrink-0 text-ink-muted">{{ column.label }}</dt>
                             <dd class="min-w-0 truncate text-right">
                                 <slot :name="`cell-${column.key}`" :row="row.original">
@@ -219,17 +223,20 @@ onMounted(load);
 
                 <div v-if="rowAction || $slots.action" class="mt-3 flex items-center justify-end gap-3 border-t border-line pt-3">
                     <slot name="action" :row="row.original" />
-                    <form v-if="rowAction?.inline && row.original.action" :action="row.original.action.url" method="POST">
-                        <input type="hidden" name="_token" :value="csrf">
-                        <input v-for="(value, field) in row.original.action.fields || {}" :key="field" type="hidden" :name="field" :value="value">
-                        <button
-                            type="submit"
-                            :class="[
-                                'rounded-full px-4 py-2 text-xs font-semibold transition',
-                                row.original.action.tone === 'brand' ? 'bg-brand-600 text-white' : 'border border-line font-medium',
-                            ]"
-                        >{{ row.original.action.label }}</button>
-                    </form>
+                    <UiConfirm
+                        v-if="rowAction?.inline && row.original.action"
+                        :action="row.original.action.url"
+                        :fields="row.original.action.fields || {}"
+                        :tone="row.original.action.confirm?.tone || 'brand'"
+                        :title="row.original.action.confirm?.title || `${row.original.action.label}?`"
+                        :message="row.original.action.confirm?.message"
+                        :confirm-label="row.original.action.confirm?.confirmLabel || row.original.action.label"
+                        :trigger-class="[
+                            'rounded-full px-4 py-2 text-xs font-semibold transition',
+                            row.original.action.tone === 'brand' ? 'bg-brand-600 text-white' : 'border border-line font-medium',
+                        ].join(' ')"
+                        :csrf="csrf"
+                    >{{ row.original.action.label }}</UiConfirm>
 
                     <UiConfirm
                         v-else-if="rowAction && !rowAction.inline && row.original[rowAction.urlKey]"
@@ -306,20 +313,26 @@ onMounted(load);
 
                         <td v-if="rowAction || $slots.action" class="px-4 py-3 text-right whitespace-nowrap" @click.stop>
                             <slot name="action" :row="row.original" />
-                            <!-- An inline action posts straight away; the row says what it does. -->
-                            <form v-if="rowAction?.inline && row.original.action" :action="row.original.action.url" method="POST" class="inline">
-                                <input type="hidden" name="_token" :value="csrf">
-                                <input v-for="(value, field) in row.original.action.fields || {}" :key="field" type="hidden" :name="field" :value="value">
-                                <button
-                                    type="submit"
-                                    :class="[
-                                        'rounded-full px-3 py-1.5 text-xs font-semibold transition',
-                                        row.original.action.tone === 'brand'
-                                            ? 'bg-brand-600 text-white hover:bg-brand-700'
-                                            : 'border border-line font-medium hover:border-brand-400',
-                                    ]"
-                                >{{ row.original.action.label }}</button>
-                            </form>
+                            <!-- A row action changes something for somebody else —
+                                 approving a vendor emails them and puts them on the
+                                 marketplace — so it asks first, like every other
+                                 action in the application. -->
+                            <UiConfirm
+                                v-if="rowAction?.inline && row.original.action"
+                                :action="row.original.action.url"
+                                :fields="row.original.action.fields || {}"
+                                :tone="row.original.action.confirm?.tone || 'brand'"
+                                :title="row.original.action.confirm?.title || `${row.original.action.label}?`"
+                                :message="row.original.action.confirm?.message"
+                                :confirm-label="row.original.action.confirm?.confirmLabel || row.original.action.label"
+                                :trigger-class="[
+                                    'rounded-full px-3 py-1.5 text-xs font-semibold transition',
+                                    row.original.action.tone === 'brand'
+                                        ? 'bg-brand-600 text-white hover:bg-brand-700'
+                                        : 'border border-line font-medium hover:border-brand-400',
+                                ].join(' ')"
+                                :csrf="csrf"
+                            >{{ row.original.action.label }}</UiConfirm>
 
                             <UiConfirm
                                 v-else-if="rowAction && !rowAction.inline && row.original[rowAction.urlKey]"

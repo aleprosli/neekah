@@ -120,8 +120,34 @@ class AnnouncementController extends Controller
 
     public function show(Announcement $announcement): View
     {
+        $announcement->load('author', 'users');
+        $sent = $announcement->status === AnnouncementStatus::Sent;
+
         return view('admin.announcements.show', [
-            'announcement' => $announcement->load('author', 'users'),
+            'announcement' => $announcement,
+            'props' => VueProps::for([
+                'announcement' => [
+                    'subject' => $announcement->subject,
+                    'paragraphs' => $announcement->paragraphs(),
+                    'action_label' => $announcement->action_label,
+                    'action_url' => $announcement->hasAction() ? $announcement->action_url : null,
+                ],
+                'facts' => [
+                    ['label' => 'Penerima', 'value' => $announcement->audience->label()],
+                    ['label' => 'Dihantar kepada', 'value' => $sent ? $announcement->recipients_count.' penerima' : '—'],
+                    ['label' => 'Status', 'value' => $announcement->status->label(), 'tone' => $announcement->status->tone()],
+                    ['label' => 'Tarikh hantar', 'value' => $announcement->sent_at?->translatedFormat('j M Y, g:i A') ?? '—'],
+                    ['label' => 'Ditulis oleh', 'value' => $announcement->author?->name ?? 'Admin'],
+                ],
+                // Accounts first, then the addresses that belong to nobody.
+                'recipients' => $announcement->audience->isCustom()
+                    ? $announcement->users
+                        ->map(fn (User $user): array => ['name' => $user->name, 'email' => $user->email])
+                        ->concat(collect($announcement->custom_emails ?? [])
+                            ->map(fn (string $email): array => ['name' => $email, 'email' => 'tiada akaun']))
+                        ->values()
+                    : [],
+            ]),
         ]);
     }
 
