@@ -42,7 +42,9 @@ it('creates a pending booking with no payments attached to it', function () {
         ->and($booking->package_name)->toBe('Premium Package')
         ->and($booking->event_date->toDateString())->toBe($eventDate)
         ->and((float) $booking->total_amount)->toBe(2500.0)
-        ->and((float) $booking->commission_amount)->toBe(200.0)
+        // Neekah is free for now: a new booking carries no commission.
+        ->and((float) $booking->commission_rate)->toBe(0.0)
+        ->and((float) $booking->commission_amount)->toBe(0.0)
         ->and($booking->status)->toBe(BookingStatus::PendingPayment)
         ->and($booking->reference)->toStartWith('NK-')
         ->and($booking->payments)->toBeEmpty();

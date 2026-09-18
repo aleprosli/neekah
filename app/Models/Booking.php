@@ -25,7 +25,19 @@ class Booking extends Model
     /** @use HasFactory<BookingFactory> */
     use HasFactory;
 
-    public const COMMISSION_RATE = 8.0;
+    /**
+     * Percent of a booking the platform takes. Neekah is free for everyone for
+     * now, so new bookings carry 0 — the 8% in the kertas kerja is switched
+     * off, not removed. Each booking stamps the rate it was made under, so
+     * turning it back on later changes only bookings made after that.
+     */
+    public const COMMISSION_RATE = 0.0;
+
+    /** Whether this booking was made under a platform commission at all. */
+    public function hasCommission(): bool
+    {
+        return (float) $this->commission_rate > 0;
+    }
 
     /**
      * @return array<string, string>

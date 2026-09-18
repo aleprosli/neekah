@@ -93,6 +93,7 @@ class BookingController extends Controller
                     'notes' => $booking->notes,
                     'total' => 'RM'.number_format((float) $booking->total_amount, 2),
                     'paid' => 'RM'.number_format($booking->paidAmount(), 2),
+                    'has_commission' => $booking->hasCommission(),
                     'commission_rate' => number_format((float) $booking->commission_rate, 0),
                 ],
                 'steps' => $this->progress($booking),

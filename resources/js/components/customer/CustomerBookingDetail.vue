@@ -231,7 +231,7 @@ const tones = {
 
             <p v-else class="rounded-xl bg-surface-muted p-4 text-xs text-ink-muted">Belum ada bayaran direkod. Berbincang dengan vendor tentang jumlah dan cara bayaran, kemudian rekodkannya di sini.</p>
 
-            <p class="text-xs text-ink-muted">Komisen platform {{ booking.commission_rate }}% dikira daripada nilai booking ini.</p>
+            <p v-if="booking.has_commission" class="text-xs text-ink-muted">Komisen platform {{ booking.commission_rate }}% dikira daripada nilai booking ini.</p>
 
             <UiConfirm
                 v-if="cancelForm"
