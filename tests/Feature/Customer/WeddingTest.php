@@ -5,6 +5,7 @@ use App\Models\Category;
 use App\Models\User;
 use App\Models\Vendor;
 use App\Models\Wedding;
+use App\Models\WeddingSite;
 use Database\Seeders\CategorySeeder;
 
 beforeEach(function () {
@@ -86,4 +87,31 @@ it('shows budget totals and booked categories on the dashboard', function () {
         ->assertSee('RM2,500')
         ->assertSee($vendor->name)
         ->assertSee('1 / 12');
+});
+
+it('points the couple at their digital card from the dashboard, and stops asking once it is out', function () {
+    $couple = User::factory()->create();
+    $wedding = Wedding::factory()->for($couple)->create();
+
+    $this->actingAs($couple)
+        ->get(route('dashboard'))
+        ->assertOk()
+        ->assertSee('Buat kad digital')
+        ->assertSee(route('site.edit'), false);
+
+    WeddingSite::factory()->published()->for($wedding)->create();
+
+    $this->actingAs($couple)
+        ->get(route('dashboard'))
+        ->assertOk()
+        ->assertSee('Kad digital saya')
+        ->assertDontSee('Buat kad digital');
+});
+
+it('offers no card button before there is a wedding to make one for', function () {
+    $this->actingAs(User::factory()->create())
+        ->get(route('dashboard'))
+        ->assertOk()
+        ->assertDontSee('Buat kad digital')
+        ->assertDontSee('Kad digital saya');
 });
