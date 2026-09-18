@@ -1,0 +1,131 @@
+<?php
+
+use App\Actions\StoreOptimizedImage;
+use App\Models\Category;
+use App\Models\User;
+use Database\Seeders\CategorySeeder;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
+
+beforeEach(function () {
+    $this->seed(CategorySeeder::class);
+    $this->admin = User::factory()->admin()->create();
+});
+
+it('shows every category on one page, in display order, with counts', function () {
+    $this->actingAs($this->admin)
+        ->get(route('admin.categories.index'))
+        ->assertOk()
+        ->assertViewHas('props', function (array $props): bool {
+            $names = collect($props['categories'])->pluck('name');
+
+            return $names->count() === Category::count()
+                && $names->first() === Category::ordered()->first()->name
+                && collect($props['stats'])->firstWhere('label', 'Jumlah kategori')['value'] === Category::count();
+        });
+});
+
+it('saves the order an admin dragged the categories into', function () {
+    [$first, $second] = Category::ordered()->take(2)->get()->all();
+
+    $this->actingAs($this->admin)
+        ->putJson(route('admin.categories.order'), [
+            'items' => [
+                ['id' => $second->id, 'sort_order' => 0],
+                ['id' => $first->id, 'sort_order' => 1],
+            ],
+        ])
+        ->assertOk();
+
+    expect(Category::ordered()->first()->id)->toBe($second->id);
+});
+
+it('lets only an admin reorder categories', function () {
+    $payload = ['items' => [['id' => Category::first()->id, 'sort_order' => 0]]];
+
+    $this->putJson(route('admin.categories.order'), $payload)->assertUnauthorized();
+    $this->actingAs(User::factory()->create())->putJson(route('admin.categories.order'), $payload)->assertForbidden();
+});
+
+it('puts a new category at the end of the list when no position is given', function () {
+    Category::query()->update(['sort_order' => 5]);
+
+    $this->actingAs($this->admin)
+        ->post(route('admin.categories.store'), ['name' => 'Kereta Pengantin', 'icon' => '🚗', 'is_active' => 1])
+        ->assertRedirect(route('admin.categories.index'));
+
+    expect(Category::where('name', 'Kereta Pengantin')->sole()->sort_order)->toBe(6);
+});
+
+it('uploads a category picture, shows it wherever the illustration goes, and replaces it', function () {
+    Storage::fake('public');
+    $category = Category::first();
+
+    $this->actingAs($this->admin)
+        ->put(route('admin.categories.update', $category), [
+            'name' => $category->name,
+            'icon' => $category->icon,
+            'is_active' => 1,
+            'image' => UploadedFile::fake()->image('kategori.jpg', 512, 512),
+        ])
+        ->assertRedirect(route('admin.categories.index'));
+
+    $first = $category->fresh();
+    expect($first->image)->not->toBeNull()
+        ->and($first->illustrationUrl())->toBe(StoreOptimizedImage::thumbnailUrl($first->image));
+    Storage::disk('public')->assertExists($first->image);
+
+    // A second upload replaces the first rather than leaving it behind.
+    $this->actingAs($this->admin)->put(route('admin.categories.update', $category), [
+        'name' => $category->name,
+        'icon' => $category->icon,
+        'is_active' => 1,
+        'image' => UploadedFile::fake()->image('baru.jpg', 512, 512),
+    ]);
+
+    expect($category->fresh()->image)->not->toBe($first->image);
+    Storage::disk('public')->assertMissing($first->image);
+});
+
+it('falls back to the shipped illustration when the upload is removed', function () {
+    Storage::fake('public');
+    $category = Category::where('slug', 'catering')->sole();
+
+    $this->actingAs($this->admin)->put(route('admin.categories.update', $category), [
+        'name' => $category->name,
+        'icon' => $category->icon,
+        'is_active' => 1,
+        'image' => UploadedFile::fake()->image('kategori.jpg', 512, 512),
+    ]);
+
+    $uploaded = $category->fresh()->image;
+
+    $this->actingAs($this->admin)->put(route('admin.categories.update', $category), [
+        'name' => $category->name,
+        'icon' => $category->icon,
+        'is_active' => 1,
+        'remove_image' => 1,
+    ]);
+
+    expect($category->fresh()->image)->toBeNull()
+        ->and($category->fresh()->illustrationUrl())->toBe(asset('img/icon/catering.svg'));
+    Storage::disk('public')->assertMissing($uploaded);
+});
+
+it('removes the picture of a deleted category', function () {
+    Storage::fake('public');
+    $category = Category::factory()->create();
+
+    $this->actingAs($this->admin)->put(route('admin.categories.update', $category), [
+        'name' => $category->name,
+        'icon' => $category->icon,
+        'is_active' => 1,
+        'image' => UploadedFile::fake()->image('kategori.jpg', 512, 512),
+    ]);
+
+    $path = $category->fresh()->image;
+
+    $this->actingAs($this->admin)->delete(route('admin.categories.destroy', $category))->assertRedirect();
+
+    Storage::disk('public')->assertMissing($path);
+});
