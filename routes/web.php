@@ -136,7 +136,7 @@ Route::middleware('auth')->group(function (): void {
 
     Route::get('/checklist', [CustomerArea\WeddingTaskController::class, 'index'])->middleware('wedding')->name('checklist.index');
     Route::post('/weddings/{wedding}/tasks', [CustomerArea\WeddingTaskController::class, 'store'])->name('weddings.tasks.store');
-    Route::put('/weddings/{wedding}/tasks/{task}', [CustomerArea\WeddingTaskController::class, 'update'])->name('weddings.tasks.update');
+    Route::put('/weddings/{wedding}/tasks', [CustomerArea\WeddingTaskController::class, 'update'])->name('weddings.tasks.update');
     Route::delete('/weddings/{wedding}/tasks/{task}', [CustomerArea\WeddingTaskController::class, 'destroy'])->name('weddings.tasks.destroy');
 
     Route::get('/tetamu', [CustomerArea\WeddingGuestController::class, 'index'])->middleware('wedding')->name('guests.index');
@@ -192,6 +192,19 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::put('/categories/order', [AdminArea\CategoryOrderController::class, 'update'])->name('categories.order');
     Route::put('/categories/{category}', [AdminArea\CategoryController::class, 'update'])->name('categories.update');
     Route::delete('/categories/{category}', [AdminArea\CategoryController::class, 'destroy'])->name('categories.destroy');
+    Route::get('/checklist', [AdminArea\ChecklistSectionController::class, 'index'])->name('checklist.index');
+    Route::put('/checklist/order', [AdminArea\ChecklistOrderController::class, 'update'])->name('checklist.order');
+    Route::post('/checklist/sections', [AdminArea\ChecklistSectionController::class, 'store'])->name('checklist.sections.store');
+    Route::put('/checklist/sections/{section}', [AdminArea\ChecklistSectionController::class, 'update'])->name('checklist.sections.update');
+    Route::delete('/checklist/sections/{section}', [AdminArea\ChecklistSectionController::class, 'destroy'])->name('checklist.sections.destroy');
+    Route::post('/checklist/items', [AdminArea\ChecklistItemController::class, 'store'])->name('checklist.items.store');
+    Route::put('/checklist/items/{item}', [AdminArea\ChecklistItemController::class, 'update'])->name('checklist.items.update');
+    Route::delete('/checklist/items/{item}', [AdminArea\ChecklistItemController::class, 'destroy'])->name('checklist.items.destroy');
+    Route::get('/announcements', [AdminArea\AnnouncementController::class, 'index'])->name('announcements.index');
+    Route::post('/announcements', [AdminArea\AnnouncementController::class, 'store'])->name('announcements.store');
+    Route::post('/announcements/test', [AdminArea\AnnouncementController::class, 'test'])->name('announcements.test');
+    Route::get('/announcements/recipients', [AdminArea\AnnouncementController::class, 'recipients'])->name('announcements.recipients');
+    Route::get('/announcements/{announcement}', [AdminArea\AnnouncementController::class, 'show'])->name('announcements.show');
     Route::get('/bookings', [AdminArea\BookingController::class, 'index'])->name('bookings.index');
     Route::get('/bookings/data', [AdminArea\BookingController::class, 'data'])->name('bookings.data');
     Route::get('/bookings/{booking}', [AdminArea\BookingController::class, 'show'])->name('bookings.show');

@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-#[Fillable(['wedding_id', 'category_id', 'title', 'notes', 'due_date', 'completed_at', 'completed_by', 'sort_order'])]
+#[Fillable(['wedding_id', 'category_id', 'checklist_item_id', 'checklist_section_id', 'title', 'notes', 'due_date', 'completed_at', 'completed_by', 'sort_order'])]
 class WeddingTask extends Model
 {
     /** @use HasFactory<WeddingTaskFactory> */
@@ -35,6 +35,16 @@ class WeddingTask extends Model
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
+    }
+
+    public function checklistItem(): BelongsTo
+    {
+        return $this->belongsTo(ChecklistItem::class);
+    }
+
+    public function checklistSection(): BelongsTo
+    {
+        return $this->belongsTo(ChecklistSection::class);
     }
 
     public function completer(): BelongsTo

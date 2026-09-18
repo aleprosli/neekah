@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers\Customer;
 
+use App\Actions\SeedWeddingChecklist;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreWeddingTaskRequest;
+use App\Http\Requests\UpdateWeddingTasksRequest;
 use App\Models\Category;
 use App\Models\Wedding;
 use App\Models\WeddingTask;
@@ -11,30 +13,93 @@ use App\Support\VueProps;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 
 class WeddingTaskController extends Controller
 {
-    public function index(Request $request): View
+    /** The bucket a task the couple wrote themselves falls into. */
+    private const OWN_TASKS = 'Tugasan saya sendiri';
+
+    public function index(Request $request, SeedWeddingChecklist $seedChecklist): View
     {
         $wedding = $request->user()->weddings()->latest('event_date')->firstOrFail();
         Gate::authorize('view', $wedding);
 
-        $tasks = $wedding->tasks()->with('category', 'completer')->get();
+        // Whatever admin has added to the master checklist since the last visit.
+        $seedChecklist->handle($wedding);
 
-        $total = $tasks->count();
-        $done = $tasks->whereNotNull('completed_at')->count();
-        $overdue = $tasks->filter->isOverdue()->count();
+        $tasks = $wedding->tasks()->with('category', 'completer', 'checklistItem', 'checklistSection')->get();
 
-        $shape = fn (WeddingTask $task): array => [
+        return view('customer.checklist', [
+            'wedding' => $wedding,
+            'props' => VueProps::for([
+                'storeUrl' => route('weddings.tasks.store', $wedding),
+                'updateUrl' => route('weddings.tasks.update', $wedding),
+                // Progress is counted in the browser, so the cards move as the
+                // couple ticks rather than waiting for the save.
+                'sections' => $this->sections($wedding, $tasks),
+                'categories' => Category::active()->ordered()->get(['id', 'name', 'icon']),
+            ]),
+        ]);
+    }
+
+    /**
+     * The checklist as the couple walks it: one phase after another, each with
+     * its own progress, and the sub-headings the phase carries inside it. What
+     * the couple added themselves comes last, under its own heading.
+     *
+     * @param  Collection<int, WeddingTask>  $tasks
+     * @return array<int, array<string, mixed>>
+     */
+    private function sections(Wedding $wedding, Collection $tasks): array
+    {
+        return $tasks
+            ->sortBy(fn (WeddingTask $task): array => [
+                $task->checklistSection?->sort_order ?? PHP_INT_MAX,
+                $task->checklistSection?->id ?? PHP_INT_MAX,
+                $task->checklistItem?->sort_order ?? PHP_INT_MAX,
+                $task->sort_order,
+            ])
+            ->groupBy(fn (WeddingTask $task): string => $task->checklistSection?->title ?? self::OWN_TASKS)
+            ->map(function (Collection $group, string $title) use ($wedding): array {
+                $section = $group->first()->checklistSection;
+                $done = $group->filter->isDone()->count();
+
+                return [
+                    'title' => $title,
+                    'icon' => $section?->icon,
+                    'note' => $section?->note,
+                    'done' => $done,
+                    'total' => $group->count(),
+                    'percent' => (int) round($done / $group->count() * 100),
+                    'overdue' => $group->filter->isOverdue()->count(),
+                    'groups' => $group
+                        ->groupBy(fn (WeddingTask $task): string => $task->checklistItem?->group ?? '')
+                        ->map(fn (Collection $rows, string $heading): array => [
+                            'heading' => $heading,
+                            'tasks' => $rows->map(fn (WeddingTask $task): array => $this->shape($task, $wedding))->values(),
+                        ])->values(),
+                ];
+            })->values()->all();
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function shape(WeddingTask $task, Wedding $wedding): array
+    {
+        return [
             'id' => $task->id,
             'title' => $task->title,
+            'notes' => $task->notes,
             'due' => $task->due_date ? ($task->isOverdue() ? 'Lewat ' : '').$task->due_date->translatedFormat('j M Y') : null,
             'overdue' => $task->isOverdue(),
+            'done' => $task->isDone(),
             'completed' => $task->completed_at
                 ? 'Selesai '.$task->completed_at->translatedFormat('j M Y').($task->completer ? ' oleh '.$task->completer->name : '')
                 : null,
-            'update_url' => route('weddings.tasks.update', [$wedding, $task]),
             'destroy_url' => route('weddings.tasks.destroy', [$wedding, $task]),
             'category' => $task->category ? [
                 'name' => $task->category->name,
@@ -43,25 +108,6 @@ class WeddingTaskController extends Controller
                 'vendors_url' => route('vendors.index', ['category' => $task->category->slug]),
             ] : null,
         ];
-
-        return view('customer.checklist', [
-            'wedding' => $wedding,
-            'props' => VueProps::for([
-                'storeUrl' => route('weddings.tasks.store', $wedding),
-                'stats' => [
-                    ['label' => 'Progress', 'value' => ($total ? (int) round($done / $total * 100) : 0).'%', 'hint' => $done.' daripada '.$total.' selesai'],
-                    ['label' => 'Belum selesai', 'value' => $total - $done, 'hint' => 'Termasuk tugasan akan datang'],
-                    ['label' => 'Lewat', 'value' => $overdue, 'hint' => $overdue ? 'Perlu perhatian segera' : 'Semua mengikut jadual'],
-                ],
-                'progress' => [
-                    'caption' => $done.' / '.$total,
-                    'percent' => $total > 0 ? min(100, round($done / $total * 100)) : 0,
-                ],
-                'todo' => $tasks->filter(fn (WeddingTask $task): bool => ! $task->isDone())->map($shape)->values(),
-                'done' => $tasks->filter(fn (WeddingTask $task): bool => $task->isDone())->map($shape)->values(),
-                'categories' => Category::active()->ordered()->get(['id', 'name', 'icon']),
-            ]),
-        ]);
     }
 
     public function store(StoreWeddingTaskRequest $request, Wedding $wedding): RedirectResponse
@@ -75,21 +121,33 @@ class WeddingTaskController extends Controller
     }
 
     /**
-     * Tick or untick a task. Either partner may do it, and we record who.
+     * Tick and untick whatever the couple worked through, in one go. Either
+     * partner may do it, and we record who — nobody ticks fifteen documents one
+     * page reload at a time.
      */
-    public function update(Request $request, Wedding $wedding, WeddingTask $task): RedirectResponse
+    public function update(UpdateWeddingTasksRequest $request, Wedding $wedding): RedirectResponse
     {
-        Gate::authorize('update', $wedding);
-        abort_unless($task->wedding_id === $wedding->id, 404);
+        ['done' => $done, 'undone' => $undone] = $request->changes();
 
-        $done = $request->boolean('done');
+        $changed = 0;
 
-        $task->update([
-            'completed_at' => $done ? now() : null,
-            'completed_by' => $done ? $request->user()->id : null,
-        ]);
+        DB::transaction(function () use ($wedding, $request, $done, $undone, &$changed): void {
+            if ($done !== []) {
+                $changed += $wedding->tasks()->whereIn('id', $done)->whereNull('completed_at')
+                    ->update(['completed_at' => now(), 'completed_by' => $request->user()->id]);
+            }
 
-        return back();
+            if ($undone !== []) {
+                $changed += $wedding->tasks()->whereIn('id', $undone)->whereNotNull('completed_at')
+                    ->update(['completed_at' => null, 'completed_by' => null]);
+            }
+        });
+
+        return back()->with('status', match (true) {
+            $changed === 0 => 'Tiada perubahan untuk disimpan.',
+            $changed === 1 => '1 tugasan dikemas kini.',
+            default => $changed.' tugasan dikemas kini.',
+        });
     }
 
     public function destroy(Wedding $wedding, WeddingTask $task): RedirectResponse

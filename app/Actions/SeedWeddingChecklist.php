@@ -3,82 +3,131 @@
 namespace App\Actions;
 
 use App\Models\Category;
+use App\Models\ChecklistItem;
 use App\Models\Wedding;
+use App\Models\WeddingTask;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 
 class SeedWeddingChecklist
 {
     /**
-     * The starter checklist from the kertas kerja, with each task due a sensible
-     * number of months before the event so the couple has a real timeline.
+     * Copy the master checklist (Admin -> Checklist) onto a wedding, and fill a
+     * budget row per category on a brand new one.
      *
-     * @return array<int, array{title: string, category: string|null, months_before: int}>
-     */
-    public const TEMPLATE = [
-        ['title' => 'Tetapkan bajet dan senarai tetamu', 'category' => null, 'months_before' => 12],
-        ['title' => 'Tempah venue', 'category' => 'venue', 'months_before' => 10],
-        ['title' => 'Tempah katering', 'category' => 'catering', 'months_before' => 9],
-        ['title' => 'Tempah photographer', 'category' => 'photography', 'months_before' => 8],
-        ['title' => 'Tempah videographer', 'category' => 'videography', 'months_before' => 8],
-        ['title' => 'Tempah pelamin', 'category' => 'pelamin', 'months_before' => 7],
-        ['title' => 'Tempah hiasan dewan', 'category' => 'decoration', 'months_before' => 6],
-        ['title' => 'Tempah makeup artist', 'category' => 'makeup', 'months_before' => 6],
-        ['title' => 'Fitting baju pengantin', 'category' => 'bridal', 'months_before' => 5],
-        ['title' => 'Tempah emcee', 'category' => 'emcee', 'months_before' => 4],
-        ['title' => 'Tempah kek kahwin', 'category' => 'cake', 'months_before' => 3],
-        ['title' => 'Tempah hiburan atau live band', 'category' => 'entertainment', 'months_before' => 3],
-        ['title' => 'Hantar kad jemputan', 'category' => 'invitation', 'months_before' => 2],
-        ['title' => 'Sahkan jumlah tetamu dengan katering', 'category' => 'catering', 'months_before' => 1],
-        ['title' => 'Jelaskan baki bayaran semua vendor', 'category' => null, 'months_before' => 1],
-        ['title' => 'Sediakan wedding timeline hari majlis', 'category' => null, 'months_before' => 1],
-    ];
-
-    /**
-     * Fill a new wedding with the starter checklist and a budget row per category.
-     * Existing tasks and budget rows are left alone.
+     * The checklist part is additive and safe to run on every visit: an item
+     * the wedding already carries is left exactly as the couple left it, and
+     * an item an admin has since added simply appears. Nothing is ever removed
+     * — a task the couple already ticked belongs to them, not to the template.
      */
     public function handle(Wedding $wedding): void
     {
-        $categories = Category::active()->pluck('id', 'slug');
-
-        if ($wedding->tasks()->doesntExist()) {
-            $this->seedTasks($wedding, $categories);
-        }
+        $this->syncTasks($wedding);
 
         if ($wedding->budgetItems()->doesntExist()) {
-            $this->seedBudget($wedding, $categories);
+            $this->seedBudget($wedding);
         }
     }
 
-    /**
-     * @param  Collection<string, int>  $categories
-     */
-    private function seedTasks(Wedding $wedding, $categories): void
+    private function syncTasks(Wedding $wedding): void
     {
+        $items = ChecklistItem::active()
+            ->whereRelation('section', 'is_active', true)
+            ->with('section')
+            ->orderBy('checklist_section_id')
+            ->ordered()
+            ->get();
+
+        if ($items->isEmpty()) {
+            return;
+        }
+
+        $existing = $wedding->tasks()->whereNotNull('checklist_item_id')->pluck('checklist_item_id')->all();
+        $missing = $items->whereNotIn('id', $existing);
+
+        if ($missing->isEmpty()) {
+            return;
+        }
+
+        $missing = $this->adoptMatchingTasks($wedding, $missing);
+
         $eventDate = Carbon::parse($wedding->event_date);
+        $order = (int) $wedding->tasks()->max('sort_order');
 
-        foreach (self::TEMPLATE as $index => $task) {
-            $due = $eventDate->copy()->subMonths($task['months_before']);
-
+        foreach ($missing as $item) {
             $wedding->tasks()->create([
-                'category_id' => $task['category'] ? $categories[$task['category']] ?? null : null,
-                'title' => $task['title'],
-                // A wedding booked at short notice gets tasks due today rather than in the past.
-                'due_date' => $due->isPast() ? today() : $due->toDateString(),
-                'sort_order' => $index,
+                'checklist_item_id' => $item->id,
+                'checklist_section_id' => $item->checklist_section_id,
+                'category_id' => $item->category_id,
+                'title' => $item->title,
+                'notes' => $item->notes,
+                'due_date' => $this->dueDate($eventDate, $item),
+                'sort_order' => ++$order,
             ]);
         }
     }
 
     /**
+     * A task the wedding already carries under the same name is the same task,
+     * so it is filed under its phase rather than added a second time. That is
+     * what stops a couple who was seeded from the old checklist — or who typed
+     * "Tempah katering" themselves — from ending up with it twice.
+     *
+     * @param  Collection<int, ChecklistItem>  $missing
+     * @return Collection<int, ChecklistItem>
+     */
+    private function adoptMatchingTasks(Wedding $wedding, Collection $missing): Collection
+    {
+        $loose = $wedding->tasks()->whereNull('checklist_item_id')->get()
+            ->keyBy(fn (WeddingTask $task): string => Str::lower($task->title));
+
+        if ($loose->isEmpty()) {
+            return $missing;
+        }
+
+        return $missing->reject(function (ChecklistItem $item) use ($loose): bool {
+            $task = $loose->get(Str::lower($item->title));
+
+            if (! $task) {
+                return false;
+            }
+
+            $task->update([
+                'checklist_item_id' => $item->id,
+                'checklist_section_id' => $item->checklist_section_id,
+                'category_id' => $task->category_id ?? $item->category_id,
+            ]);
+
+            return true;
+        });
+    }
+
+    /**
+     * An item with no months_before has no deadline — everything after the
+     * akad is like that. A wedding booked at short notice gets tasks due today
+     * rather than in the past.
+     */
+    private function dueDate(Carbon $eventDate, ChecklistItem $item): ?string
+    {
+        if ($item->months_before === null) {
+            return null;
+        }
+
+        $due = $eventDate->copy()->subMonths($item->months_before);
+
+        return $due->isPast() ? today()->toDateString() : $due->toDateString();
+    }
+
+    /**
      * Spread the total budget across categories using the proportions from the
      * worked example in the kertas kerja, so the couple starts with a real plan.
-     *
-     * @param  Collection<string, int>  $categories
      */
-    private function seedBudget(Wedding $wedding, $categories): void
+    private function seedBudget(Wedding $wedding): void
     {
+        /** @var Collection<string, int> $categories */
+        $categories = Category::active()->pluck('id', 'slug');
+
         $shares = [
             'catering' => 0.33, 'venue' => 0.17, 'decoration' => 0.13, 'pelamin' => 0.10,
             'photography' => 0.08, 'videography' => 0.08, 'makeup' => 0.05, 'bridal' => 0.03,

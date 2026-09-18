@@ -2,6 +2,7 @@
 /** The platform at a glance: the numbers, what needs approving, what just sold. */
 import DataTable from '../ui/DataTable.vue';
 import UiBadge from '../ui/UiBadge.vue';
+import UiConfirm from '../ui/UiConfirm.vue';
 import UiStatCard from '../ui/UiStatCard.vue';
 
 const BOOKING_COLUMNS = [
@@ -35,8 +36,10 @@ defineProps({
         <span><strong>{{ alert.count }}</strong> laporan vendor menunggu semakan anda.</span>
     </a>
 
+    <!-- min-w-0 on each grid child: without it a long business name widens the
+         column past the screen and zooms the whole page out on a phone. -->
     <div class="mt-8 grid gap-8 lg:grid-cols-2">
-        <section class="flex flex-col gap-4">
+        <section class="flex min-w-0 flex-col gap-4">
             <div class="flex items-center justify-between">
                 <h2 class="font-display text-xl font-semibold">Menunggu kelulusan</h2>
                 <a :href="pendingUrl" class="text-sm font-medium text-brand-600 hover:underline">Semua</a>
@@ -44,7 +47,7 @@ defineProps({
 
             <p v-if="!pending.length" class="rounded-2xl border border-dashed border-line p-6 text-sm text-ink-muted">Tiada permohonan vendor baharu.</p>
 
-            <ul v-else class="divide-y divide-line rounded-2xl border border-line">
+            <ul v-else class="min-w-0 divide-y divide-line rounded-2xl border border-line">
                 <li v-for="vendor in pending" :key="vendor.id" class="flex items-center gap-3 p-4">
                     <span :class="['flex size-10 shrink-0 items-center justify-center rounded-xl bg-linear-to-br p-1 text-lg', vendor.tone]">
                         <img v-if="vendor.illustration" :src="vendor.illustration" alt="" class="size-full object-contain mix-blend-multiply">
@@ -56,18 +59,24 @@ defineProps({
                         <p class="truncate text-xs text-ink-muted">{{ vendor.summary }}</p>
                     </div>
 
-                    <form :action="vendor.approve_url" method="POST">
-                        <input type="hidden" name="_token" :value="csrf">
-                        <input type="hidden" name="status" value="approved">
-                        <button type="submit" class="rounded-full bg-brand-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-brand-700">Lulus</button>
-                    </form>
+                    <!-- Approving emails the vendor and puts them on the
+                         marketplace, so it asks before it does that. -->
+                    <UiConfirm
+                        :action="vendor.approve_url"
+                        :fields="{ status: 'approved' }"
+                        :title="`Luluskan ${vendor.name}?`"
+                        message="Profil ini akan dipaparkan di marketplace dan vendor akan menerima emel kelulusan."
+                        confirm-label="Ya, luluskan"
+                        trigger-class="shrink-0 rounded-full bg-brand-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-brand-700"
+                        :csrf="csrf"
+                    >Lulus</UiConfirm>
                 </li>
             </ul>
         </section>
 
-        <section class="flex flex-col gap-4">
+        <section class="flex min-w-0 flex-col gap-4">
             <h2 class="font-display text-xl font-semibold">Vendor teratas</h2>
-            <ol class="divide-y divide-line rounded-2xl border border-line">
+            <ol class="min-w-0 divide-y divide-line rounded-2xl border border-line">
                 <li v-for="(vendor, at) in topVendors" :key="vendor.id" class="flex items-center gap-3 p-4 text-sm">
                     <span class="w-5 shrink-0 text-center font-semibold text-ink-muted">{{ at + 1 }}</span>
                     <div class="min-w-0 flex-1">
@@ -80,7 +89,7 @@ defineProps({
         </section>
     </div>
 
-    <section class="mt-8 flex flex-col gap-4">
+    <section class="mt-8 flex min-w-0 flex-col gap-4">
         <div class="flex items-center justify-between">
             <h2 class="font-display text-xl font-semibold">Tempahan terkini</h2>
             <a :href="bookingsUrl" class="text-sm font-medium text-brand-600 hover:underline">Semua</a>

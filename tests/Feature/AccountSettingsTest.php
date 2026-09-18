@@ -83,7 +83,12 @@ it('changes the password only with the current one', function () {
 it('lets a Google account set a first password without one', function () {
     $user = User::factory()->create(['google_id' => 'g-123', 'password' => null]);
 
-    $this->actingAs($user)->get(route('account.edit'))->assertOk()->assertSee('Tetapkan kata laluan');
+    // The page tells the component the account has no password yet, which is
+    // what turns "Tukar kata laluan" into "Tetapkan kata laluan".
+    $this->actingAs($user)
+        ->get(route('account.edit'))
+        ->assertOk()
+        ->assertViewHas('props', fn (array $props): bool => $props['user']['has_password'] === false);
 
     $this->actingAs($user)
         ->put(route('account.password'), ['password' => 'rahsia-kuat-123', 'password_confirmation' => 'rahsia-kuat-123'])

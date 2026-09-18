@@ -97,3 +97,40 @@ it('shows a vendor detail page with owner, packages and controls', function () {
         ->and(collect($props['statusActions'])->pluck('value'))->toContain('approved')
         ->not->toContain('pending');
 });
+
+it('makes every status change ask first, naming the vendor and what happens', function () {
+    $vendor = Vendor::factory()->pending()->for(Category::first())->create(['name' => 'Studio Baharu']);
+
+    // The list: the row action carries its own question.
+    $this->actingAs($this->admin)
+        ->getJson(route('admin.vendors.data'))
+        ->assertOk()
+        ->assertJsonPath('data.0.action.confirm.title', 'Luluskan Studio Baharu?')
+        ->assertJsonPath('data.0.action.fields.status', VendorStatus::Approved->value)
+        ->assertJsonPath('data.0.action.confirm.confirmLabel', 'Ya, luluskan');
+
+    // The detail page: one question per status, none of them generic.
+    $this->actingAs($this->admin)
+        ->get(route('admin.vendors.show', $vendor))
+        ->assertOk()
+        ->assertViewHas('props', function (array $props): bool {
+            $actions = collect($props['statusActions']);
+
+            return $actions->every(fn (array $action): bool => filled($action['confirm_title']) && filled($action['confirm_message']))
+                && $actions->firstWhere('value', VendorStatus::Approved->value)['confirm_title'] === 'Luluskan Studio Baharu?'
+                && $actions->firstWhere('value', VendorStatus::Suspended->value)['tone'] === 'danger';
+        });
+});
+
+it('offers suspension, not approval, for a vendor already approved', function () {
+    $vendor = Vendor::factory()->for(Category::first())->create(['name' => 'Studio Lama']);
+
+    $this->actingAs($this->admin)
+        ->getJson(route('admin.vendors.data'))
+        ->assertOk()
+        ->assertJsonPath('data.0.action.label', 'Gantung')
+        ->assertJsonPath('data.0.action.confirm.title', 'Gantung Studio Lama?')
+        ->assertJsonPath('data.0.action.confirm.tone', 'danger');
+
+    expect($vendor->fresh()->status)->toBe(VendorStatus::Approved);
+});

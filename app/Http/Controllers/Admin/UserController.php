@@ -87,22 +87,125 @@ class UserController extends Controller
 
         return view('admin.users.show', [
             'user' => $user,
-            'can' => [
-                'switchToVendor' => $admin->can('switchToVendor', $user),
-                'switchToCouple' => $admin->can('switchToCouple', $user),
-                'deactivate' => $admin->can('deactivate', $user),
-                'reactivate' => $admin->can('reactivate', $user),
-                'delete' => $admin->can('delete', $user),
-            ],
-            'vendorForm' => VueProps::for([
-                'action' => route('admin.users.vendor.store', $user),
-                'loginUrl' => route('login'),
-                'categories' => Category::active()->ordered()->get(['id', 'name', 'icon']),
-                'states' => Vendor::STATES,
-                'old' => ['phone' => $user->phone, ...old()],
-                'account' => ['name' => $user->name, 'email' => $user->email],
+            'props' => VueProps::for([
+                'user' => [
+                    'name' => $user->name,
+                    'is_admin' => $user->isAdmin(),
+                    'can_impersonate' => $user->canBeImpersonated(),
+                ],
+                'facts' => [
+                    ['label' => 'Emel', 'value' => $user->email],
+                    ['label' => 'Telefon', 'value' => $user->phone ?: '—'],
+                    ['label' => 'Peranan', 'value' => $user->role->label()],
+                    ['label' => 'Status', 'value' => $user->isDeactivated()
+                        ? 'Dinyahaktif sejak '.$user->deactivated_at->translatedFormat('j M Y')
+                        : 'Aktif'],
+                    ['label' => 'Daftar', 'value' => $user->created_at->translatedFormat('j M Y').($user->google_id ? ' · Google' : '')],
+                    ['label' => 'Majlis', 'value' => $user->weddings_count.' dikongsi · '.$user->created_weddings_count.' dicipta'],
+                    ['label' => 'Tempahan (sebagai pengantin)', 'value' => $user->bookings_count],
+                    ['label' => 'Enquiry · review', 'value' => $user->enquiries_count.' · '.$user->reviews_count],
+                ],
+                'actions' => $this->accountActions($user, $admin),
+                'vendorForm' => $admin->can('switchToVendor', $user) ? VueProps::for([
+                    'action' => route('admin.users.vendor.store', $user),
+                    'loginUrl' => route('login'),
+                    'categories' => Category::active()->ordered()->get(['id', 'name', 'icon']),
+                    'states' => Vendor::STATES,
+                    'old' => ['phone' => $user->phone, ...old()],
+                    'account' => ['name' => $user->name, 'email' => $user->email],
+                ]) : null,
             ]),
         ]);
+    }
+
+    /**
+     * The fixes an admin may apply to one account, each carrying why it is not
+     * available when it is not. None of them is silently dropped: an admin
+     * looking for "delete" should read why it is refused, not wonder where it
+     * went.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private function accountActions(User $user, User $admin): array
+    {
+        $actions = [];
+
+        if ($user->isCustomer()) {
+            $allowed = $admin->can('switchToVendor', $user);
+            $actions[] = [
+                'key' => 'switchToVendor',
+                'heading' => 'Tukar ke akaun vendor',
+                'allowed' => $allowed,
+                'body' => $allowed
+                    ? 'Untuk vendor yang tersilap daftar sebagai pengantin. Isi maklumat perniagaan; profil akan menunggu kelulusan.'
+                    : 'Tidak boleh: akaun ini ada tempahan sebagai pengantin. Nyahaktifkan akaun dan minta mereka daftar vendor dengan emel lain.',
+            ];
+        }
+
+        if ($user->isVendor()) {
+            $allowed = $admin->can('switchToCouple', $user);
+            $actions[] = [
+                'key' => 'switchToCouple',
+                'heading' => 'Tukar ke akaun pengantin',
+                'allowed' => $allowed,
+                'body' => $allowed
+                    ? 'Untuk pengantin yang tersilap daftar sebagai vendor. Profil vendor, pakej dan portfolio akan dipadam.'
+                    : 'Tidak boleh: vendor ini sudah ada tempahan, enquiry atau review.',
+                'label' => 'Tukar ke pengantin',
+                'url' => route('admin.users.vendor.destroy', $user),
+                'method' => 'DELETE',
+                'tone' => 'danger',
+                'confirm_title' => 'Tukar '.$user->name.' ke akaun pengantin?',
+                'confirm_message' => 'Profil vendor, pakej dan gambar portfolio akaun ini akan dipadam. Tindakan ini tidak boleh diundur.',
+                'confirm_label' => 'Ya, tukar',
+            ];
+        }
+
+        $actions[] = $admin->can('reactivate', $user)
+            ? [
+                'key' => 'reactivate',
+                'heading' => 'Aktifkan semula',
+                'allowed' => true,
+                'body' => 'Pengguna ini boleh log masuk semula.'.($user->vendor ? ' Profil vendor kekal digantung sehingga diluluskan semula.' : ''),
+                'label' => 'Aktifkan semula',
+                'url' => route('admin.users.reactivate', $user),
+                'method' => 'DELETE',
+                'confirm_title' => 'Aktifkan semula '.$user->name.'?',
+                'confirm_message' => 'Pengguna ini akan boleh log masuk semula.',
+                'confirm_label' => 'Ya, aktifkan',
+            ]
+            : [
+                'key' => 'deactivate',
+                'heading' => 'Nyahaktifkan akaun',
+                'allowed' => $admin->can('deactivate', $user),
+                'body' => 'Pengguna dilog keluar dan tidak boleh log masuk. Semua rekod dikekalkan.'.($user->vendor ? ' Profil vendor turut digantung.' : ''),
+                'label' => 'Nyahaktifkan',
+                'url' => route('admin.users.deactivate', $user),
+                'method' => 'POST',
+                'tone' => 'danger',
+                'confirm_title' => 'Nyahaktifkan '.$user->name.'?',
+                'confirm_message' => 'Pengguna ini akan dilog keluar dan tidak boleh log masuk sehingga diaktifkan semula.',
+                'confirm_label' => 'Ya, nyahaktifkan',
+            ];
+
+        $canDelete = $admin->can('delete', $user);
+        $actions[] = [
+            'key' => 'delete',
+            'heading' => 'Padam akaun',
+            'allowed' => $canDelete,
+            'body' => $canDelete
+                ? 'Memadam akaun ini beserta majlis, enquiry dan gambar yang dimuat naik.'
+                : 'Tidak boleh dipadam: akaun ini ada tempahan, atau majlis yang dikongsi dengan pengguna lain. Nyahaktifkan sahaja supaya rekod kekal.',
+            'label' => 'Padam akaun',
+            'url' => route('admin.users.destroy', $user),
+            'method' => 'DELETE',
+            'tone' => 'danger',
+            'confirm_title' => 'Padam akaun '.$user->name.'?',
+            'confirm_message' => 'Akaun, majlis, enquiry, review dan gambar yang dimuat naik akan dipadam kekal. Tindakan ini tidak boleh diundur.',
+            'confirm_label' => 'Ya, padam kekal',
+        ];
+
+        return $actions;
     }
 
     public function destroy(Request $request, User $user, DeleteUserAccount $deleteUserAccount): RedirectResponse

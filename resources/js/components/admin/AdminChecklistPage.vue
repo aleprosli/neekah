@@ -1,0 +1,294 @@
+<script setup>
+/**
+ * The master checklist every couple starts from: eight phases of a Malaysian
+ * wedding, each a list an admin drags into the order the couple walks it. The
+ * whole list is on one page and unpaged, because order only means something
+ * while you can see what comes before and after.
+ */
+import { computed, ref } from 'vue';
+import UiConfirm from '../ui/UiConfirm.vue';
+import UiField from '../ui/UiField.vue';
+import UiTextarea from '../ui/UiTextarea.vue';
+
+const props = defineProps({
+    sections: { type: Array, required: true },
+    categories: { type: Array, required: true },
+    stats: { type: Array, required: true },
+    sectionStoreUrl: { type: String, required: true },
+    itemStoreUrl: { type: String, required: true },
+    orderUrl: { type: String, required: true },
+    csrf: { type: String, required: true },
+    errors: { type: Object, default: () => ({}) },
+});
+
+const list = ref(props.sections.map((section) => ({ ...section, items: [...section.items] })));
+const open = ref(new Set(list.value.slice(0, 1).map((section) => section.id)));
+const draggingSection = ref(null);
+const draggingItem = ref(null);
+const orderError = ref('');
+
+/** What the side panel is editing: a section, an item, or nothing. */
+const panel = ref(null);
+const form = ref({});
+
+const action = computed(() => {
+    if (!panel.value) return '';
+    if (panel.value.kind === 'section') return panel.value.row?.update_url ?? props.sectionStoreUrl;
+    return panel.value.row?.update_url ?? props.itemStoreUrl;
+});
+
+const toggle = (id) => {
+    const next = new Set(open.value);
+    next.has(id) ? next.delete(id) : next.add(id);
+    open.value = next;
+};
+
+const editSection = (row = null) => {
+    panel.value = { kind: 'section', row };
+    form.value = { title: row?.title ?? '', icon: row?.icon ?? '', note: row?.note ?? '', is_active: row ? row.is_active : true };
+};
+
+const editItem = (sectionId, row = null) => {
+    panel.value = { kind: 'item', row, sectionId };
+    form.value = {
+        checklist_section_id: row?.checklist_section_id ?? sectionId,
+        title: row?.title ?? '',
+        group: row?.group ?? '',
+        category_id: row?.category_id ?? '',
+        months_before: row?.months_before ?? '',
+        notes: row?.notes ?? '',
+        is_active: row ? row.is_active : true,
+    };
+};
+
+const moveSection = (from, to) => {
+    if (to < 0 || to >= list.value.length || from === to) return;
+
+    const next = [...list.value];
+    next.splice(to, 0, ...next.splice(from, 1));
+    list.value = next;
+    saveOrder();
+};
+
+const moveItem = (section, from, to) => {
+    if (to < 0 || to >= section.items.length || from === to) return;
+
+    section.items.splice(to, 0, ...section.items.splice(from, 1));
+    saveOrder();
+};
+
+const dropItem = (section, to) => {
+    if (draggingItem.value && draggingItem.value.sectionId === section.id) {
+        moveItem(section, draggingItem.value.at, to);
+    }
+
+    draggingItem.value = null;
+};
+
+/** Sections and every item go up together, so a drag can never half-apply. */
+const saveOrder = async () => {
+    orderError.value = '';
+
+    const payload = {
+        sections: list.value.map((section, at) => ({ id: section.id, sort_order: at })),
+        items: list.value.flatMap((section) =>
+            section.items.map((item, at) => ({ id: item.id, checklist_section_id: section.id, sort_order: at })),
+        ),
+    };
+
+    try {
+        const response = await fetch(props.orderUrl, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': props.csrf, Accept: 'application/json' },
+            body: JSON.stringify(payload),
+        });
+
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    } catch (problem) {
+        orderError.value = 'Susunan tidak dapat disimpan. Muat semula halaman dan cuba lagi.';
+        console.error(problem);
+    }
+};
+
+const dueLabel = (months) => {
+    if (months === null || months === undefined) return 'Tiada tarikh akhir';
+    if (months === 0) return 'Hari majlis';
+
+    return `${months} bulan sebelum`;
+};
+</script>
+
+<template>
+    <div class="flex flex-col gap-6 break-words">
+        <dl class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <div v-for="stat in stats" :key="stat.label" class="min-w-0 rounded-2xl border border-line bg-surface-raised p-5">
+                <dd class="font-display text-3xl font-semibold">{{ stat.value }}</dd>
+                <dt class="mt-1 text-sm text-ink-muted">{{ stat.label }}</dt>
+            </div>
+        </dl>
+
+        <p class="rounded-2xl border border-line bg-surface-raised p-4 text-sm text-ink-muted">
+            Tugasan yang ditambah di sini akan muncul dalam checklist setiap pengantin pada lawatan berikutnya.
+            Tugasan yang dipadam hanya hilang dari senarai induk ini — apa yang pengantin sudah tanda kekal milik mereka.
+        </p>
+
+        <p v-if="orderError" class="rounded-2xl bg-brand-50 p-4 text-sm text-brand-800">{{ orderError }}</p>
+
+        <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
+            <div class="flex min-w-0 flex-col gap-3">
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                    <p class="text-sm text-ink-muted">Seret untuk susun fasa dan tugasan. Susunan disimpan sendiri.</p>
+                    <button type="button" class="rounded-full bg-brand-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-700" @click="editSection()">+ Tambah fasa</button>
+                </div>
+
+                <ul class="flex flex-col gap-3">
+                    <li
+                        v-for="(section, at) in list"
+                        :key="section.id"
+                        draggable="true"
+                        :class="[
+                            'min-w-0 rounded-2xl border bg-surface-raised transition',
+                            draggingSection === at ? 'opacity-40' : '',
+                            panel?.kind === 'section' && panel.row?.id === section.id ? 'border-brand-400' : 'border-line',
+                        ]"
+                        @dragstart="draggingSection = at"
+                        @dragover.prevent
+                        @drop.prevent="draggingSection !== null && moveSection(draggingSection, at)"
+                        @dragend="draggingSection = null"
+                    >
+                        <div class="flex items-center gap-3 p-4">
+                            <span class="cursor-grab text-ink-muted select-none" aria-hidden="true">⠿</span>
+                            <span class="flex size-10 shrink-0 items-center justify-center rounded-xl bg-surface-muted text-xl">{{ section.icon || '☑' }}</span>
+
+                            <button type="button" class="min-w-0 flex-1 text-left" @click="toggle(section.id)">
+                                <p class="truncate font-medium">{{ at + 1 }}. {{ section.title }}</p>
+                                <p class="truncate text-xs text-ink-muted">{{ section.items.length }} tugasan</p>
+                            </button>
+
+                            <span v-if="!section.is_active" class="hidden shrink-0 rounded-full bg-surface-muted px-2.5 py-1 text-xs font-semibold text-ink-muted sm:inline-flex">Tidak aktif</span>
+
+                            <div class="flex shrink-0 items-center gap-1">
+                                <button type="button" class="rounded-full px-2 py-1 text-xs text-ink-muted transition hover:bg-surface-muted disabled:opacity-30" :disabled="at === 0" aria-label="Alih ke atas" @click="moveSection(at, at - 1)">↑</button>
+                                <button type="button" class="rounded-full px-2 py-1 text-xs text-ink-muted transition hover:bg-surface-muted disabled:opacity-30" :disabled="at === list.length - 1" aria-label="Alih ke bawah" @click="moveSection(at, at + 1)">↓</button>
+                                <button type="button" class="rounded-full border border-line px-3 py-1.5 text-xs font-medium transition hover:border-brand-400" @click="editSection(section)">Edit</button>
+                                <UiConfirm
+                                    :action="section.destroy_url"
+                                    method="DELETE"
+                                    tone="danger"
+                                    :title="`Padam fasa ${section.title}?`"
+                                    :message="`${section.items.length} tugasan dalam fasa ini akan hilang dari senarai induk. Checklist pengantin sedia ada tidak berubah.`"
+                                    confirm-label="Padam fasa"
+                                    trigger-class="rounded-full px-2 py-1.5 text-xs font-medium text-ink-muted transition hover:text-brand-700"
+                                    :csrf="csrf"
+                                >Padam</UiConfirm>
+                            </div>
+                        </div>
+
+                        <div v-if="open.has(section.id)" class="border-t border-line p-4 pt-3">
+                            <p v-if="section.note" class="mb-3 rounded-xl bg-surface-muted p-3 text-xs text-ink-muted">{{ section.note }}</p>
+
+                            <ul class="flex flex-col gap-1.5">
+                                <li
+                                    v-for="(item, index) in section.items"
+                                    :key="item.id"
+                                    draggable="true"
+                                    class="flex items-center gap-3 rounded-xl border border-line px-3 py-2"
+                                    @dragstart.stop="draggingItem = { sectionId: section.id, at: index }"
+                                    @dragover.prevent
+                                    @drop.prevent.stop="dropItem(section, index)"
+                                    @dragend="draggingItem = null"
+                                >
+                                    <span class="cursor-grab text-xs text-ink-muted select-none" aria-hidden="true">⠿</span>
+
+                                    <div class="min-w-0 flex-1">
+                                        <p class="truncate text-sm" :class="item.is_active ? '' : 'text-ink-muted line-through'">{{ item.title }}</p>
+                                        <p class="flex flex-wrap items-center gap-x-2 text-xs text-ink-muted">
+                                            <span v-if="item.group">{{ item.group }}</span>
+                                            <span>{{ dueLabel(item.months_before) }}</span>
+                                            <span v-if="item.category">{{ item.category }}</span>
+                                        </p>
+                                    </div>
+
+                                    <div class="flex shrink-0 items-center gap-1">
+                                        <button type="button" class="rounded-full px-2 py-1 text-xs text-ink-muted transition hover:bg-surface-muted disabled:opacity-30" :disabled="index === 0" aria-label="Alih ke atas" @click="moveItem(section, index, index - 1)">↑</button>
+                                        <button type="button" class="rounded-full px-2 py-1 text-xs text-ink-muted transition hover:bg-surface-muted disabled:opacity-30" :disabled="index === section.items.length - 1" aria-label="Alih ke bawah" @click="moveItem(section, index, index + 1)">↓</button>
+                                        <button type="button" class="rounded-full px-2 py-1.5 text-xs font-medium transition hover:text-brand-700" @click="editItem(section.id, item)">Edit</button>
+                                        <UiConfirm
+                                            :action="item.destroy_url"
+                                            method="DELETE"
+                                            tone="danger"
+                                            title="Padam tugasan ini dari senarai induk?"
+                                            :message="item.title"
+                                            confirm-label="Padam"
+                                            trigger-class="rounded-full px-2 py-1.5 text-xs font-medium text-ink-muted transition hover:text-brand-700"
+                                            :csrf="csrf"
+                                        >Padam</UiConfirm>
+                                    </div>
+                                </li>
+                            </ul>
+
+                            <button type="button" class="mt-3 rounded-full border border-line px-4 py-1.5 text-xs font-medium transition hover:border-brand-400" @click="editItem(section.id)">+ Tambah tugasan</button>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <form v-if="panel" :action="action" method="POST" class="flex h-fit min-w-0 flex-col gap-3 rounded-2xl border border-line bg-surface-raised p-5">
+                <input type="hidden" name="_token" :value="csrf">
+                <input v-if="panel.row" type="hidden" name="_method" value="PUT">
+
+                <div class="flex items-start justify-between gap-2">
+                    <h2 class="font-semibold">
+                        {{ panel.kind === 'section' ? (panel.row ? 'Edit fasa' : 'Tambah fasa') : (panel.row ? 'Edit tugasan' : 'Tambah tugasan') }}
+                    </h2>
+                    <button type="button" class="text-sm text-ink-muted hover:text-ink" aria-label="Tutup" @click="panel = null">✕</button>
+                </div>
+
+                <template v-if="panel.kind === 'section'">
+                    <UiField v-model="form.title" label="Nama fasa" name="title" placeholder="Urusan Borang & Dokumen Nikah" :error="errors.title" required />
+                    <UiField v-model="form.icon" label="Ikon (emoji)" name="icon" placeholder="📄" :error="errors.icon" />
+                    <UiTextarea v-model="form.note" label="Nota" name="note" rows="3" :error="errors.note" help="Dipaparkan di atas fasa ini dalam checklist pengantin." />
+                </template>
+
+                <template v-else>
+                    <input type="hidden" name="checklist_section_id" :value="form.checklist_section_id">
+
+                    <UiField v-model="form.title" label="Tugasan" name="title" placeholder="Submit permohonan ke pejabat agama" :error="errors.title" required />
+                    <UiField v-model="form.group" label="Kumpulan" name="group" placeholder="Dokumen Asas" :error="errors.group" help="Tajuk kecil dalam fasa ini. Kosongkan jika tiada." />
+
+                    <label class="flex flex-col gap-1.5">
+                        <span class="text-sm font-medium">Kategori vendor</span>
+                        <select v-model="form.category_id" name="category_id" class="rounded-xl border border-line bg-surface px-3 py-2.5 text-sm focus:border-brand-400 focus:outline-none">
+                            <option value="">Tiada</option>
+                            <option v-for="category in categories" :key="category.id" :value="category.id">{{ category.icon }} {{ category.name }}</option>
+                        </select>
+                        <span class="text-xs text-ink-muted">Memberi pengantin pautan "Cari vendor" pada tugasan ini.</span>
+                    </label>
+
+                    <UiField
+                        v-model="form.months_before"
+                        label="Bulan sebelum majlis"
+                        name="months_before"
+                        type="number"
+                        min="0"
+                        max="36"
+                        :error="errors.months_before"
+                        help="0 bermaksud hari majlis. Kosongkan untuk tugasan tanpa tarikh akhir."
+                    />
+
+                    <UiTextarea v-model="form.notes" label="Nota" name="notes" rows="3" :error="errors.notes" />
+                </template>
+
+                <label class="flex items-center gap-2 text-sm">
+                    <input type="hidden" name="is_active" value="0">
+                    <input v-model="form.is_active" type="checkbox" name="is_active" value="1" class="accent-brand-600">
+                    Aktif
+                </label>
+
+                <button type="submit" class="rounded-full bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700">
+                    {{ panel.row ? 'Simpan' : 'Tambah' }}
+                </button>
+            </form>
+        </div>
+    </div>
+</template>

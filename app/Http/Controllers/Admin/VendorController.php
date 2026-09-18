@@ -65,9 +65,32 @@ class VendorController extends Controller
                 'tier' => $vendor->tier->label(),
                 'score' => number_format((float) $vendor->score, 1),
                 'status' => view('components.admin.status-pill', ['label' => $vendor->status->label(), 'tone' => $vendor->status->tone()])->render(),
+                // Both of these email the vendor and change what the marketplace
+                // shows, so neither goes through on a single stray tap.
                 'action' => $vendor->status === VendorStatus::Approved
-                    ? ['url' => route('admin.vendors.status', $vendor), 'label' => 'Gantung', 'tone' => 'line', 'fields' => ['status' => VendorStatus::Suspended->value]]
-                    : ['url' => route('admin.vendors.status', $vendor), 'label' => 'Lulus', 'tone' => 'brand', 'fields' => ['status' => VendorStatus::Approved->value]],
+                    ? [
+                        'url' => route('admin.vendors.status', $vendor),
+                        'label' => 'Gantung',
+                        'tone' => 'line',
+                        'fields' => ['status' => VendorStatus::Suspended->value],
+                        'confirm' => [
+                            'title' => 'Gantung '.$vendor->name.'?',
+                            'message' => 'Profil ini akan hilang dari marketplace dan vendor akan menerima emel pemberitahuan.',
+                            'confirmLabel' => 'Ya, gantung',
+                            'tone' => 'danger',
+                        ],
+                    ]
+                    : [
+                        'url' => route('admin.vendors.status', $vendor),
+                        'label' => 'Lulus',
+                        'tone' => 'brand',
+                        'fields' => ['status' => VendorStatus::Approved->value],
+                        'confirm' => [
+                            'title' => 'Luluskan '.$vendor->name.'?',
+                            'message' => 'Profil ini akan dipaparkan di marketplace dan vendor akan menerima emel kelulusan.',
+                            'confirmLabel' => 'Ya, luluskan',
+                        ],
+                    ],
             ])->all(),
             'meta' => [
                 'total' => $vendors->total(),
@@ -119,11 +142,40 @@ class VendorController extends Controller
                         'label' => $case->label(),
                         'url' => route('admin.vendors.status', $vendor),
                         'primary' => $case === VendorStatus::Approved,
+                        'tone' => in_array($case, [VendorStatus::Suspended, VendorStatus::Rejected], true) ? 'danger' : 'brand',
+                        'confirm_title' => $this->statusQuestion($case, $vendor),
+                        'confirm_message' => $this->statusConsequence($case),
                     ])->values(),
                 'tiers' => collect(VendorTier::cases())
                     ->map(fn (VendorTier $case): array => ['value' => $case->value, 'label' => $case->label()])
                     ->all(),
             ]),
         ]);
+    }
+
+    /**
+     * What the admin is about to do to this vendor, in one sentence. Every
+     * status change emails them and moves their profile on or off the
+     * marketplace, so the dialog names the vendor rather than asking "Are you
+     * sure?" about nothing in particular.
+     */
+    private function statusQuestion(VendorStatus $status, Vendor $vendor): string
+    {
+        return match ($status) {
+            VendorStatus::Approved => 'Luluskan '.$vendor->name.'?',
+            VendorStatus::Suspended => 'Gantung '.$vendor->name.'?',
+            VendorStatus::Rejected => 'Tolak permohonan '.$vendor->name.'?',
+            VendorStatus::Pending => 'Kembalikan '.$vendor->name.' ke status menunggu?',
+        };
+    }
+
+    private function statusConsequence(VendorStatus $status): string
+    {
+        return match ($status) {
+            VendorStatus::Approved => 'Profil akan dipaparkan di marketplace dan vendor menerima emel kelulusan.',
+            VendorStatus::Suspended => 'Profil akan hilang dari marketplace dan vendor menerima emel pemberitahuan.',
+            VendorStatus::Rejected => 'Vendor menerima emel penolakan. Mereka masih boleh melengkapkan profil dan memohon semula.',
+            VendorStatus::Pending => 'Profil akan hilang dari marketplace sehingga diluluskan semula.',
+        };
     }
 }
