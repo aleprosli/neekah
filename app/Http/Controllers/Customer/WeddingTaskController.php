@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Customer;
 
+use App\Actions\SeedWeddingChecklist;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreWeddingTaskRequest;
 use App\Models\Category;
@@ -11,38 +12,27 @@ use App\Support\VueProps;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;
 
 class WeddingTaskController extends Controller
 {
-    public function index(Request $request): View
+    /** The bucket a task the couple wrote themselves falls into. */
+    private const OWN_TASKS = 'Tugasan saya sendiri';
+
+    public function index(Request $request, SeedWeddingChecklist $seedChecklist): View
     {
         $wedding = $request->user()->weddings()->latest('event_date')->firstOrFail();
         Gate::authorize('view', $wedding);
 
-        $tasks = $wedding->tasks()->with('category', 'completer')->get();
+        // Whatever admin has added to the master checklist since the last visit.
+        $seedChecklist->handle($wedding);
+
+        $tasks = $wedding->tasks()->with('category', 'completer', 'checklistItem', 'checklistSection')->get();
 
         $total = $tasks->count();
         $done = $tasks->whereNotNull('completed_at')->count();
         $overdue = $tasks->filter->isOverdue()->count();
-
-        $shape = fn (WeddingTask $task): array => [
-            'id' => $task->id,
-            'title' => $task->title,
-            'due' => $task->due_date ? ($task->isOverdue() ? 'Lewat ' : '').$task->due_date->translatedFormat('j M Y') : null,
-            'overdue' => $task->isOverdue(),
-            'completed' => $task->completed_at
-                ? 'Selesai '.$task->completed_at->translatedFormat('j M Y').($task->completer ? ' oleh '.$task->completer->name : '')
-                : null,
-            'update_url' => route('weddings.tasks.update', [$wedding, $task]),
-            'destroy_url' => route('weddings.tasks.destroy', [$wedding, $task]),
-            'category' => $task->category ? [
-                'name' => $task->category->name,
-                'icon' => $task->category->icon,
-                'illustration' => $task->category->illustrationUrl(),
-                'vendors_url' => route('vendors.index', ['category' => $task->category->slug]),
-            ] : null,
-        ];
 
         return view('customer.checklist', [
             'wedding' => $wedding,
@@ -57,11 +47,76 @@ class WeddingTaskController extends Controller
                     'caption' => $done.' / '.$total,
                     'percent' => $total > 0 ? min(100, round($done / $total * 100)) : 0,
                 ],
-                'todo' => $tasks->filter(fn (WeddingTask $task): bool => ! $task->isDone())->map($shape)->values(),
-                'done' => $tasks->filter(fn (WeddingTask $task): bool => $task->isDone())->map($shape)->values(),
+                'sections' => $this->sections($wedding, $tasks),
                 'categories' => Category::active()->ordered()->get(['id', 'name', 'icon']),
             ]),
         ]);
+    }
+
+    /**
+     * The checklist as the couple walks it: one phase after another, each with
+     * its own progress, and the sub-headings the phase carries inside it. What
+     * the couple added themselves comes last, under its own heading.
+     *
+     * @param  Collection<int, WeddingTask>  $tasks
+     * @return array<int, array<string, mixed>>
+     */
+    private function sections(Wedding $wedding, Collection $tasks): array
+    {
+        return $tasks
+            ->sortBy(fn (WeddingTask $task): array => [
+                $task->checklistSection?->sort_order ?? PHP_INT_MAX,
+                $task->checklistSection?->id ?? PHP_INT_MAX,
+                $task->checklistItem?->sort_order ?? PHP_INT_MAX,
+                $task->sort_order,
+            ])
+            ->groupBy(fn (WeddingTask $task): string => $task->checklistSection?->title ?? self::OWN_TASKS)
+            ->map(function (Collection $group, string $title) use ($wedding): array {
+                $section = $group->first()->checklistSection;
+                $done = $group->filter->isDone()->count();
+
+                return [
+                    'title' => $title,
+                    'icon' => $section?->icon,
+                    'note' => $section?->note,
+                    'done' => $done,
+                    'total' => $group->count(),
+                    'percent' => (int) round($done / $group->count() * 100),
+                    'overdue' => $group->filter->isOverdue()->count(),
+                    'groups' => $group
+                        ->groupBy(fn (WeddingTask $task): string => $task->checklistItem?->group ?? '')
+                        ->map(fn (Collection $rows, string $heading): array => [
+                            'heading' => $heading,
+                            'tasks' => $rows->map(fn (WeddingTask $task): array => $this->shape($task, $wedding))->values(),
+                        ])->values(),
+                ];
+            })->values()->all();
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function shape(WeddingTask $task, Wedding $wedding): array
+    {
+        return [
+            'id' => $task->id,
+            'title' => $task->title,
+            'notes' => $task->notes,
+            'due' => $task->due_date ? ($task->isOverdue() ? 'Lewat ' : '').$task->due_date->translatedFormat('j M Y') : null,
+            'overdue' => $task->isOverdue(),
+            'done' => $task->isDone(),
+            'completed' => $task->completed_at
+                ? 'Selesai '.$task->completed_at->translatedFormat('j M Y').($task->completer ? ' oleh '.$task->completer->name : '')
+                : null,
+            'update_url' => route('weddings.tasks.update', [$wedding, $task]),
+            'destroy_url' => route('weddings.tasks.destroy', [$wedding, $task]),
+            'category' => $task->category ? [
+                'name' => $task->category->name,
+                'icon' => $task->category->icon,
+                'illustration' => $task->category->illustrationUrl(),
+                'vendors_url' => route('vendors.index', ['category' => $task->category->slug]),
+            ] : null,
+        ];
     }
 
     public function store(StoreWeddingTaskRequest $request, Wedding $wedding): RedirectResponse

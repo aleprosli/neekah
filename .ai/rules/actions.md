@@ -1,0 +1,13 @@
+---
+paths:
+  - app/Actions/SeedWeddingChecklist.php
+---
+
+# Actions
+
+## The master checklist lives in the database and only ever adds to a wedding
+Admin -> Checklist (checklist_sections + checklist_items, seeded by ChecklistSeeder from "Checklist Melangkah ke Alam Perkahwinan": 8 fasa, ~99 tugasan) is the source. SeedWeddingChecklist::handle() runs on wedding creation AND on every visit to /checklist, so an item admin adds reaches existing couples by itself.
+
+It is additive only. A wedding_task is created when the wedding has no task with that checklist_item_id; an unlinked task with the same title is adopted (checklist_item_id/section filled in) instead of duplicated, which is what keeps a couple seeded from the old template from getting "Tempah katering" twice. Nothing is ever updated or deleted from a couple's list — deleting a master item only nulls their checklist_item_id, because a tick is their record of work they did. Never make this destructive.
+
+months_before null = no deadline (everything after the akad), 0 = the event day. A due date in the past is clamped to today. Covered by WeddingChecklistTest and Admin/ChecklistManagementTest.

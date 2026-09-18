@@ -9,6 +9,8 @@
         ['label' => 'Vendor', 'icon' => 'store', 'href' => route('admin.vendors.index'), 'active' => request()->routeIs('admin.vendors.*'), 'badge' => $pendingVendors ?: null],
         ['label' => 'Pengguna', 'icon' => 'users', 'href' => route('admin.users.index'), 'active' => request()->routeIs('admin.users.*')],
         ['label' => 'Kategori', 'icon' => 'layers', 'href' => route('admin.categories.index'), 'active' => request()->routeIs('admin.categories.*')],
+        ['label' => 'Checklist', 'icon' => 'check', 'href' => route('admin.checklist.index'), 'active' => request()->routeIs('admin.checklist.*')],
+        ['label' => 'Pengumuman', 'icon' => 'mail', 'href' => route('admin.announcements.index'), 'active' => request()->routeIs('admin.announcements.*')],
         ['label' => 'Tempahan', 'icon' => 'receipt', 'href' => route('admin.bookings.index'), 'active' => request()->routeIs('admin.bookings.*')],
         ['label' => 'Laporan', 'icon' => 'alert', 'href' => route('admin.violations.index'), 'active' => request()->routeIs('admin.violations.*'), 'badge' => $openViolations ?: null],
         ['label' => 'Kewangan', 'icon' => 'wallet', 'href' => route('admin.transactions.index'), 'active' => request()->routeIs('admin.transactions.*')],
