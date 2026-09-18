@@ -116,7 +116,7 @@
     ]
   },
   "resources/css/app.css": {
-    "file": "assets/app-jLwI8BUC.css",
+    "file": "assets/app-CFnD8a0H.css",
     "name": "app",
     "names": [
       "app.css"
@@ -125,7 +125,7 @@
     "isEntry": true
   },
   "resources/js/app.js": {
-    "file": "assets/app-D0frtia8.js",
+    "file": "assets/app-BHrYGsN6.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,

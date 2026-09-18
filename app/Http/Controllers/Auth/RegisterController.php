@@ -47,13 +47,22 @@ class RegisterController extends Controller
                 'submitLabel' => 'Daftar',
                 'captcha' => true,
                 'googleUrl' => route('auth.google'),
+                // Someone accepting an invitation is the partner already; the
+                // tip is for the one starting the account.
+                'tip' => $invitation ? null : [
+                    'title' => 'Satu akaun, dua pengantin',
+                    'body' => 'Daftar dengan akaun anda sendiri. Selepas mendaftar, jemput pasangan anda dari page Majlis saya supaya kalian boleh merancang bersama: checklist, bajet, tetamu dan kad jemputan yang sama, dan setiap seorang log masuk dengan akaun sendiri.',
+                ],
                 'invitation' => $invitation ? [
                     'initial' => mb_substr($invitation->inviter->name, 0, 1),
                     'inviter' => $invitation->inviter->name,
                     'wedding' => $invitation->wedding->title.' · '.$invitation->wedding->event_date->translatedFormat('j F Y'),
                 ] : null,
                 'fields' => [
-                    ['name' => 'name', 'label' => 'Nama', 'autocomplete' => 'name', 'placeholder' => 'Aina & Hakim', 'required' => true, 'value' => old('name')],
+                    // One account is one person. The example used to read "Aina &
+                    // Hakim", so people typed both names into an account that
+                    // was only ever meant for one of them. Both are still fine.
+                    ['name' => 'name', 'label' => 'Nama', 'autocomplete' => 'name', 'placeholder' => 'Contoh: Aina Zulkifli', 'help' => 'Nama sendiri atau nama bersama pasangan, kedua-duanya boleh. Boleh ditukar kemudian di Akaun.', 'required' => true, 'value' => old('name')],
                     ['name' => 'email', 'label' => 'Emel', 'type' => 'email', 'autocomplete' => 'email', 'required' => true, 'value' => old('email', $invitation?->email)],
                     ['name' => 'phone', 'label' => 'Nombor telefon', 'type' => 'tel', 'autocomplete' => 'tel', 'placeholder' => '012-345 6789', 'value' => old('phone')],
                     ['name' => 'password', 'label' => 'Kata laluan', 'type' => 'password', 'autocomplete' => 'new-password', 'help' => 'Sekurang-kurangnya 8 aksara.', 'required' => true],

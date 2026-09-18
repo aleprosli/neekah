@@ -68,7 +68,9 @@ it('sends a stranger with the link to register and joins them automatically', fu
     $props = $this->get(route('register'))->assertOk()->viewData('props');
 
     expect($props['invitation']['inviter'])->toBe('Aina Zulkifli')
-        ->and(collect($props['fields'])->firstWhere('name', 'email')['value'])->toBe('baru@example.com');
+        ->and(collect($props['fields'])->firstWhere('name', 'email')['value'])->toBe('baru@example.com')
+        // They are the partner being invited, so no "jemput pasangan anda" tip.
+        ->and($props['tip'])->toBeNull();
 
     $this->post(route('register'), [
         'name' => 'Baru Sekali',

@@ -25,6 +25,8 @@ const props = defineProps({
     turnstileSiteKey: { type: String, default: null },
     notice: { type: String, default: null },
     invitation: { type: Object, default: null },
+    /** { title, body } — a short explanation shown above the fields. */
+    tip: { type: Object, default: null },
     errors: { type: Object, default: () => ({}) },
 });
 
@@ -37,6 +39,16 @@ const values = ref(Object.fromEntries(props.fields.map((field) => [field.name, f
         <div class="min-w-0 text-sm">
             <p class="font-semibold">{{ invitation.inviter }} menjemput anda</p>
             <p class="truncate text-ink-muted">{{ invitation.wedding }}</p>
+        </div>
+    </div>
+
+    <div v-if="tip" class="mb-6 flex gap-3 rounded-2xl border border-gold-300/70 bg-brand-50/50 p-4">
+        <span class="flex size-9 shrink-0 items-center justify-center rounded-full bg-surface-raised text-brand-600 ring-1 ring-gold-300" aria-hidden="true">
+            <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="14" r="5.5"/><circle cx="16" cy="14" r="5.5"/><path d="m9 5 1.5 2.5h-3L9 5Z"/></svg>
+        </span>
+        <div class="min-w-0 text-sm">
+            <p class="font-semibold">{{ tip.title }}</p>
+            <p class="mt-1 text-ink-muted">{{ tip.body }}</p>
         </div>
     </div>
 

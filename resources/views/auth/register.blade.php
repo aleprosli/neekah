@@ -6,7 +6,7 @@
 @else
     <x-auth-card
         :title="$invitation ? 'Terima jemputan' : 'Daftar sebagai pengantin'"
-        :subtitle="$invitation ? 'Daftar akaun untuk menyertai majlis ini. Anda akan terus dihubungkan selepas mendaftar.' : 'Percuma. Rancang majlis, urus bajet dan tempah vendor di satu tempat.'"
+        :subtitle="$invitation ? 'Daftar akaun untuk menyertai majlis ini. Anda akan terus dihubungkan selepas mendaftar.' : 'Percuma. Rancang majlis, urus bajet dan cari vendor di satu tempat.'"
         :audience="$audience"
         :switch-url="route('register')"
     >
