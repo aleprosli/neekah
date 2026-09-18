@@ -4,14 +4,14 @@
     $vendor = auth()->user()->vendor;
     $openEnquiries = $vendor?->enquiries()->where('status', \App\Enums\EnquiryStatus::Open)->count();
     $nav = [
-        ['label' => 'Ringkasan', 'icon' => '📊', 'href' => route('vendor.dashboard'), 'active' => request()->routeIs('vendor.dashboard')],
-        ['label' => 'Profil', 'icon' => '🏪', 'href' => route('vendor.profile.edit'), 'active' => request()->routeIs('vendor.profile.*')],
-        ['label' => 'Pakej', 'icon' => '📦', 'href' => route('vendor.packages.index'), 'active' => request()->routeIs('vendor.packages.*')],
-        ['label' => 'Portfolio', 'icon' => '🖼️', 'href' => route('vendor.portfolio.index'), 'active' => request()->routeIs('vendor.portfolio.*')],
-        ['label' => 'Kalendar', 'icon' => '🗓️', 'href' => route('vendor.availability.index'), 'active' => request()->routeIs('vendor.availability.*')],
-        ['label' => 'Tempahan', 'icon' => '🧾', 'href' => route('vendor.bookings.index'), 'active' => request()->routeIs('vendor.bookings.*')],
-        ['label' => 'Enquiry', 'icon' => '💬', 'href' => route('vendor.enquiries.index'), 'active' => request()->routeIs('vendor.enquiries.*'), 'badge' => $openEnquiries ?: null],
-        ['label' => 'Point & Ranking', 'icon' => '🏆', 'href' => route('vendor.points.index'), 'active' => request()->routeIs('vendor.points.*')],
+        ['label' => 'Ringkasan', 'icon' => 'chart', 'href' => route('vendor.dashboard'), 'active' => request()->routeIs('vendor.dashboard')],
+        ['label' => 'Profil', 'icon' => 'store', 'href' => route('vendor.profile.edit'), 'active' => request()->routeIs('vendor.profile.*')],
+        ['label' => 'Pakej', 'icon' => 'box', 'href' => route('vendor.packages.index'), 'active' => request()->routeIs('vendor.packages.*')],
+        ['label' => 'Portfolio', 'icon' => 'image', 'href' => route('vendor.portfolio.index'), 'active' => request()->routeIs('vendor.portfolio.*')],
+        ['label' => 'Kalendar', 'icon' => 'calendar', 'href' => route('vendor.availability.index'), 'active' => request()->routeIs('vendor.availability.*')],
+        ['label' => 'Tempahan', 'icon' => 'receipt', 'href' => route('vendor.bookings.index'), 'active' => request()->routeIs('vendor.bookings.*')],
+        ['label' => 'Enquiry', 'icon' => 'chat', 'href' => route('vendor.enquiries.index'), 'active' => request()->routeIs('vendor.enquiries.*'), 'badge' => $openEnquiries ?: null],
+        ['label' => 'Point & Ranking', 'icon' => 'trophy', 'href' => route('vendor.points.index'), 'active' => request()->routeIs('vendor.points.*')],
     ];
 @endphp
 

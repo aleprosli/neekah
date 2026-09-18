@@ -185,6 +185,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::delete('/users/{user}/deactivation', [AdminArea\UserDeactivationController::class, 'destroy'])->name('users.reactivate');
     Route::get('/categories', [AdminArea\CategoryController::class, 'index'])->name('categories.index');
     Route::post('/categories', [AdminArea\CategoryController::class, 'store'])->name('categories.store');
+    Route::put('/categories/order', [AdminArea\CategoryOrderController::class, 'update'])->name('categories.order');
     Route::put('/categories/{category}', [AdminArea\CategoryController::class, 'update'])->name('categories.update');
     Route::delete('/categories/{category}', [AdminArea\CategoryController::class, 'destroy'])->name('categories.destroy');
     Route::get('/bookings', [AdminArea\BookingController::class, 'index'])->name('bookings.index');

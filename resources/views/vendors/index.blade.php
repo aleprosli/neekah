@@ -19,7 +19,7 @@
                         <li>
                             <a href="{{ route('vendors.index', array_filter(['category' => $category->slug, 'q' => $filters['q'], 'state' => $filters['state']])) }}" @class(['group flex w-16 flex-col items-center gap-2 text-center text-[11px] font-medium whitespace-nowrap transition', 'text-brand-700' => $filters['category'] === $category->slug, 'text-ink-muted hover:text-ink' => $filters['category'] !== $category->slug])>
                                 <span @class(['flex size-14 items-center justify-center overflow-hidden rounded-full bg-white text-2xl transition', 'shadow-md shadow-brand-600/30 ring-2 ring-brand-600' => $filters['category'] === $category->slug, 'ring-1 ring-line group-hover:ring-brand-300' => $filters['category'] !== $category->slug])>
-                                    <x-category-icon class="size-9" :slug="$category->slug" :fallback="$category->icon" />
+                                    <x-category-icon class="size-9" :category="$category" />
                                 </span>
                                 {{ $category->name }}
                             </a>

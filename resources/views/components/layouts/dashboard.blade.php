@@ -13,7 +13,7 @@
                 <nav data-nav-region class="no-scrollbar -mx-4 flex gap-1 overflow-x-auto px-4 lg:mx-0 lg:flex-col lg:px-0" aria-label="Dashboard">
                     @foreach ($nav as $item)
                         <a href="{{ $item['href'] }}" @class(['flex shrink-0 items-center gap-2 rounded-full px-4 py-2 text-sm font-medium whitespace-nowrap transition lg:rounded-xl', 'bg-brand-600 text-white' => $item['active'], 'text-ink-muted hover:bg-surface-muted hover:text-ink' => ! $item['active']])>
-                            <span aria-hidden="true">{{ $item['icon'] }}</span>
+                            <x-nav-icon :name="$item['icon']" />
                             {{ $item['label'] }}
                             @if (! empty($item['badge']))
                                 <span @class(['ml-auto rounded-full px-1.5 text-[11px] font-semibold', 'bg-white/20 text-white' => $item['active'], 'bg-brand-600 text-white' => ! $item['active']])>{{ $item['badge'] }}</span>

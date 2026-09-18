@@ -170,7 +170,7 @@
                     @foreach ($categories as $category)
                         <li>
                             <a href="{{ route('vendors.index', ['category' => $category->slug]) }}" class="flex h-full flex-col gap-1 rounded-2xl border border-line bg-surface-raised p-4 transition hover:border-brand-300 hover:shadow-md">
-                                <x-category-icon class="size-9" :slug="$category->slug" :fallback="$category->icon" />
+                                <x-category-icon class="size-9" :category="$category" />
                                 <span class="font-semibold">{{ $category->name }}</span>
                                 <span class="text-xs text-ink-muted">{{ $category->examples }}</span>
                             </a>
