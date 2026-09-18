@@ -38,6 +38,8 @@ class ProfileController extends Controller
                     'price_unit' => old('price_unit', $vendor->price_unit->value),
                     'cover_tone' => old('cover_tone', $vendor->cover_tone),
                     'cover_image_url' => $vendor->cover_image ? Storage::disk('public')->url($vendor->cover_image) : null,
+                    'logo_url' => $vendor->logoUrl(),
+                    'initial' => mb_substr($vendor->name, 0, 1),
                 ],
                 'categories' => Category::active()->ordered()->get(['id', 'name', 'icon']),
                 'states' => Vendor::STATES,
@@ -46,6 +48,7 @@ class ProfileController extends Controller
                     ->map(fn (PriceUnit $unit): array => ['value' => $unit->value, 'label' => 'Setiap '.$unit->label()])
                     ->all(),
                 'imageHint' => $images->uploadHint('landskap 1920 × 1080px').'. Jika tiada gambar, warna latar digunakan.',
+                'logoHint' => $images->uploadHint('persegi 512 × 512px').'. Jika tiada logo, huruf pertama nama perniagaan digunakan.',
             ]),
         ]);
     }
@@ -53,11 +56,21 @@ class ProfileController extends Controller
     public function update(UpdateVendorProfileRequest $request, StoreOptimizedImage $storeImage): RedirectResponse|JsonResponse
     {
         $vendor = $request->user()->vendor;
-        $data = $request->safe()->except('cover_image');
+        $data = $request->safe()->except(['cover_image', 'logo', 'remove_logo']);
 
         if ($request->hasFile('cover_image')) {
             $storeImage->delete($vendor->cover_image);
             $data['cover_image'] = $storeImage->handle($request->file('cover_image'), 'vendors/'.$vendor->id);
+        }
+
+        if ($request->hasFile('logo')) {
+            $storeImage->delete($vendor->logo);
+            $data['logo'] = $storeImage->handle($request->file('logo'), 'vendors/'.$vendor->id);
+        }
+
+        if ($request->boolean('remove_logo')) {
+            $storeImage->delete($vendor->logo);
+            $data['logo'] = null;
         }
 
         $vendor->update($data);

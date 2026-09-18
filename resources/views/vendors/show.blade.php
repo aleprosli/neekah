@@ -61,7 +61,7 @@
 
                 {{-- Vendor identity --}}
                 <div class="flex items-center gap-4 py-6">
-                    <span class="flex size-12 shrink-0 items-center justify-center rounded-full bg-linear-to-br text-lg font-semibold text-white {{ $vendor->cover_tone }}">{{ mb_substr($vendor->name, 0, 1) }}</span>
+                    <x-vendor-avatar :vendor="$vendor" class="size-12 text-lg" />
                     <div class="min-w-0">
                         <p class="font-semibold">Dikendalikan oleh {{ $vendor->name }}</p>
                         <p class="text-sm text-ink-muted">@if ($vendor->tier === VendorTier::Recommended)🏆 @endif{{ $vendor->tier->label() }} Vendor · Response rate {{ $vendor->responseRateLabel() }}</p>

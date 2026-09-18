@@ -85,6 +85,14 @@ class User extends Authenticatable
         return $this->role === UserRole::Customer;
     }
 
+    /**
+     * Someone who only ever signed in with Google has no password to confirm.
+     */
+    public function hasPassword(): bool
+    {
+        return filled($this->password);
+    }
+
     public function isDeactivated(): bool
     {
         return $this->deactivated_at !== null;

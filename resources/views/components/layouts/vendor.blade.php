@@ -12,6 +12,7 @@
         ['label' => 'Tempahan', 'icon' => 'receipt', 'href' => route('vendor.bookings.index'), 'active' => request()->routeIs('vendor.bookings.*')],
         ['label' => 'Enquiry', 'icon' => 'chat', 'href' => route('vendor.enquiries.index'), 'active' => request()->routeIs('vendor.enquiries.*'), 'badge' => $openEnquiries ?: null],
         ['label' => 'Point & Ranking', 'icon' => 'trophy', 'href' => route('vendor.points.index'), 'active' => request()->routeIs('vendor.points.*')],
+        ['label' => 'Akaun', 'icon' => 'user', 'href' => route('account.edit'), 'active' => request()->routeIs('account.*')],
     ];
 @endphp
 

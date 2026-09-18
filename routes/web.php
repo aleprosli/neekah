@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin as AdminArea;
+use App\Http\Controllers\Auth\AccountController;
 use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\NewPasswordController;
@@ -103,6 +104,9 @@ Route::middleware(['auth', 'role:vendor'])->prefix('vendor')->name('vendor.')->g
 
 Route::middleware('auth')->group(function (): void {
     Route::post('/logout', [LoginController::class, 'destroy'])->name('logout');
+    Route::get('/akaun', [AccountController::class, 'edit'])->name('account.edit');
+    Route::put('/akaun', [AccountController::class, 'update'])->name('account.update');
+    Route::put('/akaun/kata-laluan', [AccountController::class, 'updatePassword'])->name('account.password');
     Route::get('/telefon', [PhoneNumberController::class, 'create'])->name('phone.create');
     Route::post('/telefon', [PhoneNumberController::class, 'store'])->name('phone.store');
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');

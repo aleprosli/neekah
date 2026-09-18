@@ -15,6 +15,7 @@
         ['label' => 'Blog', 'icon' => 'pencil', 'href' => route('admin.posts.index'), 'active' => request()->routeIs('admin.posts.*')],
         ['label' => 'Tetapan', 'icon' => 'settings', 'href' => route('admin.settings.edit'), 'active' => request()->routeIs('admin.settings.*')],
         ['label' => 'Log sistem', 'icon' => 'pulse', 'href' => route('log-viewer.index'), 'active' => request()->routeIs('log-viewer.*')],
+        ['label' => 'Akaun', 'icon' => 'user', 'href' => route('account.edit'), 'active' => request()->routeIs('account.*')],
     ];
 @endphp
 
