@@ -71,3 +71,15 @@ it('draws sign-in in its own shell, without the public header or footer', functi
         ->not->toContain('Cara Ia Berfungsi')
         ->not->toContain('aria-label="Footer"');
 });
+
+it('tells a couple one account is one person, and that the partner is invited afterwards', function () {
+    $props = $this->get(route('register', ['as' => 'pengantin']))->assertOk()->viewData('props');
+    $name = collect($props['fields'])->firstWhere('name', 'name');
+
+    // The example used to read "Aina & Hakim", and people typed both names
+    // into an account meant for one of them.
+    expect($name['placeholder'])->not->toContain('&')
+        ->and($name['help'])->toContain('kedua-duanya boleh')
+        ->and($props['tip']['title'])->toBe('Satu akaun, dua pengantin')
+        ->and($props['tip']['body'])->toContain('jemput pasangan anda');
+});

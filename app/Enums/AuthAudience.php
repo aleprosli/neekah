@@ -24,7 +24,7 @@ enum AuthAudience: string
     public function description(): string
     {
         return match ($this) {
-            self::Couple => 'Rancang majlis, cari dan tempah vendor.',
+            self::Couple => 'Rancang majlis dan cari vendor kahwin.',
             self::Vendor => 'Urus perniagaan, tempahan dan enquiry.',
         };
     }

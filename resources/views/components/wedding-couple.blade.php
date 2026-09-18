@@ -58,7 +58,7 @@
                     Belum terhubung
                 </p>
                 <h2 class="mt-1 font-display text-xl font-semibold">Uruskan majlis berdua</h2>
-                <p class="mt-1 text-sm text-ink-muted">Jemput bakal pasangan anda supaya kedua-dua boleh menempah vendor, merekodkan bayaran dan melihat bajet yang sama.</p>
+                <p class="mt-1 text-sm text-ink-muted">Jemput bakal pasangan anda supaya kalian boleh merancang bersama: checklist, bajet, tetamu dan kad jemputan yang sama. Setiap seorang log masuk dengan akaun sendiri.</p>
             @endif
         </div>
 
