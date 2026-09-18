@@ -36,3 +36,11 @@ it('shows approved featured vendors and the vendor point system', function () {
         ->assertSee('Booking melalui platform')
         ->assertSee('+100');
 });
+
+it('tells visitors the platform is free rather than quoting a commission', function () {
+    $this->get(route('landing'))
+        ->assertOk()
+        ->assertSee('Percuma')
+        ->assertDontSee('Komisen platform')
+        ->assertDontSee('8%');
+});

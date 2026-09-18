@@ -145,6 +145,9 @@ class BookingController extends Controller
                         'contact' => collect([$booking->user->email, $booking->user->phone])->filter()->implode(' · '),
                     ],
                     'total' => 'RM'.number_format((float) $booking->total_amount, 2),
+                    // Bookings made while Neekah is free carry no commission, and
+                    // the vendor sees no commission line for them at all.
+                    'has_commission' => $booking->hasCommission(),
                     'commission_rate' => number_format((float) $booking->commission_rate, 0),
                     'commission' => 'RM'.number_format((float) $booking->commission_amount, 2),
                     'payout' => 'RM'.number_format((float) $booking->total_amount - (float) $booking->commission_amount, 2),

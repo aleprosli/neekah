@@ -36,8 +36,8 @@
                             <dd class="font-display text-2xl font-semibold">12</dd>
                         </div>
                         <div>
-                            <dt class="text-ink-muted">Komisen platform</dt>
-                            <dd class="font-display text-2xl font-semibold">8%</dd>
+                            <dt class="text-ink-muted">Yuran platform</dt>
+                            <dd class="font-display text-2xl font-semibold">Percuma</dd>
                         </div>
                         <div>
                             <dt class="text-ink-muted">Fake review</dt>

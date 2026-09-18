@@ -33,7 +33,7 @@ it('lets a vendor record a booking for a registered customer', function () {
     $booking = Booking::sole();
 
     expect($booking->user_id)->toBe($this->customer->id)
-        ->and((float) $booking->commission_amount)->toBe(240.0)
+        ->and((float) $booking->commission_amount)->toBe(0.0)
         ->and($booking->payments)->toBeEmpty()
         ->and($booking->status)->toBe(BookingStatus::PendingPayment);
 
@@ -105,4 +105,39 @@ it('shows the customer review on the vendor booking page', function () {
     $review->booking->update(['vendor_id' => $this->vendor->id]);
 
     $this->actingAs($this->vendor->user)->get(route('vendor.bookings.show', $review->booking))->assertOk()->assertSee('Terbaik!');
+});
+
+it('shows no commission on a booking made while Neekah is free', function () {
+    $booking = Booking::factory()->for($this->vendor)->for($this->customer)->create([
+        'total_amount' => 3000,
+        'commission_rate' => 0,
+        'commission_amount' => 0,
+    ]);
+
+    $this->actingAs($this->vendor->user)
+        ->get(route('vendor.bookings.show', $booking))
+        ->assertOk()
+        ->assertViewHas('props', fn (array $props): bool => $props['booking']['has_commission'] === false
+            && $props['booking']['payout'] === 'RM3,000.00');
+
+    $this->actingAs($this->vendor->user)
+        ->get(route('vendor.bookings.create'))
+        ->assertOk()
+        ->assertViewHas('props', fn (array $props): bool => $props['commissionRate'] === 0.0);
+});
+
+it('keeps the commission a booking was made under before Neekah went free', function () {
+    // The rate is stamped on each booking, so switching it off changes only
+    // what comes after; an older booking still shows what it was agreed at.
+    $booking = Booking::factory()->for($this->vendor)->for($this->customer)->create([
+        'total_amount' => 3000,
+        'commission_rate' => 8,
+        'commission_amount' => 240,
+    ]);
+
+    $this->actingAs($this->vendor->user)
+        ->get(route('vendor.bookings.show', $booking))
+        ->assertOk()
+        ->assertViewHas('props', fn (array $props): bool => $props['booking']['has_commission'] === true
+            && $props['booking']['payout'] === 'RM2,760.00');
 });

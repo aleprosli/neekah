@@ -73,8 +73,12 @@ const split = computed(() => {
 
         <dl v-if="split" class="flex flex-col gap-2 rounded-xl bg-surface-muted p-4 text-sm">
             <div class="flex justify-between"><dt class="text-ink-muted">Jumlah pakej</dt><dd class="font-medium">{{ split.total }}</dd></div>
-            <div class="flex justify-between"><dt class="text-ink-muted">Komisen platform ({{ Math.round(commissionRate * 100) }}%)</dt><dd>− {{ split.commission }}</dd></div>
-            <div class="flex justify-between border-t border-line pt-2 font-semibold"><dt>Anda terima</dt><dd>{{ split.payout }}</dd></div>
+            <!-- While Neekah is free the rate is 0, and a "Komisen 0%" line would only raise a question. -->
+            <template v-if="commissionRate > 0">
+                <div class="flex justify-between"><dt class="text-ink-muted">Komisen platform ({{ Math.round(commissionRate * 100) }}%)</dt><dd>− {{ split.commission }}</dd></div>
+                <div class="flex justify-between border-t border-line pt-2 font-semibold"><dt>Anda terima</dt><dd>{{ split.payout }}</dd></div>
+            </template>
+            <p v-else class="border-t border-line pt-2 text-xs text-ink-muted">Tiada komisen platform. Anda terima jumlah penuh.</p>
         </dl>
 
         <div class="flex gap-2 pt-2">

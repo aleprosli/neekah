@@ -104,7 +104,8 @@ const tones = {
 
             <dl class="flex flex-col gap-1 border-t border-line pt-3 text-sm">
                 <div class="flex justify-between text-ink-muted"><dt>Belum disahkan</dt><dd>{{ booking.outstanding }}</dd></div>
-                <div class="flex justify-between text-ink-muted"><dt>Komisen platform ({{ booking.commission_rate }}%)</dt><dd>- {{ booking.commission }}</dd></div>
+                <!-- Only bookings made under a commission show one; while Neekah is free, the vendor keeps it all. -->
+                <div v-if="booking.has_commission" class="flex justify-between text-ink-muted"><dt>Komisen platform ({{ booking.commission_rate }}%)</dt><dd>- {{ booking.commission }}</dd></div>
                 <div class="flex justify-between font-semibold"><dt>Anda terima</dt><dd>{{ booking.payout }}</dd></div>
             </dl>
         </aside>
