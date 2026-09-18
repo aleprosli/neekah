@@ -2,6 +2,9 @@
 
 namespace App\Support;
 
+use App\Enums\AuthAudience;
+use Illuminate\Http\Request;
+
 /**
  * The props behind resources/js/components/auth/AuthForm.vue.
  *
@@ -23,5 +26,43 @@ class AuthForm
             ...$props,
             'turnstileSiteKey' => ($props['captcha'] ?? false) && $turnstile->isEnabled() ? $turnstile->siteKey() : null,
         ]);
+    }
+
+    /**
+     * The props behind components/auth/AuthRoleChooser.vue: one card per
+     * side, each linking to that side's own sign-in or sign-up form.
+     *
+     * @param  array{prefix: string, label: string, url: string}|null  $footer
+     * @return array<string, mixed>
+     */
+    public static function chooser(bool $registering, ?array $footer = null): array
+    {
+        return [
+            'options' => collect(AuthAudience::cases())
+                ->map(fn (AuthAudience $audience): array => [
+                    'label' => $audience->label(),
+                    'description' => $audience->description(),
+                    // The same line icons the dashboards draw, rendered once here.
+                    'icon' => view('components.nav-icon', ['name' => $audience->icon()])->render(),
+                    'url' => $registering ? $audience->registerUrl() : $audience->loginUrl(),
+                ])
+                ->all(),
+            'footer' => $footer,
+        ];
+    }
+
+    /**
+     * The side a visitor picked, from ?as=. Null means they have not chosen
+     * yet — unless the form already came back with errors or old input, in
+     * which case the form is what they need to see again, not the question.
+     */
+    public static function audience(Request $request): ?AuthAudience
+    {
+        return AuthAudience::tryFrom($request->string('as')->toString());
+    }
+
+    public static function isReturningWithInput(Request $request): bool
+    {
+        return $request->session()->has('errors') || $request->session()->hasOldInput();
     }
 }

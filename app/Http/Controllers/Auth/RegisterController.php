@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Actions\AcceptWeddingInvitation;
+use App\Enums\AuthAudience;
 use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\RegisterRequest;
@@ -18,12 +19,29 @@ use Illuminate\Support\Facades\Auth;
 
 class RegisterController extends Controller
 {
+    /**
+     * Pengantin or vendor first, because the two sign up through different
+     * forms. Someone accepting a partner's invitation skips the question:
+     * they are joining a wedding, so they are a couple by definition.
+     */
     public function create(Request $request): View
     {
         $invitation = $this->pendingInvitation($request);
+        $audience = AuthForm::audience($request);
+
+        if (! $invitation && ! $audience && ! AuthForm::isReturningWithInput($request)) {
+            return view('auth.register', [
+                'chooser' => AuthForm::chooser(registering: true, footer: [
+                    'prefix' => 'Sudah ada akaun?',
+                    'label' => 'Log masuk',
+                    'url' => route('login'),
+                ]),
+            ]);
+        }
 
         return view('auth.register', [
             'invitation' => $invitation,
+            'audience' => $invitation ? null : AuthAudience::Couple,
             'props' => AuthForm::for([
                 'action' => route('register'),
                 'submitLabel' => 'Daftar',
@@ -42,7 +60,7 @@ class RegisterController extends Controller
                     ['name' => 'password_confirmation', 'label' => 'Sahkan kata laluan', 'type' => 'password', 'autocomplete' => 'new-password', 'required' => true],
                 ],
                 'links' => [
-                    ['prefix' => 'Sudah ada akaun?', 'label' => 'Log masuk', 'url' => route('login')],
+                    ['prefix' => 'Sudah ada akaun?', 'label' => 'Log masuk', 'url' => AuthAudience::Couple->loginUrl()],
                 ],
             ]),
         ]);

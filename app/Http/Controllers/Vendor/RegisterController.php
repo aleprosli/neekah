@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Vendor;
 
 use App\Actions\RegisterVendor;
+use App\Enums\AuthAudience;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\RegisterVendorRequest;
 use App\Models\Category;
@@ -26,7 +27,7 @@ class RegisterController extends Controller
         return view('vendor.register', [
             'props' => VueProps::for([
                 'action' => route('vendor.register'),
-                'loginUrl' => route('login'),
+                'loginUrl' => AuthAudience::Vendor->loginUrl(),
                 'convertUrl' => route('vendor.convert'),
                 'categories' => Category::active()->ordered()->get(['id', 'name', 'icon']),
                 'states' => Vendor::STATES,

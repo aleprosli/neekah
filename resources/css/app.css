@@ -24,6 +24,11 @@
     --color-gold-400: oklch(0.82 0.13 85);
     --color-gold-500: oklch(0.74 0.15 80);
     --color-gold-600: oklch(0.64 0.14 75);
+
+    /* The dashboards' paper: warm ivory rather than grey, the colour of
+       wedding stationery, so white cards sit on it like cards on a table. */
+    --color-ivory: oklch(0.982 0.01 75);
+    --color-ivory-deep: oklch(0.963 0.018 60);
 }
 
 @theme inline {
