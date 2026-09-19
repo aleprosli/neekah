@@ -26,6 +26,7 @@
         'calendar' => '<path d="M4 6h16v14H4z"/><path d="M4 10h16M9 3v4M15 3v4"/>',
         'chat' => '<path d="M4 5h16v11H9l-5 4V5Z"/><path d="M9 10h6"/>',
         'trophy' => '<path d="M8 4h8v5a4 4 0 0 1-8 0V4Z"/><path d="M8 5H5v2a3 3 0 0 0 3 3M16 5h3v2a3 3 0 0 1-3 3"/><path d="M12 13v4M9 20h6"/>',
+        'star' => '<path d="m12 3.5 2.6 5.5 6 .8-4.3 4.2 1 6-5.3-2.9-5.3 2.9 1-6L3.4 9.8l6-.8L12 3.5Z"/>',
         'rings' => '<circle cx="9" cy="14" r="5.5"/><circle cx="16" cy="14" r="5.5"/><path d="m9 5 1.5 2.5h-3L9 5Z"/>',
         'check' => '<path d="M4 5h16v15H4z"/><path d="m8 12 3 3 5-6"/>',
         'mail' => '<path d="M3 6h18v12H3z"/><path d="m3 7 9 6 9-6"/>',

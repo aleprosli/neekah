@@ -36,6 +36,12 @@ const props = defineProps({
 
 const fetched = ref([]);
 const rows = computed(() => props.rows ?? fetched.value);
+
+/**
+ * A row may carry one action or several. A hidden review, for instance, offers
+ * both putting it back and deleting it for good.
+ */
+const actionsFor = (row) => row.actions ?? (row.action ? [row.action] : []);
 const isStatic = computed(() => props.rows !== null);
 const meta = ref({ total: 0, current_page: 1, last_page: 1 });
 const loading = ref(false);
@@ -224,22 +230,24 @@ onMounted(load);
                 <div v-if="rowAction || $slots.action" class="mt-3 flex items-center justify-end gap-3 border-t border-line pt-3">
                     <slot name="action" :row="row.original" />
                     <UiConfirm
-                        v-if="rowAction?.inline && row.original.action"
-                        :action="row.original.action.url"
-                        :fields="row.original.action.fields || {}"
-                        :tone="row.original.action.confirm?.tone || 'brand'"
-                        :title="row.original.action.confirm?.title || `${row.original.action.label}?`"
-                        :message="row.original.action.confirm?.message"
-                        :confirm-label="row.original.action.confirm?.confirmLabel || row.original.action.label"
+                        v-for="(rowItem, at) in (rowAction?.inline ? actionsFor(row.original) : [])"
+                        :key="at"
+                        :action="rowItem.url"
+                        :method="rowItem.method || 'POST'"
+                        :fields="rowItem.fields || {}"
+                        :tone="rowItem.confirm?.tone || 'brand'"
+                        :title="rowItem.confirm?.title || `${rowItem.label}?`"
+                        :message="rowItem.confirm?.message"
+                        :confirm-label="rowItem.confirm?.confirmLabel || rowItem.label"
                         :trigger-class="[
                             'rounded-full px-4 py-2 text-xs font-semibold transition',
-                            row.original.action.tone === 'brand' ? 'bg-brand-600 text-white' : 'border border-line font-medium',
+                            rowItem.tone === 'brand' ? 'bg-brand-600 text-white' : 'border border-line font-medium',
                         ].join(' ')"
                         :csrf="csrf"
-                    >{{ row.original.action.label }}</UiConfirm>
+                    >{{ rowItem.label }}</UiConfirm>
 
                     <UiConfirm
-                        v-else-if="rowAction && !rowAction.inline && row.original[rowAction.urlKey]"
+                        v-if="rowAction && !rowAction.inline && row.original[rowAction.urlKey]"
                         :action="row.original[rowAction.urlKey]"
                         :method="rowAction.method || 'POST'"
                         :tone="rowAction.tone || 'brand'"
@@ -318,24 +326,26 @@ onMounted(load);
                                  marketplace — so it asks first, like every other
                                  action in the application. -->
                             <UiConfirm
-                                v-if="rowAction?.inline && row.original.action"
-                                :action="row.original.action.url"
-                                :fields="row.original.action.fields || {}"
-                                :tone="row.original.action.confirm?.tone || 'brand'"
-                                :title="row.original.action.confirm?.title || `${row.original.action.label}?`"
-                                :message="row.original.action.confirm?.message"
-                                :confirm-label="row.original.action.confirm?.confirmLabel || row.original.action.label"
+                                v-for="(rowItem, at) in (rowAction?.inline ? actionsFor(row.original) : [])"
+                                :key="at"
+                                :action="rowItem.url"
+                                :method="rowItem.method || 'POST'"
+                                :fields="rowItem.fields || {}"
+                                :tone="rowItem.confirm?.tone || 'brand'"
+                                :title="rowItem.confirm?.title || `${rowItem.label}?`"
+                                :message="rowItem.confirm?.message"
+                                :confirm-label="rowItem.confirm?.confirmLabel || rowItem.label"
                                 :trigger-class="[
-                                    'rounded-full px-3 py-1.5 text-xs font-semibold transition',
-                                    row.original.action.tone === 'brand'
+                                    'ml-2 rounded-full px-3 py-1.5 text-xs font-semibold transition',
+                                    rowItem.tone === 'brand'
                                         ? 'bg-brand-600 text-white hover:bg-brand-700'
                                         : 'border border-line font-medium hover:border-brand-400',
                                 ].join(' ')"
                                 :csrf="csrf"
-                            >{{ row.original.action.label }}</UiConfirm>
+                            >{{ rowItem.label }}</UiConfirm>
 
                             <UiConfirm
-                                v-else-if="rowAction && !rowAction.inline && row.original[rowAction.urlKey]"
+                                v-if="rowAction && !rowAction.inline && row.original[rowAction.urlKey]"
                                 :action="row.original[rowAction.urlKey]"
                                 :method="rowAction.method || 'POST'"
                                 :tone="rowAction.tone || 'brand'"

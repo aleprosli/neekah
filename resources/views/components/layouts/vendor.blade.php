@@ -19,6 +19,7 @@
         ['label' => 'Pelanggan', 'items' => [
             $item('Tempahan', 'receipt', 'vendor.bookings.index', 'vendor.bookings.*'),
             $item('Enquiry', 'chat', 'vendor.enquiries.index', 'vendor.enquiries.*', $openEnquiries),
+            $item('Review', 'star', 'vendor.reviews.index', 'vendor.reviews.*'),
         ]],
         ['label' => 'Prestasi', 'items' => [
             $item('Point & Ranking', 'trophy', 'vendor.points.index', 'vendor.points.*'),
