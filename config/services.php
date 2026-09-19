@@ -39,6 +39,15 @@ return [
         'chat_id' => env('TELEGRAM_CHAT_ID'),
     ],
 
+    /*
+     | Google Analytics 4. Only the measurement ID (G-XXXXXXXXXX) is needed;
+     | it is public by design and ships in every page. Leave it empty and no
+     | analytics tag is rendered at all.
+     */
+    'google_analytics' => [
+        'measurement_id' => env('GOOGLE_ANALYTICS_ID'),
+    ],
+
     'turnstile' => [
         'site_key' => env('TURNSTILE_SITE_KEY'),
         'secret_key' => env('TURNSTILE_SECRET_KEY'),

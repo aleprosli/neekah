@@ -21,3 +21,4 @@ Before planning or editing, find the row whose globs match the file's path and r
 | app/Support/Seo.php, app/Support/**, app/Support/ImageSettings.php | .ai/rules/support.md |
 | resources/js/components/ui/DataTable.vue | .ai/rules/ui.md |
 | resources/views/vendors/** | .ai/rules/vendors.md |
+| resources/views/components/analytics.blade.php | .ai/rules/views-components.md |

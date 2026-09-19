@@ -22,6 +22,8 @@
 
         @fonts
         @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+        <x-analytics />
     </head>
     <body class="min-h-screen bg-surface font-sans text-ink">
         @if ($preloader ?? true)
