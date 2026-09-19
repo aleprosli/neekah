@@ -148,8 +148,27 @@ class Vendor extends Model
      */
     public function hasCompleteCatalogue(): bool
     {
-        return $this->packages()->where('is_active', true)->exists()
-            && $this->portfolioItems()->count() >= 3;
+        $packages = $this->active_packages_count ?? $this->packages()->where('is_active', true)->count();
+        $portfolio = $this->portfolio_items_count ?? $this->portfolioItems()->count();
+
+        return $packages > 0 && $portfolio >= 3;
+    }
+
+    /**
+     * The same two tests as hasCompleteProfile() and hasCompleteCatalogue(),
+     * in SQL, so a list of vendors can be counted and paged without loading
+     * every one of them. VendorSetupScopeTest fails if the two drift apart.
+     */
+    #[Scope]
+    protected function setupComplete(Builder $query): Builder
+    {
+        return $query
+            ->whereNotNull('tagline')->where('tagline', '!=', '')
+            ->whereNotNull('description')->where('description', '!=', '')
+            ->whereNotNull('phone')->where('phone', '!=', '')
+            ->where('price_from', '>', 0)
+            ->whereHas('packages', fn (Builder $packages) => $packages->where('is_active', true))
+            ->has('portfolioItems', '>=', 3);
     }
 
     #[Scope]

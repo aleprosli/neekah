@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Actions\DeleteUserAccount;
 use App\Enums\UserRole;
+use App\Enums\UserSegment;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\User;
@@ -26,13 +27,49 @@ class UserController extends Controller
         ['key' => 'joined', 'label' => 'Daftar', 'sort' => 'created_at', 'sortable' => true],
     ];
 
+    /**
+     * A segment is already one role, so the role column would repeat itself.
+     * What the team needs instead is a phone number to call and, on the last
+     * column, how far this account actually got.
+     */
+    private const SEGMENT_COLUMNS = [
+        ['key' => 'name', 'label' => 'Nama', 'sortable' => true],
+        ['key' => 'email', 'label' => 'Emel', 'sortable' => true],
+        ['key' => 'phone', 'label' => 'Telefon'],
+        ['key' => 'joined', 'label' => 'Daftar', 'sort' => 'created_at', 'sortable' => true],
+        ['key' => 'progress', 'label' => 'Setakat ini', 'type' => 'html'],
+    ];
+
     public function index(Request $request): View
     {
+        $segment = UserSegment::tryFrom($request->string('segment')->toString());
+
         return view('admin.users.index', [
-            'columns' => self::COLUMNS,
-            'role' => UserRole::tryFrom($request->string('role')->toString()),
+            'columns' => $segment ? self::SEGMENT_COLUMNS : self::COLUMNS,
+            'role' => $segment ? null : UserRole::tryFrom($request->string('role')->toString()),
+            'segment' => $segment,
             'counts' => User::selectRaw('role, count(*) as total')->groupBy('role')->pluck('total', 'role'),
+            'segments' => $this->segmentCounts(),
         ]);
+    }
+
+    /**
+     * Every segment with how many accounts are sitting in it. Five counts on
+     * one page load, which is what makes the chips worth reading at a glance;
+     * they are the whole analytic, so they are not worth caching until the
+     * table itself is slow.
+     *
+     * @return array<int, array{segment: UserSegment, total: int}>
+     */
+    private function segmentCounts(): array
+    {
+        return array_map(
+            fn (UserSegment $segment): array => [
+                'segment' => $segment,
+                'total' => $segment->apply(User::query())->count(),
+            ],
+            UserSegment::cases(),
+        );
     }
 
     /**
@@ -41,7 +78,8 @@ class UserController extends Controller
      */
     public function data(Request $request): JsonResponse
     {
-        $role = UserRole::tryFrom($request->string('role')->toString());
+        $segment = UserSegment::tryFrom($request->string('segment')->toString());
+        $role = $segment ? null : UserRole::tryFrom($request->string('role')->toString());
         $sort = in_array($request->string('sort')->toString(), ['name', 'email', 'created_at'], true)
             ? $request->string('sort')->toString()
             : 'id';
@@ -49,6 +87,8 @@ class UserController extends Controller
 
         $users = User::query()
             ->withCount(['bookings', 'weddings'])
+            ->when($segment, fn ($query) => $segment->apply($query))
+            ->when($segment, fn ($query) => $query->with($this->segmentRelations($segment)))
             ->when($role, fn ($query) => $query->where('role', $role))
             ->when($request->string('search')->trim()->toString(), function ($query, string $keyword): void {
                 $like = '%'.$keyword.'%';
@@ -62,9 +102,11 @@ class UserController extends Controller
                 'url' => route('admin.users.show', $user),
                 'name' => $user->name,
                 'email' => $user->email,
+                'phone' => $user->phone ?: '—',
                 'role' => $user->role->label().($user->isDeactivated() ? ' · dinyahaktif' : ''),
                 'bookings' => $user->bookings_count,
                 'joined' => $user->created_at->translatedFormat('j M Y'),
+                'progress' => $segment ? $this->progressPill($user, $segment) : null,
                 'impersonate_url' => $user->canBeImpersonated() ? route('admin.users.impersonate', $user) : null,
             ])->all(),
             'meta' => [
@@ -74,6 +116,67 @@ class UserController extends Controller
                 'last_page' => $users->lastPage(),
             ],
         ]);
+    }
+
+    /**
+     * What each segment's rows need loaded so the last column costs no query
+     * of its own. The vendor counts are the ones hasCompleteCatalogue() reads.
+     *
+     * @return array<string, \Closure>
+     */
+    private function segmentRelations(UserSegment $segment): array
+    {
+        return $segment->role() === UserRole::Vendor
+            ? ['vendor' => fn ($vendor) => $vendor->withCount([
+                'packages as active_packages_count' => fn ($packages) => $packages->where('is_active', true),
+                'portfolioItems',
+            ])]
+            : ['createdWeddings' => fn ($weddings) => $weddings->orderBy('event_date')];
+    }
+
+    /**
+     * How far this account got, said in the fewest words that still tell the
+     * team what to open the call with.
+     */
+    private function progressPill(User $user, UserSegment $segment): string
+    {
+        [$label, $tone] = match ($segment->role()) {
+            UserRole::Vendor => $this->vendorProgress($user),
+            default => $this->coupleProgress($user),
+        };
+
+        return view('components.admin.status-pill', ['label' => $label, 'tone' => $tone])->render();
+    }
+
+    /**
+     * @return array{0: string, 1: string}
+     */
+    private function vendorProgress(User $user): array
+    {
+        if ($user->vendor === null) {
+            return ['Tiada profil', 'red'];
+        }
+
+        $missing = array_values(array_filter([
+            $user->vendor->hasCompleteProfile() ? null : 'profil',
+            $user->vendor->hasCompleteCatalogue() ? null : 'pakej & gambar',
+        ]));
+
+        return $missing === []
+            ? ['Lengkap', 'emerald']
+            : ['Perlu '.implode(' dan ', $missing), 'amber'];
+    }
+
+    /**
+     * @return array{0: string, 1: string}
+     */
+    private function coupleProgress(User $user): array
+    {
+        $wedding = $user->createdWeddings->first();
+
+        return $wedding === null
+            ? ['Tiada majlis', 'amber']
+            : [$wedding->event_date?->translatedFormat('j M Y') ?? 'Tarikh belum ditetapkan', 'sky'];
     }
 
     /**
