@@ -4,9 +4,16 @@
 
     <main class="mx-auto max-w-[1760px] px-4 pb-24 sm:px-6 md:pb-10 lg:px-10">
         {{-- Category tiles --}}
+        {{-- Centred while the tiles fit; once there are more than the width holds
+             they start at the left and scroll, with arrows on a desktop, which
+             has no swipe. justify-center would cut both ends off instead. --}}
         <div class="border-b border-line py-5">
-            <div class="no-scrollbar -mx-4 flex overflow-x-auto px-4 py-1 sm:mx-0 sm:px-0 md:justify-center">
-                <ul class="flex w-max gap-4 sm:gap-6">
+            <div data-scroller class="group/scroller relative">
+                <button type="button" data-scroll-prev hidden class="absolute top-1/2 left-0 z-10 hidden size-9 -translate-y-[calc(50%+0.75rem)] items-center justify-center rounded-full border border-line bg-surface-raised text-ink shadow-md transition hover:border-brand-400 md:flex" aria-label="Kategori sebelumnya">
+                    <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+                </button>
+                <div data-scroll-track class="no-scrollbar -mx-4 flex scroll-smooth overflow-x-auto px-4 py-1 sm:mx-0 sm:px-0">
+                <ul class="mx-auto flex w-max gap-4 sm:gap-6">
                     <li>
                         <a href="{{ route('vendors.index', array_filter(['q' => $filters['q'], 'state' => $filters['state']])) }}" @class(['group flex w-16 flex-col items-center gap-2 text-center text-[11px] font-medium whitespace-nowrap transition', 'text-brand-700' => ! $filters['category'], 'text-ink-muted hover:text-ink' => $filters['category']])>
                             <span @class(['flex size-14 items-center justify-center overflow-hidden rounded-full bg-white text-2xl transition', 'shadow-md shadow-brand-600/30 ring-2 ring-brand-600' => ! $filters['category'], 'ring-1 ring-line group-hover:ring-brand-300' => $filters['category']])>
@@ -26,8 +33,11 @@
                         </li>
                     @endforeach
                 </ul>
+                </div>
+                <button type="button" data-scroll-next hidden class="absolute top-1/2 right-0 z-10 hidden size-9 -translate-y-[calc(50%+0.75rem)] items-center justify-center rounded-full border border-line bg-surface-raised text-ink shadow-md transition hover:border-brand-400 md:flex" aria-label="Kategori seterusnya">
+                    <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+                </button>
             </div>
-
         </div>
 
         {{-- Filter toolbar --}}

@@ -126,6 +126,62 @@ document.addEventListener('click', (event) => {
 });
 
 /**
+ * Horizontal scrollers ([data-scroller]): arrows for a desktop, which has no
+ * swipe, shown only when there is more to see that way, and an edge fade.
+ */
+const updateScroller = (scroller) => {
+    const track = scroller.querySelector('[data-scroll-track]');
+    if (!track) {
+        return;
+    }
+
+    const before = track.scrollLeft > 4;
+    const after = track.scrollLeft + track.clientWidth < track.scrollWidth - 4;
+
+    scroller.querySelector('[data-scroll-prev]')?.toggleAttribute('hidden', !before);
+    scroller.querySelector('[data-scroll-next]')?.toggleAttribute('hidden', !after);
+
+    if (before && after) {
+        track.dataset.fade = 'both';
+    } else if (after) {
+        track.dataset.fade = 'end';
+    } else if (before) {
+        track.dataset.fade = 'start';
+    } else {
+        delete track.dataset.fade;
+    }
+};
+
+const updateScrollers = () => document.querySelectorAll('[data-scroller]').forEach(updateScroller);
+
+updateScrollers();
+window.addEventListener('resize', updateScrollers);
+window.addEventListener('load', updateScrollers);
+window.addEventListener('neekah:navigated', updateScrollers);
+
+document.addEventListener(
+    'scroll',
+    (event) => {
+        const scroller = event.target instanceof Element ? event.target.closest('[data-scroller]') : null;
+        if (scroller) {
+            updateScroller(scroller);
+        }
+    },
+    true,
+);
+
+document.addEventListener('click', (event) => {
+    const arrow = event.target.closest('[data-scroll-prev], [data-scroll-next]');
+    if (!arrow) {
+        return;
+    }
+
+    const track = arrow.closest('[data-scroller]')?.querySelector('[data-scroll-track]');
+    const direction = arrow.matches('[data-scroll-next]') ? 1 : -1;
+    track?.scrollBy({ left: direction * track.clientWidth * 0.8, behavior: 'smooth' });
+});
+
+/**
  * Vendor comparison tray. Selections live in sessionStorage so they survive
  * paging and filtering, and travel to /compare as a query string.
  */

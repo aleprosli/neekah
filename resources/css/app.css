@@ -194,6 +194,26 @@ html {
 }
 
 /*
+| Horizontal scrollers
+| A row that is wider than the screen fades out at whichever edge still has
+| more to show, so it reads as "scroll for more" rather than as cut off.
+| app.js sets data-fade from the scroll position.
+*/
+@media (min-width: 768px) {
+    [data-scroll-track][data-fade='end'] {
+        mask-image: linear-gradient(to right, #000 88%, transparent);
+    }
+
+    [data-scroll-track][data-fade='start'] {
+        mask-image: linear-gradient(to left, #000 88%, transparent);
+    }
+
+    [data-scroll-track][data-fade='both'] {
+        mask-image: linear-gradient(to right, transparent, #000 12%, #000 88%, transparent);
+    }
+}
+
+/*
 | Wedding card motion
 |--------------------------------------------------------------------------
 | Shared by every invitation template. All of it is disabled when the visitor

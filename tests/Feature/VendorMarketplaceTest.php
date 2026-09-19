@@ -45,6 +45,15 @@ it('moves legacy listing urls to the vendor list for good, keeping their filters
         ->assertRedirect(route('vendors.index', ['category' => 'photography', 'state' => 'Kedah']));
 });
 
+it('lays the category tiles in a scroller with arrows, so a long list is never cut off', function () {
+    $this->get(route('vendors.index'))
+        ->assertOk()
+        ->assertSee('data-scroll-track', false)
+        ->assertSee('aria-label="Kategori sebelumnya"', false)
+        ->assertSee('aria-label="Kategori seterusnya"', false)
+        ->assertSeeInOrder(['data-scroll-track', 'Semua', 'Catering'], false);
+});
+
 it('filters vendors by category', function () {
     Vendor::factory()->for($this->catering)->create(['name' => 'Dapur Warisan Catering']);
     Vendor::factory()->for($this->photography)->create(['name' => 'ABC Wedding Photography']);
