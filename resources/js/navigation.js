@@ -130,6 +130,11 @@ const visit = async (url, { push = true } = {}) => {
         }
 
         window.scrollTo({ top: 0 });
+
+        // The browser fired no page load, so anything counting page views has
+        // to be told by hand. Announced after the history entry, so a listener
+        // reading location.href sees the page it has just arrived at.
+        window.dispatchEvent(new CustomEvent('neekah:navigated', { detail: { url: currentUrl() } }));
     } catch {
         window.location.href = url;
     } finally {
