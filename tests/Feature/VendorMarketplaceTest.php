@@ -37,9 +37,12 @@ it('shows the demo data badge everywhere except production', function (string $e
     'production' => ['production', false],
 ]);
 
-it('redirects legacy listing urls to the root', function () {
-    $this->get('/marketplace')->assertRedirect('/');
-    $this->get('/vendors')->assertRedirect('/');
+it('moves legacy listing urls to the vendor list for good, keeping their filters', function () {
+    $this->get('/marketplace')->assertMovedPermanently()->assertRedirect(route('vendors.index'));
+    $this->get('/vendors')->assertMovedPermanently()->assertRedirect(route('vendors.index'));
+
+    $this->get('/vendors?category=photography&state=Kedah')
+        ->assertRedirect(route('vendors.index', ['category' => 'photography', 'state' => 'Kedah']));
 });
 
 it('filters vendors by category', function () {

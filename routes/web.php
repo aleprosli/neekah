@@ -26,6 +26,8 @@ use App\Http\Controllers\Vendor as VendorArea;
 use App\Http\Controllers\VendorComparisonController;
 use App\Http\Controllers\VendorController;
 use App\Http\Controllers\VendorReviewController;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 // Published invitations live on their own subdomain, e.g. ainahakim.neekah.test
@@ -62,8 +64,10 @@ Route::get('/kad-jemputan/{template:slug}/preview.png', [SiteTemplatePreviewCont
 
 Route::get('/invitations/{invitation}', [InvitationAcceptanceController::class, 'show'])->name('invitations.show');
 
-Route::redirect('/vendors', '/');
-Route::redirect('/marketplace', '/');
+// The vendor list lives at the root. Old /vendors and /marketplace links move
+// there for good, keeping their filters (?category=…&state=…).
+Route::get('/vendors', fn (Request $request): RedirectResponse => redirect()->route('vendors.index', $request->query(), 301));
+Route::get('/marketplace', fn (Request $request): RedirectResponse => redirect()->route('vendors.index', $request->query(), 301));
 
 Route::middleware('guest')->group(function (): void {
     Route::get('/register', [RegisterController::class, 'create'])->name('register');
