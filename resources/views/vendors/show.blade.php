@@ -149,11 +149,7 @@
                                             <p class="truncate text-sm font-semibold">{{ $review->authorName() }}</p>
                                             <p class="text-xs text-ink-muted">
                                                 {{ $review->created_at->translatedFormat('F Y') }} ·
-                                                @if ($review->isVerified())
-                                                    <span class="font-medium text-emerald-700">✓ Tempahan disahkan</span>
-                                                @else
-                                                    <span>Review terbuka</span>
-                                                @endif
+                                                <span @class(['font-medium text-emerald-700' => $review->isVerified()])>{{ $review->sourceLabel() }}</span>
                                             </p>
                                         </div>
                                     </div>

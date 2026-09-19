@@ -103,6 +103,8 @@ Route::middleware(['auth', 'role:vendor'])->prefix('vendor')->name('vendor.')->g
     Route::post('/bookings/{booking}/payments/{payment}/verify', [VendorArea\PaymentVerificationController::class, 'store'])->name('bookings.payments.verify')->scopeBindings();
     Route::delete('/bookings/{booking}/payments/{payment}/verify', [VendorArea\PaymentVerificationController::class, 'destroy'])->name('bookings.payments.reject')->scopeBindings();
     Route::get('/reviews', [VendorArea\ReviewController::class, 'index'])->name('reviews.index');
+    Route::post('/reviews', [VendorArea\ReviewController::class, 'store'])->name('reviews.store');
+    Route::delete('/reviews/{review}', [VendorArea\ReviewController::class, 'destroy'])->name('reviews.destroy');
     Route::post('/reviews/{review}/reply', [VendorArea\ReviewController::class, 'reply'])->name('reviews.reply');
     Route::post('/reviews/{review}/report', [VendorArea\ReviewController::class, 'report'])->name('reviews.report');
     Route::get('/points', [VendorArea\PointController::class, 'index'])->name('points.index');

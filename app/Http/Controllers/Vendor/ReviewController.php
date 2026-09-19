@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers\Vendor;
 
+use App\Actions\ModerateReview;
+use App\Actions\SubmitVendorReview;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreVendorAddedReviewRequest;
 use App\Models\Review;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
@@ -30,6 +33,46 @@ class ReviewController extends Controller
             'vendor' => $vendor,
             'reviews' => $reviews,
         ]);
+    }
+
+    /**
+     * A review the vendor already had elsewhere — Google, Instagram, a message
+     * from a couple — carried onto their Neekah profile.
+     *
+     * Stored as an open review, so it moves no rating, no points and no tier,
+     * and stamped with the vendor's own account so the public page can say who
+     * put it there. An admin can still take it down like any other.
+     */
+    public function store(StoreVendorAddedReviewRequest $request, SubmitVendorReview $submitReview): RedirectResponse
+    {
+        $vendor = $request->user()->vendor;
+
+        $review = $submitReview->handle(
+            $vendor,
+            $request->safe()->only(['rating', 'comment', 'author_name', 'author_email']),
+            $request->file('photos') ?? [],
+            addedBy: $request->user(),
+        );
+
+        if ($writtenOn = $request->date('written_on')) {
+            $review->forceFill(['created_at' => $writtenOn])->save();
+        }
+
+        return back()->with('status', 'Review oleh '.$review->author_name.' ditambah. Ia dilabel "Ditambah oleh vendor" pada profil awam anda.');
+    }
+
+    /**
+     * Only ever a review this vendor typed in themselves — for a typo, or a
+     * testimonial the writer later asked them to take down.
+     */
+    public function destroy(Review $review, ModerateReview $moderate): RedirectResponse
+    {
+        Gate::authorize('deleteOwnAddition', $review);
+
+        $author = $review->author_name;
+        $moderate->delete($review);
+
+        return back()->with('status', 'Review oleh '.$author.' dipadam.');
     }
 
     public function reply(Request $request, Review $review): RedirectResponse

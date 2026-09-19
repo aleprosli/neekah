@@ -123,6 +123,10 @@ class VendorController extends Controller
             'reviews' => fn ($query) => $query->published()->with(['user', 'photos'])->latest()->limit(12),
         ]);
 
+        // Each review belongs to the vendor already in hand. Setting the
+        // inverse keeps sourceLabel() from fetching it back one row at a time.
+        $vendor->reviews->each->setRelation('vendor', $vendor);
+
         $related = Vendor::query()
             ->approved()
             ->with('category')

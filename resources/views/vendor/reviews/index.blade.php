@@ -7,6 +7,69 @@
         Anda boleh menjawab mana-mana review di sini, dan melaporkan yang anda rasa tidak benar. Hanya admin yang boleh menariknya — supaya rating pada profil anda bermakna sesuatu kepada pengantin yang membacanya.
     </p>
 
+    {{-- Carrying over reviews the vendor already has somewhere else. --}}
+    <details class="mb-6 min-w-0 rounded-2xl border border-line bg-surface-muted/40 p-4 sm:p-6" @if ($errors->addReview->any()) open @endif>
+        <summary class="cursor-pointer text-sm font-semibold">Tambah review dari tempat lain</summary>
+
+        <p class="mt-2 max-w-2xl text-sm text-ink-muted">
+            Untuk review sebenar yang anda sudah terima di Google, Instagram atau WhatsApp. Ia akan dipaparkan pada profil anda dengan label <span class="font-medium text-ink">"Ditambah oleh vendor"</span>, supaya pengantin tahu ia datang daripada anda dan bukan dihantar melalui Neekah. Ia tidak menaikkan rating, mata atau ranking anda.
+        </p>
+
+        <form method="POST" action="{{ route('vendor.reviews.store') }}" enctype="multipart/form-data" class="mt-4 flex flex-col gap-4">
+            @csrf
+
+            @if ($errors->addReview->any())
+                <ul class="flex flex-col gap-1 rounded-xl bg-brand-50 p-3 text-xs text-brand-800">
+                    @foreach ($errors->addReview->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            @endif
+
+            <div class="grid min-w-0 gap-4 sm:grid-cols-3">
+                <label class="flex min-w-0 flex-col gap-1">
+                    <span class="text-xs font-semibold tracking-wide uppercase">Nama pelanggan</span>
+                    <input type="text" name="author_name" value="{{ old('author_name') }}" required minlength="2" maxlength="80" class="w-full rounded-xl border border-line bg-surface px-4 py-3 text-sm focus:border-brand-400 focus:outline-none">
+                </label>
+                <label class="flex min-w-0 flex-col gap-1">
+                    <span class="text-xs font-semibold tracking-wide uppercase">Emel <span class="font-normal normal-case opacity-70">(pilihan)</span></span>
+                    <input type="email" name="author_email" value="{{ old('author_email') }}" maxlength="255" class="w-full rounded-xl border border-line bg-surface px-4 py-3 text-sm focus:border-brand-400 focus:outline-none">
+                </label>
+                <label class="flex min-w-0 flex-col gap-1">
+                    <span class="text-xs font-semibold tracking-wide uppercase">Tarikh asal <span class="font-normal normal-case opacity-70">(pilihan)</span></span>
+                    <input type="date" name="written_on" value="{{ old('written_on') }}" max="{{ now()->toDateString() }}" class="w-full rounded-xl border border-line bg-surface px-4 py-3 text-sm focus:border-brand-400 focus:outline-none">
+                </label>
+            </div>
+
+            <fieldset class="min-w-0">
+                <legend class="text-xs font-semibold tracking-wide uppercase">Berapa bintang?</legend>
+                <div class="mt-1 flex flex-row-reverse justify-end">
+                    @foreach ([5, 4, 3, 2, 1] as $value)
+                        <input type="radio" id="vendor-review-star-{{ $value }}" name="rating" value="{{ $value }}" class="peer sr-only" required @checked((int) old('rating') === $value)>
+                        <label for="vendor-review-star-{{ $value }}" class="cursor-pointer px-1 py-1.5 text-3xl leading-none text-line transition peer-checked:text-gold-500 peer-focus-visible:outline peer-focus-visible:outline-brand-600">
+                            <span aria-hidden="true">★</span>
+                            <span class="sr-only">{{ $value }} bintang</span>
+                        </label>
+                    @endforeach
+                </div>
+            </fieldset>
+
+            <label class="flex min-w-0 flex-col gap-1">
+                <span class="text-xs font-semibold tracking-wide uppercase">Ulasan</span>
+                <textarea name="comment" rows="3" required minlength="10" maxlength="1000" placeholder="Salin apa yang pelanggan tulis." class="w-full rounded-xl border border-line bg-surface px-4 py-3 text-sm focus:border-brand-400 focus:outline-none">{{ old('comment') }}</textarea>
+            </label>
+
+            <div data-vue="ui-photo-picker" data-props="@vueProps(['name' => 'photos[]', 'max' => App\Models\Review::MAX_PHOTOS])">
+                <label class="flex min-w-0 flex-col gap-1">
+                    <span class="text-xs font-semibold tracking-wide uppercase">Gambar <span class="font-normal normal-case opacity-70">(pilihan)</span></span>
+                    <input type="file" name="photos[]" multiple accept="image/jpeg,image/png,image/webp" class="w-full text-sm">
+                </label>
+            </div>
+
+            <button type="submit" class="rounded-full bg-brand-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-brand-700 sm:self-start">Tambah review</button>
+        </form>
+    </details>
+
     @if ($reviews->isEmpty())
         <p class="rounded-2xl border border-dashed border-line p-8 text-center text-sm text-ink-muted">Belum ada review.</p>
     @else
@@ -17,8 +80,7 @@
                         <div class="min-w-0">
                             <p class="font-semibold">{{ $review->authorName() }}</p>
                             <p class="text-xs text-ink-muted">
-                                {{ $review->created_at->translatedFormat('j F Y') }} ·
-                                {{ $review->isVerified() ? '✓ Tempahan disahkan' : 'Review terbuka' }}
+                                {{ $review->created_at->translatedFormat('j F Y') }} · {{ $review->sourceLabel() }}
                             </p>
                         </div>
                         <p class="text-sm text-gold-500">{{ str_repeat('★', $review->rating) }}<span class="text-line">{{ str_repeat('★', 5 - $review->rating) }}</span></p>
@@ -56,6 +118,21 @@
                             Dilaporkan pada {{ $review->reported_at->translatedFormat('j F Y') }}. Admin akan memeriksanya.
                         </p>
                     @endif
+
+                    @can('deleteOwnAddition', $review)
+                        {{-- resources/js/components/ui/UiConfirm.vue --}}
+                        <div class="mt-3" data-vue="ui-confirm" data-props="@vueProps([
+                            'action' => route('vendor.reviews.destroy', $review),
+                            'method' => 'DELETE',
+                            'csrf' => csrf_token(),
+                            'tone' => 'danger',
+                            'title' => 'Padam review oleh '.$review->author_name.'?',
+                            'message' => 'Review ini dan gambarnya dipadam kekal. Tindakan ini tidak boleh diundur.',
+                            'confirmLabel' => 'Ya, padam',
+                            'label' => 'Padam review yang anda tambah ini',
+                            'triggerClass' => 'rounded-full border border-line px-3 py-1.5 text-xs font-medium transition hover:border-brand-400',
+                        ])"></div>
+                    @endcan
 
                     @can('reply', $review)
                         <div class="mt-4 flex flex-col gap-2 border-t border-line pt-4 sm:flex-row sm:gap-3">

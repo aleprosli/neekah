@@ -108,6 +108,36 @@ class Review extends Model
         return $this->booking_id !== null;
     }
 
+    /**
+     * Typed in by the business itself rather than submitted by whoever wrote
+     * it. Legitimate — a vendor carrying over real testimonials from Google or
+     * Instagram — but the page must say so, because a reader has no other way
+     * to tell a customer's words from the business's own.
+     */
+    public function isVendorAdded(): bool
+    {
+        return $this->added_by !== null && $this->added_by === $this->vendor->user_id;
+    }
+
+    /** Entered by Neekah on someone's behalf. */
+    public function isPlatformAdded(): bool
+    {
+        return $this->added_by !== null && ! $this->isVendorAdded();
+    }
+
+    /**
+     * Where this review came from, in the words shown beside the author.
+     */
+    public function sourceLabel(): string
+    {
+        return match (true) {
+            $this->isVerified() => '✓ Tempahan disahkan',
+            $this->isVendorAdded() => 'Ditambah oleh vendor',
+            $this->isPlatformAdded() => 'Ditambah oleh Neekah',
+            default => 'Review terbuka',
+        };
+    }
+
     public function isHidden(): bool
     {
         return $this->hidden_at !== null;

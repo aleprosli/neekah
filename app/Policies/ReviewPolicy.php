@@ -27,6 +27,18 @@ class ReviewPolicy
             && ! $review->isHidden();
     }
 
+    /**
+     * A vendor may take back only what they typed in themselves. Everything a
+     * customer wrote stays where it is — that is the whole point of moderate()
+     * being admin-only.
+     */
+    public function deleteOwnAddition(User $user, Review $review): bool
+    {
+        return $user->isVendor()
+            && $user->vendor?->id === $review->vendor_id
+            && $review->added_by === $user->id;
+    }
+
     /** How a vendor objects to a review, since they cannot remove it. */
     public function report(User $user, Review $review): bool
     {
