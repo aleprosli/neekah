@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Models\Booking;
 use App\Models\Review;
+use App\Models\Vendor;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -28,5 +29,33 @@ class ReviewFactory extends Factory
             'punctuality' => fake()->numberBetween(4, 5),
             'comment' => fake()->paragraph(),
         ];
+    }
+
+    /**
+     * Written straight on the profile by a guest: no booking, no account, and
+     * none of the five aspects.
+     */
+    public function open(): static
+    {
+        return $this->state(fn (): array => [
+            'booking_id' => null,
+            'user_id' => null,
+            'vendor_id' => Vendor::factory(),
+            'author_name' => fake()->name(),
+            'author_email' => fake()->optional()->safeEmail(),
+            'quality' => null,
+            'service' => null,
+            'communication' => null,
+            'value' => null,
+            'punctuality' => null,
+        ]);
+    }
+
+    public function hidden(): static
+    {
+        return $this->state(fn (): array => [
+            'hidden_at' => now(),
+            'hidden_reason' => 'Spam',
+        ]);
     }
 }

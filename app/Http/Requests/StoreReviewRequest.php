@@ -21,10 +21,16 @@ class StoreReviewRequest extends FormRequest
      */
     public function rules(): array
     {
-        $rules = ['comment' => ['required', 'string', 'min:10', 'max:1000']];
+        $rules = [
+            'comment' => ['required', 'string', 'min:10', 'max:1000'],
+            'rating' => ['required', 'integer', 'between:1,5'],
+        ];
 
-        foreach (['rating', ...Review::ASPECTS] as $field) {
-            $rules[$field] = ['required', 'integer', 'between:1,5'];
+        // The five aspects are the long form, kept for couples who have just
+        // finished a booking and have something detailed to say. A star and a
+        // sentence is what the review is; the rest is optional.
+        foreach (Review::ASPECTS as $aspect) {
+            $rules[$aspect] = ['nullable', 'integer', 'between:1,5'];
         }
 
         return $rules;

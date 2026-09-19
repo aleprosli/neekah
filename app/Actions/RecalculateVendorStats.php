@@ -24,8 +24,8 @@ class RecalculateVendorStats
         $vendor->timestamps = false;
 
         $vendor->fill([
-            'rating_avg' => round((float) $vendor->reviews()->avg('rating'), 2),
-            'reviews_count' => $vendor->reviews()->count(),
+            'rating_avg' => round((float) $vendor->rankingReviews()->avg('rating'), 2),
+            'reviews_count' => $vendor->rankingReviews()->count(),
             'completed_bookings_count' => $vendor->bookings()->where('status', BookingStatus::Completed)->count(),
         ]);
 

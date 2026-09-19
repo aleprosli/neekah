@@ -96,6 +96,17 @@ class Vendor extends Model
         return $this->hasMany(Review::class);
     }
 
+    /**
+     * The reviews rating_avg, the points and the tier are computed from: ones
+     * backed by a booking this platform can prove, and still visible. Anyone
+     * may now leave a review, so anything wider than this would let a stranger
+     * with an email address move a vendor's ranking.
+     */
+    public function rankingReviews(): HasMany
+    {
+        return $this->reviews()->verified()->published();
+    }
+
     public function violations(): HasMany
     {
         return $this->hasMany(VendorViolation::class);

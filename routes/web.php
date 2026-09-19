@@ -25,6 +25,7 @@ use App\Http\Controllers\SiteTemplatePreviewController;
 use App\Http\Controllers\Vendor as VendorArea;
 use App\Http\Controllers\VendorComparisonController;
 use App\Http\Controllers\VendorController;
+use App\Http\Controllers\VendorReviewController;
 use Illuminate\Support\Facades\Route;
 
 // Published invitations live on their own subdomain, e.g. ainahakim.neekah.test
@@ -38,6 +39,11 @@ Route::domain('{subdomain}.'.config('neekah.site_domain'))->group(function (): v
 Route::get('/', [VendorController::class, 'index'])->name('vendors.index');
 Route::get('/compare', VendorComparisonController::class)->name('vendors.compare');
 Route::get('/vendors/{vendor}', [VendorController::class, 'show'])->name('vendors.show');
+// Open to everyone, signed in or not, so the throttle is what stands between
+// a profile and someone with a script.
+Route::post('/vendors/{vendor}/reviews', [VendorReviewController::class, 'store'])
+    ->middleware('throttle:5,60')
+    ->name('vendors.reviews.store');
 
 Route::get('/about', LandingController::class)->name('landing');
 
@@ -96,6 +102,9 @@ Route::middleware(['auth', 'role:vendor'])->prefix('vendor')->name('vendor.')->g
     Route::post('/bookings/{booking}/complete', [VendorArea\BookingCompletionController::class, 'store'])->name('bookings.complete');
     Route::post('/bookings/{booking}/payments/{payment}/verify', [VendorArea\PaymentVerificationController::class, 'store'])->name('bookings.payments.verify')->scopeBindings();
     Route::delete('/bookings/{booking}/payments/{payment}/verify', [VendorArea\PaymentVerificationController::class, 'destroy'])->name('bookings.payments.reject')->scopeBindings();
+    Route::get('/reviews', [VendorArea\ReviewController::class, 'index'])->name('reviews.index');
+    Route::post('/reviews/{review}/reply', [VendorArea\ReviewController::class, 'reply'])->name('reviews.reply');
+    Route::post('/reviews/{review}/report', [VendorArea\ReviewController::class, 'report'])->name('reviews.report');
     Route::get('/points', [VendorArea\PointController::class, 'index'])->name('points.index');
     Route::get('/enquiries', [VendorArea\EnquiryController::class, 'index'])->name('enquiries.index');
     Route::get('/enquiries/{enquiry}', [VendorArea\EnquiryController::class, 'show'])->name('enquiries.show');
@@ -179,6 +188,12 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/vendors/{vendor}', [AdminArea\VendorController::class, 'show'])->name('vendors.show');
     Route::post('/vendors/{vendor}/status', [AdminArea\VendorApprovalController::class, 'store'])->name('vendors.status');
     Route::put('/vendors/{vendor}/tier', [AdminArea\VendorTierController::class, 'update'])->name('vendors.tier');
+    Route::get('/reviews', [AdminArea\ReviewController::class, 'index'])->name('reviews.index');
+    Route::get('/reviews/data', [AdminArea\ReviewController::class, 'data'])->name('reviews.data');
+    Route::post('/reviews', [AdminArea\ReviewController::class, 'store'])->name('reviews.store');
+    Route::post('/reviews/{review}/hide', [AdminArea\ReviewController::class, 'hide'])->name('reviews.hide');
+    Route::post('/reviews/{review}/restore', [AdminArea\ReviewController::class, 'restore'])->name('reviews.restore');
+    Route::delete('/reviews/{review}', [AdminArea\ReviewController::class, 'destroy'])->name('reviews.destroy');
     Route::get('/users', [AdminArea\UserController::class, 'index'])->name('users.index');
     Route::get('/users/data', [AdminArea\UserController::class, 'data'])->name('users.data');
     Route::get('/users/{user}', [AdminArea\UserController::class, 'show'])->name('users.show');

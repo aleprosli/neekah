@@ -70,7 +70,7 @@
 
                 {{-- Highlights --}}
                 <ul class="flex flex-col gap-5 py-6">
-                    @foreach ([['🔒', 'Booking & rekod bayaran di Neekah', 'Setiap bayaran direkod dan disahkan vendor, jadi kedua-dua pihak ada rekod yang sama.'], ['⚡', 'Response rate '.$vendor->responseRateLabel(), $vendor->response_rate === null ? 'Vendor ini belum menerima cukup enquiry untuk kami mengukur kadar balasan mereka.' : 'Diukur dari enquiry yang diterima melalui Neekah.'], ['✓', $vendor->completed_bookings_count.' majlis selesai', 'Review di bawah datang daripada pasangan yang benar-benar menempah.']] as [$icon, $title, $text])
+                    @foreach ([['🔒', 'Booking & rekod bayaran di Neekah', 'Setiap bayaran direkod dan disahkan vendor, jadi kedua-dua pihak ada rekod yang sama.'], ['⚡', 'Response rate '.$vendor->responseRateLabel(), $vendor->response_rate === null ? 'Vendor ini belum menerima cukup enquiry untuk kami mengukur kadar balasan mereka.' : 'Diukur dari enquiry yang diterima melalui Neekah.'], ['✓', $vendor->completed_bookings_count.' majlis selesai', 'Rating vendor ini dikira dari review tempahan yang disahkan sahaja.']] as [$icon, $title, $text])
                         <li class="flex gap-4">
                             <span class="w-6 shrink-0 text-center text-xl leading-6">{{ $icon }}</span>
                             <div class="min-w-0">
@@ -121,26 +121,70 @@
 
                 {{-- Reviews --}}
                 <section id="review" class="flex flex-col gap-6 py-6">
-                    <h2 class="font-display text-2xl font-semibold"><span class="text-gold-500">★</span> {{ $vendor->reviews_count ? number_format($vendor->rating_avg, 1) : 'Baru' }} · {{ $vendor->reviews_count }} review</h2>
+                    <div class="flex flex-col gap-2">
+                        <h2 class="font-display text-2xl font-semibold">Review</h2>
+                        {{-- Two numbers, never merged. Only the booking-backed
+                             ones move the vendor's rating and ranking, so a page
+                             that showed one combined average would be claiming
+                             something the platform cannot stand behind. --}}
+                        <div class="flex flex-wrap gap-x-6 gap-y-1 text-sm">
+                            @if ($vendor->reviews_count)
+                                <p><span class="text-gold-500">★</span> <span class="font-semibold">{{ number_format($vendor->rating_avg, 1) }}</span> <span class="text-ink-muted">· {{ $vendor->reviews_count }} dari tempahan disahkan</span></p>
+                            @endif
+                            @if ($openReviews['total'])
+                                <p><span class="text-gold-500">★</span> <span class="font-semibold">{{ number_format($openReviews['average'], 1) }}</span> <span class="text-ink-muted">· {{ $openReviews['total'] }} review terbuka</span></p>
+                            @endif
+                        </div>
+                    </div>
+
                     @if ($vendor->reviews->isEmpty())
-                        <p class="text-sm text-ink-muted">Belum ada review. Review hanya boleh diberi selepas booking selesai.</p>
+                        <p class="text-sm text-ink-muted">Belum ada review. Jadi yang pertama menulis tentang {{ $vendor->name }}.</p>
                     @else
                         <ul class="grid gap-8 sm:grid-cols-2 [&>li]:min-w-0">
                             @foreach ($vendor->reviews as $review)
-                                <li class="flex flex-col gap-2">
+                                <li class="flex min-w-0 flex-col gap-2 break-words">
                                     <div class="flex items-center gap-3">
-                                        <span class="flex size-10 shrink-0 items-center justify-center rounded-full bg-surface-muted text-sm font-semibold">{{ mb_substr($review->user->name, 0, 1) }}</span>
+                                        <span class="flex size-10 shrink-0 items-center justify-center rounded-full bg-surface-muted text-sm font-semibold">{{ $review->authorInitial() }}</span>
                                         <div class="min-w-0">
-                                            <p class="text-sm font-semibold">{{ $review->user->name }}</p>
-                                            <p class="text-xs text-ink-muted">{{ $review->created_at->translatedFormat('F Y') }} · ✓ Verified booking</p>
+                                            <p class="truncate text-sm font-semibold">{{ $review->authorName() }}</p>
+                                            <p class="text-xs text-ink-muted">
+                                                {{ $review->created_at->translatedFormat('F Y') }} ·
+                                                @if ($review->isVerified())
+                                                    <span class="font-medium text-emerald-700">✓ Tempahan disahkan</span>
+                                                @else
+                                                    <span>Review terbuka</span>
+                                                @endif
+                                            </p>
                                         </div>
                                     </div>
+
                                     <p class="text-xs text-gold-500">{{ str_repeat('★', $review->rating) }}<span class="text-line">{{ str_repeat('★', 5 - $review->rating) }}</span></p>
                                     <p class="text-sm leading-relaxed">{{ $review->comment }}</p>
+
+                                    @if ($review->photos->isNotEmpty())
+                                        <ul class="flex flex-wrap gap-2">
+                                            @foreach ($review->photos as $photo)
+                                                <li>
+                                                    <a href="{{ $photo->url() }}" target="_blank" rel="noopener">
+                                                        <img src="{{ $photo->thumbnailUrl() }}" alt="Gambar review daripada {{ $review->authorName() }}" loading="lazy" class="size-20 rounded-lg object-cover">
+                                                    </a>
+                                                </li>
+                                            @endforeach
+                                        </ul>
+                                    @endif
+
+                                    @if ($review->hasReply())
+                                        <div class="mt-1 min-w-0 rounded-xl border-l-2 border-brand-200 bg-surface-muted/60 px-3 py-2">
+                                            <p class="text-xs font-semibold">Jawapan {{ $vendor->name }}</p>
+                                            <p class="mt-1 text-sm leading-relaxed">{{ $review->reply }}</p>
+                                        </div>
+                                    @endif
                                 </li>
                             @endforeach
                         </ul>
                     @endif
+
+                    <x-vendors.review-form :vendor="$vendor" />
                 </section>
             </div>
 

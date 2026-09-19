@@ -3,6 +3,7 @@
 @php
     $pendingVendors = \App\Models\Vendor::where('status', \App\Enums\VendorStatus::Pending)->count();
     $openViolations = \App\Models\VendorViolation::where('status', \App\Enums\ViolationStatus::Open)->count();
+    $reportedReviews = \App\Models\Review::whereNotNull('reported_at')->whereNull('hidden_at')->count();
     $item = fn (string $label, string $icon, string $route, string $pattern, ?int $badge = null): array => [
         'label' => $label, 'icon' => $icon, 'href' => route($route), 'active' => request()->routeIs($pattern), 'badge' => $badge ?: null,
     ];
@@ -16,6 +17,7 @@
             $item('Kategori', 'layers', 'admin.categories.index', 'admin.categories.*'),
             $item('Tempahan', 'receipt', 'admin.bookings.index', 'admin.bookings.*'),
             $item('Kewangan', 'wallet', 'admin.transactions.index', 'admin.transactions.*'),
+            $item('Review', 'star', 'admin.reviews.index', 'admin.reviews.*', $reportedReviews),
             $item('Laporan', 'alert', 'admin.violations.index', 'admin.violations.*', $openViolations),
         ]],
         ['label' => 'Pengguna', 'items' => [

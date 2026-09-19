@@ -120,7 +120,7 @@ class VendorController extends Controller
             'category',
             'packages' => fn ($query) => $query->active(),
             'portfolioItems' => fn ($query) => $query->visible(),
-            'reviews' => fn ($query) => $query->with('user')->latest()->limit(6),
+            'reviews' => fn ($query) => $query->published()->with(['user', 'photos'])->latest()->limit(12),
         ]);
 
         $related = Vendor::query()
@@ -164,11 +164,33 @@ class VendorController extends Controller
 
         return view('vendors.show', [
             'vendor' => $vendor,
+            'openReviews' => $this->openReviewSummary($vendor),
             'gallery' => $this->gallery($vendor),
             'category' => $vendor->category,
             'related' => $related,
             'defaultEventDate' => $request->user()?->weddings()->latest('event_date')->first()?->event_date->toDateString(),
         ]);
+    }
+
+    /**
+     * Reviews written straight on the profile, counted on their own.
+     *
+     * They are kept out of rating_avg and reviews_count on purpose, so the
+     * page has to say what they add up to separately rather than folding them
+     * into a number that decides the vendor's ranking.
+     *
+     * @return array{total: int, average: float}
+     */
+    private function openReviewSummary(Vendor $vendor): array
+    {
+        $summary = $vendor->reviews()->open()->published()
+            ->selectRaw('count(*) as total, avg(rating) as average')
+            ->first();
+
+        return [
+            'total' => (int) $summary->total,
+            'average' => round((float) $summary->average, 1),
+        ];
     }
 
     /**
