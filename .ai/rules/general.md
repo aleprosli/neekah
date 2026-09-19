@@ -15,3 +15,10 @@ Phase 1 MVP: auth, create wedding, marketplace, vendor profile/catalogue/package
 Phase 2: wedding timeline, budget management, checklist, vendor comparison, notifications, vendor point system, recommended vendor.
 Phase 3: mobile app (REST API), AI planner, guest management, digital invitation, seating, wedding website, analytics.
 Default to Phase 1 scope and flag later-phase work unless asked.
+
+## Security headers live in nginx, not the app
+The six headers securityheaders.com grades are set on the prod server in /etc/nginx/snippets/security-headers.conf, included by sites-available/neekah. They are not in this repo, so a server rebuild must restore them and no middleware sets them.
+
+nginx drops inherited add_header as soon as a block sets one, so the snippet is included again inside the static-asset location (which uses `expires`). Add the include to any new location or server block that sets a header of its own.
+
+CSP allows https://challenges.cloudflare.com (Turnstile) and uses script-src 'unsafe-inline', because resources/views/components/seo/tags.blade.php emits a per-page <script type="application/ld+json"> that no static hash can cover. Swapping to a real nonce means Vite::useCspNonce() in middleware and a nonce on that tag — and updating SeoTest/BlogTest, which find the tag by exact string.
