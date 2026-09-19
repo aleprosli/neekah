@@ -173,7 +173,7 @@ onMounted(load);
             <label v-if="sortableColumns.length && !isStatic" class="min-w-0 flex-1 md:hidden">
                 <span class="sr-only">Susun ikut</span>
                 <select
-                    class="w-full rounded-xl border border-line bg-surface px-3 py-2.5 text-sm focus:border-brand-400 focus:outline-none"
+                    class="nk-select w-full rounded-xl border border-line bg-surface px-3 py-2.5 pr-9 text-sm focus:border-brand-400 focus:outline-none"
                     :value="`${sort}:${direction}`"
                     @change="sortFromSelect($event.target.value)"
                 >

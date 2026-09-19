@@ -126,7 +126,7 @@ const tone = (progress) => {
 
         <label class="flex flex-col gap-1.5 sm:w-44">
             <span class="text-sm font-medium">Kategori</span>
-            <select name="category_id" class="rounded-xl border border-line bg-surface px-3 py-2.5 text-sm focus:border-brand-400 focus:outline-none">
+            <select name="category_id" class="nk-select rounded-xl border border-line bg-surface px-3 py-2.5 pr-9 text-sm focus:border-brand-400 focus:outline-none">
                 <option value="">Tiada</option>
                 <option v-for="category in categories" :key="category.id" :value="category.id">{{ category.icon }} {{ category.name }}</option>
             </select>

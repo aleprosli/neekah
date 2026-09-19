@@ -209,7 +209,7 @@
                         </label>
                         <label class="flex flex-col gap-0.5 border-b border-line px-4 py-2.5 focus-within:bg-surface-muted">
                             <span class="text-[10px] font-semibold tracking-wide uppercase">Pakej</span>
-                            <select name="package_id" class="bg-transparent text-sm focus:outline-none" required>
+                            <select name="package_id" class="nk-select w-full bg-transparent pr-6 text-sm focus:outline-none" required>
                                 @foreach ($vendor->packages as $package)
                                     <option value="{{ $package->id }}" @selected((int) old('package_id') === $package->id)>{{ $package->name }} · RM{{ number_format($package->price) }}</option>
                                 @endforeach

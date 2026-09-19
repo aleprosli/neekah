@@ -46,7 +46,7 @@
                 <x-filter-popover label="Negeri" :active="$filters['state']">
                     <form method="GET" action="{{ route('vendors.index') }}" class="flex flex-col gap-3">
                         <x-filter-hidden :filters="$filters" except="state" />
-                        <select name="state" class="{{ $fieldClasses }}" onchange="this.form.requestSubmit()">
+                        <select name="state" class="nk-select pr-9 {{ $fieldClasses }}" onchange="this.form.requestSubmit()">
                             <option value="">Mana-mana negeri</option>
                             @foreach ($states as $state)
                                 <option value="{{ $state }}" @selected($filters['state'] === $state)>{{ $state }}</option>
@@ -227,7 +227,7 @@
 
                 <div class="flex flex-col gap-2">
                     <label for="state" class="font-semibold">Negeri</label>
-                    <select id="state" name="state" class="rounded-xl border border-line bg-surface px-4 py-3 text-sm focus:border-brand-400 focus:outline-none">
+                    <select id="state" name="state" class="nk-select rounded-xl border border-line bg-surface px-4 py-3 pr-10 text-sm focus:border-brand-400 focus:outline-none">
                         <option value="">Mana-mana negeri</option>
                         @foreach ($states as $state)
                             <option value="{{ $state }}" @selected($filters['state'] === $state)>{{ $state }}</option>
@@ -280,7 +280,7 @@
 
                 <div class="flex flex-col gap-2">
                     <label for="sort" class="font-semibold">Susunan</label>
-                    <select id="sort" name="sort" class="rounded-xl border border-line bg-surface px-4 py-3 text-sm focus:border-brand-400 focus:outline-none">
+                    <select id="sort" name="sort" class="nk-select rounded-xl border border-line bg-surface px-4 py-3 pr-10 text-sm focus:border-brand-400 focus:outline-none">
                         @foreach ($sorts as $value => $label)
                             <option value="{{ $value }}" @selected($filters['sort'] === $value)>{{ $label }}</option>
                         @endforeach

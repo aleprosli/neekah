@@ -77,13 +77,13 @@ const tones = {
             <div class="grid gap-3 sm:grid-cols-3">
                 <label class="flex min-w-0 flex-col gap-1.5">
                     <span class="text-sm font-medium">Pihak</span>
-                    <select name="side" class="rounded-xl border border-line bg-surface px-3 py-2.5 text-sm focus:border-brand-400 focus:outline-none">
+                    <select name="side" class="nk-select rounded-xl border border-line bg-surface px-3 py-2.5 pr-9 text-sm focus:border-brand-400 focus:outline-none">
                         <option v-for="side in sides" :key="side.value" :value="side.value">{{ side.label }}</option>
                     </select>
                 </label>
                 <label class="flex min-w-0 flex-col gap-1.5">
                     <span class="text-sm font-medium">Kumpulan</span>
-                    <select name="group" class="rounded-xl border border-line bg-surface px-3 py-2.5 text-sm focus:border-brand-400 focus:outline-none">
+                    <select name="group" class="nk-select rounded-xl border border-line bg-surface px-3 py-2.5 pr-9 text-sm focus:border-brand-400 focus:outline-none">
                         <option v-for="group in groups" :key="group.value" :value="group.value">{{ group.label }}</option>
                     </select>
                 </label>
@@ -113,13 +113,13 @@ const tones = {
             <div class="grid gap-3 sm:grid-cols-2">
                 <label class="flex min-w-0 flex-col gap-1.5">
                     <span class="text-sm font-medium">Pihak (jika kosong)</span>
-                    <select name="side" class="rounded-xl border border-line bg-surface px-3 py-2.5 text-sm focus:border-brand-400 focus:outline-none">
+                    <select name="side" class="nk-select rounded-xl border border-line bg-surface px-3 py-2.5 pr-9 text-sm focus:border-brand-400 focus:outline-none">
                         <option v-for="side in sides" :key="side.value" :value="side.value">{{ side.label }}</option>
                     </select>
                 </label>
                 <label class="flex min-w-0 flex-col gap-1.5">
                     <span class="text-sm font-medium">Kumpulan (jika kosong)</span>
-                    <select name="group" class="rounded-xl border border-line bg-surface px-3 py-2.5 text-sm focus:border-brand-400 focus:outline-none">
+                    <select name="group" class="nk-select rounded-xl border border-line bg-surface px-3 py-2.5 pr-9 text-sm focus:border-brand-400 focus:outline-none">
                         <option v-for="group in groups" :key="group.value" :value="group.value" :selected="group.value === 'other'">{{ group.label }}</option>
                     </select>
                 </label>

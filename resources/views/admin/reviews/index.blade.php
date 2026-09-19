@@ -32,7 +32,7 @@
             <div class="grid min-w-0 gap-4 sm:grid-cols-2">
                 <label class="flex min-w-0 flex-col gap-1">
                     <span class="text-xs font-semibold tracking-wide uppercase">Vendor</span>
-                    <select name="vendor_id" required class="w-full rounded-xl border border-line bg-surface px-4 py-3 text-sm focus:border-brand-400 focus:outline-none">
+                    <select name="vendor_id" required class="nk-select w-full rounded-xl border border-line bg-surface px-4 py-3 pr-10 text-sm focus:border-brand-400 focus:outline-none">
                         <option value="">Pilih vendor…</option>
                         @foreach ($props['vendors'] as $option)
                             <option value="{{ $option['id'] }}" @selected((int) old('vendor_id') === $option['id'])>{{ $option['name'] }}</option>

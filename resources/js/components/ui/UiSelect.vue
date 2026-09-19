@@ -22,7 +22,7 @@ defineEmits(['update:modelValue']);
             :value="modelValue"
             :required="required"
             :class="[
-                'rounded-xl border bg-surface px-4 py-2.5 text-sm focus:border-brand-400 focus:ring-2 focus:ring-brand-400/40 focus:outline-none',
+                'nk-select rounded-xl border bg-surface px-4 py-2.5 pr-10 text-sm focus:border-brand-400 focus:ring-2 focus:ring-brand-400/40 focus:outline-none',
                 error ? 'border-brand-400' : 'border-line',
             ]"
             @change="$emit('update:modelValue', $event.target.value)"

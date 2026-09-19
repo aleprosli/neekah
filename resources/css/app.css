@@ -158,6 +158,33 @@ html {
     }
 }
 
+/*
+| Selects
+| A native <select> is drawn by the operating system, so most of what is set on
+| it — border, radius, padding, height — is ignored, and on a phone it lands at
+| a different height from the <input> beside it. Turning the appearance off
+| hands the drawing back to our own classes, which means we owe it the arrow
+| the browser used to draw: the same 24px line chevron the rest of the
+| application uses.
+|
+| Deliberately no padding here. A select carries its own px-* like any other
+| field, and adds pr-9 or so to keep its longest option clear of the arrow —
+| a padding set in this utility would only fight the one set on the element.
+*/
+@utility nk-select {
+    appearance: none;
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%237a6a6d' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.625rem center;
+    background-size: 1rem 1rem;
+
+    /* The arrow is painted, not drawn by the OS, so it must not double up. */
+    &::-ms-expand {
+        display: none;
+    }
+}
+
 @utility no-scrollbar {
     scrollbar-width: none;
 

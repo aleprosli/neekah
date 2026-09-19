@@ -41,7 +41,7 @@ defineProps({
         <div class="grid gap-3 sm:grid-cols-3">
             <label class="flex min-w-0 flex-col gap-1.5">
                 <span class="text-sm font-medium">Vendor terlibat</span>
-                <select name="vendor_id" class="rounded-xl border border-line bg-surface px-3 py-2.5 text-sm focus:border-brand-400 focus:outline-none">
+                <select name="vendor_id" class="nk-select rounded-xl border border-line bg-surface px-3 py-2.5 pr-9 text-sm focus:border-brand-400 focus:outline-none">
                     <option value="">Tiada</option>
                     <option v-for="vendor in vendors" :key="vendor.id" :value="vendor.id">{{ vendor.icon }} {{ vendor.name }}</option>
                 </select>

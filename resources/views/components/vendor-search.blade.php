@@ -22,7 +22,7 @@
         <form method="GET" action="{{ route('vendors.index') }}" class="hidden w-full max-w-3xl items-stretch divide-x divide-line rounded-2xl border border-line bg-surface-raised p-1.5 shadow-lg shadow-brand-900/5 md:flex">
             <label class="flex flex-1 cursor-pointer flex-col gap-0.5 px-5 py-2">
                 <span class="text-[11px] font-semibold tracking-wide text-ink-muted uppercase">Kategori</span>
-                <select name="category" class="cursor-pointer appearance-none bg-transparent text-sm font-medium focus:outline-none">
+                <select name="category" class="nk-select w-full bg-transparent pr-6 text-sm font-medium focus:outline-none">
                     <option value="">Semua kategori</option>
                     @foreach ($categories as $category)
                         <option value="{{ $category->slug }}" @selected($current['category'] === $category->slug)>{{ $category->name }}</option>
@@ -31,7 +31,7 @@
             </label>
             <label class="flex flex-1 cursor-pointer flex-col gap-0.5 px-5 py-2">
                 <span class="text-[11px] font-semibold tracking-wide text-ink-muted uppercase">Negeri</span>
-                <select name="state" class="cursor-pointer appearance-none bg-transparent text-sm font-medium focus:outline-none">
+                <select name="state" class="nk-select w-full bg-transparent pr-6 text-sm font-medium focus:outline-none">
                     <option value="">Mana-mana negeri</option>
                     @foreach ($states as $state)
                         <option value="{{ $state }}" @selected($current['state'] === $state)>{{ $state }}</option>
@@ -40,7 +40,7 @@
             </label>
             <label class="flex flex-1 cursor-pointer flex-col gap-0.5 px-5 py-2">
                 <span class="text-[11px] font-semibold tracking-wide text-ink-muted uppercase">Bajet</span>
-                <select name="max_price" class="cursor-pointer appearance-none bg-transparent text-sm font-medium focus:outline-none">
+                <select name="max_price" class="nk-select w-full bg-transparent pr-6 text-sm font-medium focus:outline-none">
                     <option value="">Mana-mana bajet</option>
                     @foreach ($budgets as $value => $label)
                         <option value="{{ $value }}" @selected((int) $current['max_price'] === $value)>{{ $label }}</option>

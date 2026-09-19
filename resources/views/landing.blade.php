@@ -154,7 +154,7 @@
                     {{-- Search --}}
                     <form class="flex w-full flex-col gap-2 rounded-2xl border border-line bg-surface-raised p-2 shadow-sm sm:flex-row lg:w-auto" method="GET" action="{{ route('vendors.index') }}">
                         <label class="sr-only" for="search-category">Kategori</label>
-                        <select id="search-category" name="category" class="rounded-xl border-0 bg-transparent px-3 py-2 text-sm font-medium focus:ring-2 focus:ring-brand-400 focus:outline-none">
+                        <select id="search-category" name="category" class="nk-select rounded-xl border-0 bg-transparent px-3 py-2 pr-8 text-sm font-medium focus:ring-2 focus:ring-brand-400 focus:outline-none">
                             <option value="">Semua kategori</option>
                             @foreach ($categories as $category)
                                 <option value="{{ $category->slug }}">{{ $category->name }}</option>
