@@ -30,6 +30,7 @@
          reads from relations the component would otherwise be handed wholesale. --}}
     @if ($wedding)
         <x-wedding-couple :wedding="$wedding" class="mb-6" />
+        <x-invitation-setup :wedding="$wedding" class="mb-6" />
     @endif
 
     {{-- resources/js/components/customer/CustomerDashboardPage.vue --}}

@@ -1,14 +1,13 @@
-{{-- Type only. No ornament, no photograph, all whitespace. --}}
-<section class="relative flex min-h-[94vh] flex-col items-center justify-center px-8 text-center">
+{{-- Type only: a large serif, a hairline and a great deal of paper. --}}
+<section class="relative flex min-h-[100svh] flex-col items-center justify-center px-10 py-16 text-center">
     @include('sites.ornaments.'.$ornament, ['position' => 'top-left'])
-    <div class="relative max-w-sm">
+    <div class="relative flex flex-col items-center">
+        @include('sites.partials.bismillah', ['template' => $template, 'class' => 'mb-8'])
         <p class="nk-eyebrow">{{ $eyebrow }}</p>
-        <h1 class="nk-name mt-10 text-4xl leading-[1.15] font-light tracking-tight sm:text-5xl">
-            {{ $site->bride_name }}<br><span class="nk-muted text-2xl">&amp;</span><br>{{ $site->groom_name }}
+        <h1 class="nk-name mt-10 text-5xl leading-[1.1] font-light tracking-tight">
+            {{ $site->bride_name }}<span class="nk-script nk-accent my-2 block text-4xl font-normal">&amp;</span>{{ $site->groom_name }}
         </h1>
-        <div class="nk-hairline mx-auto my-10 w-16 border-t"></div>
-        <p class="nk-body text-sm tracking-[0.3em] uppercase">{{ $site->event_date->translatedFormat('j F Y') }}</p>
-        @if ($site->startsAtLabel())<p class="nk-muted mt-2 text-sm tracking-[0.2em]">{{ $site->startsAtLabel() }}</p>@endif
-        <div class="mt-10">@include('sites.partials.quick-nav', ['site' => $site, 'preview' => $preview])</div>
+        <div class="nk-hairline my-10 w-16 border-t"></div>
+        @include('sites.partials.date-block', ['site' => $site])
     </div>
 </section>

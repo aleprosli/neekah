@@ -1,21 +1,26 @@
-{{-- A photo grid cover, like an album spread. --}}
-<section class="relative flex min-h-[92vh] flex-col justify-center px-6 py-14">
-    <div class="mx-auto w-full max-w-sm">
-        <div class="grid grid-cols-3 grid-rows-3 gap-2">
-            @for ($tile = 0; $tile < 6; $tile++)
-                <div @class(['overflow-hidden rounded-lg', 'col-span-2 row-span-2' => $tile === 0]) style="background: var(--nk-panel); border: 1px solid var(--nk-line)">
-                    @if ($site->cover_image)
-                        <img src="{{ Storage::disk('public')->url($site->cover_image) }}" alt="" class="size-full object-cover" style="opacity: {{ $tile === 0 ? 1 : 0.55 + $tile * 0.06 }}">
+{{-- A spread of photographs like the first page of an album. --}}
+@php $photos = ($site->relationLoaded('photos') || $site->exists) ? $site->photos->take(3) : collect(); @endphp
+<section class="relative flex min-h-[100svh] flex-col justify-center px-8 py-16">
+    <div class="mx-auto w-full">
+        <div class="grid h-80 grid-cols-3 grid-rows-2 gap-2">
+            @for ($tile = 0; $tile < 3; $tile++)
+                @php $path = $tile === 0 ? ($site->cover_image ?? $photos->get(0)?->path) : $photos->get($tile)?->path; @endphp
+                <div @class(['relative overflow-hidden', 'col-span-2 row-span-2' => $tile === 0])>
+                    @if ($path)
+                        <img src="{{ Storage::disk('public')->url($path) }}" alt="" class="size-full object-cover">
+                    @else
+                        <div class="nk-photo-fallback flex size-full items-center justify-center">
+                            @if ($tile === 0)@include('sites.partials.monogram', ['site' => $site])@endif
+                        </div>
                     @endif
                 </div>
             @endfor
         </div>
-        <div class="mt-9 text-center">
+        <div class="mt-10 text-center">
             <p class="nk-eyebrow">{{ $eyebrow }}</p>
-            <p class="nk-script nk-name mt-4 text-5xl">{{ $site->bride_name }} &amp; {{ $site->groom_name }}</p>
-            <div class="nk-hairline mx-auto my-7 w-20 border-t"></div>
-            <p class="nk-body tracking-[0.2em] uppercase">{{ $site->event_date->translatedFormat('j F Y') }}</p>
-            <div class="mt-8">@include('sites.partials.quick-nav', ['site' => $site, 'preview' => $preview])</div>
+            <h1 class="nk-script nk-name mt-4 text-5xl">{{ $site->bride_name }} <span class="nk-accent">&amp;</span> {{ $site->groom_name }}</h1>
+            <div class="nk-hairline mx-auto my-7 w-16 border-t"></div>
+            @include('sites.partials.date-block', ['site' => $site])
         </div>
     </div>
 </section>

@@ -26,7 +26,7 @@ class WeddingController extends Controller
         $wedding->addMember($request->user(), WeddingRole::Owner);
         $seedChecklist->handle($wedding);
 
-        return redirect()->route('dashboard')->with('status', 'Wedding project dicipta, lengkap dengan checklist dan cadangan bajet.');
+        return redirect()->route('dashboard')->with('status', 'Wedding project dicipta, lengkap dengan checklist dan cadangan bajet. Langkah seterusnya: cipta kad kahwin digital anda.');
     }
 
     public function edit(Wedding $wedding): View

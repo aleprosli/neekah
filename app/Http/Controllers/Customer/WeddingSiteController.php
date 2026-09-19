@@ -11,11 +11,13 @@ use App\Models\WeddingSite;
 use App\Support\ImageSettings;
 use App\Support\VueProps;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
 class WeddingSiteController extends Controller
@@ -46,6 +48,7 @@ class WeddingSiteController extends Controller
                 'exists' => $site->exists,
                 'action' => route('weddings.site.update', $wedding),
                 'domain' => config('neekah.site_domain'),
+                'subdomainCheckUrl' => route('site.subdomain'),
                 'imageHint' => $images->uploadHint('1600 × 1200px atau lebih'),
                 'limits' => [
                     'templates' => $templates->count(),
@@ -171,6 +174,38 @@ class WeddingSiteController extends Controller
     }
 
     /**
+     * Whether an address is free, asked by the editor as the couple types. It
+     * runs the same rules the save does, and offers free alternatives when not.
+     */
+    public function checkSubdomain(Request $request): JsonResponse
+    {
+        $wedding = $request->user()->weddings()->latest('event_date')->firstOrFail();
+        Gate::authorize('update', $wedding);
+
+        $subdomain = mb_strtolower(trim($request->string('subdomain')->toString()));
+
+        $validator = Validator::make(
+            ['subdomain' => $subdomain],
+            ['subdomain' => StoreWeddingSiteRequest::subdomainRules($wedding->site)],
+            StoreWeddingSiteRequest::subdomainMessages(),
+            ['subdomain' => 'alamat web'],
+        );
+
+        $available = $validator->passes();
+
+        return response()->json([
+            'subdomain' => $subdomain,
+            'available' => $available,
+            'message' => $available ? 'Tersedia! Kad anda akan berada di '.$subdomain.'.'.config('neekah.site_domain') : $validator->errors()->first('subdomain'),
+            'suggestions' => $available || $subdomain === '' ? [] : WeddingSite::suggestSubdomains(
+                $subdomain,
+                $wedding->event_date->year,
+                $wedding->site,
+            ),
+        ]);
+    }
+
+    /**
      * A live preview of the couple's own content, without publishing it.
      */
     public function preview(Request $request): View
@@ -194,9 +229,13 @@ class WeddingSiteController extends Controller
     {
         [$bride, $groom] = array_pad(preg_split('/\s*&\s*/', $wedding->title, 2) ?: [], 2, '');
 
+        // Start from an address nobody holds, so the first save does not bounce.
+        $base = Str::slug($wedding->title) ?: 'majlis-'.$wedding->id;
+        $subdomain = WeddingSite::suggestSubdomains($base, $wedding->event_date->year, limit: 1)[0] ?? $base.'-'.$wedding->id;
+
         return new WeddingSite([
             'wedding_id' => $wedding->id,
-            'subdomain' => Str::slug($wedding->title) ?: 'majlis-'.$wedding->id,
+            'subdomain' => $subdomain,
             'template' => SiteTemplate::active()->ordered()->value('slug') ?? 'seri-gangsa',
             'bride_name' => $bride ?: 'Pengantin Perempuan',
             'groom_name' => $groom ?: 'Pengantin Lelaki',

@@ -1,23 +1,24 @@
-{{-- A tall arched window, the shape used on gate and mosque motifs. --}}
-<section class="relative flex min-h-[92vh] flex-col items-center justify-center px-6 text-center">
+{{-- A tall arched window, the shape of a gateway or a mosque's mihrab. --}}
+<section class="relative flex min-h-[100svh] flex-col items-center justify-center px-8 py-16 text-center">
     @include('sites.ornaments.'.$ornament, ['position' => 'top-left'])
     @include('sites.ornaments.'.$ornament, ['position' => 'top-right'])
-    <div class="relative w-full max-w-xs">
-        <div class="nk-arch relative mx-auto flex aspect-[3/4.4] w-full items-end justify-center overflow-hidden" style="background: var(--nk-panel); border: 1px solid var(--nk-line); box-shadow: 0 0 0 8px var(--nk-page), 0 0 0 9px var(--nk-accent)">
+    <div class="relative flex w-full flex-col items-center">
+        @include('sites.partials.bismillah', ['template' => $template, 'class' => 'mb-6'])
+        <div class="nk-arch relative flex aspect-[3/4] w-56 items-center justify-center overflow-hidden" style="border: 1px solid var(--nk-accent); box-shadow: 0 0 0 7px var(--nk-page), 0 0 0 8px color-mix(in oklab, var(--nk-accent) 45%, transparent)">
             @if ($site->cover_image)
                 <img src="{{ Storage::disk('public')->url($site->cover_image) }}" alt="" class="absolute inset-0 size-full object-cover">
-                <div class="absolute inset-0" style="background: linear-gradient(to top, var(--nk-page), transparent 55%)"></div>
+            @else
+                <div class="nk-photo-fallback absolute inset-0"></div>
+                <div class="relative">@include('sites.partials.monogram', ['site' => $site])</div>
             @endif
-            <div class="relative px-6 pb-8">
-                <p class="nk-eyebrow">{{ $eyebrow }}</p>
-                <p class="nk-script nk-name mt-4 text-4xl">{{ $site->bride_name }}</p>
-                <p class="nk-accent text-xl">&amp;</p>
-                <p class="nk-script nk-name text-4xl">{{ $site->groom_name }}</p>
-            </div>
         </div>
-        @include('sites.partials.divider-css', ['class' => 'mt-8'])
-        <p class="nk-body mt-6 text-lg tracking-[0.12em]">{{ $site->event_date->translatedFormat('j F Y') }}</p>
-        @if ($site->startsAtLabel())<p class="nk-muted mt-1 text-sm">{{ $site->startsAtLabel() }}</p>@endif
-        <div class="mt-8">@include('sites.partials.quick-nav', ['site' => $site, 'preview' => $preview])</div>
+        <p class="nk-eyebrow mt-10">{{ $eyebrow }}</p>
+        <h1 class="nk-script mt-5">
+            <span class="nk-name block text-5xl">{{ $site->bride_name }}</span>
+            <span class="nk-accent block text-3xl">&amp;</span>
+            <span class="nk-name block text-5xl">{{ $site->groom_name }}</span>
+        </h1>
+        @include('sites.partials.divider-css', ['class' => 'my-7'])
+        @include('sites.partials.date-block', ['site' => $site])
     </div>
 </section>

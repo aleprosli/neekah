@@ -15,3 +15,8 @@ Any new page that resolves the wedding this way must carry `->middleware('weddin
 PUT /weddings/{wedding}/tasks (weddings.tasks.update) takes done[] and undone[] — whole lists, not one task. There is deliberately no per-task tick route: someone sitting with their folder ticks eight documents in a row, and a post per tick was eight page reloads that each scrolled them back to the top and folded the phase they were in. CustomerChecklistPage.vue holds the ticks locally and shows a save bar; an id belonging to another wedding is dropped by the ->tasks() scope, never trusted from the request.
 
 The controller sends no stats or progress props. The percentages, the phase counters and the three stat cards are all computed in the component from `sections`, so they move as the couple ticks instead of lying until the save lands. Do not add them back server-side.
+
+## Card address check shares the save's rules; the 4-step card guide is derived, not stored
+GET /kad/alamat (site.subdomain) answers {available, message, suggestions} as the couple types. It validates with StoreWeddingSiteRequest::subdomainRules()/subdomainMessages(), the same ones the save uses — never write a second copy of the rules. Suggestions come from WeddingSite::suggestSubdomains(), which also picks the draft's starting address so the first save does not bounce on a taken one.
+
+Couples were registering and never making a card, so App\Support\InvitationSetup works out four steps from what exists (site saved → venue+address+itinerary → published → views > 0) and <x-invitation-setup> shows them on the dashboard and (compact) in the editor until all four are done. No progress column: it must always reflect real state. Covered by InvitationSetupTest and WeddingSiteTest.

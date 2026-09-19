@@ -30,12 +30,7 @@ class StoreWeddingSiteRequest extends FormRequest
         $site = $this->route('wedding')->site;
 
         return [
-            'subdomain' => [
-                'required', 'string', 'min:3', 'max:63',
-                'regex:/^[a-z0-9]+(?:-[a-z0-9]+)*$/',
-                Rule::notIn(WeddingSite::RESERVED_SUBDOMAINS),
-                Rule::unique(WeddingSite::class, 'subdomain')->ignore($site),
-            ],
+            'subdomain' => self::subdomainRules($site),
             'template' => ['required', Rule::exists(SiteTemplate::class, 'slug')->where('is_active', true)],
             'bride_name' => ['required', 'string', 'max:80'],
             'groom_name' => ['required', 'string', 'max:80'],
@@ -67,6 +62,34 @@ class StoreWeddingSiteRequest extends FormRequest
             'gift_accounts.*.holder' => ['nullable', 'string', 'max:80'],
             'gift_accounts.*.number' => ['nullable', 'string', 'max:40'],
             'wishes_enabled' => ['nullable', 'boolean'],
+        ];
+    }
+
+    /**
+     * The address rules, shared with the live availability check in the editor
+     * so the two can never disagree about what may be saved.
+     *
+     * @return array<int, mixed>
+     */
+    public static function subdomainRules(?WeddingSite $ignore = null): array
+    {
+        return [
+            'required', 'string', 'min:3', 'max:63',
+            'regex:/^[a-z0-9]+(?:-[a-z0-9]+)*$/',
+            Rule::notIn(WeddingSite::RESERVED_SUBDOMAINS),
+            Rule::unique(WeddingSite::class, 'subdomain')->ignore($ignore),
+        ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public static function subdomainMessages(): array
+    {
+        return [
+            'subdomain.regex' => 'Alamat web hanya boleh mengandungi huruf kecil, nombor dan tanda sengkang.',
+            'subdomain.not_in' => 'Alamat web ini dikhaskan untuk platform. Sila pilih yang lain.',
+            'subdomain.unique' => 'Alamat web ini telah diambil. Cuba yang lain.',
         ];
     }
 
@@ -130,10 +153,6 @@ class StoreWeddingSiteRequest extends FormRequest
      */
     public function messages(): array
     {
-        return [
-            'subdomain.regex' => 'Alamat web hanya boleh mengandungi huruf kecil, nombor dan tanda sengkang.',
-            'subdomain.not_in' => 'Alamat web ini dikhaskan untuk platform. Sila pilih yang lain.',
-            'subdomain.unique' => 'Alamat web ini telah diambil. Cuba yang lain.',
-        ];
+        return self::subdomainMessages();
     }
 }

@@ -7,7 +7,7 @@
  * three empty ones, and a couple with eight should not be told they may have
  * six. The server's own limits are passed in and enforced here too.
  */
-import { ref } from 'vue';
+import { computed, onBeforeUnmount, ref, watch } from 'vue';
 import { useUploadForm } from '../../composables/useUploadForm.js';
 import UiConfirm from '../ui/UiConfirm.vue';
 import UiField from '../ui/UiField.vue';
@@ -18,6 +18,7 @@ const props = defineProps({
     exists: { type: Boolean, required: true },
     action: { type: String, required: true },
     domain: { type: String, required: true },
+    subdomainCheckUrl: { type: String, required: true },
     site: { type: Object, required: true },
     templateGroups: { type: Array, required: true },
     limits: { type: Object, required: true },
@@ -51,6 +52,84 @@ const remove = (rows, at) => {
     rows.value.splice(at, 1);
     if (!rows.value.length) rows.value.push({});
 };
+
+/**
+ * The address is checked as the couple types, against the same rules the save
+ * uses, so "sudah diambil" is known before they fill in everything else.
+ */
+const savedSubdomain = props.site.subdomain;
+const addressCheck = ref({ state: 'idle', message: '', suggestions: [] });
+let addressTimer = null;
+let addressRequest = null;
+
+/** Lower case, spaces to dashes, nothing a web address cannot hold. */
+const tidyAddress = (value) =>
+    (value || '')
+        .toLowerCase()
+        .replace(/[\s_]+/g, '-')
+        .replace(/[^a-z0-9-]/g, '')
+        .replace(/-{2,}/g, '-')
+        .slice(0, 63);
+
+const checkAddress = async (value) => {
+    addressRequest?.abort();
+    addressRequest = new AbortController();
+
+    try {
+        const response = await fetch(`${props.subdomainCheckUrl}?subdomain=${encodeURIComponent(value)}`, {
+            headers: { Accept: 'application/json' },
+            signal: addressRequest.signal,
+        });
+        if (!response.ok) {
+            addressCheck.value = { state: 'idle', message: '', suggestions: [] };
+            return;
+        }
+        const result = await response.json();
+        addressCheck.value = {
+            state: result.available ? 'available' : 'taken',
+            message: result.message,
+            suggestions: result.suggestions,
+        };
+    } catch (error) {
+        if (error.name !== 'AbortError') addressCheck.value = { state: 'idle', message: '', suggestions: [] };
+    }
+};
+
+watch(
+    () => form.value.subdomain,
+    (value) => {
+        const tidy = tidyAddress(value);
+        if (tidy !== value) {
+            form.value.subdomain = tidy;
+            return;
+        }
+
+        clearTimeout(addressTimer);
+        if (props.exists && tidy === savedSubdomain) {
+            addressCheck.value = { state: 'idle', message: '', suggestions: [] };
+            return;
+        }
+        if (tidy.length < 3) {
+            addressCheck.value = { state: 'short', message: 'Sekurang-kurangnya 3 aksara.', suggestions: [] };
+            return;
+        }
+
+        addressCheck.value = { ...addressCheck.value, state: 'checking' };
+        addressTimer = setTimeout(() => checkAddress(tidy), 350);
+    },
+    { immediate: !props.exists },
+);
+
+onBeforeUnmount(() => {
+    clearTimeout(addressTimer);
+    addressRequest?.abort();
+});
+
+const allTemplates = props.templateGroups.flatMap((group) => group.templates.map((template) => ({ ...template, style: group.style })));
+
+/** Open on the shelf holding the chosen design, not always the first one. */
+const activeStyle = ref(allTemplates.find((template) => template.slug === props.site.template)?.style ?? props.templateGroups[0]?.style);
+const chosenTemplateName = computed(() => allTemplates.find((template) => template.slug === form.value.template)?.name ?? '—');
 
 const previewFile = (event, target) => {
     const file = event.target.files?.[0];
@@ -100,48 +179,96 @@ const previewFile = (event, target) => {
         <input type="hidden" name="_token" :value="csrf">
         <input type="hidden" name="_method" value="PUT">
 
-        <section class="flex flex-col gap-5 rounded-2xl border border-line bg-surface-raised p-6">
+        <section id="template" class="flex scroll-mt-24 flex-col gap-5 rounded-2xl border border-line bg-surface-raised p-6">
             <div class="flex flex-wrap items-end justify-between gap-3">
                 <div>
                     <h2 class="font-semibold">Template</h2>
-                    <p class="text-sm text-ink-muted">{{ limits.templates }} reka bentuk. Tekan "Lihat contoh" untuk membuka satu kad penuh.</p>
+                    <p class="text-sm text-ink-muted">{{ limits.templates }} reka bentuk dalam {{ templateGroups.length }} gaya. Tekan "Lihat contoh" untuk membuka kad penuh.</p>
                 </div>
                 <a :href="limits.gallery_url" target="_blank" rel="noopener" class="text-sm font-medium text-brand-600 underline underline-offset-4">Layari galeri</a>
             </div>
 
-            <div v-for="group in templateGroups" :key="group.style">
-                <p class="mb-3 text-xs font-semibold tracking-wide text-ink-muted uppercase">{{ group.style }}</p>
-
-                <div class="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-5">
-                    <label v-for="template in group.templates" :key="template.slug" class="cursor-pointer">
-                        <input v-model="form.template" type="radio" name="template" :value="template.slug" class="peer sr-only">
-                        <span class="flex flex-col gap-1.5 rounded-2xl border border-line p-1.5 transition peer-checked:border-brand-600 peer-checked:ring-2 peer-checked:ring-brand-400/40 hover:border-brand-300">
-                            <span v-html="template.thumbnail"></span>
-                            <span class="px-1 pb-0.5">
-                                <span class="block truncate text-xs font-semibold">{{ template.name }}</span>
-                                <a :href="template.url" target="_blank" rel="noopener" class="text-[11px] text-brand-600 underline underline-offset-2">Lihat contoh</a>
-                            </span>
-                        </span>
-                    </label>
-                </div>
+            <div class="no-scrollbar -mx-6 flex gap-2 overflow-x-auto px-6" role="tablist" aria-label="Gaya template">
+                <button
+                    v-for="group in templateGroups"
+                    :key="group.style"
+                    type="button"
+                    role="tab"
+                    :aria-selected="activeStyle === group.style"
+                    :class="[
+                        'shrink-0 rounded-full border px-4 py-1.5 text-sm font-medium transition',
+                        activeStyle === group.style ? 'border-brand-600 bg-brand-600 text-white' : 'border-line hover:border-brand-400',
+                    ]"
+                    @click="activeStyle = group.style"
+                >
+                    {{ group.style }}
+                    <span :class="['ml-1 text-xs', activeStyle === group.style ? 'text-white/70' : 'text-ink-muted']">{{ group.templates.length }}</span>
+                </button>
             </div>
+
+            <!-- Every radio stays in the form; only the chosen style's shelf is shown. -->
+            <div v-for="group in templateGroups" v-show="activeStyle === group.style" :key="group.style" class="no-scrollbar -mx-6 flex snap-x snap-mandatory gap-3 overflow-x-auto px-6 pb-2">
+                <label v-for="template in group.templates" :key="template.slug" class="relative w-32 shrink-0 cursor-pointer snap-start sm:w-36">
+                    <input v-model="form.template" type="radio" name="template" :value="template.slug" class="peer sr-only">
+                    <span class="flex flex-col gap-2 rounded-xl border border-line bg-surface p-2 transition peer-checked:border-brand-600 peer-checked:ring-2 peer-checked:ring-brand-400/40 hover:border-brand-300">
+                        <span class="block overflow-hidden rounded shadow-[0_8px_18px_-10px_rgb(0_0_0/0.4)]" v-html="template.thumbnail"></span>
+                        <span class="flex items-center justify-between gap-1 px-0.5">
+                            <span class="truncate text-xs font-semibold">{{ template.name }}</span>
+                            <svg v-if="form.template === template.slug" class="size-4 shrink-0 text-brand-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+                        </span>
+                        <a :href="template.url" target="_blank" rel="noopener" class="px-0.5 text-[11px] text-brand-600 underline underline-offset-2">Lihat contoh</a>
+                    </span>
+                </label>
+            </div>
+
+            <p class="text-sm text-ink-muted">Dipilih: <span class="font-semibold text-ink">{{ chosenTemplateName }}</span> &middot; boleh ditukar bila-bila masa, maklumat anda kekal.</p>
         </section>
 
-        <section class="flex flex-col gap-4 rounded-2xl border border-line bg-surface-raised p-6">
+        <section id="alamat" class="flex scroll-mt-24 flex-col gap-4 rounded-2xl border border-line bg-surface-raised p-6">
             <div>
-                <h2 class="font-semibold">Alamat web</h2>
-                <p class="text-sm text-ink-muted">Inilah pautan yang anda kongsi dengan tetamu.</p>
+                <h2 class="font-semibold">Alamat web kad</h2>
+                <p class="text-sm text-ink-muted">Pilih sendiri pautan yang anda kongsi dengan tetamu. Kami semak sama ada ia masih kosong semasa anda menaip.</p>
             </div>
 
-            <label class="flex flex-col gap-1.5">
+            <label class="flex flex-col gap-2">
                 <span class="sr-only">Alamat web</span>
-                <span class="flex items-center overflow-hidden rounded-xl border border-line bg-surface focus-within:border-brand-400">
-                    <input v-model="form.subdomain" type="text" name="subdomain" required class="min-w-0 flex-1 bg-transparent px-4 py-2.5 text-sm focus:outline-none" placeholder="ainapilihhakim">
+                <span
+                    :class="[
+                        'flex items-center overflow-hidden rounded-xl border bg-surface transition',
+                        addressCheck.state === 'available' ? 'border-emerald-400' : addressCheck.state === 'taken' || errors.subdomain ? 'border-brand-400' : 'border-line focus-within:border-brand-400',
+                    ]"
+                >
+                    <span class="shrink-0 pl-4 text-sm text-ink-muted">https://</span>
+                    <input v-model="form.subdomain" type="text" name="subdomain" required autocomplete="off" autocapitalize="none" spellcheck="false" class="min-w-0 flex-1 bg-transparent px-1 py-2.5 text-base font-medium focus:outline-none sm:text-sm" placeholder="aina-hakim">
                     <span class="shrink-0 border-l border-line bg-surface-muted px-3 py-2.5 text-sm text-ink-muted">.{{ domain }}</span>
                 </span>
-                <span v-if="errors.subdomain" class="text-xs text-brand-700">{{ errors.subdomain }}</span>
-                <span v-else class="text-xs text-ink-muted">Huruf kecil, nombor dan sengkang sahaja. Contoh: ainapilihhakim</span>
+
+                <span v-if="errors.subdomain && addressCheck.state === 'idle'" class="text-xs text-brand-700">{{ errors.subdomain }}</span>
+                <span v-else-if="addressCheck.state === 'checking'" class="flex items-center gap-1.5 text-xs text-ink-muted">
+                    <span class="size-3 animate-spin rounded-full border-2 border-line border-t-brand-500"></span>
+                    Menyemak…
+                </span>
+                <span v-else-if="addressCheck.state === 'available'" class="flex items-center gap-1.5 text-xs font-medium text-emerald-700">
+                    <svg class="size-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+                    <span class="break-all">{{ addressCheck.message }}</span>
+                </span>
+                <span v-else-if="addressCheck.state === 'taken' || addressCheck.state === 'short'" class="flex items-center gap-1.5 text-xs font-medium text-brand-700">
+                    <svg class="size-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+                    {{ addressCheck.message }}
+                </span>
+                <span v-else class="text-xs text-ink-muted">Huruf kecil, nombor dan sengkang sahaja. Contoh: aina-hakim</span>
             </label>
+
+            <div v-if="addressCheck.state === 'taken' && addressCheck.suggestions.length" class="flex flex-wrap items-center gap-2">
+                <span class="text-xs text-ink-muted">Masih kosong:</span>
+                <button
+                    v-for="suggestion in addressCheck.suggestions"
+                    :key="suggestion"
+                    type="button"
+                    class="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-800 transition hover:border-emerald-400"
+                    @click="form.subdomain = suggestion"
+                >{{ suggestion }}</button>
+            </div>
         </section>
 
         <section class="flex flex-col gap-4 rounded-2xl border border-line bg-surface-raised p-6">
@@ -158,7 +285,7 @@ const previewFile = (event, target) => {
             <UiTextarea v-model="form.invitation_note" label="Nota jemputan (pilihan)" name="invitation_note" :rows="3" placeholder="Doa dan restu daripada tuan/puan amat bermakna." :error="errors.invitation_note" />
         </section>
 
-        <section class="flex flex-col gap-4 rounded-2xl border border-line bg-surface-raised p-6">
+        <section id="majlis" class="flex scroll-mt-24 flex-col gap-4 rounded-2xl border border-line bg-surface-raised p-6">
             <h2 class="font-semibold">Majlis</h2>
 
             <div class="grid gap-4 sm:grid-cols-3">

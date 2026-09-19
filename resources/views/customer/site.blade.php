@@ -4,6 +4,8 @@
         <a href="{{ route('site.preview') }}" target="_blank" class="rounded-full border border-line px-4 py-2 text-sm font-medium transition hover:border-brand-400">Pratonton</a>
     </x-slot:actions>
 
+    <x-invitation-setup :wedding="$wedding" compact class="mb-6" />
+
     {{-- resources/js/components/customer/CustomerSitePage.vue --}}
     <div data-vue="customer-site-page" data-props="@vueProps($props)"></div>
 </x-layouts.customer>

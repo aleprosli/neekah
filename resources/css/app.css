@@ -366,6 +366,141 @@ html {
 }
 
 /*
+| Printed-card finish
+| What makes a page read as a kad rather than a website: paper with a little
+| grain and warmth, one sheet with a double-ruled border running its whole
+| length, a monogram, and headings set in the script face instead of bold sans.
+*/
+.nk-paper {
+    background-color: var(--nk-page);
+    background-image:
+        radial-gradient(ellipse 120% 60% at 50% 0%, color-mix(in oklab, var(--nk-accent) 9%, transparent), transparent 70%),
+        radial-gradient(ellipse 120% 60% at 50% 100%, color-mix(in oklab, var(--nk-accent) 7%, transparent), transparent 70%),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .045 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* What the sheet lies on from sm up: the page colour, a shade deeper. */
+@media (min-width: 640px) {
+    .nk-table {
+        background: color-mix(in oklab, var(--nk-page) 88%, var(--nk-ink));
+    }
+}
+
+/* The sheet: full width on a phone, a card lying on the table from sm up. */
+.nk-sheet {
+    position: relative;
+    background: var(--nk-page);
+}
+
+@media (min-width: 640px) {
+    .nk-sheet {
+        margin-block: 2.5rem;
+        border-radius: 6px;
+        box-shadow:
+            0 1px 2px color-mix(in oklab, var(--nk-ink) 10%, transparent),
+            0 30px 60px -20px color-mix(in oklab, var(--nk-ink) 28%, transparent);
+    }
+}
+
+/* Double rule inset from the sheet's edge, like foil on card stock. */
+.nk-sheet-frame {
+    position: absolute;
+    inset: 10px;
+    border: 1px solid color-mix(in oklab, var(--nk-accent) 55%, transparent);
+    pointer-events: none;
+    z-index: 1;
+}
+
+.nk-sheet-frame::after {
+    content: '';
+    position: absolute;
+    inset: 4px;
+    border: 1px solid color-mix(in oklab, var(--nk-accent) 25%, transparent);
+}
+
+.nk-monogram {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9999px;
+    border: 1px solid color-mix(in oklab, var(--nk-accent) 70%, transparent);
+    box-shadow: 0 0 0 4px var(--nk-page), 0 0 0 5px color-mix(in oklab, var(--nk-accent) 35%, transparent);
+    color: var(--nk-name);
+    font-family: var(--nk-script);
+}
+
+.nk-arabic {
+    font-family: 'Amiri', 'Scheherazade New', serif;
+    color: var(--nk-accent);
+}
+
+.nk-heading {
+    font-family: var(--nk-script);
+    color: var(--nk-name);
+    line-height: 1.1;
+}
+
+/* A printed box: square corners, hairline plus inner rule. */
+.nk-plaque {
+    position: relative;
+    background: var(--nk-panel);
+    border: 1px solid var(--nk-line);
+    outline: 1px solid color-mix(in oklab, var(--nk-accent) 30%, transparent);
+    outline-offset: -6px;
+}
+
+/* The guest's toolbar, pinned to the foot of the card as on printed-card sites. */
+.nk-dock {
+    background: color-mix(in oklab, var(--nk-panel) 92%, transparent);
+    border-top: 1px solid var(--nk-line);
+    backdrop-filter: blur(10px);
+    color: var(--nk-body);
+}
+
+.nk-dock a:hover,
+.nk-dock a:focus-visible {
+    color: var(--nk-name);
+}
+
+.nk-dock-icon {
+    color: var(--nk-accent);
+}
+
+/* The sealed envelope on the gate. The flap lifts when the guest opens it. */
+.nk-envelope {
+    position: relative;
+    background: var(--nk-panel);
+    border: 1px solid var(--nk-line);
+    box-shadow: 0 30px 60px -24px color-mix(in oklab, var(--nk-ink) 35%, transparent);
+}
+
+.nk-envelope-flap {
+    transform-origin: top center;
+    transition: transform 0.8s cubic-bezier(0.6, 0, 0.3, 1);
+}
+
+.nk-seal {
+    background: radial-gradient(circle at 35% 30%, color-mix(in oklab, var(--nk-button-bg) 70%, white), var(--nk-button-bg) 60%);
+    color: var(--nk-button-text);
+    box-shadow:
+        0 6px 14px -4px color-mix(in oklab, var(--nk-ink) 45%, transparent),
+        inset 0 0 0 3px color-mix(in oklab, var(--nk-button-text) 25%, transparent);
+    font-family: var(--nk-script);
+}
+
+.nk-open .nk-envelope-flap {
+    transform: rotateX(180deg);
+}
+
+/* A photograph placeholder that still reads as designed, not as a missing image. */
+.nk-photo-fallback {
+    background:
+        radial-gradient(circle at 30% 25%, color-mix(in oklab, var(--nk-accent) 22%, transparent), transparent 55%),
+        radial-gradient(circle at 75% 80%, color-mix(in oklab, var(--nk-name) 14%, transparent), transparent 50%),
+        var(--nk-panel);
+}
+
+/*
 | Article body
 | Blog posts are rich text from the editor, so they are styled by element
 | rather than with utility classes. The editor uses the same rules, so what an

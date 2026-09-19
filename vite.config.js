@@ -22,6 +22,13 @@ export default defineConfig({
                 bunny('Cormorant Garamond', {
                     weights: [300, 400, 500, 600],
                 }),
+                bunny('Pinyon Script', {
+                    weights: [400],
+                }),
+                bunny('Amiri', {
+                    weights: [400],
+                    subsets: ['arabic'],
+                }),
             ],
         }),
         tailwindcss(),

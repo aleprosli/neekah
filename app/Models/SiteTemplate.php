@@ -77,6 +77,14 @@ class SiteTemplate extends Model
         return $this->design['eyebrow'] ?? 'Walimatulurus';
     }
 
+    /**
+     * Whether the card opens with the Bismillah, as most Malay invitations do.
+     */
+    public function showsBismillah(): bool
+    {
+        return (bool) ($this->design['bismillah'] ?? false);
+    }
+
     public function isDark(): bool
     {
         return (bool) ($this->design['palette']['dark'] ?? false);

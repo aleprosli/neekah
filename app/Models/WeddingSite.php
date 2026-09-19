@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo as EloquentBelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 #[Fillable([
     'wedding_id', 'subdomain', 'template', 'is_published', 'salutation', 'bride_name', 'groom_name',
@@ -32,6 +33,32 @@ class WeddingSite extends Model
      * @var array<int, string>
      */
     public const RESERVED_SUBDOMAINS = ['www', 'app', 'admin', 'api', 'mail', 'vendor', 'vendors', 'neekah', 'blog', 'help', 'support', 'status', 'assets', 'static', 'cdn'];
+
+    /**
+     * Free addresses built from a base, for the draft and for when the one a
+     * couple typed is taken: the base itself, then with the year, then as walimah.
+     *
+     * @return array<int, string>
+     */
+    public static function suggestSubdomains(string $base, int $year, ?self $ignore = null, int $limit = 3): array
+    {
+        $base = Str::limit(Str::slug($base), 50, '');
+
+        $candidates = collect([$base, $base.'-'.$year, 'walimah-'.$base, $base.'-kahwin', 'majlis-'.$base])
+            ->filter(fn (string $candidate): bool => strlen($candidate) >= 3
+                && strlen($candidate) <= 63
+                && preg_match('/^[a-z0-9]+(?:-[a-z0-9]+)*$/', $candidate) === 1
+                && ! in_array($candidate, self::RESERVED_SUBDOMAINS, true))
+            ->unique()
+            ->values();
+
+        $taken = self::query()
+            ->whereIn('subdomain', $candidates)
+            ->when($ignore?->exists, fn (Builder $query) => $query->whereKeyNot($ignore->getKey()))
+            ->pluck('subdomain');
+
+        return $candidates->diff($taken)->take($limit)->values()->all();
+    }
 
     /**
      * @return array<string, string>
@@ -153,6 +180,14 @@ class WeddingSite extends Model
     public function coupleNames(): string
     {
         return $this->bride_name.' & '.$this->groom_name;
+    }
+
+    /**
+     * The couple's initials for the monogram, bride first as the names are printed.
+     */
+    public function initials(): string
+    {
+        return mb_strtoupper(mb_substr(trim((string) $this->bride_name), 0, 1).mb_substr(trim((string) $this->groom_name), 0, 1));
     }
 
     public function templateName(): string

@@ -1,4 +1,12 @@
 {
+  "_amiri-400-normal-C_1DQziU.woff": {
+    "file": "assets/amiri-400-normal-C_1DQziU.woff",
+    "src": "_amiri-400-normal-C_1DQziU.woff"
+  },
+  "_amiri-400-normal-D0NIBXga.woff2": {
+    "file": "assets/amiri-400-normal-D0NIBXga.woff2",
+    "src": "_amiri-400-normal-D0NIBXga.woff2"
+  },
   "_cormorant-garamond-300-normal-BuXLI6C0.woff": {
     "file": "assets/cormorant-garamond-300-normal-BuXLI6C0.woff",
     "src": "_cormorant-garamond-300-normal-BuXLI6C0.woff"
@@ -31,9 +39,9 @@
     "file": "assets/cormorant-garamond-600-normal-Co1r35X9.woff2",
     "src": "_cormorant-garamond-600-normal-Co1r35X9.woff2"
   },
-  "_fonts-Byp4LSx8.css": {
-    "file": "assets/fonts-Byp4LSx8.css",
-    "src": "_fonts-Byp4LSx8.css"
+  "_fonts-vQMMn0Pm.css": {
+    "file": "assets/fonts-vQMMn0Pm.css",
+    "src": "_fonts-vQMMn0Pm.css"
   },
   "_great-vibes-400-normal-BAZ173uY.woff": {
     "file": "assets/great-vibes-400-normal-BAZ173uY.woff",
@@ -66,6 +74,14 @@
   "_instrument-sans-600-normal-B9e8oLYv.woff": {
     "file": "assets/instrument-sans-600-normal-B9e8oLYv.woff",
     "src": "_instrument-sans-600-normal-B9e8oLYv.woff"
+  },
+  "_pinyon-script-400-normal-3W0BoeAr.woff": {
+    "file": "assets/pinyon-script-400-normal-3W0BoeAr.woff",
+    "src": "_pinyon-script-400-normal-3W0BoeAr.woff"
+  },
+  "_pinyon-script-400-normal-HCoaxbyT.woff2": {
+    "file": "assets/pinyon-script-400-normal-HCoaxbyT.woff2",
+    "src": "_pinyon-script-400-normal-HCoaxbyT.woff2"
   },
   "_playfair-display-500-normal-BScSeVwi.woff": {
     "file": "assets/playfair-display-500-normal-BScSeVwi.woff",
@@ -116,7 +132,7 @@
     ]
   },
   "resources/css/app.css": {
-    "file": "assets/app-DIqJJwgI.css",
+    "file": "assets/app-C8zWb1Ug.css",
     "name": "app",
     "names": [
       "app.css"
@@ -125,7 +141,7 @@
     "isEntry": true
   },
   "resources/js/app.js": {
-    "file": "assets/app-BMMBDc6f.js",
+    "file": "assets/app-2VkJiWGt.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,

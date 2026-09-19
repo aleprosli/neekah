@@ -14,3 +14,6 @@ Approving or suspending a vendor emails them and moves their profile on or off t
 Name the thing in the question — "Luluskan Studio Baharu?", not "Anda pasti?" — and say what follows in the message. Covered by Admin/VendorApprovalTest.
 
 The exceptions are ordinary forms someone fills in and submits, and reversible one-tap things like reopening a blocked date; those do not need a dialog.
+
+## sr-only inputs inside a horizontal scroller need a positioned parent
+.sr-only is position:absolute. Inside an overflow-x-auto row, a radio whose label is not `relative` takes its containing block from outside the scroller, is not clipped by it, and widens the whole page (the card editor's template shelf pushed /kad to 601px on a phone). Put `relative` on the label, and check document.documentElement.scrollWidth at 390px.

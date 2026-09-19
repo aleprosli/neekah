@@ -116,6 +116,63 @@ it('previews the couple own card without publishing it', function () {
     expect(WeddingSite::count())->toBe(0);
 });
 
+it('starts the draft on an address nobody holds yet', function () {
+    WeddingSite::factory()->create(['subdomain' => 'aina-hakim']);
+
+    $props = $this->actingAs($this->aina)->get(route('site.edit'))->assertOk()->viewData('props');
+
+    expect($props['site']['subdomain'])->toBe('aina-hakim-'.$this->wedding->event_date->year);
+});
+
+it('tells the couple a free address is available as they type', function () {
+    $this->actingAs($this->aina)
+        ->getJson(route('site.subdomain', ['subdomain' => ' Aina-Hakim ']))
+        ->assertOk()
+        ->assertJson([
+            'subdomain' => 'aina-hakim',
+            'available' => true,
+            'suggestions' => [],
+        ]);
+});
+
+it('says a taken address is taken and offers free ones instead', function () {
+    WeddingSite::factory()->create(['subdomain' => 'aina-hakim']);
+    WeddingSite::factory()->create(['subdomain' => 'aina-hakim-'.$this->wedding->event_date->year]);
+
+    $this->actingAs($this->aina)
+        ->getJson(route('site.subdomain', ['subdomain' => 'aina-hakim']))
+        ->assertOk()
+        ->assertJson([
+            'available' => false,
+            'message' => 'Alamat web ini telah diambil. Cuba yang lain.',
+            'suggestions' => ['walimah-aina-hakim', 'aina-hakim-kahwin', 'majlis-aina-hakim'],
+        ]);
+});
+
+it('refuses a reserved address in the live check with the same message as the save', function () {
+    $this->actingAs($this->aina)
+        ->getJson(route('site.subdomain', ['subdomain' => 'admin']))
+        ->assertOk()
+        ->assertJson([
+            'available' => false,
+            'message' => 'Alamat web ini dikhaskan untuk platform. Sila pilih yang lain.',
+        ]);
+});
+
+it('counts the couple own saved address as theirs to keep', function () {
+    WeddingSite::factory()->for($this->wedding)->create(['subdomain' => 'ainapilihhakim']);
+
+    $this->actingAs($this->aina)
+        ->getJson(route('site.subdomain', ['subdomain' => 'ainapilihhakim']))
+        ->assertOk()
+        ->assertJson(['available' => true]);
+});
+
+it('keeps the address check to signed-in couples', function () {
+    // Without a wedding it redirects like every planning tool; see WeddingRequiredTest.
+    $this->getJson(route('site.subdomain', ['subdomain' => 'aina-hakim']))->assertUnauthorized();
+});
+
 /**
  * @return array<string, mixed>
  */

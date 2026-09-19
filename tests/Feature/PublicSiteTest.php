@@ -48,10 +48,10 @@ it('returns 404 for an unpublished or unknown address', function () {
     $this->get('http://tiada-langsung.'.config('neekah.site_domain'))->assertNotFound();
 });
 
-it('renders all twenty templates', function () {
+it('renders all twenty-four templates', function () {
     $templates = SiteTemplate::active()->get();
 
-    expect($templates)->toHaveCount(20);
+    expect($templates)->toHaveCount(24);
 
     foreach ($templates as $template) {
         $site = WeddingSite::factory()->published()->create(['template' => $template->slug]);
@@ -114,6 +114,31 @@ it('seals the card behind an opening gate with motion and a live countdown', fun
     $response->assertSee($site->event_date->copy()->setTimeFromTimeString('11:00:00')->toIso8601String(), false);
 });
 
+it('opens the traditional designs with the Bismillah and leaves the modern ones without', function () {
+    $traditional = WeddingSite::factory()->published()->create(['template' => 'nur-geometri']);
+    $modern = WeddingSite::factory()->published()->create(['template' => 'putih-tenang']);
+
+    $this->get(siteUrl($traditional))->assertOk()->assertSee('lang="ar"', false);
+    $this->get(siteUrl($modern))->assertOk()->assertDontSee('lang="ar"', false);
+});
+
+it('pins a toolbar to the card with only the shortcuts this card can answer', function () {
+    $site = WeddingSite::factory()->published()->create([
+        'map_url' => 'https://maps.google.com/?q=dewan',
+        'contacts' => [['name' => 'Puan Rohana', 'phone' => '012-345 6789']],
+        'rsvp_enabled' => true,
+        'gift_enabled' => false,
+    ]);
+
+    $this->get(siteUrl($site))
+        ->assertOk()
+        ->assertSee('data-dock', false)
+        ->assertSee('https://maps.google.com/?q=dewan', false)
+        ->assertSee('href="#rsvp"', false)
+        ->assertSee('href="#hubungi"', false)
+        ->assertDontSee('href="#hadiah"', false);
+});
+
 it('leaves the quiet designs unanimated', function () {
     $still = WeddingSite::factory()->published()->create(['template' => 'putih-tenang']);
 
@@ -150,7 +175,7 @@ it('offers a calendar file guests can add to their phone', function () {
 it('shows the gallery, filters it by style, and samples every design', function () {
     $this->get(route('sites.templates'))
         ->assertOk()
-        ->assertSee('20 template untuk dipilih')
+        ->assertSee('24 template untuk dipilih')
         ->assertSee('Seri Gangsa')
         ->assertSee('Malam Emas');
 

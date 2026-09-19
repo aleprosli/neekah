@@ -20,6 +20,7 @@ Before planning or editing, find the row whose globs match the file's path and r
 | app/Notifications/** | .ai/rules/notifications.md |
 | routes/** | .ai/rules/routes.md |
 | app/Rules/** | .ai/rules/rules.md |
+| resources/views/sites/** | .ai/rules/sites.md |
 | app/Support/Seo.php, app/Support/**, app/Support/ImageSettings.php | .ai/rules/support.md |
 | resources/js/components/ui/DataTable.vue | .ai/rules/ui.md |
 | app/Http/Controllers/Vendor/ReviewController.php | .ai/rules/vendor.md |

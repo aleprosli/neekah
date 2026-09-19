@@ -3,7 +3,7 @@
     $flip = ['top-right' => 'right-0 top-0 -scale-x-100', 'bottom-left' => 'left-0 bottom-0 -scale-y-100', 'bottom-right' => 'right-0 bottom-0 -scale-x-100 -scale-y-100'][$position] ?? 'left-0 top-0';
     $delay = ['top-left' => '-0.6s', 'top-right' => '-2.6s', 'bottom-left' => '-4.2s', 'bottom-right' => '-1.2s'][$position] ?? '0s';
 @endphp
-<svg viewBox="0 0 200 200" fill="none" aria-hidden="true" class="pointer-events-none absolute {{ $flip }} nk-sway w-32 opacity-65 sm:w-44" style="animation-delay: {{ $delay }}">
+<svg viewBox="0 0 200 200" fill="none" aria-hidden="true" class="pointer-events-none absolute {{ $flip }} nk-sway {{ $ornamentSize ?? 'w-32 sm:w-44' }} opacity-65" style="animation-delay: {{ $delay }}">
     @foreach ([[0, 1], [22, 0.85], [-18, 0.7]] as [$angle, $scale])
         <g transform="translate(10 8) rotate({{ $angle }}) scale({{ $scale }})">
             <path d="M0 0c14 34 30 66 52 96" stroke="var(--nk-accent)" stroke-opacity=".6" stroke-width="1.3" stroke-linecap="round"/>
