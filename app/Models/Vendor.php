@@ -8,6 +8,7 @@ use App\Enums\PriceUnit;
 use App\Enums\VendorStatus;
 use App\Enums\VendorTier;
 use App\Support\PhoneNumber;
+use App\Support\SocialLinks;
 use Database\Factories\VendorFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Scope;
@@ -20,7 +21,7 @@ use Illuminate\Support\Carbon;
 
 #[Fillable([
     'user_id', 'category_id', 'name', 'slug', 'tagline', 'description', 'city', 'state',
-    'phone', 'whatsapp', 'price_from', 'price_unit', 'cover_image', 'logo', 'cover_tone',
+    'phone', 'whatsapp', 'social_links', 'price_from', 'price_unit', 'cover_image', 'logo', 'cover_tone',
     'status', 'tier', 'rating_avg', 'reviews_count', 'completed_bookings_count',
     'response_rate', 'completion_rate', 'score', 'points_total', 'tier_locked', 'penalty_points', 'violations_count', 'approved_at',
 ])]
@@ -40,6 +41,7 @@ class Vendor extends Model
     protected function casts(): array
     {
         return [
+            'social_links' => 'array',
             'price_from' => 'decimal:2',
             'price_unit' => PriceUnit::class,
             'status' => VendorStatus::class,
@@ -141,6 +143,28 @@ class Vendor extends Model
         }
 
         return 'https://wa.me/'.$number.($message ? '?text='.rawurlencode($message) : '');
+    }
+
+    /**
+     * The vendor's social media and website, in the order the platforms are
+     * listed. Each link is checked again on the way out, so a row written
+     * before a rule tightened never reaches the public page.
+     *
+     * @return list<array{platform: string, label: string, url: string}>
+     */
+    public function socialLinks(): array
+    {
+        $links = [];
+
+        foreach (SocialLinks::PLATFORMS as $platform => $details) {
+            $url = $this->social_links[$platform] ?? null;
+
+            if (is_string($url) && SocialLinks::isAllowed($platform, $url)) {
+                $links[] = ['platform' => $platform, 'label' => $details['label'], 'url' => $url];
+            }
+        }
+
+        return $links;
     }
 
     /**

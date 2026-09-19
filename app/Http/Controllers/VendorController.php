@@ -166,9 +166,14 @@ class VendorController extends Controller
                 ] : null,
             ]);
 
+        $openReviews = $this->openReviewSummary($vendor);
+
         return view('vendors.show', [
             'vendor' => $vendor,
-            'openReviews' => $this->openReviewSummary($vendor),
+            'openReviews' => $openReviews,
+            // How many reviews a visitor can read on the page. reviews_count
+            // stays booking-backed only, because the ranking reads it.
+            'publishedReviewsCount' => $vendor->reviews_count + $openReviews['total'],
             'gallery' => $this->gallery($vendor),
             'category' => $vendor->category,
             'related' => $related,

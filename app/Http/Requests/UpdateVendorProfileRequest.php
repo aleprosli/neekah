@@ -6,7 +6,10 @@ use App\Enums\PriceUnit;
 use App\Models\Category;
 use App\Models\Vendor;
 use App\Support\ImageSettings;
+use App\Support\SocialLinks;
+use Closure;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
 class UpdateVendorProfileRequest extends FormRequest
@@ -24,6 +27,23 @@ class UpdateVendorProfileRequest extends FormRequest
     }
 
     /**
+     * Turn "@kedai" and pasted addresses into the one link that is stored, so
+     * the rules below only ever judge a full address.
+     */
+    protected function prepareForValidation(): void
+    {
+        if (! is_array($this->input('social_links'))) {
+            return;
+        }
+
+        $this->merge([
+            'social_links' => collect($this->input('social_links'))
+                ->map(fn (mixed $value, string $platform): ?string => is_string($value) ? SocialLinks::normalise($platform, $value) : null)
+                ->all(),
+        ]);
+    }
+
+    /**
      * @return array<string, array<int, mixed>>
      */
     public function rules(ImageSettings $images): array
@@ -37,6 +57,16 @@ class UpdateVendorProfileRequest extends FormRequest
             'state' => ['required', Rule::in(Vendor::STATES)],
             'phone' => ['nullable', 'string', 'max:30'],
             'whatsapp' => ['nullable', 'string', 'max:30'],
+            'social_links' => ['nullable', 'array:'.implode(',', array_keys(SocialLinks::PLATFORMS))],
+            'social_links.*' => ['nullable', 'string', 'max:255', 'url:https', function (string $attribute, mixed $value, Closure $fail): void {
+                $platform = Str::after($attribute, 'social_links.');
+
+                if (! SocialLinks::isAllowed($platform, (string) $value)) {
+                    $fail($platform === 'website'
+                        ? 'Pautan laman web tidak boleh menghala ke WhatsApp atau Telegram.'
+                        : 'Pautan ini bukan pautan '.SocialLinks::PLATFORMS[$platform]['label'].' yang sah.');
+                }
+            }],
             'price_from' => ['required', 'numeric', 'min:0', 'max:9999999'],
             'price_unit' => ['required', Rule::enum(PriceUnit::class)],
             'cover_tone' => ['required', Rule::in(self::TONES)],
@@ -61,6 +91,7 @@ class UpdateVendorProfileRequest extends FormRequest
             'cover_tone' => 'warna',
             'cover_image' => 'gambar muka depan',
             'logo' => 'logo perniagaan',
+            ...collect(SocialLinks::PLATFORMS)->mapWithKeys(fn (array $details, string $platform): array => ['social_links.'.$platform => 'pautan '.$details['label']])->all(),
         ];
     }
 }

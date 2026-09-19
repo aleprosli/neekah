@@ -9,6 +9,7 @@ use App\Http\Requests\UpdateVendorProfileRequest;
 use App\Models\Category;
 use App\Models\Vendor;
 use App\Support\ImageSettings;
+use App\Support\SocialLinks;
 use App\Support\VueProps;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
@@ -34,6 +35,7 @@ class ProfileController extends Controller
                     'description' => old('description', $vendor->description),
                     'phone' => old('phone', $vendor->phone),
                     'whatsapp' => old('whatsapp', $vendor->whatsapp),
+                    'social_links' => old('social_links', $vendor->social_links ?? []),
                     'price_from' => old('price_from', $vendor->price_from),
                     'price_unit' => old('price_unit', $vendor->price_unit->value),
                     'cover_tone' => old('cover_tone', $vendor->cover_tone),
@@ -43,6 +45,10 @@ class ProfileController extends Controller
                 ],
                 'categories' => Category::active()->ordered()->get(['id', 'name', 'icon']),
                 'states' => Vendor::STATES,
+                'socialPlatforms' => collect(SocialLinks::PLATFORMS)
+                    ->map(fn (array $details, string $platform): array => ['key' => $platform, 'label' => $details['label'], 'placeholder' => $details['placeholder']])
+                    ->values()
+                    ->all(),
                 'tones' => UpdateVendorProfileRequest::TONES,
                 'priceUnits' => collect(PriceUnit::cases())
                     ->map(fn (PriceUnit $unit): array => ['value' => $unit->value, 'label' => 'Setiap '.$unit->label()])
@@ -57,6 +63,10 @@ class ProfileController extends Controller
     {
         $vendor = $request->user()->vendor;
         $data = $request->safe()->except(['cover_image', 'logo', 'remove_logo']);
+
+        if (array_key_exists('social_links', $data)) {
+            $data['social_links'] = array_filter($data['social_links'] ?? []) ?: null;
+        }
 
         if ($request->hasFile('cover_image')) {
             $storeImage->delete($vendor->cover_image);

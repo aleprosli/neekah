@@ -19,13 +19,14 @@ const props = defineProps({
     states: { type: Array, required: true },
     tones: { type: Array, required: true },
     priceUnits: { type: Array, required: true },
+    socialPlatforms: { type: Array, required: true },
     errors: { type: Object, default: () => ({}) },
     imageHint: { type: String, required: true },
     logoHint: { type: String, required: true },
 });
 
 const { uploading, percent: uploadPercent, error: uploadError, submit: submitUpload } = useUploadForm();
-const form = ref({ ...props.vendor });
+const form = ref({ ...props.vendor, social_links: { ...props.vendor.social_links } });
 const coverPreview = ref(props.vendor.cover_image_url);
 const logoPreview = ref(props.vendor.logo_url);
 const removeLogo = ref(false);
@@ -79,6 +80,26 @@ const stateOptions = computed(() => props.states.map((state) => ({ value: state,
             <div class="grid gap-4 sm:grid-cols-2">
                 <UiField v-model="form.price_from" label="Harga bermula (RM)" name="price_from" type="number" step="0.01" min="0" :error="errors.price_from" required help="Diselaraskan automatik dengan pakej termurah bila anda tambah pakej." />
                 <UiSelect v-model="form.price_unit" label="Unit harga" name="price_unit" :options="priceUnits" :error="errors.price_unit" required />
+            </div>
+        </section>
+
+        <section class="flex flex-col gap-4 rounded-2xl border border-line bg-surface-raised p-6">
+            <div>
+                <h2 class="font-semibold">Media sosial</h2>
+                <p class="text-sm text-ink-muted">Dipaparkan pada halaman awam anda. Taip nama pengguna atau tampal pautan penuh; biarkan kosong jika tiada.</p>
+            </div>
+
+            <div class="grid gap-4 sm:grid-cols-2">
+                <UiField
+                    v-for="platform in socialPlatforms"
+                    :key="platform.key"
+                    v-model="form.social_links[platform.key]"
+                    :label="platform.label"
+                    :name="`social_links[${platform.key}]`"
+                    :placeholder="platform.placeholder"
+                    :error="errors[`social_links.${platform.key}`]"
+                    maxlength="255"
+                />
             </div>
         </section>
 

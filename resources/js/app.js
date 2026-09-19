@@ -105,6 +105,27 @@ document.addEventListener('click', async (event) => {
 });
 
 /**
+ * The phone's own share sheet, which is the only way into Instagram, TikTok
+ * and the rest. The button stays hidden where the browser has none.
+ */
+const revealShareButtons = () => {
+    if (navigator.share) {
+        document.querySelectorAll('[data-share-item]').forEach((item) => (item.hidden = false));
+    }
+};
+
+revealShareButtons();
+window.addEventListener('neekah:navigated', revealShareButtons);
+
+document.addEventListener('click', (event) => {
+    const button = event.target.closest('[data-share-url]');
+    if (button) {
+        // Rejects when the visitor closes the sheet, which is not an error.
+        navigator.share({ title: button.dataset.shareTitle, url: button.dataset.shareUrl }).catch(() => {});
+    }
+});
+
+/**
  * Vendor comparison tray. Selections live in sessionStorage so they survive
  * paging and filtering, and travel to /compare as a query string.
  */

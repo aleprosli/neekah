@@ -53,7 +53,7 @@
                     <p class="text-sm">
                         <span class="font-semibold"><span class="text-gold-500">★</span> {{ $vendor->reviews_count ? number_format($vendor->rating_avg, 1) : 'Baru' }}</span>
                         <span class="text-ink-muted">·</span>
-                        <a href="#review" class="underline underline-offset-4">{{ $vendor->reviews_count }} review</a>
+                        <a href="#review" class="underline underline-offset-4">{{ $publishedReviewsCount }} review</a>
                         <span class="text-ink-muted">·</span>
                         {{ $vendor->completed_bookings_count }} majlis selesai
                     </p>
@@ -67,6 +67,19 @@
                         <p class="text-sm text-ink-muted">@if ($vendor->tier === VendorTier::Recommended)🏆 @endif{{ $vendor->tier->label() }} Vendor · Response rate {{ $vendor->responseRateLabel() }}</p>
                     </div>
                 </div>
+
+                @if ($socialLinks = $vendor->socialLinks())
+                    <div class="flex flex-col gap-2 py-6">
+                        <p class="text-sm font-medium">Ikuti {{ $vendor->name }}</p>
+                        <ul class="flex flex-wrap gap-2 text-xs font-semibold">
+                            @foreach ($socialLinks as $link)
+                                <li><a href="{{ $link['url'] }}" target="_blank" rel="noopener nofollow ugc" class="block rounded-full border border-line px-3.5 py-2 transition hover:border-brand-400">{{ $link['label'] }} ↗</a></li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
+                <x-vendors.share :vendor="$vendor" class="py-6" />
 
                 {{-- Highlights --}}
                 <ul class="flex flex-col gap-5 py-6">
@@ -294,7 +307,7 @@
         <div class="flex items-center justify-between gap-3">
             <div class="text-sm">
                 <p><span class="font-semibold">RM{{ number_format($vendor->price_from) }}</span> <span class="text-ink-muted">/ {{ $vendor->price_unit->label() }}</span></p>
-                <p class="text-xs"><span class="text-gold-500">★</span> {{ $vendor->reviews_count ? number_format($vendor->rating_avg, 1) : 'Baru' }} <span class="text-ink-muted">· {{ $vendor->reviews_count }} review</span></p>
+                <p class="text-xs"><span class="text-gold-500">★</span> {{ $vendor->reviews_count ? number_format($vendor->rating_avg, 1) : 'Baru' }} <span class="text-ink-muted">· {{ $publishedReviewsCount }} review</span></p>
             </div>
             <a href="#tempah" class="rounded-full bg-brand-600 px-6 py-3 text-sm font-semibold text-white">Tempah</a>
         </div>
