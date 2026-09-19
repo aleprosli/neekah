@@ -9,6 +9,7 @@ Before planning or editing, find the row whose globs match the file's path and r
 | resources/js/components/** | .ai/rules/components.md |
 | app/Http/Controllers/**, app/Http/Controllers/SitemapController.php | .ai/rules/controllers.md |
 | app/Http/Controllers/Customer/**, app/Http/Controllers/Customer/WeddingTaskController.php | .ai/rules/customer.md |
+| app/Enums/UserSegment.php | .ai/rules/enums.md |
 | resources/views/errors/** | .ai/rules/errors.md |
 | ** | .ai/rules/general.md |
 | app/Jobs/** | .ai/rules/jobs.md |
