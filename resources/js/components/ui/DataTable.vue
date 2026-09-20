@@ -23,9 +23,10 @@ const props = defineProps({
     columns: { type: Array, required: true },
     /**
      * Chip filters shown above the table, each group
-     * { key, label?, value, allLabel?, options: [{ value, label, count?, description? }] }.
-     * Choosing one reloads the rows in place; the groups are mutually
-     * exclusive, because a server that reads two of them at once has to pick.
+     * { key, label?, value, allLabel?, exclusive?, options: [{ value, label, count?, description? }] }.
+     * Choosing one reloads the rows in place. Groups narrow each other —
+     * "menunggu kelulusan" AND "setup lengkap" — unless a group is marked
+     * exclusive, which clears the others as the users page needs.
      */
     filters: { type: Array, default: () => [] },
     searchPlaceholder: { type: String, default: 'Cari…' },
@@ -72,11 +73,20 @@ const page = ref(1);
 
 const selected = ref(Object.fromEntries(props.filters.map((group) => [group.key, group.value ?? ''])));
 
-/** One group at a time: picking a segment drops the role, as the server does. */
+/**
+ * Groups narrow each other, so a status and a setup state can be asked for at
+ * once. An exclusive group (the users page's role and segment, which the
+ * server reads one of) clears the rest instead.
+ */
 const chooseFilter = (group, value) => {
-    Object.keys(selected.value).forEach((key) => {
-        selected.value[key] = key === group.key ? value : '';
-    });
+    if (group.exclusive) {
+        Object.keys(selected.value).forEach((key) => {
+            selected.value[key] = key === group.key ? value : '';
+        });
+    } else {
+        selected.value[group.key] = value;
+    }
+
     page.value = 1;
     load();
     rememberFilters();

@@ -10,6 +10,7 @@ use App\Models\PortfolioItem;
 use App\Models\Vendor;
 use App\Support\VueProps;
 use Illuminate\Contracts\View\View;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -20,6 +21,7 @@ class VendorController extends Controller
         ['key' => 'vendor', 'label' => 'Vendor', 'type' => 'html', 'sort' => 'name', 'sortable' => true],
         ['key' => 'category', 'label' => 'Kategori'],
         ['key' => 'location', 'label' => 'Lokasi'],
+        ['key' => 'setup', 'label' => 'Kelengkapan', 'type' => 'html'],
         ['key' => 'tier', 'label' => 'Tahap'],
         ['key' => 'score', 'label' => 'Score', 'sortable' => true, 'align' => 'right'],
         ['key' => 'status', 'label' => 'Status', 'type' => 'html'],
@@ -75,16 +77,31 @@ class VendorController extends Controller
             ],
             // The chips belong to the table, which swaps its rows in place; as
             // links they reloaded the page and collided with its paging.
-            'filters' => [[
-                'key' => 'status',
-                'value' => VendorStatus::tryFrom($request->string('status')->toString())?->value,
-                'allLabel' => 'Semua ('.$counts->sum().')',
-                'options' => array_map(fn (VendorStatus $case): array => [
-                    'value' => $case->value,
-                    'label' => $case->label(),
-                    'count' => $counts[$case->value] ?? 0,
-                ], VendorStatus::cases()),
-            ]],
+            'filters' => [
+                [
+                    'key' => 'status',
+                    'value' => VendorStatus::tryFrom($request->string('status')->toString())?->value,
+                    'allLabel' => 'Semua ('.$counts->sum().')',
+                    'options' => array_map(fn (VendorStatus $case): array => [
+                        'value' => $case->value,
+                        'label' => $case->label(),
+                        'count' => $counts[$case->value] ?? 0,
+                    ], VendorStatus::cases()),
+                ],
+                [
+                    'key' => 'setup',
+                    'label' => 'Kelengkapan',
+                    'value' => in_array($request->string('setup')->toString(), ['complete', 'partial'], true)
+                        ? $request->string('setup')->toString()
+                        : null,
+                    'allLabel' => 'Semua',
+                    'hint' => 'Lengkap bermaksud profil penuh, sekurang-kurangnya satu pakej aktif dan tiga gambar portfolio.',
+                    'options' => [
+                        ['value' => 'complete', 'label' => 'Setup lengkap', 'count' => Vendor::setupComplete()->count()],
+                        ['value' => 'partial', 'label' => 'Setup belum lengkap', 'count' => Vendor::whereNot(fn (Builder $query) => $query->setupComplete())->count()],
+                    ],
+                ],
+            ],
         ]);
     }
 
@@ -100,9 +117,19 @@ class VendorController extends Controller
             : 'id';
         $direction = $request->string('direction')->toString() === 'asc' ? 'asc' : 'desc';
 
+        $setup = $request->string('setup')->toString();
+
         $vendors = Vendor::query()
             ->with(['category', 'user'])
+            // The two counts the setup column and hasCompleteCatalogue() read,
+            // so a page of vendors costs two queries rather than one each.
+            ->withCount([
+                'packages as active_packages_count' => fn ($packages) => $packages->where('is_active', true),
+                'portfolioItems',
+            ])
             ->when($status, fn ($query) => $query->where('status', $status))
+            ->when($setup === 'complete', fn (Builder $query) => $query->setupComplete())
+            ->when($setup === 'partial', fn (Builder $query) => $query->whereNot(fn (Builder $inner) => $inner->setupComplete()))
             ->when($request->string('search')->trim()->toString(), function ($query, string $keyword): void {
                 $like = '%'.$keyword.'%';
                 $query->where(fn ($query) => $query->where('name', 'like', $like)->orWhere('city', 'like', $like));
@@ -118,6 +145,7 @@ class VendorController extends Controller
                 'vendor' => view('components.admin.vendor-cell', ['vendor' => $vendor])->render(),
                 'category' => $vendor->category->name,
                 'location' => $vendor->city.', '.$vendor->state,
+                'setup' => view('components.admin.vendor-setup', ['vendor' => $vendor])->render(),
                 'tier' => $vendor->tier->label(),
                 'score' => number_format((float) $vendor->score, 1),
                 'status' => view('components.admin.status-pill', ['label' => $vendor->status->label(), 'tone' => $vendor->status->tone()])->render(),

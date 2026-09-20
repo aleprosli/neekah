@@ -53,6 +53,7 @@ class UserController extends Controller
             'filters' => [
                 [
                     'key' => 'role',
+                    'exclusive' => true,
                     'value' => $segment ? null : UserRole::tryFrom($request->string('role')->toString())?->value,
                     'allLabel' => 'Semua ('.$counts->sum().')',
                     'options' => array_map(fn (UserRole $case): array => [
@@ -63,6 +64,7 @@ class UserController extends Controller
                 ],
                 [
                     'key' => 'segment',
+                    'exclusive' => true,
                     'label' => 'Perlu diikuti',
                     'value' => $segment?->value,
                     'allLabel' => 'Tiada',

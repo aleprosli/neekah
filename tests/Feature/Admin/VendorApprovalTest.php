@@ -3,6 +3,8 @@
 use App\Enums\VendorStatus;
 use App\Enums\VendorTier;
 use App\Models\Category;
+use App\Models\Package;
+use App\Models\PortfolioItem;
 use App\Models\User;
 use App\Models\Vendor;
 use App\Notifications\VendorStatusChanged;
@@ -196,4 +198,50 @@ it('keeps batch approval to admins', function () {
         ->assertForbidden();
 
     expect($vendor->fresh()->status)->toBe(VendorStatus::Pending);
+});
+
+it('shows at a glance how far each vendor got with their setup', function () {
+    $ready = Vendor::factory()->pending()->for(Category::first())->create(['logo' => 'vendors/logo.webp']);
+    Package::factory()->for($ready)->create(['is_active' => true]);
+    PortfolioItem::factory()->count(3)->for($ready)->create();
+
+    $thin = Vendor::factory()->pending()->for(Category::first())->create([
+        'tagline' => null,
+        'logo' => null,
+    ]);
+    PortfolioItem::factory()->count(2)->for($thin)->create();
+
+    $rows = collect($this->actingAs($this->admin)->getJson(route('admin.vendors.data'))->assertOk()->json('data'))
+        ->keyBy('id');
+
+    expect($rows[$ready->id]['setup'])->toContain('Lengkap')
+        ->toContain('1 pakej')
+        ->toContain('3 gambar');
+
+    // What is missing is named, so the admin knows what to ask the vendor for.
+    expect($rows[$thin->id]['setup'])->toContain('0 / 4 siap')
+        ->toContain('Tiada pakej aktif')
+        ->toContain('Perlu sekurang-kurangnya 3 gambar portfolio');
+});
+
+it('narrows the list to vendors who finished their setup, alongside the status', function () {
+    $ready = Vendor::factory()->pending()->for(Category::first())->create();
+    Package::factory()->for($ready)->create(['is_active' => true]);
+    PortfolioItem::factory()->count(3)->for($ready)->create();
+
+    $thin = Vendor::factory()->pending()->for(Category::first())->create();
+    $approvedAndReady = Vendor::factory()->for(Category::first())->create();
+    Package::factory()->for($approvedAndReady)->create(['is_active' => true]);
+    PortfolioItem::factory()->count(3)->for($approvedAndReady)->create();
+
+    $ids = fn (array $query): array => collect($this->actingAs($this->admin)
+        ->getJson(route('admin.vendors.data', $query))
+        ->assertOk()
+        ->json('data'))->pluck('id')->sort()->values()->all();
+
+    expect($ids(['setup' => 'complete']))->toBe(collect([$ready->id, $approvedAndReady->id])->sort()->values()->all())
+        ->and($ids(['setup' => 'partial']))->toBe([$thin->id])
+        // The two chips narrow each other rather than replacing one another.
+        ->and($ids(['status' => 'pending', 'setup' => 'complete']))->toBe([$ready->id])
+        ->and($ids(['status' => 'pending', 'setup' => 'partial']))->toBe([$thin->id]);
 });
