@@ -13,7 +13,7 @@
         data-vue="admin-violations-page"
         data-props="@vueProps([
             'violations' => $violations->items(),
-            'pagination' => $violations->hasPages() ? (string) $violations->links() : '',
+            'pagination' => $violations->hasPages() ? (string) $violations->onEachSide(1)->links() : '',
         ])"
     ></div>
 </x-layouts.admin>

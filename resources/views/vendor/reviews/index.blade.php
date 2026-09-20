@@ -161,6 +161,6 @@
             @endforeach
         </ul>
 
-        <div class="mt-6">{{ $reviews->links() }}</div>
+        <div class="mt-6">{{ $reviews->onEachSide(1)->links() }}</div>
     @endif
 </x-layouts.vendor>

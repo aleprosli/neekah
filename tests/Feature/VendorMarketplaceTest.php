@@ -54,6 +54,24 @@ it('lays the category tiles in a scroller with arrows, so a long list is never c
         ->assertSeeInOrder(['data-scroll-track', 'Semua', 'Catering'], false);
 });
 
+it('pages a long list with a window instead of every page number', function () {
+    // 12 per page, so 170 approved vendors is 15 pages. Printing all fifteen
+    // numbers is what ran the pager off the side of the page.
+    Vendor::factory()->count(170)->for($this->catering)->create();
+
+    $response = $this->get(route('vendors.index', ['page' => 8]))->assertOk();
+
+    // The window around page 8, the two ends, and the count a phone gets.
+    $response->assertSee('aria-current="page">8<', false)
+        ->assertSee('aria-label="Halaman 7"', false)
+        ->assertSee('aria-label="Halaman 9"', false)
+        ->assertSee('aria-label="Halaman 1"', false)
+        ->assertSee('aria-label="Halaman 15"', false)
+        ->assertSee('Halaman 8 / 15')
+        ->assertDontSee('aria-label="Halaman 4"', false)
+        ->assertDontSee('aria-label="Halaman 12"', false);
+});
+
 it('filters vendors by category', function () {
     Vendor::factory()->for($this->catering)->create(['name' => 'Dapur Warisan Catering']);
     Vendor::factory()->for($this->photography)->create(['name' => 'ABC Wedding Photography']);

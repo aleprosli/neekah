@@ -9,7 +9,7 @@
         data-props="@vueProps([
             'posts' => $posts->items(),
             'createUrl' => route('admin.posts.create'),
-            'pagination' => $posts->hasPages() ? (string) $posts->links() : '',
+            'pagination' => $posts->hasPages() ? (string) $posts->onEachSide(1)->links() : '',
             'csrf' => csrf_token(),
         ])"
     ></div>

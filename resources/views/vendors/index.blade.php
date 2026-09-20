@@ -183,23 +183,7 @@
                 @endforeach
             </ul>
 
-            @if ($vendors->hasPages())
-                <nav class="mt-12 flex items-center justify-center gap-1 text-sm" aria-label="Halaman">
-                    @if ($vendors->onFirstPage())
-                        <span class="flex size-9 items-center justify-center text-ink-muted/50">‹</span>
-                    @else
-                        <a href="{{ $vendors->previousPageUrl() }}" class="flex size-9 items-center justify-center rounded-full hover:bg-surface-muted" aria-label="Sebelum">‹</a>
-                    @endif
-                    @foreach ($vendors->getUrlRange(1, $vendors->lastPage()) as $page => $url)
-                        <a href="{{ $url }}" @class(['flex size-9 items-center justify-center rounded-full font-medium', 'bg-brand-600 text-white' => $page === $vendors->currentPage(), 'hover:bg-surface-muted' => $page !== $vendors->currentPage()])>{{ $page }}</a>
-                    @endforeach
-                    @if ($vendors->hasMorePages())
-                        <a href="{{ $vendors->nextPageUrl() }}" class="flex size-9 items-center justify-center rounded-full hover:bg-surface-muted" aria-label="Seterusnya">›</a>
-                    @else
-                        <span class="flex size-9 items-center justify-center text-ink-muted/50">›</span>
-                    @endif
-                </nav>
-            @endif
+            {{ $vendors->onEachSide(1)->links() }}
         @endif
     </main>
 

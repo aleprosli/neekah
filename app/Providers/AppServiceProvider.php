@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Support\Seo;
 use Illuminate\Auth\Middleware\RedirectIfAuthenticated;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
@@ -33,6 +34,10 @@ class AppServiceProvider extends ServiceProvider
         RedirectIfAuthenticated::redirectUsing(
             fn (Request $request) => $request->user()->homeRoute(),
         );
+
+        // One pager for every list: a window of pages, not all of them. See
+        // resources/views/pagination/neekah.blade.php.
+        Paginator::defaultView('pagination.neekah');
 
         // Only admins may read the application log.
         Gate::define('viewLogViewer', fn (?User $user) => $user?->isAdmin() ?? false);

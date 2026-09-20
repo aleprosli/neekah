@@ -4,7 +4,7 @@
         data-vue="vendor-enquiries-page"
         data-props="@vueProps([
             'enquiries' => $enquiries->items(),
-            'pagination' => $enquiries->hasPages() ? (string) $enquiries->links() : '',
+            'pagination' => $enquiries->hasPages() ? (string) $enquiries->onEachSide(1)->links() : '',
         ])"
     ></div>
 </x-layouts.vendor>
