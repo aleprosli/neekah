@@ -5,7 +5,9 @@ use App\Enums\VendorTier;
 use App\Models\Category;
 use App\Models\User;
 use App\Models\Vendor;
+use App\Notifications\VendorStatusChanged;
 use Database\Seeders\CategorySeeder;
+use Illuminate\Support\Facades\Notification;
 
 beforeEach(function () {
     $this->seed(CategorySeeder::class);
@@ -133,4 +135,65 @@ it('offers suspension, not approval, for a vendor already approved', function ()
         ->assertJsonPath('data.0.action.confirm.tone', 'danger');
 
     expect($vendor->fresh()->status)->toBe(VendorStatus::Approved);
+});
+
+it('approves a whole batch the admin ticked, emailing each one', function () {
+    Notification::fake();
+
+    $first = Vendor::factory()->pending()->for(Category::first())->create();
+    $second = Vendor::factory()->pending()->for(Category::first())->create();
+    $untouched = Vendor::factory()->pending()->for(Category::first())->create();
+
+    $this->actingAs($this->admin)
+        ->post(route('admin.vendors.bulk-status'), ['status' => 'approved', 'ids' => [$first->id, $second->id]])
+        ->assertRedirect()
+        ->assertSessionHas('status', '2 vendor kini Diluluskan.');
+
+    expect($first->fresh()->status)->toBe(VendorStatus::Approved)
+        ->and($first->fresh()->tier)->toBe(VendorTier::Verified)
+        ->and($second->fresh()->status)->toBe(VendorStatus::Approved)
+        ->and($untouched->fresh()->status)->toBe(VendorStatus::Pending);
+
+    Notification::assertSentTo([$first->user, $second->user], VendorStatusChanged::class);
+    Notification::assertNotSentTo($untouched->user, VendorStatusChanged::class);
+});
+
+it('leaves a vendor already in that status alone, so nobody is emailed twice', function () {
+    Notification::fake();
+
+    $already = Vendor::factory()->for(Category::first())->create(['status' => VendorStatus::Approved]);
+
+    $this->actingAs($this->admin)
+        ->post(route('admin.vendors.bulk-status'), ['status' => 'approved', 'ids' => [$already->id]])
+        ->assertSessionHas('status', 'Tiada perubahan: vendor yang dipilih sudah Diluluskan.');
+
+    Notification::assertNothingSent();
+});
+
+it('refuses a batch with no vendors, an unknown status or an id that is not a vendor', function () {
+    $vendor = Vendor::factory()->pending()->for(Category::first())->create();
+
+    $this->actingAs($this->admin)
+        ->post(route('admin.vendors.bulk-status'), ['status' => 'approved', 'ids' => []])
+        ->assertSessionHasErrors(['ids' => 'Pilih sekurang-kurangnya satu vendor.']);
+
+    $this->actingAs($this->admin)
+        ->post(route('admin.vendors.bulk-status'), ['status' => 'banana', 'ids' => [$vendor->id]])
+        ->assertSessionHasErrors('status');
+
+    $this->actingAs($this->admin)
+        ->post(route('admin.vendors.bulk-status'), ['status' => 'approved', 'ids' => [$vendor->id, 999999]])
+        ->assertSessionHasErrors('ids.1');
+
+    expect($vendor->fresh()->status)->toBe(VendorStatus::Pending);
+});
+
+it('keeps batch approval to admins', function () {
+    $vendor = Vendor::factory()->pending()->for(Category::first())->create();
+
+    $this->actingAs(User::factory()->create())
+        ->post(route('admin.vendors.bulk-status'), ['status' => 'approved', 'ids' => [$vendor->id]])
+        ->assertForbidden();
+
+    expect($vendor->fresh()->status)->toBe(VendorStatus::Pending);
 });

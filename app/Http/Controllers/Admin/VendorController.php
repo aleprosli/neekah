@@ -31,6 +31,48 @@ class VendorController extends Controller
 
         return view('admin.vendors.index', [
             'columns' => self::COLUMNS,
+            // Approving a whole batch of new registrations at once: each one
+            // still gets its email and its promotion out of New.
+            'bulkActions' => [
+                [
+                    'key' => 'approve',
+                    'label' => 'Luluskan',
+                    'tone' => 'brand',
+                    'url' => route('admin.vendors.bulk-status'),
+                    'fields' => ['status' => VendorStatus::Approved->value],
+                    'confirm' => [
+                        'title' => 'Luluskan __COUNT__ vendor?',
+                        'message' => 'Setiap profil akan dipaparkan di marketplace dan setiap vendor menerima emel kelulusan.',
+                        'confirmLabel' => 'Ya, luluskan __COUNT__',
+                    ],
+                ],
+                [
+                    'key' => 'reject',
+                    'label' => 'Tolak',
+                    'tone' => 'danger',
+                    'url' => route('admin.vendors.bulk-status'),
+                    'fields' => ['status' => VendorStatus::Rejected->value],
+                    'confirm' => [
+                        'title' => 'Tolak __COUNT__ permohonan?',
+                        'message' => 'Setiap vendor menerima emel penolakan. Mereka masih boleh melengkapkan profil dan memohon semula.',
+                        'confirmLabel' => 'Ya, tolak __COUNT__',
+                        'tone' => 'danger',
+                    ],
+                ],
+                [
+                    'key' => 'suspend',
+                    'label' => 'Gantung',
+                    'tone' => 'line',
+                    'url' => route('admin.vendors.bulk-status'),
+                    'fields' => ['status' => VendorStatus::Suspended->value],
+                    'confirm' => [
+                        'title' => 'Gantung __COUNT__ vendor?',
+                        'message' => 'Profil mereka akan hilang dari marketplace dan setiap vendor menerima emel pemberitahuan.',
+                        'confirmLabel' => 'Ya, gantung __COUNT__',
+                        'tone' => 'danger',
+                    ],
+                ],
+            ],
             // The chips belong to the table, which swaps its rows in place; as
             // links they reloaded the page and collided with its paging.
             'filters' => [[
@@ -70,6 +112,8 @@ class VendorController extends Controller
 
         return response()->json([
             'data' => $vendors->getCollection()->map(fn (Vendor $vendor): array => [
+                // The id is what a batch action posts back.
+                'id' => $vendor->id,
                 'url' => route('admin.vendors.show', $vendor),
                 'vendor' => view('components.admin.vendor-cell', ['vendor' => $vendor])->render(),
                 'category' => $vendor->category->name,

@@ -193,6 +193,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/vendors', [AdminArea\VendorController::class, 'index'])->name('vendors.index');
     Route::get('/vendors/data', [AdminArea\VendorController::class, 'data'])->name('vendors.data');
     Route::get('/vendors/{vendor}', [AdminArea\VendorController::class, 'show'])->name('vendors.show');
+    Route::post('/vendors/status', [AdminArea\VendorApprovalController::class, 'bulk'])->name('vendors.bulk-status');
     Route::post('/vendors/{vendor}/status', [AdminArea\VendorApprovalController::class, 'store'])->name('vendors.status');
     Route::put('/vendors/{vendor}/tier', [AdminArea\VendorTierController::class, 'update'])->name('vendors.tier');
     Route::get('/reviews', [AdminArea\ReviewController::class, 'index'])->name('reviews.index');

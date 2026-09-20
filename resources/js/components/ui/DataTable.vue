@@ -38,6 +38,13 @@ const props = defineProps({
      * { urlKey, label, title, message, confirmLabel, method, tone }.
      */
     rowAction: { type: Object, default: null },
+    /**
+     * Actions over the rows the admin ticked:
+     * [{ key, label, tone, url, method?, fields?, confirm: { title, message, confirmLabel, tone } }].
+     * __COUNT__ in the confirm wording is replaced with how many are ticked.
+     * Rows must carry an `id` for this to have anything to post.
+     */
+    bulkActions: { type: Array, default: () => [] },
     csrf: { type: String, default: '' },
 });
 
@@ -143,6 +150,8 @@ const load = async () => {
 
         const payload = await response.json();
         fetched.value = payload.data ?? [];
+        // The ticks belong to rows that are no longer on screen.
+        picked.value = [];
         meta.value = payload.meta ?? meta.value;
         serverColumns.value = payload.columns ?? null;
     } catch (problem) {
@@ -189,6 +198,28 @@ const cardColumns = computed(() => {
 });
 
 const sortableColumns = computed(() => activeColumns.value.filter((column) => column.sortable));
+
+/**
+ * Ticking rows for a batch action. A new marketplace arrives with dozens of
+ * registrations, and approving them one dialog at a time is the whole evening.
+ */
+const picked = ref([]);
+const selectable = computed(() => props.bulkActions.length > 0);
+const pageIds = computed(() => rows.value.map((row) => row.id).filter((id) => id !== undefined && id !== null));
+const allPagePicked = computed(() => pageIds.value.length > 0 && pageIds.value.every((id) => picked.value.includes(id)));
+
+const togglePick = (id) => {
+    picked.value = picked.value.includes(id) ? picked.value.filter((one) => one !== id) : [...picked.value, id];
+};
+
+const togglePage = () => {
+    picked.value = allPagePicked.value
+        ? picked.value.filter((id) => !pageIds.value.includes(id))
+        : [...new Set([...picked.value, ...pageIds.value])];
+};
+
+/** __COUNT__ reads as the number ticked, so the dialog says what it will do. */
+const withCount = (text) => (text ?? '').replaceAll('__COUNT__', picked.value.length);
 
 const go = (to) => {
     page.value = Math.min(Math.max(1, to), meta.value.last_page);
@@ -284,6 +315,35 @@ onMounted(load);
             <slot name="actions" />
         </div>
 
+        <!-- What the ticked rows can be done to, shown only once something is
+             ticked so it never sits in the way. -->
+        <div v-if="selectable && picked.length" class="sticky top-3 z-20 flex flex-wrap items-center gap-3 rounded-2xl border border-brand-300 bg-brand-50 px-4 py-3 shadow-sm">
+            <p class="text-sm font-semibold text-brand-900">{{ picked.length }} dipilih</p>
+            <div class="flex flex-wrap gap-2">
+                <UiConfirm
+                    v-for="action in bulkActions"
+                    :key="action.key"
+                    :action="action.url"
+                    :method="action.method || 'POST'"
+                    :fields="{ ...(action.fields || {}), ids: picked }"
+                    :tone="action.confirm?.tone || action.tone || 'brand'"
+                    :title="withCount(action.confirm?.title || `${action.label} __COUNT__ rekod?`)"
+                    :message="withCount(action.confirm?.message)"
+                    :confirm-label="withCount(action.confirm?.confirmLabel || action.label)"
+                    :trigger-class="[
+                        'rounded-full px-4 py-2 text-xs font-semibold transition',
+                        action.tone === 'danger'
+                            ? 'bg-red-600 text-white hover:bg-red-700'
+                            : action.tone === 'line'
+                              ? 'border border-line bg-surface font-medium hover:border-brand-400'
+                              : 'bg-brand-600 text-white hover:bg-brand-700',
+                    ].join(' ')"
+                    :csrf="csrf"
+                >{{ action.label }}</UiConfirm>
+            </div>
+            <button type="button" class="ml-auto text-xs font-medium text-ink-muted underline underline-offset-4 hover:text-ink" @click="picked = []">Kosongkan pilihan</button>
+        </div>
+
         <p v-if="failed" class="rounded-xl bg-brand-50 px-4 py-3 text-sm text-brand-800">
             Senarai tidak dapat dimuatkan. Muat semula halaman untuk cuba lagi.
         </p>
@@ -294,6 +354,10 @@ onMounted(load);
              default, so one long business name pushes the card past the screen. -->
         <ul v-if="rows.length" class="flex min-w-0 flex-col gap-3 md:hidden">
             <li v-for="row in table.getRowModel().rows" :key="`card-${row.id}`" class="min-w-0 rounded-2xl border border-line bg-surface-raised p-4">
+                <label v-if="selectable && row.original.id" class="mb-3 flex items-center gap-2 text-xs font-medium text-ink-muted">
+                    <input type="checkbox" class="size-4 accent-brand-600" :checked="picked.includes(row.original.id)" @change="togglePick(row.original.id)">
+                    Pilih
+                </label>
                 <component
                     :is="row.original.url ? 'a' : 'div'"
                     :href="row.original.url"
@@ -367,6 +431,16 @@ onMounted(load);
             <table class="w-full min-w-[640px] text-left text-sm">
                 <thead class="border-b border-line bg-surface-muted/60">
                     <tr>
+                        <th v-if="selectable" scope="col" class="w-10 px-4 py-3">
+                            <input
+                                type="checkbox"
+                                class="size-4 accent-brand-600"
+                                :checked="allPagePicked"
+                                :disabled="!pageIds.length"
+                                aria-label="Pilih semua di halaman ini"
+                                @change="togglePage"
+                            >
+                        </th>
                         <th
                             v-for="header in table.getHeaderGroups()[0].headers"
                             :key="header.id"
@@ -390,10 +464,10 @@ onMounted(load);
 
                 <tbody class="divide-y divide-line">
                     <tr v-if="loading && !rows.length">
-                        <td :colspan="activeColumns.length + (rowAction || $slots.action ? 1 : 0)" class="px-4 py-10 text-center text-ink-muted">Memuatkan…</td>
+                        <td :colspan="activeColumns.length + (rowAction || $slots.action ? 1 : 0) + (selectable ? 1 : 0)" class="px-4 py-10 text-center text-ink-muted">Memuatkan…</td>
                     </tr>
                     <tr v-else-if="!rows.length">
-                        <td :colspan="activeColumns.length + (rowAction || $slots.action ? 1 : 0)" class="px-4 py-12 text-center">
+                        <td :colspan="activeColumns.length + (rowAction || $slots.action ? 1 : 0) + (selectable ? 1 : 0)" class="px-4 py-12 text-center">
                             <p class="font-medium">{{ emptyTitle }}</p>
                             <p class="mt-1 text-ink-muted">{{ emptyMessage }}</p>
                         </td>
@@ -404,6 +478,16 @@ onMounted(load);
                         :class="['transition hover:bg-surface-muted/60', row.original.url ? 'cursor-pointer' : '']"
                         @click="openRow(row.original)"
                     >
+                        <td v-if="selectable" class="px-4 py-3" @click.stop>
+                            <input
+                                v-if="row.original.id"
+                                type="checkbox"
+                                class="size-4 accent-brand-600"
+                                :checked="picked.includes(row.original.id)"
+                                :aria-label="`Pilih ${row.original[activeColumns[0].key]}`.replace(/<[^>]*>/g, '')"
+                                @change="togglePick(row.original.id)"
+                            >
+                        </td>
                         <td
                             v-for="cell in row.getVisibleCells()"
                             :key="cell.id"

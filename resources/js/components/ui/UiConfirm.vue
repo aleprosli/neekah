@@ -17,7 +17,8 @@ defineProps({
     // wording can come through as a prop instead.
     label: { type: String, default: null },
     triggerClass: { type: String, default: 'rounded-full border border-line px-3 py-1.5 text-xs font-medium transition hover:border-brand-400 hover:text-brand-700' },
-    /** Extra fields the confirmed form posts, e.g. { status: 'approved' }. */
+    /** Extra fields the confirmed form posts, e.g. { status: 'approved' }. An
+     *  array value posts one input per item, as ids[] for a batch action. */
     fields: { type: Object, default: () => ({}) },
     csrf: { type: String, required: true },
 });
@@ -49,7 +50,10 @@ const open = ref(false);
                     <form :action="action" method="POST">
                         <input type="hidden" name="_token" :value="csrf">
                         <input v-if="['PUT', 'PATCH', 'DELETE'].includes(method.toUpperCase())" type="hidden" name="_method" :value="method">
-                        <input v-for="(value, field) in fields" :key="field" type="hidden" :name="field" :value="value">
+                        <template v-for="(value, field) in fields" :key="field">
+                            <input v-if="!Array.isArray(value)" type="hidden" :name="field" :value="value">
+                            <input v-for="item in (Array.isArray(value) ? value : [])" v-else :key="`${field}-${item}`" type="hidden" :name="`${field}[]`" :value="item">
+                        </template>
                         <button
                             type="submit"
                             :class="['w-full rounded-full px-5 py-2.5 text-sm font-semibold transition sm:w-auto', tone === 'danger' ? 'bg-red-600 text-white hover:bg-red-700' : 'bg-brand-600 text-white hover:bg-brand-700']"

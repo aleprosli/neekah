@@ -6,6 +6,7 @@
             'dataUrl' => route('admin.vendors.data'),
             'columns' => $columns,
             'filters' => $filters,
+            'bulkActions' => $bulkActions,
             'searchPlaceholder' => 'Cari nama vendor atau bandar…',
             'emptyTitle' => 'Tiada vendor sepadan',
             'emptyMessage' => 'Cuba status lain, atau kosongkan carian.',
