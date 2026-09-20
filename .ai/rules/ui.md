@@ -14,3 +14,8 @@ Demo names are short, so a page can look fine at 360px and still blow out in pro
 To check: set a vendor name to something like "Studio Fotografi Dan Videografi Perkahwinan Nur Aisyah Enterprise Sdn Bhd", load the page, and confirm document.body.scrollWidth equals the viewport. Chrome on macOS will not open a window under 500px, so narrow document.documentElement instead — no Tailwind breakpoint sits between 390 and 500, so the layout is the same one a phone gets.
 
 Every flex or grid child in that chain needs min-w-0; break-words alone does not stop it.
+
+## Table filters are a DataTable prop; dataUrl must carry no query
+DataTable adds page/per_page/search/sort to dataUrl itself. Passing a url that already had a query (route('admin.vendors.data', ['status' => ...])) produced "...?status=pending?page=2", so the server read status="pending?page=2": the filter silently did nothing and paging stuck on page one. Every admin/vendor list had it.
+
+Status chips are now the `filters` prop — [{key, label?, value, allLabel?, hint?, options: [{value, label, count?, description?}]}], built with App\Support\TableFilter::fromEnum() — and the table swaps rows in place, writing the choice back to the address bar with replaceState. Groups are mutually exclusive (users: segment clears role, as the endpoint already did). A data() response may also return `columns`, which wins over the prop; that is how the segment views change columns without a page load. ResponsiveTablesTest fails on any dataUrl built with route parameters.

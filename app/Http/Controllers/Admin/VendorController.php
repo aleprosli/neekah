@@ -27,10 +27,22 @@ class VendorController extends Controller
 
     public function index(Request $request): View
     {
+        $counts = Vendor::selectRaw('status, count(*) as total')->groupBy('status')->pluck('total', 'status');
+
         return view('admin.vendors.index', [
             'columns' => self::COLUMNS,
-            'status' => VendorStatus::tryFrom($request->string('status')->toString()),
-            'counts' => Vendor::selectRaw('status, count(*) as total')->groupBy('status')->pluck('total', 'status'),
+            // The chips belong to the table, which swaps its rows in place; as
+            // links they reloaded the page and collided with its paging.
+            'filters' => [[
+                'key' => 'status',
+                'value' => VendorStatus::tryFrom($request->string('status')->toString())?->value,
+                'allLabel' => 'Semua ('.$counts->sum().')',
+                'options' => array_map(fn (VendorStatus $case): array => [
+                    'value' => $case->value,
+                    'label' => $case->label(),
+                    'count' => $counts[$case->value] ?? 0,
+                ], VendorStatus::cases()),
+            ]],
         ]);
     }
 

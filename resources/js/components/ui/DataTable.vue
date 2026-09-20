@@ -21,6 +21,13 @@ const props = defineProps({
     rows: { type: Array, default: null },
     /** [{ key, label, sortable?, align?, type? }] — type "html" renders trusted markup from the server. */
     columns: { type: Array, required: true },
+    /**
+     * Chip filters shown above the table, each group
+     * { key, label?, value, allLabel?, options: [{ value, label, count?, description? }] }.
+     * Choosing one reloads the rows in place; the groups are mutually
+     * exclusive, because a server that reads two of them at once has to pick.
+     */
+    filters: { type: Array, default: () => [] },
     searchPlaceholder: { type: String, default: 'Cari…' },
     emptyTitle: { type: String, default: 'Tiada rekod' },
     emptyMessage: { type: String, default: 'Tiada apa-apa untuk dipaparkan buat masa ini.' },
@@ -35,6 +42,11 @@ const props = defineProps({
 });
 
 const fetched = ref([]);
+const serverColumns = ref(null);
+
+/** A filtered list may come back with its own columns (the segment views do). */
+const activeColumns = computed(() => serverColumns.value ?? props.columns);
+
 const rows = computed(() => props.rows ?? fetched.value);
 
 /**
@@ -51,8 +63,36 @@ const sort = ref(props.initialSort);
 const direction = ref('desc');
 const page = ref(1);
 
+const selected = ref(Object.fromEntries(props.filters.map((group) => [group.key, group.value ?? ''])));
+
+/** One group at a time: picking a segment drops the role, as the server does. */
+const chooseFilter = (group, value) => {
+    Object.keys(selected.value).forEach((key) => {
+        selected.value[key] = key === group.key ? value : '';
+    });
+    page.value = 1;
+    load();
+    rememberFilters();
+};
+
+const activeOption = (group) => group.options.find((option) => option.value === selected.value[group.key]);
+
+/** Keep the address bar in step, so a refresh or a shared link filters too. */
+const rememberFilters = () => {
+    const url = new URL(window.location.href);
+    props.filters.forEach((group) => {
+        const value = selected.value[group.key];
+        if (value) {
+            url.searchParams.set(group.key, value);
+        } else {
+            url.searchParams.delete(group.key);
+        }
+    });
+    window.history.replaceState({}, '', url);
+};
+
 const columnDefs = computed(() =>
-    props.columns.map((column) => ({
+    activeColumns.value.map((column) => ({
         accessorKey: column.key,
         header: column.label,
         meta: column,
@@ -79,20 +119,32 @@ const load = async () => {
     loading.value = true;
     failed.value = false;
 
-    const query = new URLSearchParams({
+    // The endpoint may already carry a query of its own, so the parameters are
+    // merged into it. Appending "?page=2" to a url that has one makes the
+    // server read "status=pending?page=2": no filter, and always page one.
+    const url = new URL(props.dataUrl, window.location.origin);
+    const query = {
         page: page.value,
         per_page: props.perPage,
+        ...Object.fromEntries(Object.entries(selected.value).filter(([, value]) => value)),
         ...(search.value ? { search: search.value } : {}),
         ...(sort.value ? { sort: sort.value, direction: direction.value } : {}),
+    };
+    Object.entries(query).forEach(([key, value]) => url.searchParams.set(key, value));
+    props.filters.forEach((group) => {
+        if (!selected.value[group.key]) {
+            url.searchParams.delete(group.key);
+        }
     });
 
     try {
-        const response = await fetch(`${props.dataUrl}?${query}`, { headers: { Accept: 'application/json' } });
+        const response = await fetch(url, { headers: { Accept: 'application/json' } });
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
         const payload = await response.json();
         fetched.value = payload.data ?? [];
         meta.value = payload.meta ?? meta.value;
+        serverColumns.value = payload.columns ?? null;
     } catch (problem) {
         failed.value = true;
         fetched.value = [];
@@ -129,14 +181,14 @@ const openRow = (row) => {
 };
 
 const cardColumns = computed(() => {
-    const last = props.columns.at(-1);
+    const last = activeColumns.value.at(-1);
 
-    return props.columns.filter(
+    return activeColumns.value.filter(
         (column, at) => at !== 0 && !(column === last && last.type === 'html'),
     );
 });
 
-const sortableColumns = computed(() => props.columns.filter((column) => column.sortable));
+const sortableColumns = computed(() => activeColumns.value.filter((column) => column.sortable));
 
 const go = (to) => {
     page.value = Math.min(Math.max(1, to), meta.value.last_page);
@@ -158,6 +210,49 @@ onMounted(load);
 
 <template>
     <div class="flex min-w-0 flex-col gap-4">
+        <!-- Filters swap the rows in place. They were links that reloaded the
+             page, and the reload carried the filter in the endpoint's own
+             query, where it collided with paging. -->
+        <div v-for="group in filters" :key="group.key" class="flex min-w-0 flex-col gap-2">
+            <p v-if="group.label" class="font-display text-xs tracking-[0.18em] text-gold uppercase">{{ group.label }}</p>
+            <div class="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4 lg:mx-0 lg:flex-wrap lg:px-0">
+                <button
+                    type="button"
+                    :class="[
+                        'shrink-0 rounded-full border px-4 py-1.5 text-sm font-medium whitespace-nowrap transition',
+                        selected[group.key] ? 'border-line hover:border-brand-400' : 'border-brand-600 bg-brand-600 text-white',
+                    ]"
+                    :aria-pressed="!selected[group.key]"
+                    @click="chooseFilter(group, '')"
+                >{{ group.allLabel || 'Semua' }}</button>
+
+                <button
+                    v-for="option in group.options"
+                    :key="option.value"
+                    type="button"
+                    :title="option.description"
+                    :class="[
+                        'flex shrink-0 items-center gap-2 rounded-full border px-4 py-1.5 text-sm font-medium whitespace-nowrap transition',
+                        selected[group.key] === option.value ? 'border-brand-600 bg-brand-600 text-white' : 'border-line hover:border-brand-400',
+                    ]"
+                    :aria-pressed="selected[group.key] === option.value"
+                    @click="chooseFilter(group, option.value)"
+                >
+                    {{ option.label }}
+                    <span
+                        v-if="option.count !== undefined && option.count !== null"
+                        :class="[
+                            'rounded-full px-2 py-0.5 text-xs font-semibold tabular-nums',
+                            selected[group.key] === option.value ? 'bg-white/20' : 'bg-surface-muted text-ink-muted',
+                        ]"
+                    >{{ option.count }}</span>
+                </button>
+            </div>
+            <p v-if="group.hint || activeOption(group)?.description" class="text-sm text-ink-muted">
+                {{ activeOption(group)?.description || group.hint }}
+            </p>
+        </div>
+
         <div v-if="!isStatic || $slots.actions" class="flex flex-wrap items-center gap-3">
             <label v-if="!isStatic" class="relative min-w-0 flex-1 sm:max-w-xs">
                 <span class="sr-only">{{ searchPlaceholder }}</span>
@@ -206,12 +301,12 @@ onMounted(load);
                 >
                     <div class="flex min-w-0 items-start justify-between gap-3">
                         <p class="min-w-0 font-medium break-words">
-                            <slot :name="`cell-${columns[0].key}`" :row="row.original">
-                                <span v-if="columns[0].type === 'html'" v-html="row.original[columns[0].key]"></span>
-                                <span v-else>{{ row.original[columns[0].key] }}</span>
+                            <slot :name="`cell-${activeColumns[0].key}`" :row="row.original">
+                                <span v-if="activeColumns[0].type === 'html'" v-html="row.original[activeColumns[0].key]"></span>
+                                <span v-else>{{ row.original[activeColumns[0].key] }}</span>
                             </slot>
                         </p>
-                        <span v-if="columns.at(-1).type === 'html'" class="shrink-0" v-html="row.original[columns.at(-1).key]"></span>
+                        <span v-if="activeColumns.at(-1).type === 'html'" class="shrink-0" v-html="row.original[activeColumns.at(-1).key]"></span>
                     </div>
 
                     <dl class="flex min-w-0 flex-col gap-1 text-sm">
@@ -295,10 +390,10 @@ onMounted(load);
 
                 <tbody class="divide-y divide-line">
                     <tr v-if="loading && !rows.length">
-                        <td :colspan="columns.length + (rowAction || $slots.action ? 1 : 0)" class="px-4 py-10 text-center text-ink-muted">Memuatkan…</td>
+                        <td :colspan="activeColumns.length + (rowAction || $slots.action ? 1 : 0)" class="px-4 py-10 text-center text-ink-muted">Memuatkan…</td>
                     </tr>
                     <tr v-else-if="!rows.length">
-                        <td :colspan="columns.length + (rowAction || $slots.action ? 1 : 0)" class="px-4 py-12 text-center">
+                        <td :colspan="activeColumns.length + (rowAction || $slots.action ? 1 : 0)" class="px-4 py-12 text-center">
                             <p class="font-medium">{{ emptyTitle }}</p>
                             <p class="mt-1 text-ink-muted">{{ emptyMessage }}</p>
                         </td>

@@ -7,6 +7,7 @@ use App\Enums\PaymentStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
 use App\Models\Payment;
+use App\Support\TableFilter;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -34,7 +35,11 @@ class TransactionController extends Controller
 
         return view('admin.transactions', [
             'columns' => self::COLUMNS,
-            'status' => PaymentStatus::tryFrom($request->string('status')->toString()),
+            'filters' => [TableFilter::fromEnum(
+                'status',
+                PaymentStatus::cases(),
+                PaymentStatus::tryFrom($request->string('status')->toString())?->value,
+            )],
             'stats' => [
                 ['label' => 'Gross transaction value', 'value' => 'RM'.number_format($gross, 2), 'hint' => 'Semua bayaran diterima'],
                 ['label' => 'Komisen platform', 'value' => 'RM'.number_format($commission, 2), 'hint' => '8% daripada booking aktif'],

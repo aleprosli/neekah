@@ -39,6 +39,27 @@ it('never leaves a table able to run off a phone screen', function () {
     expect($unscrollable)->toBe([]);
 });
 
+it('never hands the table an endpoint that already carries a query', function () {
+    // The table adds its own page, search and sort parameters to dataUrl. When
+    // the url arrived with a filter already on it the two collided — the server
+    // read "status=pending?page=2", so the filter did nothing and paging stuck
+    // on page one. Filters belong in the `filters` prop, which the table sends
+    // as parameters of its own.
+    $offenders = [];
+
+    foreach (Finder::create()->files()->in(resource_path('views'))->name('*.blade.php') as $file) {
+        preg_match_all("/'dataUrl' => route\(([^\n]*)\)/", $file->getContents(), $matches);
+
+        foreach ($matches[1] as $arguments) {
+            if (str_contains($arguments, '[')) {
+                $offenders[] = str_replace(resource_path().'/', '', $file->getPathname());
+            }
+        }
+    }
+
+    expect($offenders)->toBe([]);
+});
+
 it('gives the shared table a card layout for narrow screens', function () {
     $table = file_get_contents(resource_path('js/components/ui/DataTable.vue'));
 

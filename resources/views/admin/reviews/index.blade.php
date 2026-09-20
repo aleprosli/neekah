@@ -1,15 +1,4 @@
 <x-layouts.admin title="Review" heading="Review" subheading="Semua review pada setiap profil vendor, termasuk yang sudah ditarik.">
-    <div class="no-scrollbar -mx-4 mb-4 flex gap-2 overflow-x-auto px-4 lg:mx-0 lg:px-0">
-        <a href="{{ route('admin.reviews.index') }}" @class(['rounded-full border px-4 py-1.5 text-sm font-medium whitespace-nowrap', 'border-brand-600 bg-brand-600 text-white' => ! $filter, 'border-line hover:border-brand-400' => $filter])>Semua ({{ $total }})</a>
-        @foreach ($filters as ['filter' => $case, 'total' => $count])
-            <a href="{{ route('admin.reviews.index', ['filter' => $case->value]) }}" @class(['rounded-full border px-4 py-1.5 text-sm font-medium whitespace-nowrap', 'border-brand-600 bg-brand-600 text-white' => $filter === $case, 'border-line hover:border-brand-400' => $filter !== $case])>{{ $case->label() }} ({{ $count }})</a>
-        @endforeach
-    </div>
-
-    <p class="mb-6 text-sm text-ink-muted">
-        {{ $filter?->description() ?? 'Review dari tempahan menggerakkan rating dan ranking vendor. Review terbuka tidak. Menyembunyikan boleh diundur; memadam tidak.' }}
-    </p>
-
     {{-- Carrying over a review the vendor already had elsewhere. --}}
     <details class="mb-6 min-w-0 rounded-2xl border border-line bg-surface-muted/40 p-4 sm:p-6">
         <summary class="cursor-pointer text-sm font-semibold">Tambah review secara manual</summary>
@@ -89,8 +78,9 @@
     <div
         data-vue="data-table"
         data-props="@vueProps([
-            'dataUrl' => route('admin.reviews.data', ['filter' => $filter?->value]),
+            'dataUrl' => route('admin.reviews.data'),
             'columns' => $columns,
+            'filters' => $filters,
             'searchPlaceholder' => 'Cari ulasan, penulis atau vendor…',
             'emptyTitle' => 'Tiada review sepadan',
             'emptyMessage' => 'Cuba penapis lain, atau kosongkan carian.',

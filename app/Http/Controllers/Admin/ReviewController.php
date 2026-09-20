@@ -34,15 +34,19 @@ class ReviewController extends Controller
 
         return view('admin.reviews.index', [
             'columns' => self::COLUMNS,
-            'filter' => $filter,
             'total' => Review::count(),
-            'filters' => array_map(
-                fn (ReviewFilter $case): array => [
-                    'filter' => $case,
-                    'total' => $case->apply(Review::query())->count(),
-                ],
-                ReviewFilter::cases(),
-            ),
+            'filters' => [[
+                'key' => 'filter',
+                'value' => $filter?->value,
+                'allLabel' => 'Semua ('.Review::count().')',
+                'hint' => 'Review dari tempahan menggerakkan rating dan ranking vendor. Review terbuka tidak. Menyembunyikan boleh diundur; memadam tidak.',
+                'options' => array_map(fn (ReviewFilter $case): array => [
+                    'value' => $case->value,
+                    'label' => $case->label(),
+                    'count' => $case->apply(Review::query())->count(),
+                    'description' => $case->description(),
+                ], ReviewFilter::cases()),
+            ]],
             'props' => VueProps::for([
                 'action' => route('admin.reviews.store'),
                 'vendors' => Vendor::orderBy('name')->get(['id', 'name'])->map(

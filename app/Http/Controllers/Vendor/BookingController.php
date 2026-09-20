@@ -11,6 +11,7 @@ use App\Models\Booking;
 use App\Models\Package;
 use App\Models\Payment;
 use App\Models\WeddingTimelineItem;
+use App\Support\TableFilter;
 use App\Support\VueProps;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
@@ -36,8 +37,12 @@ class BookingController extends Controller
 
         return view('vendor.bookings.index', [
             'columns' => self::COLUMNS,
-            'status' => BookingStatus::tryFrom($request->string('status')->toString()),
-            'counts' => $vendor->bookings()->selectRaw('status, count(*) as total')->groupBy('status')->pluck('total', 'status'),
+            'filters' => [TableFilter::fromEnum(
+                'status',
+                BookingStatus::cases(),
+                BookingStatus::tryFrom($request->string('status')->toString())?->value,
+                $vendor->bookings()->selectRaw('status, count(*) as total')->groupBy('status')->pluck('total', 'status'),
+            )],
         ]);
     }
 

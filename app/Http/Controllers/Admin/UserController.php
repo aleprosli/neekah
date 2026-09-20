@@ -43,13 +43,38 @@ class UserController extends Controller
     public function index(Request $request): View
     {
         $segment = UserSegment::tryFrom($request->string('segment')->toString());
+        $counts = User::selectRaw('role, count(*) as total')->groupBy('role')->pluck('total', 'role');
 
         return view('admin.users.index', [
             'columns' => $segment ? self::SEGMENT_COLUMNS : self::COLUMNS,
-            'role' => $segment ? null : UserRole::tryFrom($request->string('role')->toString()),
-            'segment' => $segment,
-            'counts' => User::selectRaw('role, count(*) as total')->groupBy('role')->pluck('total', 'role'),
-            'segments' => $this->segmentCounts(),
+            // Two groups the table swaps between in place. They are exclusive:
+            // a segment is already one role, and the data endpoint ignores the
+            // role once a segment is asked for.
+            'filters' => [
+                [
+                    'key' => 'role',
+                    'value' => $segment ? null : UserRole::tryFrom($request->string('role')->toString())?->value,
+                    'allLabel' => 'Semua ('.$counts->sum().')',
+                    'options' => array_map(fn (UserRole $case): array => [
+                        'value' => $case->value,
+                        'label' => $case->label(),
+                        'count' => $counts[$case->value] ?? 0,
+                    ], UserRole::cases()),
+                ],
+                [
+                    'key' => 'segment',
+                    'label' => 'Perlu diikuti',
+                    'value' => $segment?->value,
+                    'allLabel' => 'Tiada',
+                    'hint' => 'Pilih satu kumpulan untuk melihat senarai akaunnya.',
+                    'options' => array_map(fn (array $row): array => [
+                        'value' => $row['segment']->value,
+                        'label' => $row['segment']->label(),
+                        'count' => number_format($row['total']),
+                        'description' => $row['segment']->description(),
+                    ], $this->segmentCounts()),
+                ],
+            ],
         ]);
     }
 
@@ -109,6 +134,10 @@ class UserController extends Controller
                 'progress' => $segment ? $this->progressPill($user, $segment) : null,
                 'impersonate_url' => $user->canBeImpersonated() ? route('admin.users.impersonate', $user) : null,
             ])->all(),
+            // A segment view needs its own columns (a phone number to call and
+            // how far the account got), and the table now switches without a
+            // page load, so the columns travel with the rows.
+            'columns' => $segment ? self::SEGMENT_COLUMNS : self::COLUMNS,
             'meta' => [
                 'total' => $users->total(),
                 'per_page' => $users->perPage(),

@@ -110,12 +110,16 @@ it('shows every segment on the user page, each with its own count and definition
 
     $page = $this->actingAs($this->admin)->get(route('admin.users.index'))->assertOk();
 
-    foreach (UserSegment::cases() as $segment) {
-        $page->assertSee($segment->label())->assertSee($segment->description(), false);
-    }
+    // The chips are the table's own filters, so they travel as its props.
+    $group = collect($page->viewData('filters'))->firstWhere('key', 'segment');
 
-    $counts = collect($page->viewData('segments'))->mapWithKeys(
-        fn (array $row): array => [$row['segment']->value => $row['total']],
+    expect(collect($group['options'])->pluck('label')->all())
+        ->toBe(collect(UserSegment::cases())->map(fn (UserSegment $segment): string => $segment->label())->all())
+        ->and(collect($group['options'])->pluck('description')->all())
+        ->toBe(collect(UserSegment::cases())->map(fn (UserSegment $segment): string => $segment->description())->all());
+
+    $counts = collect($group['options'])->mapWithKeys(
+        fn (array $option): array => [$option['value'] => (int) str_replace(',', '', $option['count'])],
     );
 
     expect($counts[UserSegment::CoupleNoWedding->value])->toBe(1)

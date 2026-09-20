@@ -7,6 +7,7 @@ use App\Enums\PaymentStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
 use App\Models\Payment;
+use App\Support\TableFilter;
 use App\Support\VueProps;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
@@ -29,8 +30,12 @@ class BookingController extends Controller
     {
         return view('admin.bookings.index', [
             'columns' => self::COLUMNS,
-            'status' => BookingStatus::tryFrom($request->string('status')->toString()),
-            'counts' => Booking::selectRaw('status, count(*) as total')->groupBy('status')->pluck('total', 'status'),
+            'filters' => [TableFilter::fromEnum(
+                'status',
+                BookingStatus::cases(),
+                BookingStatus::tryFrom($request->string('status')->toString())?->value,
+                Booking::selectRaw('status, count(*) as total')->groupBy('status')->pluck('total', 'status'),
+            )],
         ]);
     }
 
