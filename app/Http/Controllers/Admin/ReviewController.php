@@ -38,7 +38,8 @@ class ReviewController extends Controller
             'filters' => [[
                 'key' => 'filter',
                 'value' => $filter?->value,
-                'allLabel' => 'Semua ('.Review::count().')',
+                'allLabel' => 'Semua',
+                'allCount' => Review::count(),
                 'hint' => 'Review dari tempahan menggerakkan rating dan ranking vendor. Review terbuka tidak. Menyembunyikan boleh diundur; memadam tidak.',
                 'options' => array_map(fn (ReviewFilter $case): array => [
                     'value' => $case->value,
@@ -65,9 +66,7 @@ class ReviewController extends Controller
             : 'created_at';
         $direction = $request->string('direction')->toString() === 'asc' ? 'asc' : 'desc';
 
-        $reviews = Review::query()
-            ->with(['vendor:id,name', 'user:id,name', 'photos'])
-            ->when($filter, fn ($query) => $filter->apply($query))
+        $matching = Review::query()
             ->when($request->string('search')->trim()->toString(), function ($query, string $keyword): void {
                 $like = '%'.$keyword.'%';
                 $query->where(fn ($query) => $query
@@ -75,7 +74,11 @@ class ReviewController extends Controller
                     ->orWhere('author_name', 'like', $like)
                     ->orWhereHas('vendor', fn ($vendor) => $vendor->where('name', 'like', $like))
                     ->orWhereHas('user', fn ($user) => $user->where('name', 'like', $like)));
-            })
+            });
+
+        $reviews = $matching->clone()
+            ->with(['vendor:id,name', 'user:id,name', 'photos'])
+            ->when($filter, fn ($query) => $filter->apply($query))
             ->orderBy($sort, $direction)
             ->paginate(min($request->integer('per_page', 20), 100));
 
@@ -89,6 +92,10 @@ class ReviewController extends Controller
                 'state' => view('components.admin.status-pill', $this->stateOf($review))->render(),
                 'actions' => $this->rowActions($review),
             ])->all(),
+            'filters' => ['filter' => collect(ReviewFilter::cases())
+                ->mapWithKeys(fn (ReviewFilter $case): array => [$case->value => $case->apply($matching->clone())->count()])
+                ->prepend($matching->clone()->count(), '')
+                ->all()],
             'meta' => [
                 'total' => $reviews->total(),
                 'per_page' => $reviews->perPage(),

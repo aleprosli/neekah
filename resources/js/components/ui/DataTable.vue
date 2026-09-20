@@ -72,6 +72,22 @@ const direction = ref('desc');
 const page = ref(1);
 
 const selected = ref(Object.fromEntries(props.filters.map((group) => [group.key, group.value ?? ''])));
+const liveCounts = ref(null);
+
+/** What a chip shows: the freshest count the endpoint gave, else the one it was born with. */
+const countFor = (group, value) => {
+    const live = liveCounts.value?.[group.key];
+
+    if (live && Object.prototype.hasOwnProperty.call(live, value)) {
+        return live[value];
+    }
+
+    if (value === '') {
+        return group.allCount ?? null;
+    }
+
+    return group.options.find((option) => option.value === value)?.count ?? null;
+};
 
 /**
  * Groups narrow each other, so a status and a setup state can be asked for at
@@ -164,6 +180,10 @@ const load = async () => {
         picked.value = [];
         meta.value = payload.meta ?? meta.value;
         serverColumns.value = payload.columns ?? null;
+        // Counts that follow the filters: the endpoint counts each group
+        // against what the others left, so a chip cannot claim 60 rows above
+        // an empty table.
+        liveCounts.value = payload.filters ?? null;
     } catch (problem) {
         failed.value = true;
         fetched.value = [];
@@ -265,7 +285,16 @@ onMounted(load);
                     ]"
                     :aria-pressed="!selected[group.key]"
                     @click="chooseFilter(group, '')"
-                >{{ group.allLabel || 'Semua' }}</button>
+                >
+                    {{ group.allLabel || 'Semua' }}
+                    <span
+                        v-if="countFor(group, '') !== null"
+                        :class="[
+                            'ml-2 rounded-full px-2 py-0.5 text-xs font-semibold tabular-nums',
+                            selected[group.key] ? 'bg-surface-muted text-ink-muted' : 'bg-white/20',
+                        ]"
+                    >{{ countFor(group, '') }}</span>
+                </button>
 
                 <button
                     v-for="option in group.options"
@@ -281,12 +310,12 @@ onMounted(load);
                 >
                     {{ option.label }}
                     <span
-                        v-if="option.count !== undefined && option.count !== null"
+                        v-if="countFor(group, option.value) !== null"
                         :class="[
                             'rounded-full px-2 py-0.5 text-xs font-semibold tabular-nums',
                             selected[group.key] === option.value ? 'bg-white/20' : 'bg-surface-muted text-ink-muted',
                         ]"
-                    >{{ option.count }}</span>
+                    >{{ countFor(group, option.value) }}</span>
                 </button>
             </div>
             <p v-if="group.hint || activeOption(group)?.description" class="text-sm text-ink-muted">

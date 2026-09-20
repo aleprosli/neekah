@@ -60,16 +60,18 @@ class TransactionController extends Controller
             : 'id';
         $direction = $request->string('direction')->toString() === 'asc' ? 'asc' : 'desc';
 
-        $payments = Payment::query()
-            ->with(['booking.vendor', 'booking.user', 'recorder'])
-            ->when($status, fn ($query) => $query->where('status', $status))
+        $matching = Payment::query()
             ->when($request->string('search')->trim()->toString(), function ($query, string $keyword): void {
                 $like = '%'.$keyword.'%';
                 $query->where(fn ($query) => $query
                     ->where('reference', 'like', $like)
                     ->orWhereHas('booking', fn ($query) => $query->where('reference', 'like', $like))
                     ->orWhereHas('booking.vendor', fn ($query) => $query->where('name', 'like', $like)));
-            })
+            });
+
+        $payments = $matching->clone()
+            ->with(['booking.vendor', 'booking.user', 'recorder'])
+            ->when($status, fn ($query) => $query->where('status', $status))
             ->orderBy($sort, $direction)
             ->paginate(min($request->integer('per_page', 25), 100));
 
@@ -84,6 +86,7 @@ class TransactionController extends Controller
                 'status' => view('components.admin.status-pill', ['label' => $payment->status->label(), 'tone' => $payment->status->tone()])->render(),
                 'date' => ($payment->paid_at ?? $payment->created_at)->translatedFormat('j M Y'),
             ])->all(),
+            'filters' => ['status' => TableFilter::countsByColumn($matching, 'status')],
             'meta' => [
                 'total' => $payments->total(),
                 'per_page' => $payments->perPage(),

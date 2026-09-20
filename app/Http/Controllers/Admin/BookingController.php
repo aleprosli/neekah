@@ -51,16 +51,20 @@ class BookingController extends Controller
             : 'id';
         $direction = $request->string('direction')->toString() === 'asc' ? 'asc' : 'desc';
 
-        $bookings = Booking::query()
-            ->with(['vendor', 'user', 'payments'])
-            ->when($status, fn ($query) => $query->where('status', $status))
+        // The chips count what the search left, so they never disagree with
+        // the table under them.
+        $matching = Booking::query()
             ->when($request->string('search')->trim()->toString(), function ($query, string $keyword): void {
                 $like = '%'.$keyword.'%';
                 $query->where(fn ($query) => $query
                     ->where('reference', 'like', $like)
                     ->orWhereHas('vendor', fn ($query) => $query->where('name', 'like', $like))
                     ->orWhereHas('user', fn ($query) => $query->where('name', 'like', $like)->orWhere('email', 'like', $like)));
-            })
+            });
+
+        $bookings = $matching->clone()
+            ->with(['vendor', 'user', 'payments'])
+            ->when($status, fn ($query) => $query->where('status', $status))
             ->orderBy($sort, $direction)
             ->paginate(min($request->integer('per_page', 15), 100));
 
@@ -75,6 +79,7 @@ class BookingController extends Controller
                 'paid' => 'RM'.number_format((float) $booking->payments->where('status', PaymentStatus::Paid)->sum('amount'), 2),
                 'status' => view('components.booking-status', ['status' => $booking->status])->render(),
             ])->all(),
+            'filters' => ['status' => TableFilter::countsByColumn($matching, 'status')],
             'meta' => [
                 'total' => $bookings->total(),
                 'per_page' => $bookings->perPage(),

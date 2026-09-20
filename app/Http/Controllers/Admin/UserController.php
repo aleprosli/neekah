@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\User;
 use App\Models\Vendor;
+use App\Support\TableFilter;
 use App\Support\VueProps;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
@@ -55,7 +56,8 @@ class UserController extends Controller
                     'key' => 'role',
                     'exclusive' => true,
                     'value' => $segment ? null : UserRole::tryFrom($request->string('role')->toString())?->value,
-                    'allLabel' => 'Semua ('.$counts->sum().')',
+                    'allLabel' => 'Semua',
+                    'allCount' => $counts->sum(),
                     'options' => array_map(fn (UserRole $case): array => [
                         'value' => $case->value,
                         'label' => $case->label(),
@@ -112,6 +114,12 @@ class UserController extends Controller
             : 'id';
         $direction = $request->string('direction')->toString() === 'asc' ? 'asc' : 'desc';
 
+        $matching = User::query()
+            ->when($request->string('search')->trim()->toString(), function ($query, string $keyword): void {
+                $like = '%'.$keyword.'%';
+                $query->where(fn ($query) => $query->where('name', 'like', $like)->orWhere('email', 'like', $like));
+            });
+
         $users = User::query()
             ->withCount(['bookings', 'weddings'])
             ->when($segment, fn ($query) => $segment->apply($query))
@@ -136,6 +144,15 @@ class UserController extends Controller
                 'progress' => $segment ? $this->progressPill($user, $segment) : null,
                 'impersonate_url' => $user->canBeImpersonated() ? route('admin.users.impersonate', $user) : null,
             ])->all(),
+            // The chips count what the search left, and a segment is counted
+            // through its own query, the same one the rows come from.
+            'filters' => [
+                'role' => TableFilter::countsByColumn($matching, 'role'),
+                'segment' => collect(UserSegment::cases())
+                    ->mapWithKeys(fn (UserSegment $case): array => [$case->value => $case->apply($matching->clone())->count()])
+                    ->prepend($matching->clone()->count(), '')
+                    ->all(),
+            ],
             // A segment view needs its own columns (a phone number to call and
             // how far the account got), and the table now switches without a
             // page load, so the columns travel with the rows.

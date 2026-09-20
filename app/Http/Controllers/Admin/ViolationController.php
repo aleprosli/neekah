@@ -47,14 +47,16 @@ class ViolationController extends Controller
     {
         $status = ViolationStatus::tryFrom($request->string('status')->toString());
 
-        $violations = VendorViolation::query()
-            ->with(['vendor', 'reporter', 'booking'])
-            ->when($status, fn ($query) => $query->where('status', $status))
+        $matching = VendorViolation::query()
             ->when($request->string('search')->trim()->toString(), function ($query, string $keyword): void {
                 $like = '%'.$keyword.'%';
                 $query->where(fn ($query) => $query->where('description', 'like', $like)
                     ->orWhereHas('vendor', fn ($vendor) => $vendor->where('name', 'like', $like)));
-            })
+            });
+
+        $violations = $matching->clone()
+            ->with(['vendor', 'reporter', 'booking'])
+            ->when($status, fn ($query) => $query->where('status', $status))
             ->orderByRaw("case when status = 'open' then 0 else 1 end")
             ->orderByDesc('id')
             ->paginate(min($request->integer('per_page', 20), 100));
@@ -72,6 +74,7 @@ class ViolationController extends Controller
                     'tone' => $violation->isOpen() ? 'amber' : 'muted',
                 ])->render(),
             ])->all(),
+            'filters' => ['status' => TableFilter::countsByColumn($matching, 'status')],
             'meta' => [
                 'total' => $violations->total(),
                 'per_page' => $violations->perPage(),

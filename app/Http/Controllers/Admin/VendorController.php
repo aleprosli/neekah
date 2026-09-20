@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Package;
 use App\Models\PortfolioItem;
 use App\Models\Vendor;
+use App\Support\TableFilter;
 use App\Support\VueProps;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
@@ -81,7 +82,8 @@ class VendorController extends Controller
                 [
                     'key' => 'status',
                     'value' => VendorStatus::tryFrom($request->string('status')->toString())?->value,
-                    'allLabel' => 'Semua ('.$counts->sum().')',
+                    'allLabel' => 'Semua',
+                    'allCount' => $counts->sum(),
                     'options' => array_map(fn (VendorStatus $case): array => [
                         'value' => $case->value,
                         'label' => $case->label(),
@@ -95,6 +97,7 @@ class VendorController extends Controller
                         ? $request->string('setup')->toString()
                         : null,
                     'allLabel' => 'Semua',
+                    'allCount' => Vendor::count(),
                     'hint' => 'Lengkap bermaksud profil penuh, sekurang-kurangnya satu pakej aktif dan tiga gambar portfolio.',
                     'options' => [
                         ['value' => 'complete', 'label' => 'Setup lengkap', 'count' => Vendor::setupComplete()->count()],
@@ -119,7 +122,21 @@ class VendorController extends Controller
 
         $setup = $request->string('setup')->toString();
 
-        $vendors = Vendor::query()
+        // Everything the two chip groups have in common, so each group can be
+        // counted against what the other one already narrowed.
+        $matching = fn (): Builder => Vendor::query()
+            ->when($request->string('search')->trim()->toString(), function (Builder $query, string $keyword): void {
+                $like = '%'.$keyword.'%';
+                $query->where(fn (Builder $query) => $query->where('name', 'like', $like)->orWhere('city', 'like', $like));
+            });
+
+        $withSetup = fn (Builder $query): Builder => $query
+            ->when($setup === 'complete', fn (Builder $query) => $query->setupComplete())
+            ->when($setup === 'partial', fn (Builder $query) => $query->whereNot(fn (Builder $inner) => $inner->setupComplete()));
+
+        $countingSetup = $matching()->when($status, fn (Builder $query) => $query->where('status', $status));
+
+        $vendors = $withSetup($countingSetup->clone())
             ->with(['category', 'user'])
             // The two counts the setup column and hasCompleteCatalogue() read,
             // so a page of vendors costs two queries rather than one each.
@@ -127,13 +144,6 @@ class VendorController extends Controller
                 'packages as active_packages_count' => fn ($packages) => $packages->where('is_active', true),
                 'portfolioItems',
             ])
-            ->when($status, fn ($query) => $query->where('status', $status))
-            ->when($setup === 'complete', fn (Builder $query) => $query->setupComplete())
-            ->when($setup === 'partial', fn (Builder $query) => $query->whereNot(fn (Builder $inner) => $inner->setupComplete()))
-            ->when($request->string('search')->trim()->toString(), function ($query, string $keyword): void {
-                $like = '%'.$keyword.'%';
-                $query->where(fn ($query) => $query->where('name', 'like', $like)->orWhere('city', 'like', $like));
-            })
             ->orderBy($sort, $direction)
             ->paginate(min($request->integer('per_page', 20), 100));
 
@@ -176,6 +186,16 @@ class VendorController extends Controller
                         ],
                     ],
             ])->all(),
+            // The chips follow the filters: each group counts what the others
+            // left, so a count can never disagree with the table under it.
+            'filters' => [
+                'status' => TableFilter::countsByColumn($withSetup($matching()), 'status'),
+                'setup' => [
+                    '' => $countingSetup->clone()->count(),
+                    'complete' => $countingSetup->clone()->setupComplete()->count(),
+                    'partial' => $countingSetup->clone()->whereNot(fn (Builder $inner) => $inner->setupComplete())->count(),
+                ],
+            ],
             'meta' => [
                 'total' => $vendors->total(),
                 'per_page' => $vendors->perPage(),

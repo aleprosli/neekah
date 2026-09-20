@@ -2,6 +2,8 @@
 
 namespace App\Support;
 
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Collection;
 
 /**
@@ -13,6 +15,28 @@ use Illuminate\Support\Collection;
  */
 class TableFilter
 {
+    /**
+     * How many rows sit behind each value of a column, plus '' for the lot.
+     *
+     * The chips count what the OTHER filters and the search already narrowed
+     * the list to, so "Setup lengkap 60" can never sit above an empty table.
+     *
+     * @param  Builder<*>|Relation<*, *, *>  $query
+     * @return array<string, int>
+     */
+    public static function countsByColumn(Builder|Relation $query, string $column): array
+    {
+        $counts = $query->clone()
+            ->reorder()
+            ->selectRaw($column.' as value, count(*) as total')
+            ->groupBy($column)
+            ->pluck('total', 'value')
+            ->map(fn ($total): int => (int) $total)
+            ->all();
+
+        return ['' => array_sum($counts)] + $counts;
+    }
+
     /**
      * A group built from an enum's cases, each chip carrying how many rows it holds.
      *
@@ -26,7 +50,10 @@ class TableFilter
             'key' => $key,
             'label' => $label,
             'value' => $value,
-            'allLabel' => $counts ? 'Semua ('.$counts->sum().')' : 'Semua',
+            // The count rides on the chip as a badge, kept up to date by the
+            // table from what the endpoint counted.
+            'allLabel' => 'Semua',
+            'allCount' => $counts?->sum(),
             'options' => array_map(fn (\BackedEnum $case): array => [
                 'value' => $case->value,
                 'label' => method_exists($case, 'label') ? $case->label() : $case->name,

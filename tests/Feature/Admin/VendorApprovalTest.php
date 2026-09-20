@@ -245,3 +245,43 @@ it('narrows the list to vendors who finished their setup, alongside the status',
         ->and($ids(['status' => 'pending', 'setup' => 'complete']))->toBe([$ready->id])
         ->and($ids(['status' => 'pending', 'setup' => 'partial']))->toBe([$thin->id]);
 });
+
+it('counts each chip against the other filters, so a count never sits above an empty table', function () {
+    // One pending vendor with nothing filled in, one approved and complete.
+    $pendingThin = Vendor::factory()->pending()->for(Category::first())->create(['name' => 'Baru Daftar']);
+
+    $approvedReady = Vendor::factory()->for(Category::first())->create(['name' => 'Studio Siap']);
+    Package::factory()->for($approvedReady)->create(['is_active' => true]);
+    PortfolioItem::factory()->count(3)->for($approvedReady)->create();
+
+    // Nothing chosen: both groups count the whole list.
+    $this->actingAs($this->admin)
+        ->getJson(route('admin.vendors.data'))
+        ->assertOk()
+        ->assertJsonPath('filters.setup.complete', 1)
+        ->assertJsonPath('filters.setup.partial', 1)
+        ->assertJsonPath('filters.status.pending', 1);
+
+    // Asking for the pending ones: no complete vendor is pending, and the chip
+    // says so instead of counting the approved one too.
+    $this->actingAs($this->admin)
+        ->getJson(route('admin.vendors.data', ['status' => 'pending']))
+        ->assertOk()
+        ->assertJsonPath('filters.setup.complete', 0)
+        ->assertJsonPath('filters.setup.partial', 1)
+        ->assertJsonCount(1, 'data');
+
+    // And the status chips count within the chosen setup state.
+    $this->actingAs($this->admin)
+        ->getJson(route('admin.vendors.data', ['setup' => 'complete']))
+        ->assertOk()
+        ->assertJsonPath('filters.status.approved', 1)
+        ->assertJsonPath('filters.status.pending', null);
+
+    // The search narrows the counts too.
+    $this->actingAs($this->admin)
+        ->getJson(route('admin.vendors.data', ['search' => 'Baru Daftar']))
+        ->assertOk()
+        ->assertJsonPath('filters.status.pending', 1)
+        ->assertJsonPath('filters.setup.complete', 0);
+});
