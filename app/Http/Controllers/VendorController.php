@@ -49,14 +49,7 @@ class VendorController extends Controller
         $vendors = Vendor::query()
             ->approved()
             ->with('category')
-            ->when($filters['q'], fn (Builder $query, string $keyword) => $query->where(function (Builder $query) use ($keyword): void {
-                $like = '%'.$keyword.'%';
-                $query->where('name', 'like', $like)
-                    ->orWhere('tagline', 'like', $like)
-                    ->orWhere('city', 'like', $like)
-                    ->orWhere('state', 'like', $like)
-                    ->orWhereHas('category', fn (Builder $query) => $query->where('name', 'like', $like));
-            }))
+            ->when($filters['q'], fn (Builder $query, string $keyword) => $query->matching($keyword))
             ->when($activeCategory, fn (Builder $query, Category $category) => $query->whereBelongsTo($category))
             ->when($filters['state'], fn (Builder $query, string $state) => $query->where('state', $state))
             ->when($filters['min_price'] !== null, fn (Builder $query) => $query->where('price_from', '>=', $filters['min_price']))

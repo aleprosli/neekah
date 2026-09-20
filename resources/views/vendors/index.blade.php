@@ -216,7 +216,7 @@
             <div class="flex flex-col gap-7 overflow-y-auto px-6 py-6">
                 <div class="flex flex-col gap-2">
                     <label for="q" class="font-semibold">Cari</label>
-                    <input id="q" type="search" name="q" value="{{ $filters['q'] }}" placeholder="Nama vendor, bandar…" class="rounded-xl border border-line bg-surface px-4 py-3 text-sm focus:border-brand-400 focus:outline-none">
+                    <input id="q" type="search" name="q" value="{{ $filters['q'] }}" placeholder="Nama vendor, pakej, bandar…" class="rounded-xl border border-line bg-surface px-4 py-3 text-sm focus:border-brand-400 focus:outline-none">
                 </div>
 
                 <div class="flex flex-col gap-2">

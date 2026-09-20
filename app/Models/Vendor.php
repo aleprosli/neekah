@@ -206,6 +206,42 @@ class Vendor extends Model
             ->has('portfolioItems', '>=', 3);
     }
 
+    /**
+     * Free-text search over everything a couple would type: the business name,
+     * its tagline and description, where it is, its category, and the names of
+     * the packages it sells. Each word has to match somewhere, so the more a
+     * couple types the narrower the list gets rather than the wider.
+     */
+    #[Scope]
+    protected function matching(Builder $query, string $keyword): Builder
+    {
+        $words = collect(preg_split('/\s+/', trim($keyword)) ?: [])
+            ->filter(fn (string $word): bool => mb_strlen($word) > 1)
+            ->take(6);
+
+        if ($words->isEmpty()) {
+            return $query;
+        }
+
+        return $query->where(function (Builder $query) use ($words): void {
+            foreach ($words as $word) {
+                $like = '%'.$word.'%';
+
+                $query->where(function (Builder $query) use ($like): void {
+                    $query->where('name', 'like', $like)
+                        ->orWhere('tagline', 'like', $like)
+                        ->orWhere('description', 'like', $like)
+                        ->orWhere('city', 'like', $like)
+                        ->orWhere('state', 'like', $like)
+                        ->orWhereHas('category', fn (Builder $category) => $category->where('name', 'like', $like))
+                        ->orWhereHas('packages', fn (Builder $packages) => $packages
+                            ->where('is_active', true)
+                            ->where(fn (Builder $package) => $package->where('name', 'like', $like)->orWhere('description', 'like', $like)));
+                });
+            }
+        });
+    }
+
     #[Scope]
     protected function approved(Builder $query): Builder
     {

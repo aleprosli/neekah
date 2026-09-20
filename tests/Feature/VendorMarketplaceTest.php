@@ -95,6 +95,59 @@ it('searches vendors by keyword and state', function () {
         ->assertDontSee('Pelamin Seri Selangor');
 });
 
+it('searches the description, the state and the package names, not just the business name', function () {
+    $byDescription = Vendor::factory()->for($this->photography)->create([
+        'name' => 'Lensa Cahaya',
+        'description' => 'Kami pakar gambar candid untuk majlis Melayu.',
+        'state' => 'Selangor',
+    ]);
+    $byPackage = Vendor::factory()->for($this->photography)->create(['name' => 'Studio Kita', 'state' => 'Kedah']);
+    Package::factory()->for($byPackage)->create(['name' => 'Pakej Candid Penuh', 'is_active' => true]);
+
+    $hidden = Vendor::factory()->for($this->photography)->create(['name' => 'Jauh Sekali', 'state' => 'Johor']);
+    Package::factory()->for($hidden)->create(['name' => 'Pakej Candid Penuh', 'is_active' => false]);
+
+    $found = fn (string $keyword): array => Vendor::approved()->matching($keyword)->pluck('name')->sort()->values()->all();
+
+    // A word from the description, and a word from a live package.
+    expect($found('candid'))->toBe([$byDescription->name, $byPackage->name])
+        ->and($found('Kedah'))->toBe([$byPackage->name])
+        // Every word has to land somewhere, so typing more narrows the list.
+        ->and($found('candid kedah'))->toBe([$byPackage->name])
+        ->and($found('candid johor'))->toBe([])
+        // A retired package is not something a couple can buy, so it is not searched.
+        ->and($found('Jauh'))->toBe([$hidden->name]);
+});
+
+it('keeps the category and the state alongside a keyword, each one narrowing further', function () {
+    Vendor::factory()->for($this->photography)->create(['name' => 'Gambar Selangor', 'state' => 'Selangor', 'description' => 'Rakaman majlis penuh.']);
+    Vendor::factory()->for($this->catering)->create(['name' => 'Katering Selangor', 'state' => 'Selangor', 'description' => 'Rakaman majlis penuh.']);
+    Vendor::factory()->for($this->photography)->create(['name' => 'Gambar Johor', 'state' => 'Johor', 'description' => 'Rakaman majlis penuh.']);
+
+    $this->get(route('vendors.index', ['q' => 'rakaman']))->assertOk()->assertSee('3 vendor');
+
+    $this->get(route('vendors.index', ['q' => 'rakaman', 'state' => 'Selangor']))
+        ->assertOk()
+        ->assertSee('2 vendor');
+
+    $this->get(route('vendors.index', ['q' => 'rakaman', 'state' => 'Selangor', 'category' => 'photography']))
+        ->assertOk()
+        ->assertSee('1 vendor')
+        ->assertSee('Gambar Selangor')
+        ->assertDontSee('Katering Selangor');
+});
+
+it('offers a keyword box in the search bar, and no budget select', function () {
+    // Budget left the bar: a couple knows what they want before what it costs,
+    // and the price filter is still in the toolbar under the results.
+    $this->get(route('vendors.index'))
+        ->assertOk()
+        ->assertSee('name="q"', false)
+        ->assertSee('Nama vendor atau pakej')
+        ->assertDontSee('Mana-mana bajet')
+        ->assertSee('Mana-mana negeri');
+});
+
 it('filters vendors by price, rating and tier', function () {
     Vendor::factory()->for($this->photography)->tier(VendorTier::Recommended)->create(['name' => 'Match Vendor', 'price_from' => 1500, 'rating_avg' => 4.9, 'reviews_count' => 10]);
     Vendor::factory()->for($this->photography)->tier(VendorTier::Recommended)->create(['name' => 'Too Expensive', 'price_from' => 2800, 'rating_avg' => 4.9, 'reviews_count' => 10]);
