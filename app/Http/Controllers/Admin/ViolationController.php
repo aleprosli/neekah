@@ -8,43 +8,76 @@ use App\Enums\ViolationStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ResolveViolationRequest;
 use App\Models\VendorViolation;
+use App\Support\TableFilter;
 use App\Support\VueProps;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
 class ViolationController extends Controller
 {
+    /** Columns for components/ui/DataTable.vue. */
+    private const COLUMNS = [
+        ['key' => 'vendor', 'label' => 'Vendor', 'type' => 'html'],
+        ['key' => 'type', 'label' => 'Jenis'],
+        ['key' => 'reporter', 'label' => 'Dilaporkan oleh'],
+        ['key' => 'description', 'label' => 'Aduan'],
+        ['key' => 'reported', 'label' => 'Bila'],
+        ['key' => 'badge', 'label' => 'Status', 'type' => 'html'],
+    ];
+
     public function index(Request $request): View
+    {
+        return view('admin.violations.index', [
+            'columns' => self::COLUMNS,
+            'filters' => [TableFilter::fromEnum(
+                'status',
+                ViolationStatus::cases(),
+                ViolationStatus::tryFrom($request->string('status')->toString())?->value,
+                VendorViolation::selectRaw('status, count(*) as total')->groupBy('status')->pluck('total', 'status'),
+            )],
+        ]);
+    }
+
+    /**
+     * A page of reports, the ones still to be looked at first.
+     */
+    public function data(Request $request): JsonResponse
     {
         $status = ViolationStatus::tryFrom($request->string('status')->toString());
 
         $violations = VendorViolation::query()
             ->with(['vendor', 'reporter', 'booking'])
             ->when($status, fn ($query) => $query->where('status', $status))
+            ->when($request->string('search')->trim()->toString(), function ($query, string $keyword): void {
+                $like = '%'.$keyword.'%';
+                $query->where(fn ($query) => $query->where('description', 'like', $like)
+                    ->orWhereHas('vendor', fn ($vendor) => $vendor->where('name', 'like', $like)));
+            })
             ->orderByRaw("case when status = 'open' then 0 else 1 end")
             ->orderByDesc('id')
-            ->paginate(20)
-            ->withQueryString();
+            ->paginate(min($request->integer('per_page', 20), 100));
 
-        $violations->setCollection($violations->getCollection()->map(fn (VendorViolation $violation): array => [
-            'id' => $violation->id,
-            'url' => route('admin.violations.show', $violation),
-            'vendor' => $violation->vendor->name,
-            'is_open' => $violation->isOpen(),
-            'badge' => $violation->isOpen()
-                ? 'Perlu semakan'
-                : ($violation->action?->label() ?? $violation->status->label()),
-            'type' => $violation->type->label(),
-            'reporter' => $violation->reporter?->name ?? 'pengguna dipadam',
-            'description' => $violation->description,
-            'reported' => $violation->created_at->diffForHumans(),
-        ]));
-
-        return view('admin.violations.index', [
-            'violations' => $violations,
-            'status' => $status,
-            'counts' => VendorViolation::selectRaw('status, count(*) as total')->groupBy('status')->pluck('total', 'status'),
+        return response()->json([
+            'data' => $violations->getCollection()->map(fn (VendorViolation $violation): array => [
+                'url' => route('admin.violations.show', $violation),
+                'vendor' => e($violation->vendor->name),
+                'type' => $violation->type->label(),
+                'reporter' => $violation->reporter?->name ?? 'pengguna dipadam',
+                'description' => $violation->description,
+                'reported' => $violation->created_at->diffForHumans(),
+                'badge' => view('components.admin.status-pill', [
+                    'label' => $violation->isOpen() ? 'Perlu semakan' : ($violation->action?->label() ?? $violation->status->label()),
+                    'tone' => $violation->isOpen() ? 'amber' : 'muted',
+                ])->render(),
+            ])->all(),
+            'meta' => [
+                'total' => $violations->total(),
+                'per_page' => $violations->perPage(),
+                'current_page' => $violations->currentPage(),
+                'last_page' => $violations->lastPage(),
+            ],
         ]);
     }
 

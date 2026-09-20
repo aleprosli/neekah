@@ -234,6 +234,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/transactions/data', [AdminArea\TransactionController::class, 'data'])->name('transactions.data');
     Route::post('/users/{user}/impersonate', [AdminArea\ImpersonationController::class, 'store'])->name('users.impersonate');
     Route::get('/violations', [AdminArea\ViolationController::class, 'index'])->name('violations.index');
+    Route::get('/violations/data', [AdminArea\ViolationController::class, 'data'])->name('violations.data');
     Route::get('/violations/{violation}', [AdminArea\ViolationController::class, 'show'])->name('violations.show');
     Route::put('/violations/{violation}', [AdminArea\ViolationController::class, 'update'])->name('violations.update');
     Route::resource('posts', AdminArea\PostController::class)->except('show');

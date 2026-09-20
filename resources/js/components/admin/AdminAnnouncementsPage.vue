@@ -90,7 +90,12 @@ watch(search, (keyword) => {
         searching.value = true;
 
         try {
-            const response = await fetch(`${props.searchUrl}?search=${encodeURIComponent(keyword.trim())}`, {
+            // Built through URL, not string concatenation: an endpoint that
+            // gains a query of its own would otherwise collide with this one.
+            const url = new URL(props.searchUrl, window.location.origin);
+            url.searchParams.set('search', keyword.trim());
+
+            const response = await fetch(url, {
                 headers: { Accept: 'application/json' },
             });
 

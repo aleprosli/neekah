@@ -76,7 +76,10 @@ const checkAddress = async (value) => {
     addressRequest = new AbortController();
 
     try {
-        const response = await fetch(`${props.subdomainCheckUrl}?subdomain=${encodeURIComponent(value)}`, {
+        const url = new URL(props.subdomainCheckUrl, window.location.origin);
+        url.searchParams.set('subdomain', value);
+
+        const response = await fetch(url, {
             headers: { Accept: 'application/json' },
             signal: addressRequest.signal,
         });

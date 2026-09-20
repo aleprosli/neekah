@@ -147,7 +147,15 @@ it('keeps customers and vendors out of the violation queue', function () {
     $this->actingAs($this->customer)->get(route('admin.violations.index'))->assertForbidden();
     $this->actingAs($this->vendor->user)->put(route('admin.violations.update', $violation), ['decision' => 'dismiss'])->assertForbidden();
 
-    $this->actingAs($this->admin)->get(route('admin.violations.index'))->assertOk()->assertSee($this->vendor->name);
+    $this->actingAs($this->customer)->getJson(route('admin.violations.data'))->assertForbidden();
+
+    $this->actingAs($this->admin)->get(route('admin.violations.index'))->assertOk();
+    // The rows come from the table's endpoint, filtered and paged there.
+    $this->actingAs($this->admin)
+        ->getJson(route('admin.violations.data'))
+        ->assertOk()
+        ->assertJsonPath('data.0.vendor', e($this->vendor->name))
+        ->assertJsonPath('meta.total', 1);
     // An open report reaches the admin with the decision still to make.
     $props = $this->actingAs($this->admin)->get(route('admin.violations.show', $violation))->assertOk()->viewData('props');
 
