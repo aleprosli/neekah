@@ -24,6 +24,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Booking through the platform
+    |--------------------------------------------------------------------------
+    | Off while Neekah is a network: couples contact vendors themselves and
+    | deal with them directly, so a public profile offers WhatsApp and an
+    | enquiry, not a booking form. The flow is still here — vendors record
+    | their own bookings — and switching this on brings the couple's side back
+    | when booking is automated.
+    */
+
+    'bookings_enabled' => (bool) env('NEEKAH_BOOKINGS_ENABLED', false),
+
+    /*
+    |--------------------------------------------------------------------------
     | Brand artwork
     |--------------------------------------------------------------------------
     | Every logo on the site reads from here, so swapping the brand is a change

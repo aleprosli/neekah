@@ -83,7 +83,7 @@
                             <th class="sticky left-0 z-10 border-t border-line bg-surface p-3"></th>
                             @foreach ($vendors as $vendor)
                                 <td class="border-t border-line p-3">
-                                    <a href="{{ route('vendors.show', $vendor) }}#tempah" class="inline-flex rounded-full bg-brand-600 px-4 py-2 text-xs font-semibold text-white transition hover:bg-brand-700">Tempah</a>
+                                    <a href="{{ route('vendors.show', $vendor) }}#hubungi" class="inline-flex rounded-full bg-brand-600 px-4 py-2 text-xs font-semibold text-white transition hover:bg-brand-700">Hubungi</a>
                                 </td>
                             @endforeach
                         </tr>

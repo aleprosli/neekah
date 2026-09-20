@@ -119,6 +119,7 @@ it('guards the login form as well', function () {
 });
 
 it('guards the booking form on a vendor page', function () {
+    config(['neekah.bookings_enabled' => true]);
     $this->seed(CategorySeeder::class);
     $customer = User::factory()->create();
     $vendor = Vendor::factory()->for(Category::first())->create();

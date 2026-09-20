@@ -55,6 +55,11 @@ class BookingController extends Controller
 
     public function store(StoreBookingRequest $request, Vendor $vendor, CreateBooking $createBooking): RedirectResponse
     {
+        // Booking through Neekah is switched off while the platform is a
+        // network: the vendor profile offers WhatsApp and an enquiry instead,
+        // and this endpoint answers 404 rather than quietly accepting a post
+        // nothing on the site links to. Vendors still record their own.
+        abort_unless(config('neekah.bookings_enabled'), 404);
         abort_unless($vendor->isApproved(), 404);
 
         $package = Package::findOrFail($request->integer('package_id'));

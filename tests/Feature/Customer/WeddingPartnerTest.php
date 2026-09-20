@@ -14,6 +14,10 @@ use Database\Seeders\CategorySeeder;
 use Illuminate\Support\Facades\Notification;
 
 beforeEach(function () {
+    // Booking through the platform is off by default; these cover the flow
+    // itself, which vendors still use and which returns when it is switched on.
+    config(['neekah.bookings_enabled' => true]);
+
     $this->seed(CategorySeeder::class);
     $this->aina = User::factory()->create(['name' => 'Aina Zulkifli', 'email' => 'aina@example.com']);
     $this->hakim = User::factory()->create(['name' => 'Hakim Ismail', 'email' => 'hakim@example.com']);

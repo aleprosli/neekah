@@ -55,7 +55,7 @@
                         <span class="text-ink-muted">·</span>
                         <a href="#review" class="underline underline-offset-4">{{ $publishedReviewsCount }} review</a>
                         <span class="text-ink-muted">·</span>
-                        {{ $vendor->completed_bookings_count }} majlis selesai
+                        <span class="text-ink-muted">{{ $vendor->city }}, {{ $vendor->state }}</span>
                     </p>
                 </div>
 
@@ -83,7 +83,7 @@
 
                 {{-- Highlights --}}
                 <ul class="flex flex-col gap-5 py-6">
-                    @foreach ([['🔒', 'Booking & rekod bayaran di Neekah', 'Setiap bayaran direkod dan disahkan vendor, jadi kedua-dua pihak ada rekod yang sama.'], ['⚡', 'Response rate '.$vendor->responseRateLabel(), $vendor->response_rate === null ? 'Vendor ini belum menerima cukup enquiry untuk kami mengukur kadar balasan mereka.' : 'Diukur dari enquiry yang diterima melalui Neekah.'], ['✓', $vendor->completed_bookings_count.' majlis selesai', 'Rating vendor ini dikira dari review tempahan yang disahkan sahaja.']] as [$icon, $title, $text])
+                    @foreach ([['💬', 'Berhubung terus dengan vendor', 'Hantar enquiry atau WhatsApp mereka sendiri. Neekah tidak mengambil komisen dan tidak memegang bayaran anda.'], ['⚡', 'Response rate '.$vendor->responseRateLabel(), $vendor->response_rate === null ? 'Vendor ini belum menerima cukup enquiry untuk kami mengukur kadar balasan mereka.' : 'Diukur dari enquiry yang diterima melalui Neekah.'], ['★', $publishedReviewsCount.' review', 'Sesiapa boleh menulis review di sini; yang datang daripada tempahan disahkan ditandakan berasingan.']] as [$icon, $title, $text])
                         <li class="flex gap-4">
                             <span class="w-6 shrink-0 text-center text-xl leading-6">{{ $icon }}</span>
                             <div class="min-w-0">
@@ -197,76 +197,109 @@
                 </section>
             </div>
 
-            {{-- Booking card --}}
-            <aside id="tempah" class="min-w-0 lg:sticky lg:top-28 lg:self-start">
-                <form method="POST" action="{{ route('vendors.bookings.store', $vendor) }}" class="flex flex-col gap-4 rounded-2xl border border-line bg-surface-raised p-6 shadow-xl shadow-brand-900/10">
-                    @csrf
-                    <p class="text-sm text-ink-muted">Dari <span class="font-display text-2xl font-semibold text-ink">RM{{ number_format($vendor->price_from) }}</span> / {{ $vendor->price_unit->label() }}</p>
+            {{-- What the couple does next. Booking through Neekah is off while
+                 the platform is a network: they deal with the vendor themselves,
+                 so this offers WhatsApp and an enquiry. Switching
+                 config('neekah.bookings_enabled') on brings the booking form back
+                 for when booking is automated. --}}
+            <aside id="hubungi" class="min-w-0 lg:sticky lg:top-28 lg:self-start">
+                @if (config('neekah.bookings_enabled'))
+                    <form method="POST" action="{{ route('vendors.bookings.store', $vendor) }}" class="flex flex-col gap-4 rounded-2xl border border-line bg-surface-raised p-6 shadow-xl shadow-brand-900/10">
+                        @csrf
+                        <p class="text-sm text-ink-muted">Dari <span class="font-display text-2xl font-semibold text-ink">RM{{ number_format($vendor->price_from) }}</span> / {{ $vendor->price_unit->label() }}</p>
 
-                    @if ($errors->any())
-                        <ul class="flex flex-col gap-1 rounded-xl bg-brand-50 p-3 text-xs text-brand-800">
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    @endif
-
-                    <div class="overflow-hidden rounded-xl border border-line">
-                        <label class="flex flex-col gap-0.5 border-b border-line px-4 py-2.5 focus-within:bg-surface-muted">
-                            <span class="text-[10px] font-semibold tracking-wide uppercase">Tarikh majlis</span>
-                            <input type="date" name="event_date" value="{{ old('event_date', $defaultEventDate ?? '') }}" min="{{ now()->addDay()->toDateString() }}" required class="bg-transparent text-sm focus:outline-none">
-                        </label>
-                        <label class="flex flex-col gap-0.5 border-b border-line px-4 py-2.5 focus-within:bg-surface-muted">
-                            <span class="text-[10px] font-semibold tracking-wide uppercase">Pakej</span>
-                            <select name="package_id" class="nk-select w-full bg-transparent pr-6 text-sm focus:outline-none" required>
-                                @foreach ($vendor->packages as $package)
-                                    <option value="{{ $package->id }}" @selected((int) old('package_id') === $package->id)>{{ $package->name }} · RM{{ number_format($package->price) }}</option>
+                        @if ($errors->any())
+                            <ul class="flex flex-col gap-1 rounded-xl bg-brand-50 p-3 text-xs text-brand-800">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
                                 @endforeach
-                            </select>
-                        </label>
-                        <label class="flex flex-col gap-0.5 px-4 py-2.5 focus-within:bg-surface-muted">
-                            <span class="text-[10px] font-semibold tracking-wide uppercase">Nota untuk vendor</span>
-                            <input type="text" name="notes" value="{{ old('notes') }}" placeholder="Contoh: majlis di dewan, 500 tetamu" class="bg-transparent text-sm focus:outline-none">
-                        </label>
-                    </div>
-
-                    <x-turnstile />
-
-                    <button type="submit" class="rounded-full bg-brand-600 py-3.5 text-sm font-semibold text-white transition hover:bg-brand-700 disabled:opacity-50" @disabled($vendor->packages->isEmpty())>
-                        {{ auth()->check() ? 'Tempah sekarang' : 'Log masuk untuk tempah' }}
-                    </button>
-
-                    @auth
-                        {{-- The vendor's own number is only ever rendered for a signed-in
-                             visitor, so it cannot be scraped from the public markup. --}}
-                        @if ($whatsapp = $vendor->whatsappUrl('Hai '.$vendor->name.', saya jumpa anda di Neekah. Boleh saya tanya tentang pakej untuk majlis saya?'))
-                            <a href="{{ $whatsapp }}" target="_blank" rel="noopener" class="flex items-center justify-center gap-2 rounded-full border border-brand-600 py-3.5 text-sm font-semibold text-brand-700 transition hover:bg-brand-50">
-                                <span aria-hidden="true">💬</span> WhatsApp vendor
-                            </a>
+                            </ul>
                         @endif
 
-                        @if ($vendor->phone)
-                            <p class="text-center text-sm text-ink-muted">
-                                Atau hubungi terus di <a href="tel:{{ preg_replace('/[^0-9+]/', '', $vendor->phone) }}" class="font-medium text-ink underline underline-offset-4">{{ $vendor->phone }}</a>
-                            </p>
-                        @endif
-                    @else
-                        @if ($vendor->phone || $vendor->whatsapp)
-                            <a href="{{ route('login') }}" class="flex items-center justify-center gap-2 rounded-full border border-brand-600 py-3.5 text-sm font-semibold text-brand-700 transition hover:bg-brand-50">
+                        <div class="overflow-hidden rounded-xl border border-line">
+                            <label class="flex flex-col gap-0.5 border-b border-line px-4 py-2.5 focus-within:bg-surface-muted">
+                                <span class="text-[10px] font-semibold tracking-wide uppercase">Tarikh majlis</span>
+                                <input type="date" name="event_date" value="{{ old('event_date', $defaultEventDate ?? '') }}" min="{{ now()->addDay()->toDateString() }}" required class="bg-transparent text-sm focus:outline-none">
+                            </label>
+                            <label class="flex flex-col gap-0.5 border-b border-line px-4 py-2.5 focus-within:bg-surface-muted">
+                                <span class="text-[10px] font-semibold tracking-wide uppercase">Pakej</span>
+                                <select name="package_id" class="nk-select w-full bg-transparent pr-6 text-sm focus:outline-none" required>
+                                    @foreach ($vendor->packages as $package)
+                                        <option value="{{ $package->id }}" @selected((int) old('package_id') === $package->id)>{{ $package->name }} · RM{{ number_format($package->price) }}</option>
+                                    @endforeach
+                                </select>
+                            </label>
+                            <label class="flex flex-col gap-0.5 px-4 py-2.5 focus-within:bg-surface-muted">
+                                <span class="text-[10px] font-semibold tracking-wide uppercase">Nota untuk vendor</span>
+                                <input type="text" name="notes" value="{{ old('notes') }}" placeholder="Contoh: majlis di dewan, 500 tetamu" class="bg-transparent text-sm focus:outline-none">
+                            </label>
+                        </div>
+
+                        <x-turnstile />
+
+                        <button type="submit" class="rounded-full bg-brand-600 py-3.5 text-sm font-semibold text-white transition hover:bg-brand-700 disabled:opacity-50" @disabled($vendor->packages->isEmpty())>
+                            {{ auth()->check() ? 'Tempah sekarang' : 'Log masuk untuk tempah' }}
+                        </button>
+
+                        @auth
+                            {{-- The vendor's own number is only ever rendered for a signed-in
+                                 visitor, so it cannot be scraped from the public markup. --}}
+                            @if ($whatsapp = $vendor->whatsappUrl('Hai '.$vendor->name.', saya jumpa anda di Neekah. Boleh saya tanya tentang pakej untuk majlis saya?'))
+                                <a href="{{ $whatsapp }}" target="_blank" rel="noopener" class="flex items-center justify-center gap-2 rounded-full border border-brand-600 py-3.5 text-sm font-semibold text-brand-700 transition hover:bg-brand-50">
+                                    <span aria-hidden="true">💬</span> WhatsApp vendor
+                                </a>
+                            @endif
+
+                            @if ($vendor->phone)
+                                <p class="text-center text-sm text-ink-muted">
+                                    Atau hubungi terus di <a href="tel:{{ preg_replace('/[^0-9+]/', '', $vendor->phone) }}" class="font-medium text-ink underline underline-offset-4">{{ $vendor->phone }}</a>
+                                </p>
+                            @endif
+                        @else
+                            @if ($vendor->phone || $vendor->whatsapp)
+                                <a href="{{ route('login') }}" class="flex items-center justify-center gap-2 rounded-full border border-brand-600 py-3.5 text-sm font-semibold text-brand-700 transition hover:bg-brand-50">
+                                    <span aria-hidden="true">💬</span> Log masuk untuk WhatsApp vendor
+                                </a>
+                                <p class="text-center text-sm text-ink-muted">Nombor vendor hanya dipaparkan kepada pengguna berdaftar.</p>
+                            @endif
+                        @endauth
+
+                        <p class="text-center text-sm text-ink-muted">Anda tidak dicaj di sini. Tempahan ini menghubungkan anda dengan vendor; bayaran diurus terus antara anda berdua dan direkodkan di halaman booking.</p>
+                    </form>
+                @else
+                    <div class="flex flex-col gap-4 rounded-2xl border border-line bg-surface-raised p-6 shadow-xl shadow-brand-900/10">
+                        <p class="text-sm text-ink-muted">Dari <span class="font-display text-2xl font-semibold text-ink">RM{{ number_format($vendor->price_from) }}</span> / {{ $vendor->price_unit->label() }}</p>
+
+                        @auth
+                            {{-- The vendor's own number is only ever rendered for a signed-in
+                                 visitor, so it cannot be scraped from the public markup. --}}
+                            @if ($whatsapp = $vendor->whatsappUrl('Hai '.$vendor->name.', saya jumpa anda di Neekah. Boleh saya tanya tentang pakej untuk majlis saya?'))
+                                <a href="{{ $whatsapp }}" target="_blank" rel="noopener" class="flex items-center justify-center gap-2 rounded-full bg-brand-600 py-3.5 text-sm font-semibold text-white transition hover:bg-brand-700">
+                                    <span aria-hidden="true">💬</span> WhatsApp vendor
+                                </a>
+                            @endif
+
+                            @if ($vendor->phone)
+                                <p class="text-center text-sm text-ink-muted">
+                                    Atau hubungi terus di <a href="tel:{{ preg_replace('/[^0-9+]/', '', $vendor->phone) }}" class="font-medium text-ink underline underline-offset-4">{{ $vendor->phone }}</a>
+                                </p>
+                            @endif
+                        @else
+                            <a href="{{ route('login') }}" class="flex items-center justify-center gap-2 rounded-full bg-brand-600 py-3.5 text-sm font-semibold text-white transition hover:bg-brand-700">
                                 <span aria-hidden="true">💬</span> Log masuk untuk WhatsApp vendor
                             </a>
                             <p class="text-center text-sm text-ink-muted">Nombor vendor hanya dipaparkan kepada pengguna berdaftar.</p>
-                        @endif
-                    @endauth
+                        @endauth
 
-                    <p class="text-center text-sm text-ink-muted">Anda tidak dicaj di sini. Tempahan ini menghubungkan anda dengan vendor; bayaran diurus terus antara anda berdua dan direkodkan di halaman booking.</p>
-                </form>
+                        <p class="text-center text-sm text-ink-muted">Anda berurusan terus dengan vendor. Neekah tidak memegang bayaran dan tidak mengambil komisen.</p>
+                    </div>
+                @endif
 
-                {{-- Enquiry --}}
-                <details class="mt-4 rounded-2xl border border-line bg-surface-raised p-5" @if ($errors->has('message')) open @endif>
-                    <summary class="cursor-pointer list-none text-sm font-semibold [&::-webkit-details-marker]:hidden">
-                        Ada soalan? Hantar enquiry dahulu →
-                    </summary>
+                {{-- Enquiry. Not folded into a <details> any more: with booking
+                     off this is the action the page is here for. --}}
+                <div class="mt-4 rounded-2xl border border-line bg-surface-raised p-5">
+                    <p class="text-sm font-semibold">Hantar enquiry</p>
+                    <p class="mt-1 text-sm text-ink-muted">Tanya tentang tarikh, pakej atau harga. Vendor menjawab terus kepada anda.</p>
                     @auth
                         <form method="POST" action="{{ route('vendors.enquiries.store', $vendor) }}" class="mt-4 flex flex-col gap-3">
                             @csrf
@@ -277,7 +310,7 @@
                     @else
                         <p class="mt-3 text-sm text-ink-muted"><a href="{{ route('login') }}" class="font-medium text-brand-600 underline underline-offset-4">Log masuk</a> untuk menghantar enquiry kepada vendor ini.</p>
                     @endauth
-                </details>
+                </div>
 
                 @auth
                     @if (auth()->user()->isCustomer())
@@ -309,7 +342,7 @@
                 <p><span class="font-semibold">RM{{ number_format($vendor->price_from) }}</span> <span class="text-ink-muted">/ {{ $vendor->price_unit->label() }}</span></p>
                 <p class="text-xs"><span class="text-gold-500">★</span> {{ $vendor->reviews_count ? number_format($vendor->rating_avg, 1) : 'Baru' }} <span class="text-ink-muted">· {{ $publishedReviewsCount }} review</span></p>
             </div>
-            <a href="#tempah" class="rounded-full bg-brand-600 px-6 py-3 text-sm font-semibold text-white">Tempah</a>
+            <a href="#hubungi" class="rounded-full bg-brand-600 px-6 py-3 text-sm font-semibold text-white">Hubungi vendor</a>
         </div>
     </div>
 

@@ -10,6 +10,10 @@ use App\Notifications\BookingCreatedForCustomer;
 use Database\Seeders\CategorySeeder;
 
 beforeEach(function () {
+    // Booking through the platform is off by default; these cover the flow
+    // itself, which vendors still use and which returns when it is switched on.
+    config(['neekah.bookings_enabled' => true]);
+
     $this->seed(CategorySeeder::class);
     $this->customer = User::factory()->create();
     $this->vendor = Vendor::factory()->for(Category::first())->create();

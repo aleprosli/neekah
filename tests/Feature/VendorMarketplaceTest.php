@@ -1,11 +1,13 @@
 <?php
 
 use App\Enums\VendorTier;
+use App\Models\Booking;
 use App\Models\Category;
 use App\Models\Package;
 use App\Models\Review;
 use App\Models\User;
 use App\Models\Vendor;
+use App\Models\Wedding;
 use App\Support\ContactSettings;
 use Database\Seeders\CategorySeeder;
 
@@ -136,7 +138,56 @@ it('shows a vendor profile with packages, reviews and related vendors', function
         ->assertSee('Hasil kerja sangat memuaskan.')
         ->assertSee($review->user->name)
         ->assertSee('Lensa Cahaya Studio')
-        ->assertSee('Log masuk untuk tempah');
+        // Booking through Neekah is off: a guest is offered the vendor's own
+        // line and an enquiry, never a booking form.
+        ->assertSee('Log masuk untuk WhatsApp vendor')
+        ->assertSee('Hantar enquiry')
+        ->assertDontSee('Tempah sekarang')
+        ->assertDontSee('Log masuk untuk tempah');
+});
+
+it('offers no booking form while booking through the platform is off', function () {
+    $vendor = Vendor::factory()->for($this->photography)->create();
+    $package = Package::factory()->for($vendor)->create();
+    $customer = User::factory()->create();
+
+    // Nothing links to it, and the endpoint itself is closed rather than
+    // quietly accepting a booking nobody can reach.
+    $this->actingAs($customer)
+        ->get(route('vendors.show', $vendor))
+        ->assertOk()
+        ->assertDontSee(route('vendors.bookings.store', $vendor), false)
+        ->assertSee('WhatsApp vendor');
+
+    $this->actingAs($customer)
+        ->post(route('vendors.bookings.store', $vendor), [
+            'package_id' => $package->id,
+            'event_date' => now()->addMonths(3)->toDateString(),
+        ])
+        ->assertNotFound();
+
+    expect(Booking::count())->toBe(0);
+});
+
+it('brings the booking form back when booking is switched on', function () {
+    config(['neekah.bookings_enabled' => true]);
+
+    $vendor = Vendor::factory()->for($this->photography)->create();
+    Package::factory()->for($vendor)->create();
+
+    $this->get(route('vendors.show', $vendor))->assertOk()->assertSee('Log masuk untuk tempah');
+
+    $customer = User::factory()->create();
+    Wedding::factory()->for($customer)->create();
+
+    $this->actingAs($customer)
+        ->post(route('vendors.bookings.store', $vendor), [
+            'package_id' => $vendor->packages()->value('id'),
+            'event_date' => now()->addMonths(3)->toDateString(),
+        ])
+        ->assertRedirect();
+
+    expect(Booking::count())->toBe(1);
 });
 
 it('shows the vendor\'s WhatsApp and phone only to a signed-in visitor', function () {
