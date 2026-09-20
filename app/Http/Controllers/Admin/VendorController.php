@@ -14,6 +14,7 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class VendorController extends Controller
 {
@@ -109,6 +110,72 @@ class VendorController extends Controller
     }
 
     /**
+     * The list the admin is looking at, as a CSV: the same filters, the same
+     * search, and the phone numbers the table has no room for. Streamed and
+     * chunked, so exporting every vendor costs one row of memory at a time.
+     */
+    public function export(Request $request): StreamedResponse
+    {
+        $status = VendorStatus::tryFrom($request->string('status')->toString());
+        $setup = $request->string('setup')->toString();
+
+        $vendors = $this->withSetup($this->searched($request), $setup)
+            ->when($status, fn (Builder $query) => $query->where('status', $status))
+            ->with(['category', 'user'])
+            ->withCount([
+                'packages as active_packages_count' => fn ($packages) => $packages->where('is_active', true),
+                'portfolioItems',
+            ]);
+
+        $name = collect([
+            'neekah-vendor',
+            $status?->value,
+            match ($setup) {
+                'complete' => 'setup-lengkap',
+                'partial' => 'setup-belum-lengkap',
+                default => null,
+            },
+            now()->format('Y-m-d'),
+        ])->filter()->implode('-').'.csv';
+
+        return response()->streamDownload(function () use ($vendors): void {
+            $handle = fopen('php://output', 'wb');
+
+            // Excel reads a CSV as the local codepage unless it is told
+            // otherwise, which turns every Malay name with an accent to mojibake.
+            fwrite($handle, "\xEF\xBB\xBF");
+
+            fputcsv($handle, [
+                'Nama', 'Kategori', 'Telefon', 'WhatsApp', 'Emel', 'Bandar', 'Negeri',
+                'Status', 'Tahap', 'Kelengkapan', 'Pakej aktif', 'Gambar portfolio', 'Daftar', 'Profil',
+            ]);
+
+            $vendors->chunkById(500, function ($chunk) use ($handle): void {
+                foreach ($chunk as $vendor) {
+                    fputcsv($handle, [
+                        $vendor->name,
+                        $vendor->category->name,
+                        $vendor->phone,
+                        $vendor->whatsapp ?: $vendor->phone,
+                        $vendor->user->email,
+                        $vendor->city,
+                        $vendor->state,
+                        $vendor->status->label(),
+                        $vendor->tier->label(),
+                        $vendor->hasCompleteProfile() && $vendor->hasCompleteCatalogue() ? 'Lengkap' : 'Belum lengkap',
+                        $vendor->active_packages_count,
+                        $vendor->portfolio_items_count,
+                        $vendor->created_at->toDateString(),
+                        route('admin.vendors.show', $vendor),
+                    ]);
+                }
+            });
+
+            fclose($handle);
+        }, $name, ['Content-Type' => 'text/csv; charset=UTF-8']);
+    }
+
+    /**
      * A page of vendors, each carrying the one status change that makes sense
      * for it: approve what is not approved, suspend what is.
      */
@@ -122,17 +189,8 @@ class VendorController extends Controller
 
         $setup = $request->string('setup')->toString();
 
-        // Everything the two chip groups have in common, so each group can be
-        // counted against what the other one already narrowed.
-        $matching = fn (): Builder => Vendor::query()
-            ->when($request->string('search')->trim()->toString(), function (Builder $query, string $keyword): void {
-                $like = '%'.$keyword.'%';
-                $query->where(fn (Builder $query) => $query->where('name', 'like', $like)->orWhere('city', 'like', $like));
-            });
-
-        $withSetup = fn (Builder $query): Builder => $query
-            ->when($setup === 'complete', fn (Builder $query) => $query->setupComplete())
-            ->when($setup === 'partial', fn (Builder $query) => $query->whereNot(fn (Builder $inner) => $inner->setupComplete()));
+        $matching = fn (): Builder => $this->searched($request);
+        $withSetup = fn (Builder $query): Builder => $this->withSetup($query, $setup);
 
         $countingSetup = $matching()->when($status, fn (Builder $query) => $query->where('status', $status));
 
@@ -263,6 +321,32 @@ class VendorController extends Controller
      * marketplace, so the dialog names the vendor rather than asking "Are you
      * sure?" about nothing in particular.
      */
+    /**
+     * The vendors the admin is looking at: the search only, so each chip group
+     * can be counted against what the others left.
+     *
+     * @return Builder<Vendor>
+     */
+    private function searched(Request $request): Builder
+    {
+        return Vendor::query()
+            ->when($request->string('search')->trim()->toString(), function (Builder $query, string $keyword): void {
+                $like = '%'.$keyword.'%';
+                $query->where(fn (Builder $query) => $query->where('name', 'like', $like)->orWhere('city', 'like', $like));
+            });
+    }
+
+    /**
+     * @param  Builder<Vendor>  $query
+     * @return Builder<Vendor>
+     */
+    private function withSetup(Builder $query, string $setup): Builder
+    {
+        return $query
+            ->when($setup === 'complete', fn (Builder $query) => $query->setupComplete())
+            ->when($setup === 'partial', fn (Builder $query) => $query->whereNot(fn (Builder $inner) => $inner->setupComplete()));
+    }
+
     private function statusQuestion(VendorStatus $status, Vendor $vendor): string
     {
         return match ($status) {

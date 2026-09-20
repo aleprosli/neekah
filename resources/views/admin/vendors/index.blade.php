@@ -7,6 +7,7 @@
             'columns' => $columns,
             'filters' => $filters,
             'bulkActions' => $bulkActions,
+            'exportUrl' => route('admin.vendors.export'),
             'searchPlaceholder' => 'Cari nama vendor atau bandar…',
             'emptyTitle' => 'Tiada vendor sepadan',
             'emptyMessage' => 'Cuba status lain, atau kosongkan carian.',

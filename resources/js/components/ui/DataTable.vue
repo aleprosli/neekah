@@ -46,6 +46,8 @@ const props = defineProps({
      * Rows must carry an `id` for this to have anything to post.
      */
     bulkActions: { type: Array, default: () => [] },
+    /** Endpoint that returns the list as a file; it is handed the same filters and search. */
+    exportUrl: { type: String, default: null },
     csrf: { type: String, default: '' },
 });
 
@@ -251,6 +253,21 @@ const togglePage = () => {
 /** __COUNT__ reads as the number ticked, so the dialog says what it will do. */
 const withCount = (text) => (text ?? '').replaceAll('__COUNT__', picked.value.length);
 
+/** The same list the table is showing, as a download. */
+const exportHref = computed(() => {
+    if (!props.exportUrl) {
+        return null;
+    }
+
+    const url = new URL(props.exportUrl, window.location.origin);
+    Object.entries(selected.value).forEach(([key, value]) => value && url.searchParams.set(key, value));
+    if (search.value) {
+        url.searchParams.set('search', search.value);
+    }
+
+    return url.toString();
+});
+
 const go = (to) => {
     page.value = Math.min(Math.max(1, to), meta.value.last_page);
     load();
@@ -352,6 +369,16 @@ onMounted(load);
                 <span v-else>{{ meta.total }} rekod</span>
             </p>
             <slot name="actions" />
+
+            <!-- Downloads exactly what is on screen: same chips, same search. -->
+            <a
+                v-if="exportHref"
+                :href="exportHref"
+                class="ml-auto inline-flex items-center gap-2 rounded-full border border-line px-4 py-2 text-xs font-semibold transition hover:border-brand-400 hover:text-brand-700"
+            >
+                <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 11l5 5 5-5M5 21h14"/></svg>
+                Muat turun CSV
+            </a>
         </div>
 
         <!-- What the ticked rows can be done to, shown only once something is

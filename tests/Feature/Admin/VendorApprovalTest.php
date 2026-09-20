@@ -285,3 +285,48 @@ it('counts each chip against the other filters, so a count never sits above an e
         ->assertJsonPath('filters.status.pending', 1)
         ->assertJsonPath('filters.setup.complete', 0);
 });
+
+it('exports the list as a csv with the phone numbers, following the filters', function () {
+    $ready = Vendor::factory()->for(Category::first())->create([
+        'name' => 'Studio Siap',
+        'phone' => '012-345 6789',
+        'whatsapp' => '019-888 7777',
+        'city' => 'Alor Setar',
+    ]);
+    Package::factory()->for($ready)->create(['is_active' => true]);
+    PortfolioItem::factory()->count(3)->for($ready)->create();
+
+    $thin = Vendor::factory()->pending()->for(Category::first())->create(['name' => 'Baru Daftar', 'phone' => '011-222 3333']);
+
+    $csv = fn (array $query): string => $this->actingAs($this->admin)
+        ->get(route('admin.vendors.export', $query))
+        ->assertOk()
+        ->assertHeader('content-type', 'text/csv; charset=UTF-8')
+        ->streamedContent();
+
+    // Everything, with the columns the admin came for.
+    $all = $csv([]);
+    expect($all)->toContain('Nama,Kategori,Telefon,WhatsApp')
+        ->toContain('Studio Siap')
+        ->toContain('012-345 6789')
+        ->toContain('019-888 7777')
+        ->toContain('Baru Daftar')
+        ->toContain('011-222 3333');
+
+    // The same chips as the table, so a filtered export holds only those rows.
+    expect($csv(['setup' => 'complete']))->toContain('Studio Siap')->not->toContain('Baru Daftar');
+    expect($csv(['setup' => 'partial']))->toContain('Baru Daftar')->not->toContain('Studio Siap');
+    expect($csv(['status' => 'pending']))->toContain('Baru Daftar')->not->toContain('Studio Siap');
+    expect($csv(['search' => 'Alor Setar']))->toContain('Studio Siap')->not->toContain('Baru Daftar');
+});
+
+it('names the export file after the filters, and keeps it to admins', function () {
+    $this->actingAs($this->admin)
+        ->get(route('admin.vendors.export', ['status' => 'pending', 'setup' => 'partial']))
+        ->assertOk()
+        ->assertDownload('neekah-vendor-pending-setup-belum-lengkap-'.now()->format('Y-m-d').'.csv');
+
+    $this->actingAs(User::factory()->create())
+        ->get(route('admin.vendors.export'))
+        ->assertForbidden();
+});
