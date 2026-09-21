@@ -18,6 +18,8 @@ return [
     'about' => 'Tentang',
     'vendor' => 'Vendor',
     'back_to_site' => 'Kembali ke Neekah',
+    'main' => 'Utama',
+    'open_menu' => 'Buka menu',
     'language' => 'Bahasa',
 
 ];

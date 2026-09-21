@@ -18,6 +18,8 @@ return [
     'about' => 'About',
     'vendor' => 'Vendor',
     'back_to_site' => 'Back to Neekah',
+    'main' => 'Main',
+    'open_menu' => 'Open menu',
     'language' => 'Language',
 
 ];

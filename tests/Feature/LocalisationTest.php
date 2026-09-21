@@ -128,3 +128,12 @@ it('ships the browser its own dictionary, in the language of the page', function
     expect($read('/login')['auth']['remember_me'])->toBe('Ingat saya')
         ->and($read('/en/login')['auth']['remember_me'])->toBe('Remember me');
 });
+
+it('changes language with a whole page load, not a region swap', function () {
+    // navigation.js swaps <main> and the nav regions and keeps everything
+    // else. Changing language changes the lang attribute, the dictionary the
+    // browser was handed for Vue, the sidebar and the header — so the URL
+    // changed while the page around it stayed in the old language until it
+    // was refreshed by hand.
+    $this->get('/')->assertOk()->assertSee('data-no-swap', false);
+});

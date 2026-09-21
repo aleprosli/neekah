@@ -112,7 +112,7 @@
 
         <div class="flex min-h-screen flex-col lg:pl-[17rem]">
             <header class="sticky top-0 z-30 flex h-16 shrink-0 items-center gap-3 border-b border-gold-300/40 bg-ivory/85 px-4 backdrop-blur-md sm:px-6 lg:px-10">
-                <label for="dashboard-drawer" class="-ml-1 flex size-9 cursor-pointer items-center justify-center rounded-full text-ink-muted hover:bg-brand-50 lg:hidden" aria-label="Buka menu">
+                <label for="dashboard-drawer" class="-ml-1 flex size-9 cursor-pointer items-center justify-center rounded-full text-ink-muted hover:bg-brand-50 lg:hidden" aria-label="{{ __('nav.open_menu') }}">
                     <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
                 </label>
 

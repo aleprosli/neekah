@@ -6,7 +6,7 @@
             <x-brand.lockup class="h-7 max-w-[42vw] object-contain sm:h-8" />
         </a>
 
-        <nav data-nav-region class="hidden items-center gap-1 text-sm font-medium md:flex" aria-label="Utama">
+        <nav data-nav-region class="hidden items-center gap-1 text-sm font-medium md:flex" aria-label="{{ __('nav.main') }}">
             <a href="{{ route('vendors.index') }}" @class(['rounded-full px-4 py-2 transition hover:bg-surface-muted', 'bg-surface-muted text-brand-700' => App\Support\Locales::routeIs('vendors.*')])>{{ __('nav.find_vendors') }}</a>
             <a href="{{ route('landing') }}#cara" class="rounded-full px-4 py-2 transition hover:bg-surface-muted">{{ __('nav.how_it_works') }}</a>
             <a href="{{ route('vendor.register') }}" class="rounded-full px-4 py-2 transition hover:bg-surface-muted">{{ __('nav.for_vendors') }}</a>
