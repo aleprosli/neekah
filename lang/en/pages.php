@@ -308,6 +308,7 @@ return [
     ],
 
     'gallery_page' => [
+        'designs' => ':count designs',
         'step_pick' => 'Pick a template',
         'step_pick_detail' => 'Tap any design below to see the full card.',
         'step_fill' => 'Fill in the details',
@@ -354,5 +355,21 @@ return [
     'errors' => [
         'cari_vendor' => 'Find vendors',
         'tentang_neekah' => 'About Neekah',
+    ],
+
+    'template_style' => [
+        'Klasik' => 'Classic',
+        'Islamik' => 'Islamic',
+        'Bunga' => 'Floral',
+        'Moden' => 'Modern',
+        'Malam' => 'Evening',
+    ],
+
+    'template_style_notes' => [
+        'Klasik' => 'Cream paper, maroon and gold ink — the traditional printed look.',
+        'Islamik' => 'Opens with the Bismillah, with geometry and a mihrab arch.',
+        'Bunga' => 'Pastel colours with petals drifting slowly down.',
+        'Moden' => 'Clean type, plenty of room and earth tones.',
+        'Malam' => 'A dark ground and gold shimmer, for an evening reception.',
     ],
 ];

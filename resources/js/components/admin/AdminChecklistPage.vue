@@ -11,6 +11,7 @@ import UiField from '../ui/UiField.vue';
 import UiTextarea from '../ui/UiTextarea.vue';
 
 const props = defineProps({
+    locales: { type: Array, required: true },
     sections: { type: Array, required: true },
     categories: { type: Array, required: true },
     stats: { type: Array, required: true },
@@ -43,20 +44,23 @@ const toggle = (id) => {
     open.value = next;
 };
 
+/** A value per language, from what the server sent or empty. */
+const perLocale = (values) => Object.fromEntries(props.locales.map((l) => [l.code, values?.[l.code] ?? '']));
+
 const editSection = (row = null) => {
     panel.value = { kind: 'section', row };
-    form.value = { title: row?.title ?? '', icon: row?.icon ?? '', note: row?.note ?? '', is_active: row ? row.is_active : true };
+    form.value = { title: perLocale(row?.titles), icon: row?.icon ?? '', note: perLocale(row?.notes_all), is_active: row ? row.is_active : true };
 };
 
 const editItem = (sectionId, row = null) => {
     panel.value = { kind: 'item', row, sectionId };
     form.value = {
         checklist_section_id: row?.checklist_section_id ?? sectionId,
-        title: row?.title ?? '',
-        group: row?.group ?? '',
+        title: perLocale(row?.titles),
+        group: perLocale(row?.groups),
         category_id: row?.category_id ?? '',
         months_before: row?.months_before ?? '',
-        notes: row?.notes ?? '',
+        notes: perLocale(row?.notes_all),
         is_active: row ? row.is_active : true,
     };
 };
@@ -242,16 +246,16 @@ const dueLabel = (months) => {
                 </div>
 
                 <template v-if="panel.kind === 'section'">
-                    <UiField v-model="form.title" :label="$t('admin_checklist.nama_fasa')" name="title" :placeholder="$t('admin_checklist.urusan_borang_dokumen_nikah')" :error="errors.title" required />
+                    <UiField v-for="locale in locales" :key="`st-${locale.code}`" v-model="form.title[locale.code]" :label="`${$t('admin_checklist.nama_fasa')} · ${locale.label}`" :name="`title[${locale.code}]`" :placeholder="$t('admin_checklist.urusan_borang_dokumen_nikah')" :error="errors[`title.${locale.code}`]" :required="locale.code === locales[0].code" />
                     <UiField v-model="form.icon" :label="$t('admin_checklist.ikon_emoji')" name="icon" placeholder="📄" :error="errors.icon" />
-                    <UiTextarea v-model="form.note" :label="$t('admin_checklist.nota')" name="note" rows="3" :error="errors.note" :help="$t('admin_checklist.dipaparkan_di_atas_fasa_ini')" />
+                    <UiTextarea v-for="locale in locales" :key="`sn-${locale.code}`" v-model="form.note[locale.code]" :label="`${$t('admin_checklist.nota')} · ${locale.label}`" :name="`note[${locale.code}]`" rows="3" :error="errors[`note.${locale.code}`]" :help="$t('admin_checklist.dipaparkan_di_atas_fasa_ini')" />
                 </template>
 
                 <template v-else>
                     <input type="hidden" name="checklist_section_id" :value="form.checklist_section_id">
 
-                    <UiField v-model="form.title" :label="$t('admin_checklist.tugasan')" name="title" :placeholder="$t('admin_checklist.submit_permohonan_ke_pejabat_agama')" :error="errors.title" required />
-                    <UiField v-model="form.group" :label="$t('admin_checklist.kumpulan')" name="group" :placeholder="$t('admin_checklist.dokumen_asas')" :error="errors.group" :help="$t('admin_checklist.tajuk_kecil_dalam_fasa_ini')" />
+                    <UiField v-for="locale in locales" :key="`it-${locale.code}`" v-model="form.title[locale.code]" :label="`${$t('admin_checklist.tugasan')} · ${locale.label}`" :name="`title[${locale.code}]`" :placeholder="$t('admin_checklist.submit_permohonan_ke_pejabat_agama')" :error="errors[`title.${locale.code}`]" :required="locale.code === locales[0].code" />
+                    <UiField v-for="locale in locales" :key="`ig-${locale.code}`" v-model="form.group[locale.code]" :label="`${$t('admin_checklist.kumpulan')} · ${locale.label}`" :name="`group[${locale.code}]`" :placeholder="$t('admin_checklist.dokumen_asas')" :error="errors[`group.${locale.code}`]" :help="$t('admin_checklist.tajuk_kecil_dalam_fasa_ini')" />
 
                     <label class="flex flex-col gap-1.5">
                         <span class="text-sm font-medium">{{ $t('admin_checklist.kategori_vendor') }}</span>
@@ -273,7 +277,7 @@ const dueLabel = (months) => {
                         help="0 bermaksud hari majlis. Kosongkan untuk tugasan tanpa tarikh akhir."
                     />
 
-                    <UiTextarea v-model="form.notes" :label="$t('admin_checklist.nota_2')" name="notes" rows="3" :error="errors.notes" />
+                    <UiTextarea v-for="locale in locales" :key="`in-${locale.code}`" v-model="form.notes[locale.code]" :label="`${$t('admin_checklist.nota_2')} · ${locale.label}`" :name="`notes[${locale.code}]`" rows="3" :error="errors[`notes.${locale.code}`]" />
                 </template>
 
                 <label class="flex items-center gap-2 text-sm">

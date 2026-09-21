@@ -5,6 +5,7 @@ use App\Models\SiteTemplate;
 use App\Models\Vendor;
 use App\Support\Locales;
 use Database\Seeders\CategorySeeder;
+use Database\Seeders\SiteTemplateSeeder;
 use Illuminate\Support\Facades\URL;
 
 beforeEach(function () {
@@ -212,4 +213,30 @@ it('finds a row by its text in whichever language the caller knows', function ()
     // where('name', ...) compares against the whole JSON document now.
     expect(Category::whereTranslated('name', 'Invitations')->sole()->slug)->toBe('invitation')
         ->and(Category::whereTranslated('name', 'Invitation')->sole()->slug)->toBe('invitation');
+});
+
+it('keeps the template style in the url while translating what is shown', function () {
+    $this->seed(SiteTemplateSeeder::class);
+
+    // The style is a closed set of five and it is in the gallery's URLs, so
+    // translating the value itself would move every one of those URLs.
+    $this->get('/en/kad-jemputan')->assertOk()
+        ->assertSee('Classic')
+        ->assertSee('?style=Klasik', false);
+
+    $this->get('/kad-jemputan')->assertOk()->assertSee('Klasik');
+});
+
+it('translates what a designer wrote about a template, not its name', function () {
+    $this->seed(SiteTemplateSeeder::class);
+
+    $template = SiteTemplate::where('slug', 'mawar-pagi')->sole();
+
+    // "Mawar Pagi" is the name of a design, the way a paint colour has a name.
+    app()->setLocale('en');
+    expect($template->name)->toBe('Mawar Pagi')
+        ->and($template->description)->toBe('Soft pink with a fall of petals.');
+
+    app()->setLocale('ms');
+    expect($template->description)->toBe('Merah jambu lembut dengan hujan kelopak.');
 });

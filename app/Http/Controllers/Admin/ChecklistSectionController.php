@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Casts\Translatable;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreChecklistSectionRequest;
 use App\Models\Category;
 use App\Models\ChecklistItem;
 use App\Models\ChecklistSection;
 use App\Models\Wedding;
+use App\Support\Locales;
 use App\Support\VueProps;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
@@ -39,11 +41,14 @@ class ChecklistSectionController extends Controller
                     ['label' => 'Majlis terlibat', 'value' => Wedding::count()],
                 ],
                 'categories' => Category::active()->ordered()->get(['id', 'name', 'icon']),
+                'locales' => collect(Locales::codes())->map(fn (string $c): array => ['code' => $c, 'label' => Locales::label($c)])->all(),
                 'sections' => $sections->map(fn (ChecklistSection $section): array => [
                     'id' => $section->id,
                     'title' => $section->title,
+                    'titles' => Translatable::all($section, 'title'),
                     'icon' => $section->icon,
                     'note' => $section->note,
+                    'notes_all' => Translatable::all($section, 'note'),
                     'is_active' => $section->is_active,
                     'update_url' => route('admin.checklist.sections.update', $section),
                     'destroy_url' => route('admin.checklist.sections.destroy', $section),
@@ -51,8 +56,11 @@ class ChecklistSectionController extends Controller
                         'id' => $item->id,
                         'checklist_section_id' => $item->checklist_section_id,
                         'title' => $item->title,
+                        'titles' => Translatable::all($item, 'title'),
                         'group' => $item->group,
+                        'groups' => Translatable::all($item, 'group'),
                         'notes' => $item->notes,
+                        'notes_all' => Translatable::all($item, 'notes'),
                         'months_before' => $item->months_before,
                         'is_active' => $item->is_active,
                         'category_id' => $item->category_id,

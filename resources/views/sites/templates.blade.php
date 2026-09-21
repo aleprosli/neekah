@@ -1,11 +1,5 @@
 @php
-    $notes = [
-        'Klasik' => 'Kertas krim, dakwat marun dan emas — gaya kad cetak tradisional.',
-        'Islamik' => 'Dibuka dengan Bismillah, bercorak geometri dan gerbang mihrab.',
-        'Bunga' => 'Warna pastel dengan kelopak yang gugur perlahan.',
-        'Moden' => 'Tipografi bersih, ruang lapang dan tona tanah.',
-        'Malam' => 'Latar gelap dan kilauan emas untuk resepsi malam.',
-    ];
+    $notes = __('pages.template_style_notes');
     $groups = $templates->groupBy('style');
     $startUrl = auth()->check() ? route('site.edit') : route('register');
 @endphp
@@ -46,7 +40,7 @@
             <div class="no-scrollbar mx-auto flex max-w-6xl gap-2 overflow-x-auto px-4 py-3 sm:justify-center sm:px-6">
                 <a href="{{ route('sites.templates') }}" @class(['shrink-0 rounded-full border px-4 py-1.5 text-sm font-medium transition', 'border-brand-600 bg-brand-600 text-white' => ! $style, 'border-line hover:border-brand-400' => $style])>{{ __('pages.gallery_page.semua') }}</a>
                 @foreach ($styles as $name)
-                    <a href="{{ route('sites.templates', ['style' => $name]) }}" @class(['shrink-0 rounded-full border px-4 py-1.5 text-sm font-medium transition', 'border-brand-600 bg-brand-600 text-white' => $style === $name, 'border-line hover:border-brand-400' => $style !== $name])>{{ $name }}</a>
+                    <a href="{{ route('sites.templates', ['style' => $name]) }}" @class(['shrink-0 rounded-full border px-4 py-1.5 text-sm font-medium transition', 'border-brand-600 bg-brand-600 text-white' => $style === $name, 'border-line hover:border-brand-400' => $style !== $name])>{{ __('pages.template_style.'.$name) }}</a>
                 @endforeach
             </div>
         </nav>
@@ -56,8 +50,8 @@
             @foreach ($groups as $name => $group)
                 <section>
                     <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-line pb-3">
-                        <h2 class="font-display text-2xl font-semibold">{{ $name }}</h2>
-                        <p class="text-sm text-ink-muted">{{ $notes[$name] ?? '' }} <span class="whitespace-nowrap">· {{ $group->count() }} reka bentuk</span></p>
+                        <h2 class="font-display text-2xl font-semibold">{{ __('pages.template_style.'.$name) }}</h2>
+                        <p class="text-sm text-ink-muted">{{ $notes[$name] ?? '' }} <span class="whitespace-nowrap">· {{ __('pages.gallery_page.designs', ['count' => $group->count()]) }}</span></p>
                     </div>
 
                     <ul class="mt-6 grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 lg:grid-cols-4">

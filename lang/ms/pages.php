@@ -308,6 +308,7 @@ return [
     ],
 
     'gallery_page' => [
+        'designs' => ':count reka bentuk',
         'step_pick' => 'Pilih template',
         'step_pick_detail' => 'Tekan mana-mana reka bentuk di bawah untuk melihat contoh penuh.',
         'step_fill' => 'Isi maklumat majlis',
@@ -354,5 +355,21 @@ return [
     'errors' => [
         'cari_vendor' => 'Cari vendor',
         'tentang_neekah' => 'Tentang Neekah',
+    ],
+
+    'template_style' => [
+        'Klasik' => 'Klasik',
+        'Islamik' => 'Islamik',
+        'Bunga' => 'Bunga',
+        'Moden' => 'Moden',
+        'Malam' => 'Malam',
+    ],
+
+    'template_style_notes' => [
+        'Klasik' => 'Kertas krim, dakwat marun dan emas — gaya kad cetak tradisional.',
+        'Islamik' => 'Dibuka dengan Bismillah, bercorak geometri dan gerbang mihrab.',
+        'Bunga' => 'Warna pastel dengan kelopak yang gugur perlahan.',
+        'Moden' => 'Tipografi bersih, ruang lapang dan tona tanah.',
+        'Malam' => 'Latar gelap dan kilauan emas untuk resepsi malam.',
     ],
 ];
