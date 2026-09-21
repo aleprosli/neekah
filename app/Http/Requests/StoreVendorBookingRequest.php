@@ -74,7 +74,7 @@ class StoreVendorBookingRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'customer_email.exists' => 'Tiada akaun pengantin dengan emel ini. Minta pelanggan daftar di Neekah dahulu.',
+            'customer_email.exists' => __('validation.custom.no_customer_account'),
         ];
     }
 }

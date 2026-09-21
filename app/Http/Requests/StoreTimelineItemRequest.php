@@ -65,7 +65,7 @@ class StoreTimelineItemRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'vendor_id.in' => 'Anda hanya boleh menugaskan vendor yang telah ditempah untuk majlis ini.',
+            'vendor_id.in' => __('validation.custom.timeline_vendor_not_booked'),
         ];
     }
 }

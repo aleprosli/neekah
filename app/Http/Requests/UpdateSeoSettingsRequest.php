@@ -50,7 +50,7 @@ class UpdateSeoSettingsRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'twitter.regex' => 'Akaun X hanya boleh mengandungi huruf, nombor dan garis bawah.',
+            'twitter.regex' => __('validation.custom.twitter_handle'),
         ];
     }
 }

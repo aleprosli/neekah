@@ -181,6 +181,13 @@ return [
     */
 
     'custom' => [
+        'timeline_vendor_not_booked' => 'Anda hanya boleh menugaskan vendor yang telah ditempah untuk majlis ini.',
+        'no_customer_account' => 'Tiada akaun pengantin dengan emel ini. Minta pelanggan daftar di Neekah dahulu.',
+        'twitter_handle' => 'Akaun X hanya boleh mengandungi huruf, nombor dan garis bawah.',
+        'current_password_to_change_email' => 'Masukkan kata laluan semasa anda untuk menukar emel.',
+        'report_too_short' => 'Sila terangkan apa yang berlaku sekurang-kurangnya 20 aksara supaya admin boleh menyiasat.',
+        'rsvp_pax_over' => 'Jemputan anda adalah untuk :max orang. Sila hubungi pengantin jika perlu tambah.',
+
         'attribute-name' => [
             'rule-name' => 'custom-message',
         ],

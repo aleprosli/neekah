@@ -54,7 +54,7 @@ class UpdateAccountRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'current_password.required' => 'Masukkan kata laluan semasa anda untuk menukar emel.',
+            'current_password.required' => __('validation.custom.current_password_to_change_email'),
         ];
     }
 }

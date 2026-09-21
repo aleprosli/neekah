@@ -74,7 +74,7 @@ class StoreRsvpRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'pax.between' => 'Jemputan anda adalah untuk :max orang. Sila hubungi pengantin jika perlu tambah.',
+            'pax.between' => __('validation.custom.rsvp_pax_over'),
         ];
     }
 }

@@ -181,6 +181,13 @@ return [
     */
 
     'custom' => [
+        'timeline_vendor_not_booked' => 'You can only assign a vendor you have booked for this wedding.',
+        'no_customer_account' => 'There is no couple account with this email. Ask your customer to register on Neekah first.',
+        'twitter_handle' => 'An X account can only contain letters, numbers and underscores.',
+        'current_password_to_change_email' => 'Enter your current password to change your email.',
+        'report_too_short' => 'Please describe what happened in at least 20 characters, so an admin can look into it.',
+        'rsvp_pax_over' => 'Your invitation is for :max people. Please contact the couple if you need more.',
+
         'attribute-name' => [
             'rule-name' => 'custom-message',
         ],
