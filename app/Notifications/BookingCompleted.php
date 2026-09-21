@@ -3,6 +3,7 @@
 namespace App\Notifications;
 
 use App\Models\Booking;
+use App\Support\NeekahMail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -29,20 +30,19 @@ class BookingCompleted extends Notification implements ShouldQueue
     {
         return [
             'icon' => '⭐',
-            'title' => "Majlis dengan {$this->booking->vendor->name} selesai",
-            'body' => 'Kongsi pengalaman anda dengan memberi review.',
+            'title_key' => 'notifications.booking_completed.title',
+            'title_params' => ['vendor' => $this->booking->vendor->name],
+            'body_key' => 'notifications.booking_completed.body',
             'url' => route('bookings.show', $this->booking),
         ];
     }
 
     public function toMail(object $notifiable): MailMessage
     {
-        return (new MailMessage)
-            ->subject('Bagaimana majlis anda dengan '.$this->booking->vendor->name.'?')
-            ->greeting('Hai '.$notifiable->name.',')
-            ->line($this->booking->vendor->name.' telah menandakan booking '.$this->booking->reference.' sebagai selesai.')
-            ->line('Kongsi pengalaman anda. Review hanya boleh diberi oleh pengantin yang benar-benar menempah, jadi ulasan anda sangat bermakna kepada pengantin lain.')
-            ->action('Beri review', route('bookings.show', $this->booking))
-            ->salutation('Terima kasih, Neekah');
+        return NeekahMail::to($notifiable)
+            ->subject(__('notifications.booking_completed.subject', ['vendor' => $this->booking->vendor->name]))
+            ->line(__('notifications.booking_completed.intro', ['vendor' => $this->booking->vendor->name, 'reference' => $this->booking->reference]))
+            ->line(__('notifications.booking_completed.ask_review'))
+            ->action(__('notifications.actions.write_review'), route('bookings.show', $this->booking));
     }
 }

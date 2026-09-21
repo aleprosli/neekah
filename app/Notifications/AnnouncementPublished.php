@@ -3,6 +3,7 @@
 namespace App\Notifications;
 
 use App\Models\Announcement;
+use App\Support\NeekahMail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -47,7 +48,7 @@ class AnnouncementPublished extends Notification implements ShouldQueue
         // A typed-in address has no account, so there is no name to greet.
         $name = $notifiable->name ?? null;
 
-        $message = (new MailMessage)
+        $message = NeekahMail::to($notifiable)
             ->subject($this->announcement->subject)
             ->greeting($name ? 'Hai '.$name.',' : 'Hai,');
 

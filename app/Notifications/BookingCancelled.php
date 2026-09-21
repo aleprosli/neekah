@@ -4,6 +4,7 @@ namespace App\Notifications;
 
 use App\Models\Booking;
 use App\Models\User;
+use App\Support\NeekahMail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -30,28 +31,28 @@ class BookingCancelled extends Notification implements ShouldQueue
     {
         return [
             'icon' => '🚫',
-            'title' => "Booking {$this->booking->reference} dibatalkan",
-            'body' => $this->canceller->name.' membatalkan tempahan '.$this->booking->package_name.'.',
+            'title_key' => 'notifications.booking_cancelled.title',
+            'title_params' => ['reference' => $this->booking->reference],
+            'body_key' => 'notifications.booking_cancelled.body',
+            'body_params' => ['name' => $this->canceller->name, 'package' => $this->booking->package_name],
             'url' => $this->url($notifiable),
         ];
     }
 
     public function toMail(object $notifiable): MailMessage
     {
-        $message = (new MailMessage)
-            ->subject('Booking '.$this->booking->reference.' dibatalkan')
-            ->greeting('Hai '.$notifiable->name.',')
-            ->line($this->canceller->name.' telah membatalkan booking '.$this->booking->reference.'.')
+        $message = NeekahMail::to($notifiable)
+            ->subject(__('notifications.booking_cancelled.subject', ['reference' => $this->booking->reference]))
+            ->line(__('notifications.booking_cancelled.intro', ['name' => $this->canceller->name, 'reference' => $this->booking->reference]))
             ->line($this->booking->package_name.' · '.$this->booking->event_date->translatedFormat('l, j F Y'));
 
         if ($this->reason) {
-            $message->line('Sebab: '.$this->reason);
+            $message->line(__('notifications.booking_cancelled.reason', ['reason' => $this->reason]));
         }
 
         return $message
-            ->line('Tiada bayaran yang disahkan pada booking ini, jadi tiada apa yang perlu dipulangkan melalui Neekah.')
-            ->action('Lihat booking', $this->url($notifiable))
-            ->salutation('Terima kasih, Neekah');
+            ->line(__('notifications.booking_cancelled.no_refund'))
+            ->action(__('notifications.actions.view_booking'), $this->url($notifiable));
     }
 
     private function url(object $notifiable): string

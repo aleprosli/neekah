@@ -25,11 +25,12 @@
         </div>
 
         @forelse ($unread as $notification)
+            @php($shown = App\Support\StoredNotification::render($notification->data))
             <a href="{{ route('notifications.show', $notification->id) }}" class="flex gap-3 border-b border-line px-4 py-3 transition last:border-b-0 hover:bg-surface-muted">
-                <span class="text-lg leading-none">{{ $notification->data['icon'] ?? '🔔' }}</span>
+                <span class="text-lg leading-none">{{ $shown['icon'] }}</span>
                 <span class="min-w-0 flex-1">
-                    <span class="block truncate font-medium">{{ $notification->data['title'] ?? 'Notifikasi' }}</span>
-                    <span class="block truncate text-xs text-ink-muted">{{ $notification->data['body'] ?? '' }}</span>
+                    <span class="block truncate font-medium">{{ $shown['title'] }}</span>
+                    <span class="block truncate text-xs text-ink-muted">{{ $shown['body'] }}</span>
                     <span class="block text-xs text-ink-muted">{{ $notification->created_at->diffForHumans() }}</span>
                 </span>
             </a>

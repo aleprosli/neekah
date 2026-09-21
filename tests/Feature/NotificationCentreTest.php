@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\Vendor;
 use App\Notifications\BookingCompleted;
 use App\Notifications\BookingCreatedForCustomer;
+use App\Support\StoredNotification;
 use Database\Seeders\CategorySeeder;
 
 beforeEach(function () {
@@ -28,9 +29,15 @@ it('stores a notification for both sides when a booking is made', function () {
     expect($this->customer->notifications()->count())->toBe(1)
         ->and($this->vendor->user->notifications()->count())->toBe(1);
 
+    // The row stores what happened, not a finished sentence, so somebody who
+    // switches language sees their whole history in it.
     $notification = $this->customer->notifications()->first();
-    expect($notification->data)->toHaveKeys(['icon', 'title', 'body', 'url'])
-        ->and($notification->data['title'])->toContain('dibuat');
+    expect($notification->data)->toHaveKeys(['icon', 'title_key', 'url'])
+        ->and(StoredNotification::render($notification->data)['title'])->toContain('dibuat');
+
+    app()->setLocale('en');
+    expect(StoredNotification::render($notification->data)['title'])->toContain('created');
+    app()->setLocale('ms');
 });
 
 it('shows an unread badge in the header and lists notifications', function () {

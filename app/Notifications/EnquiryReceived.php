@@ -3,6 +3,7 @@
 namespace App\Notifications;
 
 use App\Models\Enquiry;
+use App\Support\NeekahMail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -23,33 +24,32 @@ class EnquiryReceived extends Notification implements ShouldQueue
     }
 
     /**
-     * @return array<string, string>
+     * @return array<string, mixed>
      */
     public function toDatabase(object $notifiable): array
     {
         return [
             'icon' => '💬',
-            'title' => "Enquiry baharu daripada {$this->enquiry->user->name}",
-            'body' => 'Balas dalam 24 jam untuk mengekalkan response rate anda.',
+            'title_key' => 'notifications.enquiry_received.title',
+            'title_params' => ['name' => $this->enquiry->user->name],
+            'body_key' => 'notifications.enquiry_received.body',
             'url' => route('vendor.enquiries.show', $this->enquiry),
         ];
     }
 
     public function toMail(object $notifiable): MailMessage
     {
-        $message = (new MailMessage)
-            ->subject('Enquiry baharu daripada '.$this->enquiry->user->name)
-            ->greeting('Hai '.$notifiable->name.',')
-            ->line($this->enquiry->user->name.' menghantar enquiry kepada anda:')
+        $message = NeekahMail::to($notifiable)
+            ->subject(__('notifications.enquiry_received.subject', ['name' => $this->enquiry->user->name]))
+            ->line(__('notifications.enquiry_received.intro', ['name' => $this->enquiry->user->name]))
             ->line('"'.$this->enquiry->message.'"');
 
         if ($this->enquiry->event_date) {
-            $message->line('Tarikh majlis: '.$this->enquiry->event_date->translatedFormat('l, j F Y'));
+            $message->line(__('notifications.event_date', ['date' => $this->enquiry->event_date->translatedFormat('l, j F Y')]));
         }
 
         return $message
-            ->line('Balas dengan cepat untuk mengekalkan response rate yang tinggi.')
-            ->action('Balas enquiry', route('vendor.enquiries.show', $this->enquiry))
-            ->salutation('Terima kasih, Neekah');
+            ->line(__('notifications.enquiry_received.reply_fast'))
+            ->action(__('notifications.actions.reply_enquiry'), route('vendor.enquiries.show', $this->enquiry));
     }
 }

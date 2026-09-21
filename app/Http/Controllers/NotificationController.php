@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Support\StoredNotification;
 use App\Support\VueProps;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
@@ -17,10 +18,9 @@ class NotificationController extends Controller
 
         $notifications->setCollection($notifications->getCollection()->map(fn ($notification): array => [
             'id' => $notification->id,
+            // The link is to the reader, not to wherever the notification points.
             'url' => route('notifications.show', $notification->id),
-            'icon' => $notification->data['icon'] ?? '🔔',
-            'title' => $notification->data['title'] ?? 'Notifikasi',
-            'body' => $notification->data['body'] ?? '',
+            ...StoredNotification::render($notification->data),
             'at' => $notification->created_at->translatedFormat('j M Y, g:i A'),
             'unread' => $notification->unread(),
         ]));

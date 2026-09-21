@@ -4,6 +4,7 @@ namespace App\Notifications;
 
 use App\Models\Vendor;
 use App\Support\ContactSettings;
+use App\Support\NeekahMail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -34,23 +35,22 @@ class VendorRegistered extends Notification implements ShouldQueue
     {
         return [
             'icon' => '🎉',
-            'title' => 'Selamat datang ke Neekah',
-            'body' => 'Lengkapkan profil, pakej dan portfolio anda sementara admin menyemak permohonan.',
+            'title_key' => 'notifications.vendor_registered.title',
+            'body_key' => 'notifications.vendor_registered.body',
             'url' => route('vendor.profile.edit'),
         ];
     }
 
     public function toMail(object $notifiable): MailMessage
     {
-        $message = (new MailMessage)
-            ->subject('Terima kasih kerana mendaftar dengan Neekah')
-            ->greeting('Terima kasih, '.$notifiable->name.'!')
-            ->line('Permohonan '.$this->vendor->name.' telah kami terima dan kini menunggu semakan admin.')
-            ->line('Sementara menunggu, lengkapkan profil, pakej dan portfolio anda. Profil yang lengkap disemak dengan lebih cepat dan muncul lebih tinggi dalam carian pengantin.')
-            ->action('Lengkapkan profil', route('vendor.profile.edit'))
-            ->line('Kami akan emel anda sebaik sahaja permohonan diluluskan.')
+        // NeekahMail already sets the sign-off; this one re-set it by hand.
+        return NeekahMail::to($notifiable)
+            ->subject(__('notifications.vendor_registered.subject'))
+            ->greeting(__('notifications.thanks_name', ['name' => $notifiable->name]))
+            ->line(__('notifications.vendor_registered.received', ['vendor' => $this->vendor->name]))
+            ->line(__('notifications.vendor_registered.meanwhile'))
+            ->action(__('notifications.actions.complete_profile'), route('vendor.profile.edit'))
+            ->line(__('notifications.vendor_registered.will_email'))
             ->line(app(ContactSettings::class)->supportSentence());
-
-        return $message->salutation('Terima kasih, Neekah');
     }
 }

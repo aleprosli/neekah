@@ -2,12 +2,17 @@
 
 use App\Models\Category;
 use App\Models\ChecklistItem;
+use App\Models\Enquiry;
 use App\Models\SiteTemplate;
+use App\Models\User;
 use App\Models\Vendor;
+use App\Notifications\EnquiryReceived;
 use App\Support\Locales;
+use App\Support\StoredNotification;
 use Database\Seeders\CategorySeeder;
 use Database\Seeders\ChecklistSeeder;
 use Database\Seeders\SiteTemplateSeeder;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\URL;
 
 beforeEach(function () {
@@ -262,4 +267,60 @@ it('adds the language a checklist row is missing without duplicating or overwrit
 
     app()->setLocale('ms');
     expect($item->fresh()->title)->toBe('Tempah katering');
+});
+
+it('writes to a person in the language they were last reading the site in', function () {
+    $this->seed(CategorySeeder::class);
+    Notification::fake();
+
+    $vendor = Vendor::factory()->create();
+    $enquiry = Enquiry::factory()->for($vendor)->create();
+
+    // A page's language is its URL; an email has no URL and one reader, so it
+    // follows the language they were last browsing in.
+    $vendor->user->forceFill(['locale' => 'en'])->save();
+
+    expect($vendor->user->preferredLocale())->toBe('en');
+
+    $vendor->user->notify(new EnquiryReceived($enquiry));
+
+    Notification::assertSentTo($vendor->user, EnquiryReceived::class);
+});
+
+it('records the language a signed-in person is browsing in', function () {
+    $user = User::factory()->create(['locale' => null]);
+
+    $this->actingAs($user)->get('/en')->assertOk();
+    expect($user->fresh()->locale)->toBe('en');
+
+    $this->actingAs($user)->get('/')->assertOk();
+    expect($user->fresh()->locale)->toBe('ms');
+});
+
+it('shows a stored notification in the language it is read in', function () {
+    $data = [
+        'icon' => '💬',
+        'title_key' => 'notifications.enquiry_received.title',
+        'title_params' => ['name' => 'Aina'],
+        'body_key' => 'notifications.enquiry_received.body',
+        'url' => '/',
+    ];
+
+    app()->setLocale('ms');
+    expect(StoredNotification::render($data)['title'])->toBe('Enquiry baharu daripada Aina');
+
+    app()->setLocale('en');
+    expect(StoredNotification::render($data)['title'])->toBe('New enquiry from Aina');
+});
+
+it('still shows a notification written before the rows held keys', function () {
+    // Rows already in the database hold a finished sentence. They were true
+    // when they were written and there is nothing to look up.
+    $legacy = ['icon' => '🔔', 'title' => 'Booking ABC dibuat', 'body' => 'Sila semak.', 'url' => '/'];
+
+    app()->setLocale('en');
+    expect(StoredNotification::render($legacy))->toMatchArray([
+        'title' => 'Booking ABC dibuat',
+        'body' => 'Sila semak.',
+    ]);
 });

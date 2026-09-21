@@ -3,6 +3,7 @@
 namespace App\Notifications;
 
 use App\Support\ContactSettings;
+use App\Support\NeekahMail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -31,21 +32,20 @@ class CustomerRegistered extends Notification implements ShouldQueue
     {
         return [
             'icon' => '💍',
-            'title' => 'Selamat datang ke Neekah',
-            'body' => 'Mulakan dengan menetapkan tarikh majlis anda, kemudian cari vendor.',
+            'title_key' => 'notifications.customer_registered.title',
+            'body_key' => 'notifications.customer_registered.body',
             'url' => route('dashboard'),
         ];
     }
 
     public function toMail(object $notifiable): MailMessage
     {
-        return (new MailMessage)
-            ->subject('Selamat datang ke Neekah')
-            ->greeting('Selamat datang, '.$notifiable->name.'!')
-            ->line('Akaun anda sudah sedia. Neekah mengumpulkan semua urusan majlis anda di satu tempat: cari dan tempah vendor yang disahkan, jejak bajet, checklist dan timeline, dan hantar kad jemputan digital.')
-            ->line('Mulakan dengan menetapkan tarikh majlis anda. Selepas itu kami boleh cadangkan vendor yang masih kosong pada tarikh tersebut.')
-            ->action('Buka dashboard', route('dashboard'))
-            ->line(app(ContactSettings::class)->supportSentence())
-            ->salutation('Terima kasih, Neekah');
+        return NeekahMail::to($notifiable)
+            ->subject(__('notifications.customer_registered.subject'))
+            ->greeting(__('notifications.welcome', ['name' => $notifiable->name]))
+            ->line(__('notifications.customer_registered.intro'))
+            ->line(__('notifications.customer_registered.next_step'))
+            ->action(__('notifications.actions.open_dashboard'), route('dashboard'))
+            ->line(app(ContactSettings::class)->supportSentence());
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Notifications;
 
 use App\Models\WeddingInvitation;
+use App\Support\NeekahMail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -26,14 +27,13 @@ class WeddingPartnerInvited extends Notification implements ShouldQueue
     {
         $wedding = $this->invitation->wedding;
 
-        return (new MailMessage)
-            ->subject($this->invitation->inviter->name.' menjemput anda menguruskan majlis "'.$wedding->title.'"')
-            ->greeting('Hai!')
-            ->line($this->invitation->inviter->name.' menjemput anda menjadi pasangan dalam wedding project di Neekah.')
+        return NeekahMail::to($notifiable)
+            ->subject(__('notifications.partner_invited.subject', ['name' => $this->invitation->inviter->name, 'wedding' => $wedding->title]))
+            ->greeting(__('notifications.greeting_plain'))
+            ->line(__('notifications.partner_invited.intro', ['name' => $this->invitation->inviter->name]))
             ->line($wedding->title.' · '.$wedding->event_date->translatedFormat('l, j F Y').' · '.$wedding->city.', '.$wedding->state)
-            ->line('Setelah menerima jemputan, anda berdua akan berkongsi checklist, bajet, tempahan dan pembayaran yang sama.')
-            ->action('Terima jemputan', route('invitations.show', $this->invitation))
-            ->line('Pautan ini sah selama '.WeddingInvitation::EXPIRES_AFTER_DAYS.' hari. Jika anda tidak mengenali jemputan ini, abaikan emel ini.')
-            ->salutation('Terima kasih, Neekah');
+            ->line(__('notifications.partner_invited.shared'))
+            ->action(__('notifications.actions.accept_invitation'), route('invitations.show', $this->invitation))
+            ->line(__('notifications.partner_invited.expires', ['days' => WeddingInvitation::EXPIRES_AFTER_DAYS]));
     }
 }

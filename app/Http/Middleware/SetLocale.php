@@ -27,6 +27,15 @@ class SetLocale
 
         App::setLocale($locale);
 
+        // What a signed-in person is reading the site in is what we write to
+        // them in. Only on a GET: a redirect after a form post should not be
+        // what decides the language of their next email.
+        $user = $request->user();
+
+        if ($user && $request->isMethod('GET') && $user->locale !== $locale) {
+            $user->forceFill(['locale' => $locale])->saveQuietly();
+        }
+
         return $next($request);
     }
 }
