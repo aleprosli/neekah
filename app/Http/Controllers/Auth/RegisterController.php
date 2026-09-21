@@ -32,8 +32,8 @@ class RegisterController extends Controller
         if (! $invitation && ! $audience && ! AuthForm::isReturningWithInput($request)) {
             return view('auth.register', [
                 'chooser' => AuthForm::chooser(registering: true, footer: [
-                    'prefix' => 'Sudah ada akaun?',
-                    'label' => 'Log masuk',
+                    'prefix' => __('auth_pages.links.have_account'),
+                    'label' => __('auth_pages.links.log_in'),
                     'url' => route('login'),
                 ]),
             ]);
@@ -50,8 +50,8 @@ class RegisterController extends Controller
                 // Someone accepting an invitation is the partner already; the
                 // tip is for the one starting the account.
                 'tip' => $invitation ? null : [
-                    'title' => 'Satu akaun, dua pengantin',
-                    'body' => 'Daftar dengan akaun anda sendiri. Selepas mendaftar, jemput pasangan anda dari page Majlis saya supaya kalian boleh merancang bersama: checklist, bajet, tetamu dan kad jemputan yang sama, dan setiap seorang log masuk dengan akaun sendiri.',
+                    'title' => __('auth_pages.tip.one_account_title'),
+                    'body' => __('auth_pages.tip.one_account_body'),
                 ],
                 'invitation' => $invitation ? [
                     'initial' => mb_substr($invitation->inviter->name, 0, 1),
@@ -62,14 +62,14 @@ class RegisterController extends Controller
                     // One account is one person. The example used to read "Aina &
                     // Hakim", so people typed both names into an account that
                     // was only ever meant for one of them. Both are still fine.
-                    ['name' => 'name', 'label' => 'Nama', 'autocomplete' => 'name', 'placeholder' => 'Contoh: Aina Zulkifli', 'help' => 'Nama sendiri atau nama bersama pasangan, kedua-duanya boleh. Boleh ditukar kemudian di Akaun.', 'required' => true, 'value' => old('name')],
-                    ['name' => 'email', 'label' => 'Emel', 'type' => 'email', 'autocomplete' => 'email', 'required' => true, 'value' => old('email', $invitation?->email)],
-                    ['name' => 'phone', 'label' => 'Nombor telefon', 'type' => 'tel', 'autocomplete' => 'tel', 'placeholder' => '012-345 6789', 'value' => old('phone')],
-                    ['name' => 'password', 'label' => 'Kata laluan', 'type' => 'password', 'autocomplete' => 'new-password', 'help' => 'Sekurang-kurangnya 8 aksara.', 'required' => true],
-                    ['name' => 'password_confirmation', 'label' => 'Sahkan kata laluan', 'type' => 'password', 'autocomplete' => 'new-password', 'required' => true],
+                    ['name' => 'name', 'label' => __('auth_pages.fields.name'), 'autocomplete' => 'name', 'placeholder' => __('auth_pages.fields.name_placeholder'), 'help' => __('auth_pages.fields.name_help'), 'required' => true, 'value' => old('name')],
+                    ['name' => 'email', 'label' => __('auth_pages.fields.email'), 'type' => 'email', 'autocomplete' => 'email', 'required' => true, 'value' => old('email', $invitation?->email)],
+                    ['name' => 'phone', 'label' => __('auth_pages.fields.phone'), 'type' => 'tel', 'autocomplete' => 'tel', 'placeholder' => '012-345 6789', 'value' => old('phone')],
+                    ['name' => 'password', 'label' => __('auth_pages.fields.password'), 'type' => 'password', 'autocomplete' => 'new-password', 'help' => __('auth_pages.fields.password_help'), 'required' => true],
+                    ['name' => 'password_confirmation', 'label' => __('auth_pages.fields.password_confirm'), 'type' => 'password', 'autocomplete' => 'new-password', 'required' => true],
                 ],
                 'links' => [
-                    ['prefix' => 'Sudah ada akaun?', 'label' => 'Log masuk', 'url' => AuthAudience::Couple->loginUrl()],
+                    ['prefix' => __('auth_pages.links.have_account'), 'label' => __('auth_pages.links.log_in'), 'url' => AuthAudience::Couple->loginUrl()],
                 ],
             ]),
         ]);

@@ -57,8 +57,8 @@ class ProfileController extends Controller
                 'priceUnits' => collect(PriceUnit::cases())
                     ->map(fn (PriceUnit $unit): array => ['value' => $unit->value, 'label' => __('props.vendor.setiap').$unit->label()])
                     ->all(),
-                'imageHint' => $images->uploadHint('landskap 1920 × 1080px').'. Jika tiada gambar, warna latar digunakan.',
-                'logoHint' => $images->uploadHint('persegi 512 × 512px').'. Jika tiada logo, huruf pertama nama perniagaan digunakan.',
+                'imageHint' => __('props.vendor.image_hint_fallback', ['hint' => $images->uploadHint(__('props.vendor.landskap_1920'))]),
+                'logoHint' => __('props.vendor.logo_hint_fallback', ['hint' => $images->uploadHint(__('props.vendor.persegi_512'))]),
             ]),
         ]);
     }

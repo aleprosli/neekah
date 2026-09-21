@@ -25,10 +25,10 @@ enum AnnouncementAudience: string
     public function description(): string
     {
         return match ($this) {
-            self::Everyone => 'Setiap pengantin dan vendor yang aktif.',
-            self::Customers => 'Akaun pengantin sahaja.',
-            self::Vendors => 'Akaun vendor sahaja.',
-            self::Custom => 'Pilih pengguna satu per satu, atau taip alamat emel sendiri.',
+            self::Everyone => __('enums.announcement_audience_desc.everyone'),
+            self::Customers => __('enums.announcement_audience_desc.customers'),
+            self::Vendors => __('enums.announcement_audience_desc.vendors'),
+            self::Custom => __('enums.announcement_audience_desc.custom'),
         };
     }
 

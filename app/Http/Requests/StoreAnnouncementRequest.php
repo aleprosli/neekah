@@ -46,13 +46,13 @@ class StoreAnnouncementRequest extends FormRequest
 
                 foreach ($this->typedAddresses() as $address) {
                     if (! filter_var($address, FILTER_VALIDATE_EMAIL)) {
-                        $validator->errors()->add('emails', '"'.$address.'" bukan alamat emel yang sah.');
+                        $validator->errors()->add('emails', __('validation.custom.not_an_email', ['address' => $address]));
                     }
                 }
 
                 // A test send goes to the admin alone, so it needs no recipients yet.
                 if (Locales::routeIs('admin.announcements.store') && $this->input('user_ids', []) === [] && $this->typedAddresses()->isEmpty()) {
-                    $validator->errors()->add('user_ids', 'Pilih sekurang-kurangnya seorang penerima, atau taip satu alamat emel.');
+                    $validator->errors()->add('user_ids', __('validation.custom.pick_a_recipient'));
                 }
             },
         ];

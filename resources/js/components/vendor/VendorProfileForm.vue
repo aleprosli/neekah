@@ -195,7 +195,7 @@ const stateChoices = computed(() =>
 
         <div>
             <button type="submit" class="rounded-full bg-brand-600 px-8 py-3 text-sm font-semibold text-white transition hover:bg-brand-700 disabled:opacity-50" :disabled="uploading">
-                {{ uploading ? 'Memuat naik…' : 'Simpan profil' }}
+                {{ uploading ? $t('common.memuat_naik') : $t('vendor_profile.simpan_profil') }}
             </button>
         </div>
     </form>

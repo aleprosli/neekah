@@ -100,7 +100,7 @@ class WeddingSite extends Model
     {
         return $this->siteTemplate
             ?? SiteTemplate::active()->ordered()->first()
-            ?? throw new \RuntimeException('Tiada template kad jemputan yang aktif.');
+            ?? throw new \RuntimeException('No invitation card template is active.');
     }
 
     public function rsvps(): HasMany

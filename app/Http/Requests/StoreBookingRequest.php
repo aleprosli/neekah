@@ -48,7 +48,7 @@ class StoreBookingRequest extends FormRequest
                 }
 
                 if (! $vendor->isAvailableOn($this->date('event_date'))) {
-                    $validator->errors()->add('event_date', 'Vendor ini tidak tersedia pada tarikh tersebut. Sila pilih tarikh lain.');
+                    $validator->errors()->add('event_date', __('validation.custom.vendor_unavailable'));
                 }
             },
         ];

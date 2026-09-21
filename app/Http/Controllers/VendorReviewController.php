@@ -38,6 +38,6 @@ class VendorReviewController extends Controller
             ->withFragment('review')
             // Its own key: the page already shows session('status') at the top,
             // and the visitor is being sent back down to the review section.
-            ->with('reviewStatus', 'Terima kasih! Review anda sudah dipaparkan pada profil '.$vendor->name.'.');
+            ->with('reviewStatus', __('props.couple.review_dipaparkan', ['vendor' => $vendor->name]));
     }
 }

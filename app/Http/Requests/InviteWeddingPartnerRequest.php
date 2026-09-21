@@ -35,19 +35,19 @@ class InviteWeddingPartnerRequest extends FormRequest
                 $email = $this->string('email')->lower()->toString();
 
                 if ($email === mb_strtolower($this->user()->email)) {
-                    $validator->errors()->add('email', 'Itu emel anda sendiri.');
+                    $validator->errors()->add('email', __('validation.custom.own_email'));
 
                     return;
                 }
 
                 if ($wedding->isFull()) {
-                    $validator->errors()->add('email', 'Majlis ini sudah ada dua ahli. Buang pasangan sedia ada dahulu.');
+                    $validator->errors()->add('email', __('validation.custom.wedding_already_full'));
 
                     return;
                 }
 
                 if ($wedding->invitations()->pending()->whereRaw('LOWER(email) = ?', [$email])->exists()) {
-                    $validator->errors()->add('email', 'Jemputan ke emel ini masih menunggu jawapan.');
+                    $validator->errors()->add('email', __('validation.custom.invitation_pending'));
                 }
             },
         ];

@@ -35,7 +35,7 @@ class StoreCategoryRequest extends FormRequest
                     ->exists();
 
                 if ($taken) {
-                    $fail('Kategori dengan nama ini sudah wujud.');
+                    $fail(__('validation.custom.category_name_taken'));
                 }
             }],
             'name.*' => ['nullable', 'string', 'max:60'],

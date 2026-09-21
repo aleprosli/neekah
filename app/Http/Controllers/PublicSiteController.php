@@ -30,7 +30,7 @@ class PublicSiteController extends Controller
             ->published()
             ->with('siteTemplate')
             ->where('subdomain', $subdomain)
-            ->firstOr(fn () => abort(404, 'Kad jemputan ini tidak dijumpai.'));
+            ->firstOr(fn () => abort(404, __('validation.custom.card_not_found')));
 
         $site->increment('views');
 

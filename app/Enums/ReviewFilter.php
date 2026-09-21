@@ -29,10 +29,10 @@ enum ReviewFilter: string
     public function description(): string
     {
         return match ($this) {
-            self::Reported => 'Vendor membantah review ini dan meminta admin melihatnya. Ia masih dipaparkan sehingga anda bertindak.',
-            self::Hidden => 'Sudah ditarik dari profil vendor. Rekodnya kekal, termasuk sebab dan siapa yang menariknya.',
-            self::Open => 'Ditulis terus pada profil, tanpa tempahan. Tidak menyentuh rating, mata atau ranking vendor.',
-            self::Verified => 'Datang daripada tempahan yang selesai di Neekah. Hanya yang ini menggerakkan rating dan ranking.',
+            self::Reported => __('enums.review_filter_desc.reported'),
+            self::Hidden => __('enums.review_filter_desc.hidden'),
+            self::Open => __('enums.review_filter_desc.open'),
+            self::Verified => __('enums.review_filter_desc.verified'),
         };
     }
 

@@ -109,7 +109,7 @@ class VendorController extends Controller
         ])));
 
         return app(ContactSettings::class)->whatsappUrl(
-            'Salam Neekah, saya sedang mencari '.$looking.' untuk majlis saya tetapi belum jumpa di laman web. Boleh bantu kongsikan kepada vendor lain?'
+            __('props.vendor_onboarding.whatsapp_looking', ['looking' => $looking])
         );
     }
 

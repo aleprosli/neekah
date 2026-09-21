@@ -177,7 +177,7 @@ const saveOrder = async () => {
                 <input v-if="editing?.id" type="hidden" name="_method" value="PUT">
 
                 <div class="flex items-start justify-between gap-2">
-                    <h2 class="font-semibold">{{ editing?.id ? 'Edit kategori' : 'Tambah kategori' }}</h2>
+                    <h2 class="font-semibold">{{ editing?.id ? $t('admin_categories.edit_kategori') : $t('admin_categories.tambah_kategori') }}</h2>
                     <button type="button" class="text-sm text-ink-muted hover:text-ink" :aria-label="$t('admin_categories.tutup')" @click="panelOpen = false">✕</button>
                 </div>
 
@@ -225,7 +225,7 @@ const saveOrder = async () => {
                 <p v-if="uploadError" class="text-sm text-red-600">{{ uploadError }}</p>
 
                 <button type="submit" class="rounded-full bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700" :disabled="uploading">
-                    {{ editing?.id ? 'Simpan' : 'Tambah kategori' }}
+                    {{ editing?.id ? $t('common.simpan') : $t('admin_categories.tambah_kategori') }}
                 </button>
             </form>
         </div>

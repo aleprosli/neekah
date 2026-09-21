@@ -106,7 +106,7 @@ const destroyUrl = (photo) => props.destroyUrlTemplate.replace('__ID__', photo.i
                 <UiField name="caption" :label="$t('portfolio.kapsyen_pilihan')" :placeholder="$t('portfolio.majlis_aina_hakim_alor_setar')" class="min-w-0 flex-1" :error="errors.caption" />
 
                 <button type="submit" class="rounded-full bg-brand-600 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700 disabled:opacity-50" :disabled="uploading">
-                    {{ uploading ? 'Memuat naik…' : 'Muat naik' }}
+                    {{ uploading ? $t('common.memuat_naik') : $t('portfolio.muat_naik') }}
                 </button>
             </div>
 

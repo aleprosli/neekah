@@ -39,7 +39,7 @@ const form = ref({ ...props.wedding });
         <UiTextarea v-model="form.notes" :label="$t('wedding_form.nota_pilihan')" name="notes" :rows="3" :placeholder="$t('wedding_form.tema_jumlah_tetamu_permintaan_khas')" :error="errors.notes" />
 
         <div class="flex flex-wrap gap-2 pt-2">
-            <button type="submit" class="rounded-full bg-brand-600 px-8 py-3 text-sm font-semibold text-white transition hover:bg-brand-700">{{ editing ? 'Simpan' : 'Cipta majlis' }}</button>
+            <button type="submit" class="rounded-full bg-brand-600 px-8 py-3 text-sm font-semibold text-white transition hover:bg-brand-700">{{ editing ? $t('common.simpan') : $t('wedding_form.cipta_majlis') }}</button>
             <a :href="cancelUrl" class="rounded-full px-6 py-3 text-sm font-medium text-ink-muted transition hover:bg-surface-muted">{{ $t('wedding_form.batal') }}</a>
         </div>
     </form>

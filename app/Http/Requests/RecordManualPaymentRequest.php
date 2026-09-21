@@ -40,7 +40,7 @@ class RecordManualPaymentRequest extends FormRequest
                 $remaining = $booking->outstandingAmount() - $this->pendingAmount($booking);
 
                 if ($this->float('amount') > $remaining + 0.01) {
-                    $validator->errors()->add('amount', 'Baki yang belum direkod hanya RM'.number_format(max($remaining, 0), 2).'.');
+                    $validator->errors()->add('amount', __('validation.custom.remaining_balance', ['amount' => number_format(max($remaining, 0), 2)]));
                 }
             },
         ];

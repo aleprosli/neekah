@@ -57,18 +57,18 @@ class VendorComparisonController extends Controller
         }
 
         return [
-            $this->row('Kategori', $vendors->map(fn (Vendor $v): string => $v->category->icon.' '.$v->category->name)->all()),
-            $this->row('Lokasi', $vendors->map(fn (Vendor $v): string => $v->city.', '.$v->state)->all()),
-            $this->row('Kawasan dicover', $vendors->map(fn (Vendor $v): string => implode(', ', $v->serviceStates()))->all()),
-            $this->row('Tahap', $vendors->map(fn (Vendor $v): string => $v->tier->label())->all(), $this->bestIndex($vendors, fn (Vendor $v): float => $v->tier->rank())),
-            $this->row('Rating', $vendors->map(fn (Vendor $v): string => $v->reviews_count ? '★ '.number_format($v->rating_avg, 1).' ('.$v->reviews_count.')' : 'Baru')->all(), $this->bestIndex($vendors, fn (Vendor $v): float => (float) $v->rating_avg)),
-            $this->row('Harga bermula', $vendors->map(fn (Vendor $v): string => 'RM'.number_format($v->price_from).' / '.$v->price_unit->label())->all(), $this->bestIndex($vendors, fn (Vendor $v): float => -(float) $v->price_from)),
-            $this->row('Pakej termurah', $vendors->map(fn (Vendor $v): string => $v->packages->isEmpty() ? '—' : 'RM'.number_format($v->packages->min('price')))->all()),
-            $this->row('Bilangan pakej', $vendors->map(fn (Vendor $v): string => (string) $v->packages->count())->all(), $this->bestIndex($vendors, fn (Vendor $v): float => $v->packages->count())),
-            $this->row('Majlis selesai', $vendors->map(fn (Vendor $v): string => (string) $v->completed_bookings_count)->all(), $this->bestIndex($vendors, fn (Vendor $v): float => $v->completed_bookings_count)),
-            $this->row('Completion rate', $vendors->map(fn (Vendor $v): string => $v->completion_rate.'%')->all(), $this->bestIndex($vendors, fn (Vendor $v): float => $v->completion_rate)),
-            $this->row('Response rate', $vendors->map(fn (Vendor $v): string => $v->responseRateLabel())->all(), $this->bestIndex($vendors, fn (Vendor $v): float => (float) ($v->response_rate ?? 0))),
-            $this->row('Vendor Score', $vendors->map(fn (Vendor $v): string => number_format((float) $v->score, 1))->all(), $this->bestIndex($vendors, fn (Vendor $v): float => (float) $v->score)),
+            $this->row(__('pages.compare.kategori'), $vendors->map(fn (Vendor $v): string => $v->category->icon.' '.$v->category->name)->all()),
+            $this->row(__('pages.compare.lokasi'), $vendors->map(fn (Vendor $v): string => $v->city.', '.$v->state)->all()),
+            $this->row(__('pages.compare.kawasan_dicover'), $vendors->map(fn (Vendor $v): string => implode(', ', $v->serviceStates()))->all()),
+            $this->row(__('pages.compare.tahap'), $vendors->map(fn (Vendor $v): string => $v->tier->label())->all(), $this->bestIndex($vendors, fn (Vendor $v): float => $v->tier->rank())),
+            $this->row(__('pages.compare.rating'), $vendors->map(fn (Vendor $v): string => $v->reviews_count ? '★ '.number_format($v->rating_avg, 1).' ('.$v->reviews_count.')' : __('pages.compare.baru'))->all(), $this->bestIndex($vendors, fn (Vendor $v): float => (float) $v->rating_avg)),
+            $this->row(__('pages.compare.harga_bermula'), $vendors->map(fn (Vendor $v): string => 'RM'.number_format($v->price_from).' / '.$v->price_unit->label())->all(), $this->bestIndex($vendors, fn (Vendor $v): float => -(float) $v->price_from)),
+            $this->row(__('pages.compare.pakej_termurah'), $vendors->map(fn (Vendor $v): string => $v->packages->isEmpty() ? '—' : 'RM'.number_format($v->packages->min('price')))->all()),
+            $this->row(__('pages.compare.bilangan_pakej'), $vendors->map(fn (Vendor $v): string => (string) $v->packages->count())->all(), $this->bestIndex($vendors, fn (Vendor $v): float => $v->packages->count())),
+            $this->row(__('pages.compare.majlis_selesai'), $vendors->map(fn (Vendor $v): string => (string) $v->completed_bookings_count)->all(), $this->bestIndex($vendors, fn (Vendor $v): float => $v->completed_bookings_count)),
+            $this->row(__('pages.compare.completion_rate'), $vendors->map(fn (Vendor $v): string => $v->completion_rate.'%')->all(), $this->bestIndex($vendors, fn (Vendor $v): float => $v->completion_rate)),
+            $this->row(__('pages.compare.response_rate'), $vendors->map(fn (Vendor $v): string => $v->responseRateLabel())->all(), $this->bestIndex($vendors, fn (Vendor $v): float => (float) ($v->response_rate ?? 0))),
+            $this->row(__('pages.compare.vendor_score'), $vendors->map(fn (Vendor $v): string => number_format((float) $v->score, 1))->all(), $this->bestIndex($vendors, fn (Vendor $v): float => (float) $v->score)),
         ];
     }
 

@@ -47,7 +47,7 @@ class InvitationAcceptanceController extends Controller
                 'acceptUrl' => route('invitations.accept', $invitation),
                 'dashboardUrl' => route('dashboard'),
                 'browseUrl' => route('vendors.index'),
-                'footnote' => 'Jemputan dihantar ke '.$invitation->email.'. Anda log masuk sebagai '.$request->user()->email.'.',
+                'footnote' => __('props.couple.jemputan_dihantar_footnote', ['invited' => $invitation->email, 'current' => $request->user()->email]),
             ]),
         ]);
     }

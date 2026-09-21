@@ -181,6 +181,30 @@ return [
     */
 
     'custom' => [
+        'remaining_balance' => 'Only RM:amount is left to record.',
+        'own_email' => 'That is your own email.',
+        'wedding_already_full' => 'This wedding already has two members. Remove the existing partner first.',
+        'invitation_pending' => 'An invitation to this email is still waiting for an answer.',
+        'not_an_email' => '“:address” is not a valid email address.',
+        'pick_a_recipient' => 'Pick at least one recipient, or type an email address.',
+        'malaysian_phone' => 'Enter a valid Malaysian phone number, for example 012-345 6789.',
+        'category_name_taken' => 'A category with this name already exists.',
+        'vendor_date_taken' => 'You already have a booking, or have closed off that date.',
+        'vendor_unavailable' => 'This vendor is not available on that date. Please pick another one.',
+        'website_not_messaging' => 'A website link cannot point at WhatsApp or Telegram.',
+        'not_a_valid_link' => 'This is not a valid :platform link.',
+        'email_is_a_couple' => 'This email is already registered as a couple’s account. Log in with it to convert it to a vendor account.',
+        'subdomain_regex' => 'A web address can only contain lowercase letters, numbers and hyphens.',
+        'subdomain_reserved' => 'This web address is reserved by the platform. Please pick another.',
+        'subdomain_taken' => 'This web address is taken. Try another one.',
+        'review_once' => 'A review can only be left once, after the booking is complete.',
+        'complete_confirmed_only' => 'Only a confirmed booking can be marked complete.',
+        'rsvp_closed' => 'RSVP for this wedding is closed.',
+        'card_not_found' => 'That invitation card could not be found.',
+
+        'turnstile_missing' => 'Please complete the security check.',
+        'turnstile_failed' => 'The security check did not pass. Please try again.',
+
         'credentials' => 'That email and password do not match our records.',
         'too_many_attempts' => 'Too many attempts. Try again in :minutes minutes.',
         'reset_link_invalid' => 'That reset link is not valid, or it has expired.',

@@ -29,10 +29,10 @@ enum PaymentMethod: string
     public function description(): string
     {
         return match ($this) {
-            self::ManualTransfer => 'Pengantin membayar terus kepada vendor, merekodkan bayaran berserta resit, dan vendor mengesahkannya.',
-            self::Billplz => 'FPX dan kad melalui Billplz.',
-            self::Bayarcash => 'FPX, DuitNow dan kad melalui Bayarcash.',
-            self::Stripe => 'Kad kredit dan debit melalui Stripe.',
+            self::ManualTransfer => __('enums.payment_method_desc.manual_transfer'),
+            self::Billplz => __('enums.payment_method_desc.billplz'),
+            self::Bayarcash => __('enums.payment_method_desc.bayarcash'),
+            self::Stripe => __('enums.payment_method_desc.stripe'),
         };
     }
 

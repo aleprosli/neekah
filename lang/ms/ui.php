@@ -10,6 +10,8 @@ return [
     ],
 
     'common' => [
+        'memuat_naik' => 'Memuat naik…',
+        'simpan' => 'Simpan',
         'teruskan' => 'Teruskan',
         'semak_semula' => 'Semak semula',
         'tiada_rekod' => 'Tiada rekod',
@@ -124,6 +126,7 @@ return [
     ],
 
     'wedding_form' => [
+        'cipta_majlis' => 'Cipta majlis',
         'nama_majlis' => 'Nama majlis',
         'aina_hakim' => 'Aina & Hakim',
         'tarikh_majlis' => 'Tarikh majlis',
@@ -225,6 +228,9 @@ return [
     ],
 
     'booking' => [
+        'bayaran_direkod' => 'Bayaran direkod',
+        'bayaran_disahkan_vendor' => 'Bayaran disahkan vendor',
+        'majlis_selesai' => 'Majlis selesai',
         'bayaran_akan_dihantar' => ':amount akan dihantar kepada vendor untuk disahkan. Vendor akan menyemak akaun mereka sebelum booking disahkan.',
         'bayaran_akan_dihantar_resit' => ':amount akan dihantar kepada vendor untuk disahkan bersama resit :receipt. Vendor akan menyemak akaun mereka sebelum booking disahkan.',
         'contoh_bayaran_pendahuluan_transfer_maybank2u' => 'Contoh: bayaran pendahuluan, transfer Maybank2u',
@@ -271,6 +277,7 @@ return [
     ],
 
     'vendor_profile' => [
+        'simpan_profil' => 'Simpan profil',
         'maksimum_kategori' => 'Maksimum :count. Pencari akan jumpa anda dalam setiap satu.',
         'nama_perniagaan' => 'Nama perniagaan',
         'kategori_utama' => 'Kategori utama',
@@ -328,6 +335,9 @@ return [
     ],
 
     'package' => [
+        'tambah_item' => 'Tambah item',
+        'untuk_susun_semula' => ' untuk susun semula.',
+        'tambah_pakej' => 'Tambah pakej',
         'nama_pakej' => 'Nama pakej',
         'cth_pakej_premium' => 'Cth: Pakej Premium',
         'harga_rm' => 'Harga (RM)',
@@ -399,6 +409,8 @@ return [
     ],
 
     'vendor_enquiry' => [
+        'kemas_kini_balasan' => 'Kemas kini balasan',
+        'balas' => 'Balas',
         'terima_kasih_atas_enquiry_anda' => 'Terima kasih atas enquiry anda…',
         'mesej' => 'Mesej',
         'hantar_balasan' => 'Hantar balasan',
@@ -410,6 +422,10 @@ return [
     ],
 
     'points' => [
+        'majlis_selesai_count' => ':count majlis selesai',
+        'perlu_enquiry_untuk_diukur' => 'Perlu sekurang-kurangnya :count enquiry untuk diukur',
+        'enquiry_yang_anda_balas' => 'Enquiry yang anda balas',
+        'recommended_needs_clean' => 'Recommended Vendor juga memerlukan rekod bersih tanpa pelanggaran disahkan dalam tempoh 6 bulan.',
         'belum_cukup_review_untuk_menunjukkan' => 'Belum cukup review untuk menunjukkan aliran.',
         'pendapatan_mengikut_bulan' => 'Pendapatan mengikut bulan',
         'majlis_selesai' => 'Majlis selesai',
@@ -423,6 +439,9 @@ return [
     ],
 
     'portfolio' => [
+        'muat_naik' => 'Muat naik',
+        'tambah_gambar_lagi' => 'Tambah gambar lagi',
+        'pilih_gambar' => 'Pilih gambar',
         'kapsyen_pilihan' => 'Kapsyen (pilihan)',
         'majlis_aina_hakim_alor_setar' => 'Majlis Aina & Hakim, Alor Setar',
         'alih_ke_kiri' => 'Alih ke kiri',
@@ -471,6 +490,11 @@ return [
     ],
 
     'admin_checklist' => [
+        'edit_fasa' => 'Edit fasa',
+        'tambah_fasa' => 'Tambah fasa',
+        'edit_tugasan' => 'Edit tugasan',
+        'tambah_tugasan' => 'Tambah tugasan',
+        'tambah' => 'Tambah',
         'padam_fasa_nama' => 'Padam fasa :name?',
         'tugasan_akan_hilang' => ':count tugasan dalam fasa ini akan hilang dari senarai induk. Checklist pengantin sedia ada tidak berubah.',
         'bulan_sebelum_majlis_help' => '0 bermaksud hari majlis. Kosongkan untuk tugasan tanpa tarikh akhir.',
@@ -558,6 +582,8 @@ return [
     ],
 
     'admin_categories' => [
+        'edit_kategori' => 'Edit kategori',
+        'tambah_kategori' => 'Tambah kategori',
         'padam_kategori_nama' => 'Padam kategori :name?',
         'alih_ke_atas' => 'Alih ke atas',
         'alih_ke_bawah' => 'Alih ke bawah',
@@ -646,6 +672,7 @@ return [
     ],
 
     'card_editor' => [
+        'muat_naik_gambar' => 'Muat naik gambar',
         'published' => 'Tersiar',
         'draft' => 'Draf, belum tersiar',
         'views' => ':count tontonan',

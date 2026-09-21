@@ -22,7 +22,7 @@ class CompleteBooking
     public function handle(Booking $booking): Booking
     {
         if ($booking->status !== BookingStatus::Confirmed) {
-            throw new InvalidArgumentException('Hanya booking yang telah disahkan boleh ditandakan selesai.');
+            throw new InvalidArgumentException(__('validation.custom.complete_confirmed_only'));
         }
 
         return DB::transaction(function () use ($booking): Booking {

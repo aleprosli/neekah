@@ -13,7 +13,7 @@ class RsvpController extends Controller
     {
         $site = WeddingSite::query()->published()->where('subdomain', $subdomain)->firstOrFail();
 
-        abort_unless($site->acceptsRsvps(), 403, 'RSVP untuk majlis ini telah ditutup.');
+        abort_unless($site->acceptsRsvps(), 403, __('validation.custom.rsvp_closed'));
 
         $attending = $request->boolean('attending');
 
@@ -26,7 +26,7 @@ class RsvpController extends Controller
         ], $request->string('u')->toString() ?: null);
 
         return back()->with('rsvp', $attending
-            ? 'Terima kasih! Kehadiran anda telah direkod.'
-            : 'Terima kasih atas maklum balas anda.');
+            ? __('props.couple.terima_kasih_kehadiran')
+            : __('props.couple.terima_kasih_maklum_balas'));
     }
 }

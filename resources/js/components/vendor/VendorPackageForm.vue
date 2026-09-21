@@ -100,7 +100,7 @@ const onImageChosen = (event) => {
             <div class="flex flex-wrap items-start justify-between gap-3">
                 <div>
                     <h2 class="font-semibold">{{ $t('package.kandungan_pakej') }}</h2>
-                    <p class="text-sm text-ink-muted">{{ $t('package.satu_item_satu_baris_seret') }}<span aria-hidden="true">⠿</span> untuk susun semula.</p>
+                    <p class="text-sm text-ink-muted">{{ $t('package.satu_item_satu_baris_seret') }}<span aria-hidden="true">⠿</span>{{ $t('package.untuk_susun_semula') }}</p>
                 </div>
                 <span class="rounded-full bg-surface-muted px-3 py-1 text-xs font-medium text-ink-muted">{{ visibleCount }} item</span>
             </div>
@@ -143,7 +143,7 @@ const onImageChosen = (event) => {
             </ul>
 
             <div class="flex flex-wrap items-center gap-3">
-                <button type="button" class="rounded-full border border-line px-4 py-2 text-sm font-medium transition hover:border-brand-400 hover:text-brand-700" @click="addFeature()">+ Tambah item</button>
+                <button type="button" class="rounded-full border border-line px-4 py-2 text-sm font-medium transition hover:border-brand-400 hover:text-brand-700" @click="addFeature()">+ {{ $t('package.tambah_item') }}</button>
                 <span class="text-xs text-ink-muted">{{ $t('package.tekan_enter_untuk_terus_tambah') }}</span>
             </div>
 
@@ -163,7 +163,7 @@ const onImageChosen = (event) => {
 
         <div class="flex flex-wrap gap-2">
             <button type="submit" class="rounded-full bg-brand-600 px-8 py-3 text-sm font-semibold text-white transition hover:bg-brand-700 disabled:opacity-50" :disabled="uploading">
-                {{ uploading ? 'Memuat naik…' : editing ? 'Simpan' : 'Tambah pakej' }}
+                {{ uploading ? $t('common.memuat_naik') : editing ? $t('common.simpan') : $t('package.tambah_pakej') }}
             </button>
             <a :href="cancelUrl" class="rounded-full px-6 py-3 text-sm font-medium text-ink-muted transition hover:bg-surface-muted">{{ $t('package.batal') }}</a>
         </div>

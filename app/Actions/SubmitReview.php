@@ -23,7 +23,7 @@ class SubmitReview
     public function handle(Booking $booking, array $attributes): Review
     {
         if (! $booking->canBeReviewed()) {
-            throw new InvalidArgumentException('Review hanya boleh diberi sekali selepas booking selesai.');
+            throw new InvalidArgumentException(__('validation.custom.review_once'));
         }
 
         return DB::transaction(function () use ($booking, $attributes): Review {

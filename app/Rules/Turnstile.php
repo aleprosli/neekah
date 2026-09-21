@@ -30,7 +30,7 @@ class Turnstile implements ValidationRule
         }
 
         if (! is_string($value) || $value === '') {
-            $fail('Sila lengkapkan semakan keselamatan.');
+            $fail(__('validation.custom.turnstile_missing'));
 
             return;
         }
@@ -51,7 +51,7 @@ class Turnstile implements ValidationRule
         }
 
         if (! $response->json('success')) {
-            $fail('Semakan keselamatan gagal. Sila cuba sekali lagi.');
+            $fail(__('validation.custom.turnstile_failed'));
         }
     }
 }

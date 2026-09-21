@@ -26,7 +26,7 @@ class UpdateImageSettingsRequest extends FormRequest
             'max_dimension' => ['required', 'integer', 'between:800,4000'],
             'thumbnail_width' => ['required', 'integer', 'between:200,1200'],
             'quality' => ['required', 'integer', 'between:40,95'],
-            'format' => ['required', Rule::in(array_keys(ImageSettings::FORMATS))],
+            'format' => ['required', Rule::in(ImageSettings::FORMAT_KEYS)],
             'max_upload_mb' => ['required', 'integer', 'between:1,15'],
         ];
     }

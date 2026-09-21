@@ -19,10 +19,10 @@ class PasswordResetLinkController extends Controller
                 'submitLabel' => 'Hantar pautan',
                 'notice' => session('status'),
                 'fields' => [
-                    ['name' => 'email', 'label' => 'Emel', 'type' => 'email', 'autocomplete' => 'email', 'required' => true, 'value' => old('email')],
+                    ['name' => 'email', 'label' => __('auth_pages.fields.email'), 'type' => 'email', 'autocomplete' => 'email', 'required' => true, 'value' => old('email')],
                 ],
                 'links' => [
-                    ['prefix' => 'Ingat kata laluan anda?', 'label' => 'Log masuk', 'url' => route('login')],
+                    ['prefix' => __('auth_pages.links.remember_password'), 'label' => __('auth_pages.links.log_in'), 'url' => route('login')],
                 ],
             ]),
         ]);

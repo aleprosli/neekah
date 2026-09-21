@@ -205,7 +205,7 @@ class SettingController extends Controller
                     'value' => $values[$method->settingKey()],
                     'help' => $method->isIntegrated()
                         ? $method->description()
-                        : $method->description().' Integrasi belum dibina, jadi ia belum dipaparkan kepada pengantin walaupun dihidupkan.',
+                        : $method->description().__('props.admin.not_integrated'),
                 ])->all(),
                 ['name' => 'instructions', 'label' => __('props.admin.arahan_bayaran_manual'), 'type' => 'textarea', 'rows' => 3, 'value' => $values['instructions'], 'help' => __('props.admin.dipaparkan_kepada_pengantin_di_borang')],
             ],
@@ -229,14 +229,14 @@ class SettingController extends Controller
             'submit' => __('props.admin.simpan_tetapan_gambar'),
             'columns' => true,
             'warning' => $images->isLimitedByServer()
-                ? 'Server ini hanya menerima <strong>'.$images->serverUploadMegabytes().'MB</strong> setiap muat naik, jadi had di bawah tidak digunakan sepenuhnya. Naikkan <code class="font-mono">upload_max_filesize</code> dan <code class="font-mono">post_max_size</code> dalam php.ini (serta <code class="font-mono">client_max_body_size</code> pada nginx), kemudian mulakan semula PHP.'
+                ? __('props.admin.upload_server_warning', ['size' => $images->serverUploadMegabytes()])
                 : null,
             'note' => __('props.admin.tetapan_ini_digunakan_untuk_gambar'),
             'fields' => [
-                ['name' => 'max_dimension', 'label' => __('props.admin.saiz_maksimum_piksel_sisi_terpanjang'), 'type' => 'number', 'value' => $values['max_dimension'], 'min' => 800, 'max' => 4000, 'step' => 10, 'required' => true, 'help' => '1920 sudah tajam untuk skrin penuh. Lebih besar bermakna fail lebih berat.'],
+                ['name' => 'max_dimension', 'label' => __('props.admin.saiz_maksimum_piksel_sisi_terpanjang'), 'type' => 'number', 'value' => $values['max_dimension'], 'min' => 800, 'max' => 4000, 'step' => 10, 'required' => true, 'help' => __('props.admin.max_dimension_help')],
                 ['name' => 'thumbnail_width', 'label' => __('props.admin.lebar_thumbnail_piksel'), 'type' => 'number', 'value' => $values['thumbnail_width'], 'min' => 200, 'max' => 1200, 'step' => 10, 'required' => true, 'help' => __('props.admin.saiz_yang_dipaparkan_dalam_senarai')],
                 ['name' => 'quality', 'label' => __('props.admin.kualiti_40_hingga_95'), 'type' => 'number', 'value' => $values['quality'], 'min' => 40, 'max' => 95, 'required' => true, 'help' => '80 ialah titik terbaik: sukar dibezakan daripada asal, tetapi fail jauh lebih kecil.'],
-                ['name' => 'format', 'label' => __('props.admin.format'), 'type' => 'select', 'value' => $values['format'], 'required' => true, 'help' => __('props.admin.webp_biasanya_25_hingga_35'), 'options' => collect(ImageSettings::FORMATS)->map(fn (string $label, string $value): array => ['value' => $value, 'label' => $label])->values()->all()],
+                ['name' => 'format', 'label' => __('props.admin.format'), 'type' => 'select', 'value' => $values['format'], 'required' => true, 'help' => __('props.admin.webp_biasanya_25_hingga_35'), 'options' => collect(ImageSettings::formats())->map(fn (string $label, string $value): array => ['value' => $value, 'label' => $label])->values()->all()],
                 ['name' => 'max_upload_mb', 'label' => __('props.admin.had_saiz_muat_naik_mb'), 'type' => 'number', 'value' => $values['max_upload_mb'], 'min' => 1, 'max' => 15, 'required' => true, 'help' => __('props.admin.saiz_fail_asal_yang_dibenarkan')],
             ],
         ];
@@ -253,7 +253,7 @@ class SettingController extends Controller
     {
         $seo->save($request->validated());
 
-        return $this->saved('Tetapan SEO disimpan. Ia digunakan pada setiap halaman yang tidak menerangkan dirinya sendiri.');
+        return $this->saved(__('props.admin.seo_saved'));
     }
 
     public function updateTurnstile(UpdateTurnstileSettingsRequest $request, TurnstileSettings $turnstile): RedirectResponse
@@ -274,14 +274,14 @@ class SettingController extends Controller
     {
         $payments->save($request->settings());
 
-        return $this->saved('Tetapan bayaran disimpan.');
+        return $this->saved(__('props.admin.payments_saved'));
     }
 
     public function update(UpdateImageSettingsRequest $request, ImageSettings $images): RedirectResponse
     {
         $images->save($request->validated());
 
-        return $this->saved('Tetapan gambar disimpan. Gambar yang dimuat naik selepas ini akan menggunakannya.');
+        return $this->saved(__('props.admin.images_saved'));
     }
 
     /**

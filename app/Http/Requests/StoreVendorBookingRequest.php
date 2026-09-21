@@ -44,7 +44,7 @@ class StoreVendorBookingRequest extends FormRequest
                 }
 
                 if (! $this->user()->vendor->isAvailableOn($this->date('event_date'))) {
-                    $validator->errors()->add('event_date', 'Anda sudah ada tempahan atau tarikh ditutup pada hari tersebut.');
+                    $validator->errors()->add('event_date', __('validation.custom.vendor_date_taken'));
                 }
             },
         ];

@@ -125,7 +125,7 @@ class PostController extends Controller
         return match (true) {
             $post->isPublished() => 'Artikel tersiar di '.$post->url(),
             $post->isScheduled() => 'Artikel dijadualkan tersiar pada '.$post->localPublishedAt()->translatedFormat('j F Y, g:i A').'.',
-            default => 'Draf disimpan. Pilih "Siarkan" apabila artikel sudah sedia.',
+            default => __('props.admin.draft_saved'),
         };
     }
 }

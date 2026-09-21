@@ -26,7 +26,7 @@ class StorePhoneNumberRequest extends FormRequest
                 /** A number we cannot turn into a wa.me link is of no use as a lead. */
                 function (string $attribute, mixed $value, Closure $fail): void {
                     if (PhoneNumber::normalise((string) $value) === null) {
-                        $fail('Masukkan nombor telefon Malaysia yang sah, contoh 012-345 6789.');
+                        $fail(__('validation.custom.malaysian_phone'));
                     }
                 },
             ],

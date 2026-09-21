@@ -25,13 +25,13 @@ class PhoneNumberController extends Controller
                 'fields' => [
                     [
                         'name' => 'phone',
-                        'label' => 'Nombor telefon',
+                        'label' => __('auth_pages.fields.phone'),
                         'type' => 'tel',
                         'autocomplete' => 'tel',
                         'placeholder' => '012-345 6789',
                         'required' => true,
                         'value' => old('phone'),
-                        'help' => 'Nombor WhatsApp anda. Kami tidak memaparkannya kepada sesiapa selain vendor yang anda tempah.',
+                        'help' => __('auth_pages.fields.phone_help'),
                     ],
                 ],
             ]),

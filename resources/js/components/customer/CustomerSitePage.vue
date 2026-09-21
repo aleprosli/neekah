@@ -397,7 +397,7 @@ const previewFile = (event, target) => {
             <UiUploadProgress :uploading="uploading" :percent="uploadPercent" :error="uploadError" />
 
             <button type="submit" class="w-fit rounded-full bg-brand-600 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700 disabled:opacity-50" :disabled="uploading">
-                {{ uploading ? 'Memuat naik…' : 'Muat naik gambar' }}
+                {{ uploading ? $t('common.memuat_naik') : $t('card_editor.muat_naik_gambar') }}
             </button>
         </form>
 

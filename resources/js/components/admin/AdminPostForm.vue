@@ -83,7 +83,7 @@ const onCoverChosen = (event) => {
                 />
 
                 <button type="submit" class="rounded-full bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700 disabled:opacity-50" :disabled="uploading">
-                    {{ uploading ? 'Memuat naik…' : 'Simpan' }}
+                    {{ uploading ? $t('common.memuat_naik') : $t('common.simpan') }}
                 </button>
 
                 <UiUploadProgress :uploading="uploading" :percent="uploadPercent" :error="uploadError" />

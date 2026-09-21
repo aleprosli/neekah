@@ -10,6 +10,8 @@ return [
     ],
 
     'common' => [
+        'memuat_naik' => 'Uploading…',
+        'simpan' => 'Save',
         'teruskan' => 'Continue',
         'semak_semula' => 'Let me check',
         'tiada_rekod' => 'Nothing here',
@@ -124,6 +126,7 @@ return [
     ],
 
     'wedding_form' => [
+        'cipta_majlis' => 'Create the wedding',
         'nama_majlis' => 'Wedding name',
         'aina_hakim' => 'Aina & Hakim',
         'tarikh_majlis' => 'Wedding date',
@@ -225,6 +228,9 @@ return [
     ],
 
     'booking' => [
+        'bayaran_direkod' => 'Payment recorded',
+        'bayaran_disahkan_vendor' => 'Payment confirmed by the vendor',
+        'majlis_selesai' => 'Wedding complete',
         'bayaran_akan_dihantar' => ':amount will be sent to the vendor to confirm. They will check their account before the booking is confirmed.',
         'bayaran_akan_dihantar_resit' => ':amount will be sent to the vendor to confirm, along with the receipt :receipt. They will check their account before the booking is confirmed.',
         'contoh_bayaran_pendahuluan_transfer_maybank2u' => 'For example: deposit, Maybank2u transfer',
@@ -271,6 +277,7 @@ return [
     ],
 
     'vendor_profile' => [
+        'simpan_profil' => 'Save profile',
         'maksimum_kategori' => 'At most :count. Searchers will find you under each one.',
         'nama_perniagaan' => 'Business name',
         'kategori_utama' => 'Main category',
@@ -328,6 +335,9 @@ return [
     ],
 
     'package' => [
+        'tambah_item' => 'Add an item',
+        'untuk_susun_semula' => ' to reorder.',
+        'tambah_pakej' => 'Add a package',
         'nama_pakej' => 'Package name',
         'cth_pakej_premium' => 'For example: Premium Package',
         'harga_rm' => 'Price (RM)',
@@ -399,6 +409,8 @@ return [
     ],
 
     'vendor_enquiry' => [
+        'kemas_kini_balasan' => 'Update reply',
+        'balas' => 'Reply',
         'terima_kasih_atas_enquiry_anda' => 'Thank you for your enquiry…',
         'mesej' => 'Message',
         'hantar_balasan' => 'Send reply',
@@ -410,6 +422,10 @@ return [
     ],
 
     'points' => [
+        'majlis_selesai_count' => ':count weddings completed',
+        'perlu_enquiry_untuk_diukur' => 'Needs at least :count enquiries before it can be measured',
+        'enquiry_yang_anda_balas' => 'Enquiries you replied to',
+        'recommended_needs_clean' => 'Recommended Vendor also needs a clean record: no upheld violation in the last 6 months.',
         'belum_cukup_review_untuk_menunjukkan' => 'Not enough reviews to show a trend yet.',
         'pendapatan_mengikut_bulan' => 'Earnings by month',
         'majlis_selesai' => 'Weddings completed',
@@ -423,6 +439,9 @@ return [
     ],
 
     'portfolio' => [
+        'muat_naik' => 'Upload',
+        'tambah_gambar_lagi' => 'Add more photos',
+        'pilih_gambar' => 'Choose photos',
         'kapsyen_pilihan' => 'Caption (optional)',
         'majlis_aina_hakim_alor_setar' => 'Aina & Hakim, Alor Setar',
         'alih_ke_kiri' => 'Move left',
@@ -471,6 +490,11 @@ return [
     ],
 
     'admin_checklist' => [
+        'edit_fasa' => 'Edit phase',
+        'tambah_fasa' => 'Add a phase',
+        'edit_tugasan' => 'Edit task',
+        'tambah_tugasan' => 'Add a task',
+        'tambah' => 'Add',
         'padam_fasa_nama' => 'Delete the :name phase?',
         'tugasan_akan_hilang' => ':count tasks in this phase will go from the master list. Existing couples’ checklists are unchanged.',
         'bulan_sebelum_majlis_help' => '0 means the wedding day itself. Leave it empty for a task with no deadline.',
@@ -558,6 +582,8 @@ return [
     ],
 
     'admin_categories' => [
+        'edit_kategori' => 'Edit category',
+        'tambah_kategori' => 'Add a category',
         'padam_kategori_nama' => 'Delete the :name category?',
         'alih_ke_atas' => 'Move up',
         'alih_ke_bawah' => 'Move down',
@@ -646,6 +672,7 @@ return [
     ],
 
     'card_editor' => [
+        'muat_naik_gambar' => 'Upload photos',
         'published' => 'Published',
         'draft' => 'Draft, not published yet',
         'views' => ':count views',

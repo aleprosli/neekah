@@ -50,7 +50,7 @@ class PaymentSettings extends SettingGroup
             ...collect(PaymentMethod::cases())
                 ->mapWithKeys(fn (PaymentMethod $method): array => [$method->settingKey() => $method === PaymentMethod::ManualTransfer])
                 ->all(),
-            'instructions' => 'Bayar terus kepada vendor mengikut persetujuan anda, kemudian rekodkan bayaran itu di sini supaya kedua-dua pihak ada rekod yang sama.',
+            'instructions' => __('props.vendor_onboarding.manual_instructions'),
         ];
     }
 

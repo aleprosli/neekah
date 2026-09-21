@@ -118,6 +118,19 @@ return [
     ],
 
     'compare' => [
+        'kategori' => 'Category',
+        'lokasi' => 'Location',
+        'kawasan_dicover' => 'Areas covered',
+        'tahap' => 'Tier',
+        'rating' => 'Rating',
+        'baru' => 'New',
+        'harga_bermula' => 'Starting price',
+        'pakej_termurah' => 'Cheapest package',
+        'bilangan_pakej' => 'Number of packages',
+        'majlis_selesai' => 'Weddings completed',
+        'completion_rate' => 'Completion rate',
+        'response_rate' => 'Response rate',
+        'vendor_score' => 'Vendor Score',
         'banding_vendor' => 'Compare vendors',
         'banding_vendor_2' => 'Compare vendors',
         'belum_ada_vendor_dipilih' => 'No vendors picked yet',
@@ -132,6 +145,9 @@ return [
     ],
 
     'dash' => [
+        'tempoh_terakhir' => 'Period: last :period',
+        'artikel_baru' => 'New article',
+        'sunting_artikel' => 'Edit article',
         'edit_pakej' => 'Edit package',
         'cipta_wedding_project' => 'Create a wedding project',
         'cipta_wedding_project_sub' => 'Create a wedding project to start planning.',

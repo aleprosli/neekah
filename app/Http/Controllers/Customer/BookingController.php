@@ -142,9 +142,9 @@ class BookingController extends Controller
 
         $steps = [
             ['Booking dibuat', true, $booking->created_at],
-            ['Bayaran direkod', $booking->payments->isNotEmpty(), $booking->payments->first()?->created_at],
-            ['Bayaran disahkan vendor', $firstVerified !== null, $firstVerified?->verified_at],
-            ['Majlis selesai', $booking->completed_at !== null, $booking->completed_at],
+            [__('ui.booking.bayaran_direkod'), $booking->payments->isNotEmpty(), $booking->payments->first()?->created_at],
+            [__('ui.booking.bayaran_disahkan_vendor'), $firstVerified !== null, $firstVerified?->verified_at],
+            [__('ui.booking.majlis_selesai'), $booking->completed_at !== null, $booking->completed_at],
             ['Review diberi', $booking->review !== null, $booking->review?->created_at],
         ];
 

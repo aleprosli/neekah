@@ -181,6 +181,30 @@ return [
     */
 
     'custom' => [
+        'remaining_balance' => 'Baki yang belum direkod hanya RM:amount.',
+        'own_email' => 'Itu emel anda sendiri.',
+        'wedding_already_full' => 'Majlis ini sudah ada dua ahli. Buang pasangan sedia ada dahulu.',
+        'invitation_pending' => 'Jemputan ke emel ini masih menunggu jawapan.',
+        'not_an_email' => '":address" bukan alamat emel yang sah.',
+        'pick_a_recipient' => 'Pilih sekurang-kurangnya seorang penerima, atau taip satu alamat emel.',
+        'malaysian_phone' => 'Masukkan nombor telefon Malaysia yang sah, contoh 012-345 6789.',
+        'category_name_taken' => 'Kategori dengan nama ini sudah wujud.',
+        'vendor_date_taken' => 'Anda sudah ada tempahan atau tarikh ditutup pada hari tersebut.',
+        'vendor_unavailable' => 'Vendor ini tidak tersedia pada tarikh tersebut. Sila pilih tarikh lain.',
+        'website_not_messaging' => 'Pautan laman web tidak boleh menghala ke WhatsApp atau Telegram.',
+        'not_a_valid_link' => 'Pautan ini bukan pautan :platform yang sah.',
+        'email_is_a_couple' => 'Emel ini sudah didaftar sebagai akaun pengantin. Log masuk dengan akaun itu untuk menukarnya ke akaun vendor.',
+        'subdomain_regex' => 'Alamat web hanya boleh mengandungi huruf kecil, nombor dan tanda sengkang.',
+        'subdomain_reserved' => 'Alamat web ini dikhaskan untuk platform. Sila pilih yang lain.',
+        'subdomain_taken' => 'Alamat web ini telah diambil. Cuba yang lain.',
+        'review_once' => 'Review hanya boleh diberi sekali selepas booking selesai.',
+        'complete_confirmed_only' => 'Hanya booking yang telah disahkan boleh ditandakan selesai.',
+        'rsvp_closed' => 'RSVP untuk majlis ini telah ditutup.',
+        'card_not_found' => 'Kad jemputan ini tidak dijumpai.',
+
+        'turnstile_missing' => 'Sila lengkapkan semakan keselamatan.',
+        'turnstile_failed' => 'Semakan keselamatan gagal. Sila cuba sekali lagi.',
+
         'credentials' => 'Emel atau kata laluan tidak sepadan dengan rekod kami.',
         'too_many_attempts' => 'Terlalu banyak percubaan. Cuba lagi dalam :minutes minit.',
         'reset_link_invalid' => 'Pautan set semula tidak sah atau telah tamat tempoh.',

@@ -1,4 +1,4 @@
-<x-layouts.app title="Notifikasi">
+<x-layouts.app :title="__('ui.notifications.title')">
     <x-site.header />
 
     <main class="mx-auto max-w-3xl px-4 pt-24 pb-24 sm:px-6 lg:pt-28">

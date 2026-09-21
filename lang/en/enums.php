@@ -163,4 +163,25 @@ return [
         'open' => 'Open review',
     ],
 
+    'payment_method_desc' => [
+        'manual_transfer' => 'The couple pays the vendor directly, records the payment with a receipt, and the vendor confirms it.',
+        'billplz' => 'FPX and cards through Billplz.',
+        'bayarcash' => 'FPX, DuitNow and cards through Bayarcash.',
+        'stripe' => 'Credit and debit cards through Stripe.',
+    ],
+
+    'review_filter_desc' => [
+        'reported' => 'The vendor disputes this review and has asked an admin to look. It stays visible until you act.',
+        'hidden' => 'Already taken off the vendor’s profile. The record stays, including why and who took it off.',
+        'open' => 'Written straight onto the profile, with no booking behind it. It does not touch the vendor’s rating, points or ranking.',
+        'verified' => 'It comes from a booking completed on Neekah. Only these move the rating and the ranking.',
+    ],
+
+    'announcement_audience_desc' => [
+        'everyone' => 'Every active couple and vendor.',
+        'customers' => 'Couples’ accounts only.',
+        'vendors' => 'Vendor accounts only.',
+        'custom' => 'Pick users one by one, or type an email address yourself.',
+    ],
+
 ];

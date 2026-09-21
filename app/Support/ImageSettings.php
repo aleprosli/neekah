@@ -9,11 +9,21 @@ namespace App\Support;
  */
 class ImageSettings extends SettingGroup
 {
-    /** @var array<string, string> */
-    public const FORMATS = [
-        'webp' => 'WebP (disyorkan, fail paling kecil)',
-        'jpeg' => 'JPEG (paling serasi)',
-    ];
+    /** The formats an admin may choose between, in their own language. */
+    public const FORMAT_KEYS = ['webp', 'jpeg'];
+
+    /**
+     * A constant cannot hold a function call, and these labels are translated.
+     *
+     * @return array<string, string>
+     */
+    public static function formats(): array
+    {
+        return [
+            'webp' => __('props.vendor.format_webp'),
+            'jpeg' => __('props.vendor.format_jpeg'),
+        ];
+    }
 
     /** @var array{max_dimension: int, thumbnail_width: int, quality: int, format: string, max_upload_mb: int} */
     private const DEFAULTS = [
@@ -52,7 +62,7 @@ class ImageSettings extends SettingGroup
     {
         $format = (string) $this->value('format');
 
-        return array_key_exists($format, self::FORMATS) ? $format : self::DEFAULTS['format'];
+        return in_array($format, self::FORMAT_KEYS, true) ? $format : self::DEFAULTS['format'];
     }
 
     public function maxUploadMegabytes(): int
@@ -96,7 +106,7 @@ class ImageSettings extends SettingGroup
      */
     public function acceptedFormatsLabel(): string
     {
-        return 'JPG, PNG atau WebP';
+        return __('props.vendor.accepted_formats');
     }
 
     /**
@@ -107,8 +117,8 @@ class ImageSettings extends SettingGroup
     {
         return implode(' · ', array_filter([
             $this->acceptedFormatsLabel(),
-            'maksimum '.$this->effectiveUploadMegabytes().'MB',
-            $recommended ? 'disyorkan '.$recommended : null,
+            __('props.vendor.upload_maksimum', ['size' => $this->effectiveUploadMegabytes()]),
+            $recommended ? __('props.vendor.upload_disyorkan', ['recommended' => $recommended]) : null,
         ]));
     }
 

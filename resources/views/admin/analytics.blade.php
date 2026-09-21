@@ -1,4 +1,4 @@
-<x-layouts.admin :title="__('pages.dash.analitik')" :heading="__('pages.dash.analitik_platform')" :subheading="'Tempoh: '.$period->label().' terakhir'">
+<x-layouts.admin :title="__('pages.dash.analitik')" :heading="__('pages.dash.analitik_platform')" :subheading="__('pages.dash.tempoh_terakhir', ['period' => $period->label()])">
     <x-slot:actions>
         <x-filter-popover :label="__('pages.dash.tempoh')" :active="$period->label()" align="right" width="w-48">
             <ul class="flex flex-col gap-1">

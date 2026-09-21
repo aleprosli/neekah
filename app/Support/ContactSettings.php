@@ -65,8 +65,8 @@ class ContactSettings extends SettingGroup
         $channels = array_filter([$this->email() ?: null, $this->phone() ?: null, $this->whatsappUrl()]);
 
         return $channels === []
-            ? 'Ada sebarang pertanyaan? Hubungi kami melalui '.config('app.url').'.'
-            : 'Ada sebarang pertanyaan? Hubungi kami di '.implode(' · ', $channels).'.';
+            ? __('props.vendor_onboarding.contact_url', ['url' => config('app.url')])
+            : __('props.vendor_onboarding.contact_channels', ['channels' => implode(' · ', $channels)]);
     }
 
     /**

@@ -242,8 +242,8 @@ class UserController extends Controller
         $wedding = $user->createdWeddings->first();
 
         return $wedding === null
-            ? ['Tiada majlis', 'amber']
-            : [$wedding->event_date?->translatedFormat('j M Y') ?? 'Tarikh belum ditetapkan', 'sky'];
+            ? [__('props.admin.tiada_majlis'), 'amber']
+            : [$wedding->event_date?->translatedFormat('j M Y') ?? __('props.admin.date_not_set'), 'sky'];
     }
 
     /**
@@ -307,8 +307,8 @@ class UserController extends Controller
                 'heading' => __('props.admin.tukar_ke_akaun_vendor'),
                 'allowed' => $allowed,
                 'body' => $allowed
-                    ? 'Untuk vendor yang tersilap daftar sebagai pengantin. Isi maklumat perniagaan; profil akan menunggu kelulusan.'
-                    : 'Tidak boleh: akaun ini ada tempahan sebagai pengantin. Nyahaktifkan akaun dan minta mereka daftar vendor dengan emel lain.',
+                    ? __('props.admin.convert_to_vendor_yes')
+                    : __('props.admin.convert_to_vendor_no'),
             ];
         }
 
@@ -319,8 +319,8 @@ class UserController extends Controller
                 'heading' => __('props.admin.tukar_ke_akaun_pengantin'),
                 'allowed' => $allowed,
                 'body' => $allowed
-                    ? 'Untuk pengantin yang tersilap daftar sebagai vendor. Profil vendor, pakej dan portfolio akan dipadam.'
-                    : 'Tidak boleh: vendor ini sudah ada tempahan, enquiry atau review.',
+                    ? __('props.admin.convert_to_couple_yes')
+                    : __('props.admin.convert_to_couple_no'),
                 'label' => __('props.admin.tukar_ke_pengantin'),
                 'url' => route('admin.users.vendor.destroy', $user),
                 'method' => 'DELETE',
@@ -336,7 +336,7 @@ class UserController extends Controller
                 'key' => 'reactivate',
                 'heading' => __('props.admin.aktifkan_semula'),
                 'allowed' => true,
-                'body' => 'Pengguna ini boleh log masuk semula.'.($user->vendor ? ' Profil vendor kekal digantung sehingga diluluskan semula.' : ''),
+                'body' => __('props.admin.reactivate_body').($user->vendor ? __('props.admin.reactivate_body_vendor') : ''),
                 'label' => __('props.admin.aktifkan_semula_2'),
                 'url' => route('admin.users.reactivate', $user),
                 'method' => 'DELETE',
@@ -348,7 +348,7 @@ class UserController extends Controller
                 'key' => 'deactivate',
                 'heading' => __('props.admin.nyahaktifkan_akaun'),
                 'allowed' => $admin->can('deactivate', $user),
-                'body' => 'Pengguna dilog keluar dan tidak boleh log masuk. Semua rekod dikekalkan.'.($user->vendor ? ' Profil vendor turut digantung.' : ''),
+                'body' => __('props.admin.deactivate_body').($user->vendor ? __('props.admin.deactivate_body_vendor') : ''),
                 'label' => __('props.admin.nyahaktifkan'),
                 'url' => route('admin.users.deactivate', $user),
                 'method' => 'POST',
@@ -364,8 +364,8 @@ class UserController extends Controller
             'heading' => __('props.admin.padam_akaun'),
             'allowed' => $canDelete,
             'body' => $canDelete
-                ? 'Memadam akaun ini beserta majlis, enquiry dan gambar yang dimuat naik.'
-                : 'Tidak boleh dipadam: akaun ini ada tempahan, atau majlis yang dikongsi dengan pengguna lain. Nyahaktifkan sahaja supaya rekod kekal.',
+                ? __('props.admin.delete_yes')
+                : __('props.admin.delete_no'),
             'label' => __('props.admin.padam_akaun_2'),
             'url' => route('admin.users.destroy', $user),
             'method' => 'DELETE',

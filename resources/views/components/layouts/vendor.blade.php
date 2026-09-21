@@ -22,7 +22,7 @@
             $item(__('pages.sidebar_vendor.review'), 'star', 'vendor.reviews.index', 'vendor.reviews.*'),
         ]],
         ['label' => __('pages.sidebar_vendor.prestasi'), 'items' => [
-            $item('Point & Ranking', 'trophy', 'vendor.points.index', 'vendor.points.*'),
+            $item(__('pages.dash.point_ranking'), 'trophy', 'vendor.points.index', 'vendor.points.*'),
         ]],
     ];
     $context = $vendor

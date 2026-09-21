@@ -28,7 +28,7 @@ class VendorTierController extends Controller
         $vendor->save();
         $recalculateStats->handle($vendor);
 
-        $note = $vendor->tier_locked ? ' Tahap dikunci, pengiraan automatik tidak akan mengubahnya.' : '';
+        $note = $vendor->tier_locked ? __('props.admin.tier_locked') : '';
 
         return back()->with('status', $vendor->name.' kini '.$vendor->fresh()->tier->label().' Vendor (score '.number_format((float) $vendor->fresh()->score, 2).').'.$note);
     }

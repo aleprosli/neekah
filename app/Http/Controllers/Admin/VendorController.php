@@ -171,7 +171,7 @@ class VendorController extends Controller
                         $vendor->state,
                         $vendor->status->label(),
                         $vendor->tier->label(),
-                        $vendor->hasCompleteProfile() && $vendor->hasCompleteCatalogue() ? 'Lengkap' : 'Belum lengkap',
+                        $vendor->hasCompleteProfile() && $vendor->hasCompleteCatalogue() ? 'Lengkap' : __('props.admin.belum_lengkap'),
                         $vendor->active_packages_count,
                         $vendor->portfolio_items_count,
                         $vendor->created_at->toDateString(),
@@ -371,10 +371,10 @@ class VendorController extends Controller
     private function statusConsequence(VendorStatus $status): string
     {
         return match ($status) {
-            VendorStatus::Approved => 'Profil akan dipaparkan di marketplace dan vendor menerima emel kelulusan.',
-            VendorStatus::Suspended => 'Profil akan hilang dari marketplace dan vendor menerima emel pemberitahuan.',
-            VendorStatus::Rejected => 'Vendor menerima emel penolakan. Mereka masih boleh melengkapkan profil dan memohon semula.',
-            VendorStatus::Pending => 'Profil akan hilang dari marketplace sehingga diluluskan semula.',
+            VendorStatus::Approved => __('props.admin.vendor_approve'),
+            VendorStatus::Suspended => __('props.admin.vendor_suspend'),
+            VendorStatus::Rejected => __('props.admin.vendor_reject'),
+            VendorStatus::Pending => __('props.admin.vendor_unapprove'),
         };
     }
 }

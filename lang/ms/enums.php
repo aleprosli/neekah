@@ -163,4 +163,25 @@ return [
         'open' => 'Review terbuka',
     ],
 
+    'payment_method_desc' => [
+        'manual_transfer' => 'Pengantin membayar terus kepada vendor, merekodkan bayaran berserta resit, dan vendor mengesahkannya.',
+        'billplz' => 'FPX dan kad melalui Billplz.',
+        'bayarcash' => 'FPX, DuitNow dan kad melalui Bayarcash.',
+        'stripe' => 'Kad kredit dan debit melalui Stripe.',
+    ],
+
+    'review_filter_desc' => [
+        'reported' => 'Vendor membantah review ini dan meminta admin melihatnya. Ia masih dipaparkan sehingga anda bertindak.',
+        'hidden' => 'Sudah ditarik dari profil vendor. Rekodnya kekal, termasuk sebab dan siapa yang menariknya.',
+        'open' => 'Ditulis terus pada profil, tanpa tempahan. Tidak menyentuh rating, mata atau ranking vendor.',
+        'verified' => 'Datang daripada tempahan yang selesai di Neekah. Hanya yang ini menggerakkan rating dan ranking.',
+    ],
+
+    'announcement_audience_desc' => [
+        'everyone' => 'Setiap pengantin dan vendor yang aktif.',
+        'customers' => 'Akaun pengantin sahaja.',
+        'vendors' => 'Akaun vendor sahaja.',
+        'custom' => 'Pilih pengguna satu per satu, atau taip alamat emel sendiri.',
+    ],
+
 ];

@@ -33,7 +33,7 @@ const reply = ref(props.enquiry.reply ?? '');
 
                 <UiTextarea
                     v-model="reply"
-                    :label="enquiry.reply ? 'Kemas kini balasan' : 'Balas'"
+                    :label="enquiry.reply ? $t('vendor_enquiry.kemas_kini_balasan') : $t('vendor_enquiry.balas')"
                     name="reply"
                     :rows="5"
                     :placeholder="$t('vendor_enquiry.terima_kasih_atas_enquiry_anda')"

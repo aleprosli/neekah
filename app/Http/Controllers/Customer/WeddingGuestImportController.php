@@ -22,7 +22,7 @@ class WeddingGuestImportController extends Controller
         );
 
         return back()
-            ->with('status', "{$result['imported']} tetamu ditambah, {$result['updated']} dikemas kini.")
+            ->with('status', __('props.couple.tetamu_diimport', ['added' => $result['imported'], 'updated' => $result['updated']]))
             ->with('importErrors', $result['errors']);
     }
 }

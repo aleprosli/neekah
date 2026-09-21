@@ -24,9 +24,9 @@ class NewPasswordController extends Controller
                 'submitLabel' => 'Simpan kata laluan',
                 'hidden' => ['token' => $token],
                 'fields' => [
-                    ['name' => 'email', 'label' => 'Emel', 'type' => 'email', 'autocomplete' => 'email', 'required' => true, 'value' => old('email', $request->string('email')->toString())],
-                    ['name' => 'password', 'label' => 'Kata laluan baharu', 'type' => 'password', 'autocomplete' => 'new-password', 'help' => 'Sekurang-kurangnya 8 aksara.', 'required' => true],
-                    ['name' => 'password_confirmation', 'label' => 'Sahkan kata laluan', 'type' => 'password', 'autocomplete' => 'new-password', 'required' => true],
+                    ['name' => 'email', 'label' => __('auth_pages.fields.email'), 'type' => 'email', 'autocomplete' => 'email', 'required' => true, 'value' => old('email', $request->string('email')->toString())],
+                    ['name' => 'password', 'label' => __('auth_pages.fields.password_new'), 'type' => 'password', 'autocomplete' => 'new-password', 'help' => __('auth_pages.fields.password_help'), 'required' => true],
+                    ['name' => 'password_confirmation', 'label' => __('auth_pages.fields.password_confirm'), 'type' => 'password', 'autocomplete' => 'new-password', 'required' => true],
                 ],
             ]),
         ]);

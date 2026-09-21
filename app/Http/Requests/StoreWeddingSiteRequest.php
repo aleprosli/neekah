@@ -87,9 +87,9 @@ class StoreWeddingSiteRequest extends FormRequest
     public static function subdomainMessages(): array
     {
         return [
-            'subdomain.regex' => 'Alamat web hanya boleh mengandungi huruf kecil, nombor dan tanda sengkang.',
-            'subdomain.not_in' => 'Alamat web ini dikhaskan untuk platform. Sila pilih yang lain.',
-            'subdomain.unique' => 'Alamat web ini telah diambil. Cuba yang lain.',
+            'subdomain.regex' => __('validation.custom.subdomain_regex'),
+            'subdomain.not_in' => __('validation.custom.subdomain_reserved'),
+            'subdomain.unique' => __('validation.custom.subdomain_taken'),
         ];
     }
 

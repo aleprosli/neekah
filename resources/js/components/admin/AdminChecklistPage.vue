@@ -240,7 +240,7 @@ const dueLabel = (months) => {
 
                 <div class="flex items-start justify-between gap-2">
                     <h2 class="font-semibold">
-                        {{ panel.kind === 'section' ? (panel.row ? 'Edit fasa' : 'Tambah fasa') : (panel.row ? 'Edit tugasan' : 'Tambah tugasan') }}
+                        {{ panel.kind === 'section' ? (panel.row ? $t('admin_checklist.edit_fasa') : $t('admin_checklist.tambah_fasa')) : (panel.row ? $t('admin_checklist.edit_tugasan') : $t('admin_checklist.tambah_tugasan')) }}
                     </h2>
                     <button type="button" class="text-sm text-ink-muted hover:text-ink" :aria-label="$t('admin_checklist.tutup')" @click="panel = null">✕</button>
                 </div>
@@ -285,7 +285,7 @@ const dueLabel = (months) => {
                     <input v-model="form.is_active" type="checkbox" name="is_active" value="1" class="accent-brand-600">{{ $t('admin_checklist.aktif') }}</label>
 
                 <button type="submit" class="rounded-full bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700">
-                    {{ panel.row ? 'Simpan' : 'Tambah' }}
+                    {{ panel.row ? $t('common.simpan') : $t('admin_checklist.tambah') }}
                 </button>
             </form>
         </div>

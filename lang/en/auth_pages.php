@@ -24,11 +24,22 @@ return [
     ],
 
     'fields' => [
+        'name' => 'Name',
+        'name_placeholder' => 'For example: Aina Zulkifli',
+        'name_help' => 'Your own name, or both your names — either is fine. You can change it later under Account.',
+        'phone' => 'Phone number',
+        'phone_help' => 'Your WhatsApp number. We show it to no one but the vendors you book.',
+        'password_help' => 'At least 8 characters.',
+        'password_new' => 'New password',
+        'password_confirm' => 'Confirm your password',
         'email' => 'Email',
         'password' => 'Password',
     ],
 
     'links' => [
+        'have_account' => 'Already have an account?',
+        'log_in' => 'Log in',
+        'remember_password' => 'Remembered your password?',
         'switch' => 'Switch',
         'no_account' => 'No account yet?',
         'register_free' => 'Sign up free',
@@ -49,5 +60,9 @@ return [
     'phone' => [
         'title' => 'One more step',
         'subtitle' => 'Enter your phone number so vendors can reach you after you book.',
+    ],
+    'tip' => [
+        'one_account_title' => 'One account each, two people',
+        'one_account_body' => 'Register with your own account. Once you have, invite your partner from the My Wedding page so you can plan together: the same checklist, budget, guest list and invitation card, each of you logging in as yourself.',
     ],
 ];

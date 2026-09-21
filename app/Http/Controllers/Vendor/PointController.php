@@ -52,10 +52,10 @@ class PointController extends Controller
                 'stats' => [
                     ['label' => __('props.vendor.performance_point'), 'value' => number_format($vendor->points_total), 'hint' => $vendor->penalty_points ? __('props.vendor.penalties', ['count' => $vendor->penalty_points]) : __('props.vendor.no_penalties')],
                     ['label' => __('props.vendor.vendor_score'), 'value' => number_format((float) $vendor->score, 2), 'hint' => __('props.vendor.maksimum_100')],
-                    ['label' => __('props.vendor.completion_rate'), 'value' => $vendor->completion_rate.'%', 'hint' => $vendor->completed_bookings_count.' majlis selesai'],
+                    ['label' => __('props.vendor.completion_rate'), 'value' => $vendor->completion_rate.'%', 'hint' => __('ui.points.majlis_selesai_count', ['count' => $vendor->completed_bookings_count])],
                     ['label' => __('props.vendor.response_rate'), 'value' => $vendor->responseRateLabel(), 'hint' => $vendor->response_rate === null
-                        ? 'Perlu sekurang-kurangnya '.Vendor::MIN_ENQUIRIES_FOR_RESPONSE_RATE.' enquiry untuk diukur'
-                        : 'Enquiry yang anda balas'],
+                        ? __('ui.points.perlu_enquiry_untuk_diukur', ['count' => Vendor::MIN_ENQUIRIES_FOR_RESPONSE_RATE])
+                        : __('ui.points.enquiry_yang_anda_balas')],
                 ],
                 'period' => [
                     'months' => $period->months,
@@ -89,7 +89,7 @@ class PointController extends Controller
                     'next' => $nextTier?->label(),
                     'requirements' => $this->requirements($vendor),
                     'clean_record_note' => $nextTier === VendorTier::Recommended
-                        ? 'Recommended Vendor juga memerlukan rekod bersih tanpa pelanggaran disahkan dalam tempoh 6 bulan terakhir.'
+                        ? __('ui.points.recommended_needs_clean')
                         : null,
                 ],
                 'earnable' => collect(PointReason::cases())

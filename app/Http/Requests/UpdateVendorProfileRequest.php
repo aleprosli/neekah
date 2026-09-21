@@ -91,8 +91,8 @@ class UpdateVendorProfileRequest extends FormRequest
 
                 if (! SocialLinks::isAllowed($platform, (string) $value)) {
                     $fail($platform === 'website'
-                        ? 'Pautan laman web tidak boleh menghala ke WhatsApp atau Telegram.'
-                        : 'Pautan ini bukan pautan '.SocialLinks::PLATFORMS[$platform]['label'].' yang sah.');
+                        ? __('validation.custom.website_not_messaging')
+                        : __('validation.custom.not_a_valid_link', ['platform' => SocialLinks::PLATFORMS[$platform]['label']]));
                 }
             }],
             'price_from' => ['required', 'numeric', 'min:0', 'max:9999999'],

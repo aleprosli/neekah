@@ -24,11 +24,22 @@ return [
     ],
 
     'fields' => [
+        'name' => 'Nama',
+        'name_placeholder' => 'Contoh: Aina Zulkifli',
+        'name_help' => 'Nama sendiri atau nama bersama pasangan, kedua-duanya boleh. Boleh ditukar kemudian di Akaun.',
+        'phone' => 'Nombor telefon',
+        'phone_help' => 'Nombor WhatsApp anda. Kami tidak memaparkannya kepada sesiapa selain vendor yang anda tempah.',
+        'password_help' => 'Sekurang-kurangnya 8 aksara.',
+        'password_new' => 'Kata laluan baharu',
+        'password_confirm' => 'Sahkan kata laluan',
         'email' => 'Emel',
         'password' => 'Kata laluan',
     ],
 
     'links' => [
+        'have_account' => 'Sudah ada akaun?',
+        'log_in' => 'Log masuk',
+        'remember_password' => 'Ingat kata laluan anda?',
         'switch' => 'Tukar',
         'no_account' => 'Belum ada akaun?',
         'register_free' => 'Daftar percuma',
@@ -49,5 +60,9 @@ return [
     'phone' => [
         'title' => 'Satu langkah lagi',
         'subtitle' => 'Masukkan nombor telefon anda supaya vendor boleh menghubungi anda selepas anda menempah.',
+    ],
+    'tip' => [
+        'one_account_title' => 'Satu akaun, dua pengantin',
+        'one_account_body' => 'Daftar dengan akaun anda sendiri. Selepas mendaftar, jemput pasangan anda dari page Majlis saya supaya kalian boleh merancang bersama: checklist, bajet, tetamu dan kad jemputan yang sama, dan setiap seorang log masuk dengan akaun sendiri.',
     ],
 ];

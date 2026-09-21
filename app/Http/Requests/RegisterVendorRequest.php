@@ -54,7 +54,7 @@ class RegisterVendorRequest extends FormRequest
                     ->exists();
 
                 if ($isCoupleAccount) {
-                    $validator->errors()->add('existing_customer', 'Emel ini sudah didaftar sebagai akaun pengantin. Log masuk dengan akaun itu untuk menukarnya ke akaun vendor.');
+                    $validator->errors()->add('existing_customer', __('validation.custom.email_is_a_couple'));
                 }
             },
         ];
