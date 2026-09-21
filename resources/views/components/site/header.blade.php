@@ -5,7 +5,7 @@
              narrow phone however wide the buttons beside it turn out to be, in
              either language. A fixed vw cap could not promise that. --}}
         <a href="{{ route('vendors.index') }}" class="flex min-w-0 shrink items-center" aria-label="{{ config('app.name') }}">
-            <x-brand.lockup class="h-7 w-auto max-w-full object-contain sm:h-8" />
+            <x-brand.lockup class="h-7 max-w-full object-contain sm:h-8" />
         </a>
 
         <nav data-nav-region class="hidden items-center gap-1 text-sm font-medium md:flex" aria-label="{{ __('nav.main') }}">
