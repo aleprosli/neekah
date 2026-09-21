@@ -108,7 +108,7 @@
 
                 {{-- Highlights --}}
                 <ul class="flex flex-col gap-5 py-6">
-                    @foreach ([['💬', 'Berhubung terus dengan vendor', 'Hantar enquiry atau WhatsApp mereka sendiri. Neekah tidak mengambil komisen dan tidak memegang bayaran anda.'], ['⚡', 'Response rate '.$vendor->responseRateLabel(), $vendor->response_rate === null ? 'Vendor ini belum menerima cukup enquiry untuk kami mengukur kadar balasan mereka.' : 'Diukur dari enquiry yang diterima melalui Neekah.'], ['★', $publishedReviewsCount.' review', 'Sesiapa boleh menulis review di sini; yang datang daripada tempahan disahkan ditandakan berasingan.']] as [$icon, $title, $text])
+                    @foreach ([['💬', __('pages.profile.highlight_contact'), __('pages.profile.highlight_contact_detail')], ['⚡', __('pages.profile.highlight_response', ['rate' => $vendor->responseRateLabel()]), $vendor->response_rate === null ? __('pages.profile.highlight_response_none') : __('pages.profile.highlight_response_detail')], ['★', __('pages.profile.highlight_reviews', ['count' => $publishedReviewsCount]), __('pages.profile.highlight_reviews_detail')]] as [$icon, $title, $text])
                         <li class="flex gap-4">
                             <span class="w-6 shrink-0 text-center text-xl leading-6">{{ $icon }}</span>
                             <div class="min-w-0">
@@ -263,7 +263,7 @@
                         <x-turnstile />
 
                         <button type="submit" class="rounded-full bg-brand-600 py-3.5 text-sm font-semibold text-white transition hover:bg-brand-700 disabled:opacity-50" @disabled($vendor->packages->isEmpty())>
-                            {{ auth()->check() ? 'Tempah sekarang' : 'Log masuk untuk tempah' }}
+                            {{ auth()->check() ? __('pages.profile.book_now') : __('pages.profile.login_to_book') }}
                         </button>
 
                         @auth
