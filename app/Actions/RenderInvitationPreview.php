@@ -2,8 +2,8 @@
 
 namespace App\Actions;
 
-use App\Models\SiteTemplate;
 use App\Models\WeddingSite;
+use App\Support\CardDesign;
 use GdImage;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -39,10 +39,12 @@ class RenderInvitationPreview
      * The key carries everything the picture shows, so editing the card or
      * switching template produces a new file rather than a stale one.
      */
-    public function handle(WeddingSite $site, SiteTemplate $template): string
+    public function handle(WeddingSite $site, CardDesign $design): string
     {
         $key = substr(sha1(implode('|', [
-            $site->id, $template->slug, $site->bride_name, $site->groom_name,
+            // The whole design, not the template's name: a couple who changed
+            // their colours must get a new picture, not the old one.
+            $site->id, json_encode($design->toArray()), $site->bride_name, $site->groom_name,
             $site->event_date?->toDateString(), $site->venue_name, $site->cover_image,
         ])), 0, 12);
 
@@ -50,15 +52,16 @@ class RenderInvitationPreview
         $disk = Storage::disk('public');
 
         if (! $disk->exists($path)) {
-            $disk->put($path, $this->draw($site, $template));
+            $disk->put($path, $this->draw($site, $design));
         }
 
         return $path;
     }
 
-    public function draw(WeddingSite $site, SiteTemplate $template): string
+    public function draw(WeddingSite $site, CardDesign $design): string
     {
-        $palette = $template->design['palette'] ?? [];
+        $palette = $design->palette();
+        $type = $design->toArray()['type'] ?? [];
         $canvas = imagecreatetruecolor(self::WIDTH, self::HEIGHT);
 
         $page = $this->colour($canvas, $palette['page'] ?? '#ffffff');
@@ -74,10 +77,10 @@ class RenderInvitationPreview
         imagesetthickness($canvas, 2);
         imagerectangle($canvas, 40, 40, self::WIDTH - 41, self::HEIGHT - 41, $accent);
 
-        $script = $this->font($template->design['type']['script'] ?? '', 'GreatVibes-Regular.ttf');
-        $serif = $this->font($template->design['type']['body'] ?? '', 'CormorantGaramond.ttf');
+        $script = $this->font($type['script'] ?? '', 'GreatVibes-Regular.ttf');
+        $serif = $this->font($type['body'] ?? '', 'CormorantGaramond.ttf');
 
-        $this->centred($canvas, Str::upper($template->eyebrow()), $serif, 20, 148, $accent, 8);
+        $this->centred($canvas, Str::upper($design->eyebrow()), $serif, 20, 148, $accent, 8);
 
         // The names carry the card, so they are sized to fit rather than clipped.
         $this->centred($canvas, $site->bride_name, $script, $this->fitting($site->bride_name, $script, 82), 290, $name);

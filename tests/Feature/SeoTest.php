@@ -260,7 +260,7 @@ it('paints the preview in the palette of the template the couple chose', functio
 
     $corner = function (string $slug) use ($site, $render): array {
         $site->template = $slug;
-        $image = imagecreatefromstring($render->draw($site, SiteTemplate::where('slug', $slug)->sole()));
+        $image = imagecreatefromstring($render->draw($site, SiteTemplate::where('slug', $slug)->sole()->toCardDesign()));
         $colour = imagecolorat($image, 5, 5);
 
         return [($colour >> 16) & 0xFF, ($colour >> 8) & 0xFF, $colour & 0xFF];

@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Support\CardDesign;
+use App\Support\CardSections;
 use Database\Factories\WeddingSiteFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Scope;
@@ -16,7 +18,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 #[Fillable([
-    'wedding_id', 'subdomain', 'template', 'is_published', 'salutation', 'bride_name', 'groom_name',
+    'wedding_id', 'subdomain', 'template', 'design_overrides', 'sections', 'is_published', 'salutation', 'bride_name', 'groom_name',
     'bride_parents', 'groom_parents', 'invitation_note', 'event_date', 'starts_at', 'ends_at',
     'venue_name', 'venue_address', 'map_url', 'itinerary', 'contacts', 'cover_image',
     'rsvp_enabled', 'rsvp_deadline', 'closing_note',
@@ -70,6 +72,8 @@ class WeddingSite extends Model
             'rsvp_enabled' => 'boolean',
             'event_date' => 'date',
             'rsvp_deadline' => 'date',
+            'design_overrides' => 'array',
+            'sections' => 'array',
             'itinerary' => 'array',
             'contacts' => 'array',
             'gift_accounts' => 'array',
@@ -96,11 +100,31 @@ class WeddingSite extends Model
     /**
      * The chosen design, falling back to the first active one if it was retired.
      */
-    public function design(): SiteTemplate
+    /**
+     * The template the couple picked, with whatever they changed applied. This
+     * is what every view renders from, so the gallery, the editor preview and
+     * the published card cannot drift apart.
+     */
+    public function design(): CardDesign
+    {
+        return CardDesign::make($this->template(), $this->design_overrides);
+    }
+
+    public function template(): SiteTemplate
     {
         return $this->siteTemplate
             ?? SiteTemplate::active()->ordered()->first()
             ?? throw new \RuntimeException('Tiada template kad jemputan yang aktif.');
+    }
+
+    /**
+     * The sections to print, in the couple's order.
+     *
+     * @return array<int, string>
+     */
+    public function sectionOrder(): array
+    {
+        return CardSections::resolve($this->sections);
     }
 
     public function rsvps(): HasMany

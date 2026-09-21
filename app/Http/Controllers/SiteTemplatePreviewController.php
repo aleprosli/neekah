@@ -48,7 +48,10 @@ class SiteTemplatePreviewController extends Controller
 
         return view('sites.show', [
             'site' => $this->sample($template),
-            'template' => $template,
+            'template' => $template->toCardDesign(),
+            // The design renders the card; the model still names it in the
+            // preview bar above.
+            'siteTemplate' => $template,
             'preview' => true,
             'sample' => true,
         ]);
@@ -62,7 +65,7 @@ class SiteTemplatePreviewController extends Controller
     {
         abort_unless($template->is_active, 404);
 
-        return response($render->draw($this->sample($template), $template), 200, [
+        return response($render->draw($this->sample($template), $template->toCardDesign()), 200, [
             'Content-Type' => 'image/png',
             'Cache-Control' => 'public, max-age=604800',
         ]);

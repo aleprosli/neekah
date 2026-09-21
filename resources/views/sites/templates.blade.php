@@ -66,7 +66,7 @@
                                 <a href="{{ route('sites.templates.show', $template) }}" class="group block">
                                     <span class="block overflow-hidden rounded-md bg-surface-muted p-2.5 transition group-hover:-translate-y-1 sm:p-3.5">
                                         <span class="block shadow-[0_12px_28px_-12px_rgb(0_0_0/0.35)] transition group-hover:shadow-[0_20px_36px_-14px_rgb(0_0_0/0.4)]">
-                                            @include('sites.partials.thumbnail', ['template' => $template])
+                                            @include('sites.partials.thumbnail', ['template' => $template->toCardDesign()])
                                         </span>
                                     </span>
                                     <span class="mt-3 flex items-center justify-between gap-2">

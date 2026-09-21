@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Support\CardArt;
+use App\Support\CardDesign;
 use Database\Factories\SiteTemplateFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Scope;
@@ -28,6 +30,11 @@ class SiteTemplate extends Model
      * @var array<int, string>
      */
     public const ORNAMENTS = ['floral', 'vine', 'geometric', 'deco', 'botanical', 'none'];
+
+    /**
+     * @var array<int, string>
+     */
+    public const MOTIONS = CardArt::MOTIONS;
 
     /**
      * @return array<string, string>
@@ -57,24 +64,33 @@ class SiteTemplate extends Model
         return $query->orderBy('sort_order')->orderBy('name');
     }
 
+    /**
+     * This template on its own, with nothing overridden — what the gallery and
+     * the thumbnails render.
+     */
+    public function toCardDesign(): CardDesign
+    {
+        return CardDesign::make($this);
+    }
+
     public function layout(): string
     {
-        return $this->design['layout'] ?? 'centered';
+        return $this->toCardDesign()->layout();
     }
 
     public function ornament(): string
     {
-        return $this->design['ornament'] ?? 'floral';
+        return $this->toCardDesign()->ornament();
     }
 
     public function motion(): string
     {
-        return $this->design['motion'] ?? 'petals';
+        return $this->toCardDesign()->motion();
     }
 
     public function eyebrow(): string
     {
-        return $this->design['eyebrow'] ?? 'Walimatulurus';
+        return $this->toCardDesign()->eyebrow();
     }
 
     /**
@@ -82,41 +98,17 @@ class SiteTemplate extends Model
      */
     public function showsBismillah(): bool
     {
-        return (bool) ($this->design['bismillah'] ?? false);
+        return $this->toCardDesign()->showsBismillah();
     }
 
     public function isDark(): bool
     {
-        return (bool) ($this->design['palette']['dark'] ?? false);
+        return $this->toCardDesign()->isDark();
     }
 
-    /**
-     * The palette and type choices as CSS custom properties, so one stylesheet
-     * can render every template without a class per design.
-     */
     public function cssVariables(): string
     {
-        $palette = $this->design['palette'] ?? [];
-        $type = $this->design['type'] ?? [];
-
-        $variables = [
-            '--nk-page' => $palette['page'] ?? '#ffffff',
-            '--nk-ink' => $palette['ink'] ?? '#2b2b2b',
-            '--nk-name' => $palette['name'] ?? '#2b2b2b',
-            '--nk-accent' => $palette['accent'] ?? '#c19a4b',
-            '--nk-body' => $palette['body'] ?? '#5f5f5f',
-            '--nk-muted' => $palette['muted'] ?? '#9a9a9a',
-            '--nk-panel' => $palette['panel'] ?? '#ffffff',
-            '--nk-line' => $palette['line'] ?? '#e5e5e5',
-            '--nk-button-bg' => $palette['buttonBg'] ?? '#2b2b2b',
-            '--nk-button-text' => $palette['buttonText'] ?? '#ffffff',
-            '--nk-script' => $type['script'] ?? "'Great Vibes', cursive",
-            '--nk-serif' => $type['body'] ?? "'Cormorant Garamond', serif",
-        ];
-
-        return collect($variables)
-            ->map(fn (string $value, string $key): string => $key.':'.$value)
-            ->implode(';');
+        return $this->toCardDesign()->cssVariables();
     }
 
     /**
@@ -124,6 +116,6 @@ class SiteTemplate extends Model
      */
     public function petalColors(): array
     {
-        return $this->design['petals'] ?? ['#f2c6d4', '#e9b8c6', '#f6dcc2'];
+        return $this->toCardDesign()->petalColors();
     }
 }

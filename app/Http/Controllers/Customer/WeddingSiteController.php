@@ -96,7 +96,7 @@ class WeddingSiteController extends Controller
                             'url' => route('sites.templates.show', $template),
                             // The thumbnail is a Blade partial shared with the
                             // public gallery; rendering it here keeps one drawing.
-                            'thumbnail' => view('sites.partials.thumbnail', ['template' => $template])->render(),
+                            'thumbnail' => view('sites.partials.thumbnail', ['template' => $template->toCardDesign()])->render(),
                         ])->values(),
                     ])->values(),
                 'status' => $site->exists ? [
