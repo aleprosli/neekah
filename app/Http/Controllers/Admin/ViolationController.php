@@ -18,19 +18,28 @@ use Illuminate\Http\Request;
 class ViolationController extends Controller
 {
     /** Columns for components/ui/DataTable.vue. */
-    private const COLUMNS = [
-        ['key' => 'vendor', 'label' => 'Vendor', 'type' => 'html'],
-        ['key' => 'type', 'label' => 'Jenis'],
-        ['key' => 'reporter', 'label' => 'Dilaporkan oleh'],
-        ['key' => 'description', 'label' => 'Aduan'],
-        ['key' => 'reported', 'label' => 'Bila'],
-        ['key' => 'badge', 'label' => 'Status', 'type' => 'html'],
-    ];
+    /**
+     * A constant cannot hold a function call, and these labels are
+     * translated now.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private static function columns(): array
+    {
+        return [
+            ['key' => 'vendor', 'label' => __('props.admin.vendor_6'), 'type' => 'html'],
+            ['key' => 'type', 'label' => __('props.admin.jenis')],
+            ['key' => 'reporter', 'label' => __('props.admin.dilaporkan_oleh')],
+            ['key' => 'description', 'label' => __('props.admin.aduan')],
+            ['key' => 'reported', 'label' => __('props.admin.bila')],
+            ['key' => 'badge', 'label' => __('props.admin.status_7'), 'type' => 'html'],
+        ];
+    }
 
     public function index(Request $request): View
     {
         return view('admin.violations.index', [
-            'columns' => self::COLUMNS,
+            'columns' => self::columns(),
             'filters' => [TableFilter::fromEnum(
                 'status',
                 ViolationStatus::cases(),
@@ -124,10 +133,10 @@ class ViolationController extends Controller
                     ])->values(),
                 'vendor' => [
                     'summary' => [
-                        ['label' => 'Status vendor', 'value' => $violation->vendor->status->label()],
-                        ['label' => 'Tahap', 'value' => $violation->vendor->tier->label()],
-                        ['label' => 'Penalty points', 'value' => $violation->vendor->penalty_points],
-                        ['label' => 'Vendor Score', 'value' => number_format((float) $violation->vendor->score, 2)],
+                        ['label' => __('props.admin.status_vendor'), 'value' => $violation->vendor->status->label()],
+                        ['label' => __('props.admin.tahap_2'), 'value' => $violation->vendor->tier->label()],
+                        ['label' => __('props.admin.penalty_points'), 'value' => $violation->vendor->penalty_points],
+                        ['label' => __('props.admin.vendor_score_2'), 'value' => number_format((float) $violation->vendor->score, 2)],
                     ],
                 ],
             ]),

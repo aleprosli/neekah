@@ -63,10 +63,10 @@ class WeddingBudgetController extends Controller
                 'action' => route('weddings.budget.update', $wedding),
                 'budget' => $budget,
                 'stats' => [
-                    ['label' => 'Jumlah bajet', 'value' => $money($budget), 'hint' => 'Diagih '.$money((float) $planned->sum())],
-                    ['label' => 'Ditempah', 'value' => $money($totalActual), 'hint' => 'Jumlah semua booking aktif'],
-                    ['label' => 'Dibayar', 'value' => $money((float) $rows->sum('paid')), 'hint' => 'Baki bayaran '.$money($totalActual - (float) $rows->sum('paid'))],
-                    ['label' => 'Baki bajet', 'value' => $money($budget - $totalActual), 'hint' => $budget - $totalActual < 0 ? 'Melebihi bajet' : 'Masih ada ruang'],
+                    ['label' => __('props.couple.jumlah_bajet'), 'value' => $money($budget), 'hint' => __('props.couple.diagih').$money((float) $planned->sum())],
+                    ['label' => __('props.couple.ditempah_2'), 'value' => $money($totalActual), 'hint' => __('props.couple.jumlah_semua_booking_aktif')],
+                    ['label' => __('props.couple.dibayar'), 'value' => $money((float) $rows->sum('paid')), 'hint' => __('props.couple.baki_bayaran').$money($totalActual - (float) $rows->sum('paid'))],
+                    ['label' => __('props.couple.baki_bajet'), 'value' => $money($budget - $totalActual), 'hint' => $budget - $totalActual < 0 ? 'Melebihi bajet' : 'Masih ada ruang'],
                 ],
                 'progress' => [
                     'caption' => $money($totalActual).' / '.$money($budget),
@@ -106,7 +106,7 @@ class WeddingBudgetController extends Controller
                     'actual' => $money($totalActual),
                     'over' => $budget - $totalActual < 0,
                     'remaining' => $money(abs($budget - $totalActual)),
-                    'remaining_label' => $budget - $totalActual < 0 ? 'Lebih' : 'Baki',
+                    'remaining_label' => $budget - $totalActual < 0 ? __('props.common.over') : __('props.common.remaining'),
                 ],
             ]),
         ]);

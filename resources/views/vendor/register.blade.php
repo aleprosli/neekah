@@ -3,7 +3,7 @@
 {{-- Sign-up furniture, like login and the couple's form, but not noindex:
      this is also the page vendors find from Google, and the controller gives
      it a title and description of its own. The form draws its own cards. --}}
-<x-layouts.auth title="Daftar sebagai vendor" wide>
+<x-layouts.auth :title="__('pages.dash.daftar_sebagai_vendor')" wide>
     <div class="text-center">
         <p class="mb-4 inline-flex items-center gap-2 rounded-full border border-line bg-surface-raised px-3 py-1 text-xs font-medium text-ink-muted">
             <x-nav-icon :name="$audience->icon()" />

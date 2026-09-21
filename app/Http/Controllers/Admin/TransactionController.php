@@ -15,15 +15,24 @@ use Illuminate\Http\Request;
 class TransactionController extends Controller
 {
     /** Columns for components/ui/DataTable.vue. */
-    private const COLUMNS = [
-        ['key' => 'reference', 'label' => 'Rujukan', 'sortable' => true],
-        ['key' => 'booking', 'label' => 'Booking'],
-        ['key' => 'vendor', 'label' => 'Vendor'],
-        ['key' => 'recorded_by', 'label' => 'Direkod oleh'],
-        ['key' => 'amount', 'label' => 'Amaun', 'sortable' => true, 'align' => 'right'],
-        ['key' => 'status', 'label' => 'Status', 'type' => 'html'],
-        ['key' => 'date', 'label' => 'Tarikh', 'sort' => 'paid_at', 'sortable' => true],
-    ];
+    /**
+     * A constant cannot hold a function call, and these labels are
+     * translated now.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private static function columns(): array
+    {
+        return [
+            ['key' => 'reference', 'label' => __('props.admin.rujukan_2'), 'sortable' => true],
+            ['key' => 'booking', 'label' => __('props.admin.booking')],
+            ['key' => 'vendor', 'label' => __('props.admin.vendor_4')],
+            ['key' => 'recorded_by', 'label' => __('props.admin.direkod_oleh')],
+            ['key' => 'amount', 'label' => __('props.admin.amaun'), 'sortable' => true, 'align' => 'right'],
+            ['key' => 'status', 'label' => __('props.admin.status_4'), 'type' => 'html'],
+            ['key' => 'date', 'label' => __('props.admin.tarikh_2'), 'sort' => 'paid_at', 'sortable' => true],
+        ];
+    }
 
     /**
      * Financial view: gross transaction value, platform commission and vendor payouts.
@@ -34,19 +43,19 @@ class TransactionController extends Controller
         $commission = (float) Booking::whereIn('status', [BookingStatus::Confirmed, BookingStatus::Completed])->sum('commission_amount');
 
         return view('admin.transactions', [
-            'columns' => self::COLUMNS,
+            'columns' => self::columns(),
             'filters' => [TableFilter::fromEnum(
                 'status',
                 PaymentStatus::cases(),
                 PaymentStatus::tryFrom($request->string('status')->toString())?->value,
             )],
             'stats' => [
-                ['label' => 'Gross transaction value', 'value' => 'RM'.number_format($gross, 2), 'hint' => 'Semua bayaran diterima'],
-                ['label' => 'Komisen platform', 'value' => 'RM'.number_format($commission, 2), 'hint' => '8% daripada booking aktif'],
-                ['label' => 'Payout vendor', 'value' => 'RM'.number_format($gross - $commission, 2), 'hint' => 'Selepas komisen'],
-                ['label' => 'Menunggu pengesahan', 'value' => 'RM'.number_format((float) Payment::where('status', PaymentStatus::AwaitingVerification)
+                ['label' => __('props.admin.gross_transaction_value'), 'value' => 'RM'.number_format($gross, 2), 'hint' => __('props.admin.semua_bayaran_diterima')],
+                ['label' => __('props.admin.komisen_platform_2'), 'value' => 'RM'.number_format($commission, 2), 'hint' => '8% daripada booking aktif'],
+                ['label' => __('props.admin.payout_vendor'), 'value' => 'RM'.number_format($gross - $commission, 2), 'hint' => __('props.admin.selepas_komisen')],
+                ['label' => __('props.admin.menunggu_pengesahan'), 'value' => 'RM'.number_format((float) Payment::where('status', PaymentStatus::AwaitingVerification)
                     ->whereHas('booking', fn ($query) => $query->whereNot('status', BookingStatus::Cancelled))
-                    ->sum('amount'), 2), 'hint' => 'Direkod pengantin, belum disahkan vendor'],
+                    ->sum('amount'), 2), 'hint' => __('props.admin.direkod_pengantin_belum_disahkan_vendor')],
             ],
         ]);
     }

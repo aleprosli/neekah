@@ -1,4 +1,4 @@
-<x-layouts.admin title="Pengguna" heading="Pengguna" subheading="Semua akaun pengantin, vendor dan admin.">
+<x-layouts.admin :title="__('pages.dash.pengguna')" :heading="__('pages.dash.pengguna_2')" :subheading="__('pages.dash.semua_akaun_pengantin_vendor_dan')">
     {{-- resources/js/components/ui/DataTable.vue — the role and "Perlu diikuti"
          chips are the table's own filters, so choosing one swaps the rows
          (and the segment columns) in place rather than reloading the page. --}}
@@ -8,9 +8,9 @@
             'dataUrl' => route('admin.users.data'),
             'columns' => $columns,
             'filters' => $filters,
-            'searchPlaceholder' => 'Cari nama atau emel…',
-            'emptyTitle' => 'Tiada akaun sepadan',
-            'emptyMessage' => 'Cuba peranan lain, atau kosongkan carian.',
+            'searchPlaceholder' => __('pages.tables.cari_nama_atau_emel'),
+            'emptyTitle' => __('pages.tables.tiada_akaun_sepadan'),
+            'emptyMessage' => __('pages.tables.cuba_peranan_lain_atau_kosongkan'),
             'csrf' => csrf_token(),
             'rowAction' => [
                 'urlKey' => 'impersonate_url',

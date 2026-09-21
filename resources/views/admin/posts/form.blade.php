@@ -1,4 +1,4 @@
-<x-layouts.admin :title="$isNew ? 'Artikel baru' : 'Sunting artikel'" :heading="$isNew ? 'Artikel baru' : 'Sunting artikel'" subheading="Tulis, susun dan siarkan artikel di neekah.my/blog.">
+<x-layouts.admin :title="$isNew ? 'Artikel baru' : 'Sunting artikel'" :heading="$isNew ? 'Artikel baru' : 'Sunting artikel'" :subheading="__('pages.dash.tulis_susun_dan_siarkan_artikel')">
     @unless ($isNew)
         <x-slot:actions>
             <a href="{{ $post->url() }}" target="_blank" class="rounded-full border border-line px-5 py-2.5 text-sm font-medium transition hover:border-brand-400">{{ $post->isPublished() ? 'Lihat artikel' : 'Pratonton' }}</a>

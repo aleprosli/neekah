@@ -44,10 +44,10 @@ class DashboardController extends Controller
             'onboarding' => $this->onboarding($vendor),
             'props' => VueProps::for([
                 'stats' => [
-                    ['label' => 'Majlis akan datang', 'value' => $stats['upcoming'], 'href' => route('vendor.bookings.index', ['status' => 'confirmed'])],
-                    ['label' => 'Menunggu deposit', 'value' => $stats['pending'], 'href' => route('vendor.bookings.index', ['status' => 'pending_payment'])],
-                    ['label' => 'Enquiry baru', 'value' => $stats['open_enquiries'], 'href' => route('vendor.enquiries.index')],
-                    ['label' => 'Bayaran diterima', 'value' => 'RM'.number_format($stats['paid_total'], 2), 'hint' => $stats['completed'].' majlis selesai'],
+                    ['label' => __('props.vendor.majlis_akan_datang'), 'value' => $stats['upcoming'], 'href' => route('vendor.bookings.index', ['status' => 'confirmed'])],
+                    ['label' => __('props.vendor.menunggu_deposit'), 'value' => $stats['pending'], 'href' => route('vendor.bookings.index', ['status' => 'pending_payment'])],
+                    ['label' => __('props.vendor.enquiry_baru'), 'value' => $stats['open_enquiries'], 'href' => route('vendor.enquiries.index')],
+                    ['label' => __('props.vendor.bayaran_diterima'), 'value' => 'RM'.number_format($stats['paid_total'], 2), 'hint' => $stats['completed'].' majlis selesai'],
                 ],
                 'upcoming' => $upcomingBookings->map(fn (Booking $booking): array => [
                     'reference' => $booking->reference,
@@ -77,7 +77,7 @@ class DashboardController extends Controller
         return [
             [
                 'key' => 'profil',
-                'label' => 'Tagline dan penerangan',
+                'label' => __('props.vendor.tagline_dan_penerangan'),
                 'why' => 'Ayat pertama yang pengantin baca tentang anda. Ia muncul di bawah nama perniagaan, dan juga dalam hasil carian Google serta pratonton apabila pautan anda dikongsi di WhatsApp.',
                 'specs' => ['Tagline: satu baris', 'Penerangan: 2 hingga 3 perenggan'],
                 'preview' => 'profil',
@@ -87,7 +87,7 @@ class DashboardController extends Controller
             ],
             [
                 'key' => 'cover',
-                'label' => 'Gambar muka depan',
+                'label' => __('props.vendor.gambar_muka_depan'),
                 'why' => 'Gambar yang mewakili anda dalam senarai vendor dan grid carian — sebelum pengantin membuka profil anda. Tanpa gambar ini, kad anda hanya warna latar kosong berbanding pesaing yang ada gambar.',
                 'specs' => [$formats, 'Landskap 1920 × 1080px', 'Satu gambar terbaik anda'],
                 'preview' => 'portfolio',
@@ -97,7 +97,7 @@ class DashboardController extends Controller
             ],
             [
                 'key' => 'portfolio',
-                'label' => 'Gambar portfolio',
+                'label' => __('props.vendor.gambar_portfolio'),
                 'why' => 'Bukti kerja anda. Lima gambar pertama mengisi grid besar di atas halaman awam; selebihnya dibuka apabila pengantin menekan "Tunjuk semua gambar". Anda boleh susun sendiri dan sembunyikan mana-mana gambar.',
                 'specs' => [$formats, '1600 × 1200px atau lebih', 'Sekurang-kurangnya 3 gambar, 5 lebih baik'],
                 'preview' => 'portfolio',
@@ -107,7 +107,7 @@ class DashboardController extends Controller
             ],
             [
                 'key' => 'pakej',
-                'label' => 'Pakej dan gambar pakej',
+                'label' => __('props.vendor.pakej_dan_gambar_pakej'),
                 'why' => 'Pengantin memilih salah satu pakej ini semasa menempah. Setiap pakej boleh ada gambarnya sendiri, yang dipaparkan di atas kad pakej — pakej bergambar dipilih jauh lebih kerap daripada pakej berteks sahaja.',
                 'specs' => [$formats, 'Landskap 1600 × 1200px', 'Satu gambar untuk setiap pakej'],
                 'preview' => 'pakej',
@@ -117,7 +117,7 @@ class DashboardController extends Controller
             ],
             [
                 'key' => 'harga',
-                'label' => 'Harga bermula',
+                'label' => __('props.vendor.harga_bermula'),
                 'why' => 'Nombor "Dari RM…" pada kad tempah dan penapis harga di marketplace. Vendor tanpa harga tidak muncul apabila pengantin menapis ikut bajet mereka.',
                 'specs' => ['Diambil automatik daripada pakej termurah anda'],
                 'preview' => 'harga',
@@ -127,7 +127,7 @@ class DashboardController extends Controller
             ],
             [
                 'key' => 'kalendar',
-                'label' => 'Tarikh tidak tersedia',
+                'label' => __('props.vendor.tarikh_tidak_tersedia'),
                 'why' => 'Tandakan tarikh yang anda sudah penuh. Pengantin tidak boleh menempah tarikh itu, jadi anda tidak perlu menolak permintaan yang tidak boleh diterima.',
                 'specs' => ['Boleh dikemas kini bila-bila masa'],
                 'action' => 'Buka kalendar',

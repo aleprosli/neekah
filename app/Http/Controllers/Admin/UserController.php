@@ -21,26 +21,44 @@ use Illuminate\Support\Facades\Gate;
 class UserController extends Controller
 {
     /** Columns for components/ui/DataTable.vue. */
-    private const COLUMNS = [
-        ['key' => 'name', 'label' => 'Nama', 'sortable' => true],
-        ['key' => 'email', 'label' => 'Emel', 'sortable' => true],
-        ['key' => 'role', 'label' => 'Peranan'],
-        ['key' => 'bookings', 'label' => 'Tempahan', 'align' => 'right'],
-        ['key' => 'joined', 'label' => 'Daftar', 'sort' => 'created_at', 'sortable' => true],
-    ];
+    /**
+     * A constant cannot hold a function call, and these labels are
+     * translated now.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private static function columns(): array
+    {
+        return [
+            ['key' => 'name', 'label' => __('props.admin.nama'), 'sortable' => true],
+            ['key' => 'email', 'label' => __('props.admin.emel_2'), 'sortable' => true],
+            ['key' => 'role', 'label' => __('props.admin.peranan')],
+            ['key' => 'bookings', 'label' => __('props.admin.tempahan_2'), 'align' => 'right'],
+            ['key' => 'joined', 'label' => __('props.admin.daftar'), 'sort' => 'created_at', 'sortable' => true],
+        ];
+    }
 
     /**
      * A segment is already one role, so the role column would repeat itself.
      * What the team needs instead is a phone number to call and, on the last
      * column, how far this account actually got.
      */
-    private const SEGMENT_COLUMNS = [
-        ['key' => 'name', 'label' => 'Nama', 'sortable' => true],
-        ['key' => 'email', 'label' => 'Emel', 'sortable' => true],
-        ['key' => 'phone', 'label' => 'Telefon'],
-        ['key' => 'joined', 'label' => 'Daftar', 'sort' => 'created_at', 'sortable' => true],
-        ['key' => 'progress', 'label' => 'Setakat ini', 'type' => 'html'],
-    ];
+    /**
+     * A constant cannot hold a function call, and these labels are
+     * translated now.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private static function segmentColumns(): array
+    {
+        return [
+            ['key' => 'name', 'label' => __('props.admin.nama_2'), 'sortable' => true],
+            ['key' => 'email', 'label' => __('props.admin.emel_3'), 'sortable' => true],
+            ['key' => 'phone', 'label' => __('props.admin.telefon')],
+            ['key' => 'joined', 'label' => __('props.admin.daftar_2'), 'sort' => 'created_at', 'sortable' => true],
+            ['key' => 'progress', 'label' => __('props.admin.setakat_ini'), 'type' => 'html'],
+        ];
+    }
 
     public function index(Request $request): View
     {
@@ -48,7 +66,7 @@ class UserController extends Controller
         $counts = User::selectRaw('role, count(*) as total')->groupBy('role')->pluck('total', 'role');
 
         return view('admin.users.index', [
-            'columns' => $segment ? self::SEGMENT_COLUMNS : self::COLUMNS,
+            'columns' => $segment ? self::segmentColumns() : self::columns(),
             // Two groups the table swaps between in place. They are exclusive:
             // a segment is already one role, and the data endpoint ignores the
             // role once a segment is asked for.
@@ -57,7 +75,7 @@ class UserController extends Controller
                     'key' => 'role',
                     'exclusive' => true,
                     'value' => $segment ? null : UserRole::tryFrom($request->string('role')->toString())?->value,
-                    'allLabel' => 'Semua',
+                    'allLabel' => __('props.common.all'),
                     'allCount' => $counts->sum(),
                     'options' => array_map(fn (UserRole $case): array => [
                         'value' => $case->value,
@@ -68,10 +86,10 @@ class UserController extends Controller
                 [
                     'key' => 'segment',
                     'exclusive' => true,
-                    'label' => 'Perlu diikuti',
+                    'label' => __('props.admin.perlu_diikuti'),
                     'value' => $segment?->value,
-                    'allLabel' => 'Tiada',
-                    'hint' => 'Pilih satu kumpulan untuk melihat senarai akaunnya.',
+                    'allLabel' => __('props.common.none'),
+                    'hint' => __('props.admin.pilih_satu_kumpulan_untuk_melihat'),
                     'options' => array_map(fn (array $row): array => [
                         'value' => $row['segment']->value,
                         'label' => $row['segment']->label(),
@@ -157,7 +175,7 @@ class UserController extends Controller
             // A segment view needs its own columns (a phone number to call and
             // how far the account got), and the table now switches without a
             // page load, so the columns travel with the rows.
-            'columns' => $segment ? self::SEGMENT_COLUMNS : self::COLUMNS,
+            'columns' => $segment ? self::segmentColumns() : self::columns(),
             'meta' => [
                 'total' => $users->total(),
                 'per_page' => $users->perPage(),
@@ -246,16 +264,16 @@ class UserController extends Controller
                     'can_impersonate' => $user->canBeImpersonated(),
                 ],
                 'facts' => [
-                    ['label' => 'Emel', 'value' => $user->email],
-                    ['label' => 'Telefon', 'value' => $user->phone ?: '—'],
-                    ['label' => 'Peranan', 'value' => $user->role->label()],
-                    ['label' => 'Status', 'value' => $user->isDeactivated()
+                    ['label' => __('props.admin.emel_4'), 'value' => $user->email],
+                    ['label' => __('props.admin.telefon_2'), 'value' => $user->phone ?: '—'],
+                    ['label' => __('props.admin.peranan_2'), 'value' => $user->role->label()],
+                    ['label' => __('props.admin.status_5'), 'value' => $user->isDeactivated()
                         ? 'Dinyahaktif sejak '.$user->deactivated_at->translatedFormat('j M Y')
                         : 'Aktif'],
-                    ['label' => 'Daftar', 'value' => $user->created_at->translatedFormat('j M Y').($user->google_id ? ' · Google' : '')],
-                    ['label' => 'Majlis', 'value' => $user->weddings_count.' dikongsi · '.$user->created_weddings_count.' dicipta'],
-                    ['label' => 'Tempahan (sebagai pengantin)', 'value' => $user->bookings_count],
-                    ['label' => 'Enquiry · review', 'value' => $user->enquiries_count.' · '.$user->reviews_count],
+                    ['label' => __('props.admin.daftar_3'), 'value' => $user->created_at->translatedFormat('j M Y').($user->google_id ? ' · Google' : '')],
+                    ['label' => __('props.admin.majlis_2'), 'value' => $user->weddings_count.' dikongsi · '.$user->created_weddings_count.' dicipta'],
+                    ['label' => __('props.admin.tempahan_sebagai_pengantin'), 'value' => $user->bookings_count],
+                    ['label' => __('props.admin.enquiry_review'), 'value' => $user->enquiries_count.' · '.$user->reviews_count],
                 ],
                 'actions' => $this->accountActions($user, $admin),
                 'vendorForm' => $admin->can('switchToVendor', $user) ? VueProps::for([
@@ -286,7 +304,7 @@ class UserController extends Controller
             $allowed = $admin->can('switchToVendor', $user);
             $actions[] = [
                 'key' => 'switchToVendor',
-                'heading' => 'Tukar ke akaun vendor',
+                'heading' => __('props.admin.tukar_ke_akaun_vendor'),
                 'allowed' => $allowed,
                 'body' => $allowed
                     ? 'Untuk vendor yang tersilap daftar sebagai pengantin. Isi maklumat perniagaan; profil akan menunggu kelulusan.'
@@ -298,17 +316,17 @@ class UserController extends Controller
             $allowed = $admin->can('switchToCouple', $user);
             $actions[] = [
                 'key' => 'switchToCouple',
-                'heading' => 'Tukar ke akaun pengantin',
+                'heading' => __('props.admin.tukar_ke_akaun_pengantin'),
                 'allowed' => $allowed,
                 'body' => $allowed
                     ? 'Untuk pengantin yang tersilap daftar sebagai vendor. Profil vendor, pakej dan portfolio akan dipadam.'
                     : 'Tidak boleh: vendor ini sudah ada tempahan, enquiry atau review.',
-                'label' => 'Tukar ke pengantin',
+                'label' => __('props.admin.tukar_ke_pengantin'),
                 'url' => route('admin.users.vendor.destroy', $user),
                 'method' => 'DELETE',
                 'tone' => 'danger',
-                'confirm_title' => 'Tukar '.$user->name.' ke akaun pengantin?',
-                'confirm_message' => 'Profil vendor, pakej dan gambar portfolio akaun ini akan dipadam. Tindakan ini tidak boleh diundur.',
+                'confirm_title' => __('props.admin.tukar').$user->name.' ke akaun pengantin?',
+                'confirm_message' => __('props.admin.profil_vendor_pakej_dan_gambar'),
                 'confirm_label' => 'Ya, tukar',
             ];
         }
@@ -316,44 +334,44 @@ class UserController extends Controller
         $actions[] = $admin->can('reactivate', $user)
             ? [
                 'key' => 'reactivate',
-                'heading' => 'Aktifkan semula',
+                'heading' => __('props.admin.aktifkan_semula'),
                 'allowed' => true,
                 'body' => 'Pengguna ini boleh log masuk semula.'.($user->vendor ? ' Profil vendor kekal digantung sehingga diluluskan semula.' : ''),
-                'label' => 'Aktifkan semula',
+                'label' => __('props.admin.aktifkan_semula_2'),
                 'url' => route('admin.users.reactivate', $user),
                 'method' => 'DELETE',
-                'confirm_title' => 'Aktifkan semula '.$user->name.'?',
-                'confirm_message' => 'Pengguna ini akan boleh log masuk semula.',
+                'confirm_title' => __('props.admin.aktifkan_semula_3').$user->name.'?',
+                'confirm_message' => __('props.admin.pengguna_ini_akan_boleh_log'),
                 'confirm_label' => 'Ya, aktifkan',
             ]
             : [
                 'key' => 'deactivate',
-                'heading' => 'Nyahaktifkan akaun',
+                'heading' => __('props.admin.nyahaktifkan_akaun'),
                 'allowed' => $admin->can('deactivate', $user),
                 'body' => 'Pengguna dilog keluar dan tidak boleh log masuk. Semua rekod dikekalkan.'.($user->vendor ? ' Profil vendor turut digantung.' : ''),
-                'label' => 'Nyahaktifkan',
+                'label' => __('props.admin.nyahaktifkan'),
                 'url' => route('admin.users.deactivate', $user),
                 'method' => 'POST',
                 'tone' => 'danger',
-                'confirm_title' => 'Nyahaktifkan '.$user->name.'?',
-                'confirm_message' => 'Pengguna ini akan dilog keluar dan tidak boleh log masuk sehingga diaktifkan semula.',
+                'confirm_title' => __('props.admin.nyahaktifkan_2').$user->name.'?',
+                'confirm_message' => __('props.admin.pengguna_ini_akan_dilog_keluar'),
                 'confirm_label' => 'Ya, nyahaktifkan',
             ];
 
         $canDelete = $admin->can('delete', $user);
         $actions[] = [
             'key' => 'delete',
-            'heading' => 'Padam akaun',
+            'heading' => __('props.admin.padam_akaun'),
             'allowed' => $canDelete,
             'body' => $canDelete
                 ? 'Memadam akaun ini beserta majlis, enquiry dan gambar yang dimuat naik.'
                 : 'Tidak boleh dipadam: akaun ini ada tempahan, atau majlis yang dikongsi dengan pengguna lain. Nyahaktifkan sahaja supaya rekod kekal.',
-            'label' => 'Padam akaun',
+            'label' => __('props.admin.padam_akaun_2'),
             'url' => route('admin.users.destroy', $user),
             'method' => 'DELETE',
             'tone' => 'danger',
-            'confirm_title' => 'Padam akaun '.$user->name.'?',
-            'confirm_message' => 'Akaun, majlis, enquiry, review dan gambar yang dimuat naik akan dipadam kekal. Tindakan ini tidak boleh diundur.',
+            'confirm_title' => __('props.admin.padam_akaun_3').$user->name.'?',
+            'confirm_message' => __('props.admin.akaun_majlis_enquiry_review_dan'),
             'confirm_label' => 'Ya, padam kekal',
         ];
 

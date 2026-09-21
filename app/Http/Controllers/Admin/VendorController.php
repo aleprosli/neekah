@@ -19,59 +19,68 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 class VendorController extends Controller
 {
     /** Columns for components/ui/DataTable.vue. */
-    private const COLUMNS = [
-        ['key' => 'vendor', 'label' => 'Vendor', 'type' => 'html', 'sort' => 'name', 'sortable' => true],
-        ['key' => 'category', 'label' => 'Kategori'],
-        ['key' => 'location', 'label' => 'Lokasi'],
-        ['key' => 'setup', 'label' => 'Kelengkapan', 'type' => 'html'],
-        ['key' => 'tier', 'label' => 'Tahap'],
-        ['key' => 'score', 'label' => 'Score', 'sortable' => true, 'align' => 'right'],
-        ['key' => 'status', 'label' => 'Status', 'type' => 'html'],
-    ];
+    /**
+     * A constant cannot hold a function call, and these labels are
+     * translated now.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private static function columns(): array
+    {
+        return [
+            ['key' => 'vendor', 'label' => __('props.admin.vendor_5'), 'type' => 'html', 'sort' => 'name', 'sortable' => true],
+            ['key' => 'category', 'label' => __('props.admin.kategori')],
+            ['key' => 'location', 'label' => __('props.admin.lokasi')],
+            ['key' => 'setup', 'label' => __('props.admin.kelengkapan'), 'type' => 'html'],
+            ['key' => 'tier', 'label' => __('props.admin.tahap')],
+            ['key' => 'score', 'label' => __('props.admin.score'), 'sortable' => true, 'align' => 'right'],
+            ['key' => 'status', 'label' => __('props.admin.status_6'), 'type' => 'html'],
+        ];
+    }
 
     public function index(Request $request): View
     {
         $counts = Vendor::selectRaw('status, count(*) as total')->groupBy('status')->pluck('total', 'status');
 
         return view('admin.vendors.index', [
-            'columns' => self::COLUMNS,
+            'columns' => self::columns(),
             // Approving a whole batch of new registrations at once: each one
             // still gets its email and its promotion out of New.
             'bulkActions' => [
                 [
                     'key' => 'approve',
-                    'label' => 'Luluskan',
+                    'label' => __('props.admin.luluskan'),
                     'tone' => 'brand',
                     'url' => route('admin.vendors.bulk-status'),
                     'fields' => ['status' => VendorStatus::Approved->value],
                     'confirm' => [
-                        'title' => 'Luluskan __COUNT__ vendor?',
-                        'message' => 'Setiap profil akan dipaparkan di marketplace dan setiap vendor menerima emel kelulusan.',
+                        'title' => __('props.admin.luluskan_count_vendor'),
+                        'message' => __('props.admin.setiap_profil_akan_dipaparkan_di'),
                         'confirmLabel' => 'Ya, luluskan __COUNT__',
                     ],
                 ],
                 [
                     'key' => 'reject',
-                    'label' => 'Tolak',
+                    'label' => __('props.admin.tolak'),
                     'tone' => 'danger',
                     'url' => route('admin.vendors.bulk-status'),
                     'fields' => ['status' => VendorStatus::Rejected->value],
                     'confirm' => [
-                        'title' => 'Tolak __COUNT__ permohonan?',
-                        'message' => 'Setiap vendor menerima emel penolakan. Mereka masih boleh melengkapkan profil dan memohon semula.',
+                        'title' => __('props.admin.tolak_count_permohonan'),
+                        'message' => __('props.admin.setiap_vendor_menerima_emel_penolakan'),
                         'confirmLabel' => 'Ya, tolak __COUNT__',
                         'tone' => 'danger',
                     ],
                 ],
                 [
                     'key' => 'suspend',
-                    'label' => 'Gantung',
+                    'label' => __('props.admin.gantung'),
                     'tone' => 'line',
                     'url' => route('admin.vendors.bulk-status'),
                     'fields' => ['status' => VendorStatus::Suspended->value],
                     'confirm' => [
-                        'title' => 'Gantung __COUNT__ vendor?',
-                        'message' => 'Profil mereka akan hilang dari marketplace dan setiap vendor menerima emel pemberitahuan.',
+                        'title' => __('props.admin.gantung_count_vendor'),
+                        'message' => __('props.admin.profil_mereka_akan_hilang_dari'),
                         'confirmLabel' => 'Ya, gantung __COUNT__',
                         'tone' => 'danger',
                     ],
@@ -83,7 +92,7 @@ class VendorController extends Controller
                 [
                     'key' => 'status',
                     'value' => VendorStatus::tryFrom($request->string('status')->toString())?->value,
-                    'allLabel' => 'Semua',
+                    'allLabel' => __('props.common.all'),
                     'allCount' => $counts->sum(),
                     'options' => array_map(fn (VendorStatus $case): array => [
                         'value' => $case->value,
@@ -93,16 +102,16 @@ class VendorController extends Controller
                 ],
                 [
                     'key' => 'setup',
-                    'label' => 'Kelengkapan',
+                    'label' => __('props.admin.kelengkapan_2'),
                     'value' => in_array($request->string('setup')->toString(), ['complete', 'partial'], true)
                         ? $request->string('setup')->toString()
                         : null,
-                    'allLabel' => 'Semua',
+                    'allLabel' => __('props.common.all'),
                     'allCount' => Vendor::count(),
-                    'hint' => 'Lengkap bermaksud profil penuh, sekurang-kurangnya satu pakej aktif dan tiga gambar portfolio.',
+                    'hint' => __('props.admin.lengkap_bermaksud_profil_penuh_sekurang'),
                     'options' => [
-                        ['value' => 'complete', 'label' => 'Setup lengkap', 'count' => Vendor::setupComplete()->count()],
-                        ['value' => 'partial', 'label' => 'Setup belum lengkap', 'count' => Vendor::whereNot(fn (Builder $query) => $query->setupComplete())->count()],
+                        ['value' => 'complete', 'label' => __('props.admin.setup_lengkap'), 'count' => Vendor::setupComplete()->count()],
+                        ['value' => 'partial', 'label' => __('props.admin.setup_belum_lengkap'), 'count' => Vendor::whereNot(fn (Builder $query) => $query->setupComplete())->count()],
                     ],
                 ],
             ],
@@ -222,24 +231,24 @@ class VendorController extends Controller
                 'action' => $vendor->status === VendorStatus::Approved
                     ? [
                         'url' => route('admin.vendors.status', $vendor),
-                        'label' => 'Gantung',
+                        'label' => __('props.admin.gantung_2'),
                         'tone' => 'line',
                         'fields' => ['status' => VendorStatus::Suspended->value],
                         'confirm' => [
-                            'title' => 'Gantung '.$vendor->name.'?',
-                            'message' => 'Profil ini akan hilang dari marketplace dan vendor akan menerima emel pemberitahuan.',
+                            'title' => __('props.admin.gantung_3').$vendor->name.'?',
+                            'message' => __('props.admin.profil_ini_akan_hilang_dari'),
                             'confirmLabel' => 'Ya, gantung',
                             'tone' => 'danger',
                         ],
                     ]
                     : [
                         'url' => route('admin.vendors.status', $vendor),
-                        'label' => 'Lulus',
+                        'label' => __('props.admin.lulus'),
                         'tone' => 'brand',
                         'fields' => ['status' => VendorStatus::Approved->value],
                         'confirm' => [
-                            'title' => 'Luluskan '.$vendor->name.'?',
-                            'message' => 'Profil ini akan dipaparkan di marketplace dan vendor akan menerima emel kelulusan.',
+                            'title' => __('props.admin.luluskan_2').$vendor->name.'?',
+                            'message' => __('props.admin.profil_ini_akan_dipaparkan_di'),
                             'confirmLabel' => 'Ya, luluskan',
                         ],
                     ],
@@ -277,18 +286,18 @@ class VendorController extends Controller
                     'tier_url' => route('admin.vendors.tier', $vendor),
                 ],
                 'facts' => [
-                    ['label' => 'Pemilik', 'value' => $vendor->user->name, 'detail' => collect([$vendor->user->email, $vendor->user->phone])->filter()->implode(' · ')],
-                    ['label' => 'Didaftar', 'value' => $vendor->created_at->translatedFormat('j M Y')],
-                    ['label' => 'Kategori', 'value' => $vendor->category->name, 'detail' => $vendor->extraCategories()->pluck('name')->implode(' · ') ?: null],
-                    ['label' => 'Kawasan perkhidmatan', 'value' => implode(' · ', $vendor->serviceStates())],
-                    ['label' => 'Rating', 'value' => '★ '.number_format((float) $vendor->rating_avg, 2).' ('.$vendor->reviews_count.' review)'],
-                    ['label' => 'Booking', 'value' => $vendor->bookings()->count().' jumlah · '.$vendor->completed_bookings_count.' selesai'],
-                    ['label' => 'Harga bermula', 'value' => 'RM'.number_format((float) $vendor->price_from, 2).' / '.$vendor->price_unit->label()],
-                    ['label' => 'Vendor Score', 'value' => number_format((float) $vendor->score, 2).($vendor->tier_locked ? ' · tahap dikunci' : '')],
-                    ['label' => 'Performance points', 'value' => number_format($vendor->points_total).($vendor->penalty_points ? ' − '.$vendor->penalty_points.' penalti' : '')],
-                    ['label' => 'Completion rate', 'value' => $vendor->completion_rate.'% · response '.$vendor->responseRateLabel()],
-                    ...($vendor->tagline ? [['label' => 'Tagline', 'value' => $vendor->tagline, 'wide' => true]] : []),
-                    ...($vendor->description ? [['label' => 'Penerangan', 'value' => $vendor->description, 'wide' => true]] : []),
+                    ['label' => __('props.admin.pemilik'), 'value' => $vendor->user->name, 'detail' => collect([$vendor->user->email, $vendor->user->phone])->filter()->implode(' · ')],
+                    ['label' => __('props.admin.didaftar'), 'value' => $vendor->created_at->translatedFormat('j M Y')],
+                    ['label' => __('props.admin.kategori_2'), 'value' => $vendor->category->name, 'detail' => $vendor->extraCategories()->pluck('name')->implode(' · ') ?: null],
+                    ['label' => __('props.admin.kawasan_perkhidmatan'), 'value' => implode(' · ', $vendor->serviceStates())],
+                    ['label' => __('props.admin.rating'), 'value' => '★ '.number_format((float) $vendor->rating_avg, 2).' ('.$vendor->reviews_count.' review)'],
+                    ['label' => __('props.admin.booking_2'), 'value' => $vendor->bookings()->count().' jumlah · '.$vendor->completed_bookings_count.' selesai'],
+                    ['label' => __('props.admin.harga_bermula'), 'value' => 'RM'.number_format((float) $vendor->price_from, 2).' / '.$vendor->price_unit->label()],
+                    ['label' => __('props.admin.vendor_score'), 'value' => number_format((float) $vendor->score, 2).($vendor->tier_locked ? ' · tahap dikunci' : '')],
+                    ['label' => __('props.admin.performance_points'), 'value' => number_format($vendor->points_total).($vendor->penalty_points ? ' − '.$vendor->penalty_points.' penalti' : '')],
+                    ['label' => __('props.admin.completion_rate'), 'value' => $vendor->completion_rate.'% · response '.$vendor->responseRateLabel()],
+                    ...($vendor->tagline ? [['label' => __('props.admin.tagline_2'), 'value' => $vendor->tagline, 'wide' => true]] : []),
+                    ...($vendor->description ? [['label' => __('props.admin.penerangan'), 'value' => $vendor->description, 'wide' => true]] : []),
                 ],
                 'packages' => $vendor->packages->map(fn (Package $package): array => [
                     'name' => $package->name,

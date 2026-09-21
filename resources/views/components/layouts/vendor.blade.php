@@ -8,26 +8,26 @@
     ];
     $nav = [
         ['label' => null, 'items' => [
-            $item('Ringkasan', 'chart', 'vendor.dashboard', 'vendor.dashboard'),
+            $item(__('pages.sidebar_vendor.ringkasan'), 'chart', 'vendor.dashboard', 'vendor.dashboard'),
         ]],
-        ['label' => 'Perniagaan', 'items' => [
-            $item('Profil', 'store', 'vendor.profile.edit', 'vendor.profile.*'),
-            $item('Pakej', 'box', 'vendor.packages.index', 'vendor.packages.*'),
-            $item('Portfolio', 'image', 'vendor.portfolio.index', 'vendor.portfolio.*'),
-            $item('Kalendar', 'calendar', 'vendor.availability.index', 'vendor.availability.*'),
+        ['label' => __('pages.sidebar_vendor.perniagaan'), 'items' => [
+            $item(__('pages.sidebar_vendor.profil'), 'store', 'vendor.profile.edit', 'vendor.profile.*'),
+            $item(__('pages.sidebar_vendor.pakej'), 'box', 'vendor.packages.index', 'vendor.packages.*'),
+            $item(__('pages.sidebar_vendor.portfolio'), 'image', 'vendor.portfolio.index', 'vendor.portfolio.*'),
+            $item(__('pages.sidebar_vendor.kalendar'), 'calendar', 'vendor.availability.index', 'vendor.availability.*'),
         ]],
-        ['label' => 'Pelanggan', 'items' => [
-            $item('Tempahan', 'receipt', 'vendor.bookings.index', 'vendor.bookings.*'),
-            $item('Enquiry', 'chat', 'vendor.enquiries.index', 'vendor.enquiries.*', $openEnquiries),
-            $item('Review', 'star', 'vendor.reviews.index', 'vendor.reviews.*'),
+        ['label' => __('pages.sidebar_vendor.pelanggan'), 'items' => [
+            $item(__('pages.sidebar_vendor.tempahan'), 'receipt', 'vendor.bookings.index', 'vendor.bookings.*'),
+            $item(__('pages.sidebar_vendor.enquiry'), 'chat', 'vendor.enquiries.index', 'vendor.enquiries.*', $openEnquiries),
+            $item(__('pages.sidebar_vendor.review'), 'star', 'vendor.reviews.index', 'vendor.reviews.*'),
         ]],
-        ['label' => 'Prestasi', 'items' => [
+        ['label' => __('pages.sidebar_vendor.prestasi'), 'items' => [
             $item('Point & Ranking', 'trophy', 'vendor.points.index', 'vendor.points.*'),
         ]],
     ];
     $context = $vendor
         ? ['title' => $vendor->name, 'detail' => $vendor->status->label().' · '.$vendor->tier->label().' Vendor']
-        : ['title' => 'Dashboard vendor', 'detail' => null];
+        : ['title' => __('pages.sidebar_vendor.dashboard_vendor'), 'detail' => null];
 @endphp
 
 <x-layouts.dashboard :title="$title" :nav="$nav" :context="$context" :heading="$heading" :subheading="$subheading">

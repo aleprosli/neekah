@@ -19,28 +19,37 @@ use Illuminate\Support\Facades\Gate;
 class ReviewController extends Controller
 {
     /** Columns for components/ui/DataTable.vue. */
-    private const COLUMNS = [
-        ['key' => 'author', 'label' => 'Penulis', 'type' => 'html'],
-        ['key' => 'vendor', 'label' => 'Vendor'],
-        ['key' => 'rating', 'label' => 'Bintang', 'align' => 'right', 'sortable' => true],
-        ['key' => 'comment', 'label' => 'Ulasan'],
-        ['key' => 'written', 'label' => 'Tarikh', 'sort' => 'created_at', 'sortable' => true],
-        ['key' => 'state', 'label' => 'Status', 'type' => 'html'],
-    ];
+    /**
+     * A constant cannot hold a function call, and these labels are
+     * translated now.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private static function columns(): array
+    {
+        return [
+            ['key' => 'author', 'label' => __('props.admin.penulis'), 'type' => 'html'],
+            ['key' => 'vendor', 'label' => __('props.admin.vendor_3')],
+            ['key' => 'rating', 'label' => __('props.admin.bintang'), 'align' => 'right', 'sortable' => true],
+            ['key' => 'comment', 'label' => __('props.admin.ulasan')],
+            ['key' => 'written', 'label' => __('props.admin.tarikh'), 'sort' => 'created_at', 'sortable' => true],
+            ['key' => 'state', 'label' => __('props.admin.status_3'), 'type' => 'html'],
+        ];
+    }
 
     public function index(Request $request): View
     {
         $filter = ReviewFilter::tryFrom($request->string('filter')->toString());
 
         return view('admin.reviews.index', [
-            'columns' => self::COLUMNS,
+            'columns' => self::columns(),
             'total' => Review::count(),
             'filters' => [[
                 'key' => 'filter',
                 'value' => $filter?->value,
-                'allLabel' => 'Semua',
+                'allLabel' => __('props.common.all'),
                 'allCount' => Review::count(),
-                'hint' => 'Review dari tempahan menggerakkan rating dan ranking vendor. Review terbuka tidak. Menyembunyikan boleh diundur; memadam tidak.',
+                'hint' => __('props.admin.review_dari_tempahan_menggerakkan_rating'),
                 'options' => array_map(fn (ReviewFilter $case): array => [
                     'value' => $case->value,
                     'label' => $case->label(),
@@ -111,10 +120,10 @@ class ReviewController extends Controller
     private function stateOf(Review $review): array
     {
         return match (true) {
-            $review->isHidden() => ['label' => 'Disembunyikan', 'tone' => 'muted'],
-            $review->isReported() => ['label' => 'Dilaporkan', 'tone' => 'amber'],
-            $review->isVerified() => ['label' => 'Dari tempahan', 'tone' => 'emerald'],
-            default => ['label' => 'Terbuka', 'tone' => 'sky'],
+            $review->isHidden() => ['label' => __('props.admin.disembunyikan'), 'tone' => 'muted'],
+            $review->isReported() => ['label' => __('props.admin.dilaporkan'), 'tone' => 'amber'],
+            $review->isVerified() => ['label' => __('props.admin.dari_tempahan'), 'tone' => 'emerald'],
+            default => ['label' => __('props.admin.terbuka'), 'tone' => 'sky'],
         };
     }
 
@@ -142,11 +151,11 @@ class ReviewController extends Controller
     {
         return [
             'url' => route('admin.reviews.restore', $review),
-            'label' => 'Paparkan semula',
+            'label' => __('props.admin.paparkan_semula'),
             'tone' => 'brand',
             'confirm' => [
-                'title' => 'Paparkan semula review oleh '.$review->authorName().'?',
-                'message' => 'Review ini akan kembali ke profil '.$review->vendor->name.'.'.($review->isVerified() ? ' Rating dan mata vendor dikira semula.' : ''),
+                'title' => __('props.admin.paparkan_semula_review_oleh').$review->authorName().'?',
+                'message' => __('props.admin.review_ini_akan_kembali_ke').$review->vendor->name.'.'.($review->isVerified() ? ' Rating dan mata vendor dikira semula.' : ''),
                 'confirmLabel' => 'Ya, paparkan',
             ],
         ];
@@ -159,12 +168,12 @@ class ReviewController extends Controller
     {
         return [
             'url' => route('admin.reviews.hide', $review),
-            'label' => 'Sembunyikan',
+            'label' => __('props.admin.sembunyikan'),
             'tone' => 'line',
             'fields' => ['reason' => 'Disembunyikan oleh admin'],
             'confirm' => [
-                'title' => 'Sembunyikan review oleh '.$review->authorName().'?',
-                'message' => 'Ia hilang dari profil '.$review->vendor->name.' serta-merta. Rekodnya kekal dan anda boleh paparkannya semula.'.($review->isVerified() ? ' Rating dan mata vendor dikira semula.' : ''),
+                'title' => __('props.admin.sembunyikan_review_oleh').$review->authorName().'?',
+                'message' => __('props.admin.ia_hilang_dari_profil').$review->vendor->name.' serta-merta. Rekodnya kekal dan anda boleh paparkannya semula.'.($review->isVerified() ? ' Rating dan mata vendor dikira semula.' : ''),
                 'confirmLabel' => 'Ya, sembunyikan',
                 'tone' => 'danger',
             ],
@@ -178,12 +187,12 @@ class ReviewController extends Controller
     {
         return [
             'url' => route('admin.reviews.destroy', $review),
-            'label' => 'Padam kekal',
+            'label' => __('props.admin.padam_kekal'),
             'tone' => 'line',
             'method' => 'DELETE',
             'confirm' => [
-                'title' => 'Padam review oleh '.$review->authorName().' untuk selamanya?',
-                'message' => 'Ulasan dan setiap gambarnya dipadam dari server. Tiada cara untuk mengembalikannya.',
+                'title' => __('props.admin.padam_review_oleh').$review->authorName().' untuk selamanya?',
+                'message' => __('props.admin.ulasan_dan_setiap_gambarnya_dipadam'),
                 'confirmLabel' => 'Ya, padam kekal',
                 'tone' => 'danger',
             ],

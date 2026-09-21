@@ -133,11 +133,11 @@ class AnnouncementController extends Controller
                     'action_url' => $announcement->hasAction() ? $announcement->action_url : null,
                 ],
                 'facts' => [
-                    ['label' => 'Penerima', 'value' => $announcement->audience->label()],
-                    ['label' => 'Dihantar kepada', 'value' => $sent ? $announcement->recipients_count.' penerima' : '—'],
-                    ['label' => 'Status', 'value' => $announcement->status->label(), 'tone' => $announcement->status->tone()],
-                    ['label' => 'Tarikh hantar', 'value' => $announcement->sent_at?->translatedFormat('j M Y, g:i A') ?? '—'],
-                    ['label' => 'Ditulis oleh', 'value' => $announcement->author?->name ?? 'Admin'],
+                    ['label' => __('props.admin.penerima'), 'value' => $announcement->audience->label()],
+                    ['label' => __('props.admin.dihantar_kepada'), 'value' => $sent ? $announcement->recipients_count.' penerima' : '—'],
+                    ['label' => __('props.admin.status'), 'value' => $announcement->status->label(), 'tone' => $announcement->status->tone()],
+                    ['label' => __('props.admin.tarikh_hantar'), 'value' => $announcement->sent_at?->translatedFormat('j M Y, g:i A') ?? '—'],
+                    ['label' => __('props.admin.ditulis_oleh'), 'value' => $announcement->author?->name ?? 'Admin'],
                 ],
                 // Accounts first, then the addresses that belong to nobody.
                 'recipients' => $announcement->audience->isCustom()

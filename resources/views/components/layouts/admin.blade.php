@@ -9,31 +9,31 @@
     ];
     $nav = [
         ['label' => null, 'items' => [
-            $item('Ringkasan', 'chart', 'admin.dashboard', 'admin.dashboard'),
-            $item('Analitik', 'trending', 'admin.analytics', 'admin.analytics'),
+            $item(__('pages.sidebar_admin.ringkasan'), 'chart', 'admin.dashboard', 'admin.dashboard'),
+            $item(__('pages.sidebar_admin.analitik'), 'trending', 'admin.analytics', 'admin.analytics'),
         ]],
-        ['label' => 'Marketplace', 'items' => [
-            $item('Vendor', 'store', 'admin.vendors.index', 'admin.vendors.*', $pendingVendors),
-            $item('Kategori', 'layers', 'admin.categories.index', 'admin.categories.*'),
-            $item('Tempahan', 'receipt', 'admin.bookings.index', 'admin.bookings.*'),
-            $item('Kewangan', 'wallet', 'admin.transactions.index', 'admin.transactions.*'),
-            $item('Review', 'star', 'admin.reviews.index', 'admin.reviews.*', $reportedReviews),
-            $item('Laporan', 'alert', 'admin.violations.index', 'admin.violations.*', $openViolations),
+        ['label' => __('pages.sidebar_admin.marketplace'), 'items' => [
+            $item(__('pages.sidebar_admin.vendor'), 'store', 'admin.vendors.index', 'admin.vendors.*', $pendingVendors),
+            $item(__('pages.sidebar_admin.kategori'), 'layers', 'admin.categories.index', 'admin.categories.*'),
+            $item(__('pages.sidebar_admin.tempahan'), 'receipt', 'admin.bookings.index', 'admin.bookings.*'),
+            $item(__('pages.sidebar_admin.kewangan'), 'wallet', 'admin.transactions.index', 'admin.transactions.*'),
+            $item(__('pages.sidebar_admin.review'), 'star', 'admin.reviews.index', 'admin.reviews.*', $reportedReviews),
+            $item(__('pages.sidebar_admin.laporan'), 'alert', 'admin.violations.index', 'admin.violations.*', $openViolations),
         ]],
-        ['label' => 'Pengguna', 'items' => [
-            $item('Semua pengguna', 'users', 'admin.users.index', 'admin.users.*'),
-            $item('Pengumuman', 'mail', 'admin.announcements.index', 'admin.announcements.*'),
+        ['label' => __('pages.sidebar_admin.pengguna'), 'items' => [
+            $item(__('pages.sidebar_admin.semua_pengguna'), 'users', 'admin.users.index', 'admin.users.*'),
+            $item(__('pages.sidebar_admin.pengumuman'), 'mail', 'admin.announcements.index', 'admin.announcements.*'),
         ]],
-        ['label' => 'Kandungan', 'items' => [
-            $item('Checklist induk', 'check', 'admin.checklist.index', 'admin.checklist.*'),
-            $item('Blog', 'pencil', 'admin.posts.index', 'admin.posts.*'),
+        ['label' => __('pages.sidebar_admin.kandungan'), 'items' => [
+            $item(__('pages.sidebar_admin.checklist_induk'), 'check', 'admin.checklist.index', 'admin.checklist.*'),
+            $item(__('pages.sidebar_admin.blog'), 'pencil', 'admin.posts.index', 'admin.posts.*'),
         ]],
-        ['label' => 'Sistem', 'items' => [
-            $item('Tetapan', 'settings', 'admin.settings.edit', 'admin.settings.*'),
-            ['label' => 'Log sistem', 'icon' => 'pulse', 'href' => route('log-viewer.index'), 'active' => App\Support\Locales::routeIs('log-viewer.*'), 'badge' => null],
+        ['label' => __('pages.sidebar_admin.sistem'), 'items' => [
+            $item(__('pages.sidebar_admin.tetapan'), 'settings', 'admin.settings.edit', 'admin.settings.*'),
+            ['label' => __('pages.sidebar_admin.log_sistem'), 'icon' => 'pulse', 'href' => route('log-viewer.index'), 'active' => App\Support\Locales::routeIs('log-viewer.*'), 'badge' => null],
         ]],
     ];
-    $context = ['title' => 'Panel admin', 'detail' => now()->translatedFormat('l, j F Y')];
+    $context = ['title' => __('pages.sidebar_admin.panel_admin'), 'detail' => now()->translatedFormat('l, j F Y')];
 @endphp
 
 <x-layouts.dashboard :title="$title" :nav="$nav" :context="$context" :heading="$heading" :subheading="$subheading">

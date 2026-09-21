@@ -79,9 +79,9 @@
             'dataUrl' => route('admin.reviews.data'),
             'columns' => $columns,
             'filters' => $filters,
-            'searchPlaceholder' => 'Cari ulasan, penulis atau vendor…',
-            'emptyTitle' => 'Tiada review sepadan',
-            'emptyMessage' => 'Cuba penapis lain, atau kosongkan carian.',
+            'searchPlaceholder' => __('pages.tables.cari_ulasan_penulis_atau_vendor'),
+            'emptyTitle' => __('pages.tables.tiada_review_sepadan'),
+            'emptyMessage' => __('pages.tables.cuba_penapis_lain_atau_kosongkan'),
             'csrf' => csrf_token(),
             'rowAction' => ['inline' => true],
         ])"

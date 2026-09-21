@@ -43,10 +43,10 @@ class DashboardController extends Controller
                 'createUrl' => route('weddings.create'),
                 'findVendorsUrl' => route('vendors.index'),
                 'stats' => $wedding === null ? [] : [
-                    ['label' => 'Bajet', 'value' => 'RM'.number_format($budget), 'hint' => 'Baki RM'.number_format($budget - $committed)],
-                    ['label' => 'Ditempah', 'value' => 'RM'.number_format($committed), 'hint' => 'Dibayar RM'.number_format($paid)],
-                    ['label' => 'Vendor', 'value' => $bookedCategoryIds->count().' / '.$categories->count(), 'hint' => ($categories->count() ? round($bookedCategoryIds->count() / $categories->count() * 100) : 0).'% kategori ditempah'],
-                    ['label' => 'Menunggu pengesahan', 'value' => $awaitingVerification, 'hint' => 'Bayaran direkod, belum disahkan vendor', 'href' => route('bookings.index')],
+                    ['label' => __('props.couple.bajet'), 'value' => 'RM'.number_format($budget), 'hint' => __('props.couple.baki_rm').number_format($budget - $committed)],
+                    ['label' => __('props.couple.ditempah'), 'value' => 'RM'.number_format($committed), 'hint' => __('props.couple.dibayar_rm').number_format($paid)],
+                    ['label' => __('props.couple.vendor'), 'value' => $bookedCategoryIds->count().' / '.$categories->count(), 'hint' => ($categories->count() ? round($bookedCategoryIds->count() / $categories->count() * 100) : 0).'% kategori ditempah'],
+                    ['label' => __('props.couple.menunggu_pengesahan'), 'value' => $awaitingVerification, 'hint' => __('props.couple.bayaran_direkod_belum_disahkan_vendor'), 'href' => route('bookings.index')],
                 ],
                 'budget' => $wedding === null ? null : [
                     'caption' => 'RM'.number_format($committed).' / RM'.number_format($budget),

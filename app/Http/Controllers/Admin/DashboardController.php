@@ -41,10 +41,10 @@ class DashboardController extends Controller
             'stats' => $stats,
             'props' => VueProps::for([
                 'stats' => [
-                    ['label' => 'Pengantin', 'value' => number_format($stats['customers']), 'hint' => 'Akaun customer', 'href' => route('admin.users.index', ['role' => 'customer'])],
-                    ['label' => 'Vendor', 'value' => number_format($stats['vendors']), 'hint' => $stats['pending_vendors'].' menunggu kelulusan', 'href' => route('admin.vendors.index')],
-                    ['label' => 'Tempahan', 'value' => number_format($stats['bookings']), 'hint' => $stats['active_bookings'].' aktif · '.$stats['completed_bookings'].' selesai', 'href' => route('admin.bookings.index')],
-                    ['label' => 'Komisen platform', 'value' => 'RM'.number_format($stats['commission'], 2), 'hint' => 'GTV RM'.number_format($stats['gross'], 2), 'href' => route('admin.transactions.index')],
+                    ['label' => __('props.admin.pengantin_2'), 'value' => number_format($stats['customers']), 'hint' => __('props.admin.akaun_customer'), 'href' => route('admin.users.index', ['role' => 'customer'])],
+                    ['label' => __('props.admin.vendor_2'), 'value' => number_format($stats['vendors']), 'hint' => $stats['pending_vendors'].' menunggu kelulusan', 'href' => route('admin.vendors.index')],
+                    ['label' => __('props.admin.tempahan'), 'value' => number_format($stats['bookings']), 'hint' => $stats['active_bookings'].' aktif · '.$stats['completed_bookings'].' selesai', 'href' => route('admin.bookings.index')],
+                    ['label' => __('props.admin.komisen_platform'), 'value' => 'RM'.number_format($stats['commission'], 2), 'hint' => __('props.admin.gtv_rm').number_format($stats['gross'], 2), 'href' => route('admin.transactions.index')],
                 ],
                 'alert' => $stats['open_violations'] > 0 ? [
                     'count' => $stats['open_violations'],

@@ -34,10 +34,10 @@ class CategoryController extends Controller
                     ->all(),
                 'imageHint' => $images->uploadHint('512 × 512px, latar lutsinar'),
                 'stats' => [
-                    ['label' => 'Jumlah kategori', 'value' => $categories->count()],
-                    ['label' => 'Jumlah vendor', 'value' => Vendor::count()],
-                    ['label' => 'Kategori aktif', 'value' => $categories->where('is_active', true)->count()],
-                    ['label' => 'Tidak aktif', 'value' => $categories->where('is_active', false)->count()],
+                    ['label' => __('props.admin.jumlah_kategori'), 'value' => $categories->count()],
+                    ['label' => __('props.admin.jumlah_vendor'), 'value' => Vendor::count()],
+                    ['label' => __('props.admin.kategori_aktif'), 'value' => $categories->where('is_active', true)->count()],
+                    ['label' => __('props.admin.tidak_aktif'), 'value' => $categories->where('is_active', false)->count()],
                 ],
                 'categories' => $categories
                     ->map(fn (Category $category): array => [

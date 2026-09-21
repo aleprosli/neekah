@@ -1,6 +1,6 @@
-<x-layouts.admin title="Analitik" heading="Analitik platform" :subheading="'Tempoh: '.$period->label().' terakhir'">
+<x-layouts.admin :title="__('pages.dash.analitik')" :heading="__('pages.dash.analitik_platform')" :subheading="'Tempoh: '.$period->label().' terakhir'">
     <x-slot:actions>
-        <x-filter-popover label="Tempoh" :active="$period->label()" align="right" width="w-48">
+        <x-filter-popover :label="__('pages.dash.tempoh')" :active="$period->label()" align="right" width="w-48">
             <ul class="flex flex-col gap-1">
                 @foreach (\App\Support\AnalyticsPeriod::CHOICES as $months => $label)
                     <li><a href="{{ route('admin.analytics', ['months' => $months]) }}" @class(['block rounded-xl px-3 py-2 text-sm', 'bg-brand-50 font-semibold text-brand-700' => $period->months === $months, 'hover:bg-surface-muted' => $period->months !== $months])>{{ $label }}</a></li>

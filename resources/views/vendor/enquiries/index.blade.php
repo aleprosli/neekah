@@ -1,4 +1,4 @@
-<x-layouts.vendor title="Enquiry" heading="Enquiry" subheading="Balas cepat untuk kekalkan response rate yang tinggi.">
+<x-layouts.vendor :title="__('pages.dash.enquiry')" :heading="__('pages.dash.enquiry_2')" :subheading="__('pages.dash.balas_cepat_untuk_kekalkan_response')">
     {{-- resources/js/components/vendor/VendorEnquiriesPage.vue --}}
     <div
         data-vue="vendor-enquiries-page"

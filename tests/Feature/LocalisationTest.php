@@ -6,6 +6,7 @@ use App\Models\Enquiry;
 use App\Models\SiteTemplate;
 use App\Models\User;
 use App\Models\Vendor;
+use App\Models\Wedding;
 use App\Notifications\EnquiryReceived;
 use App\Support\Locales;
 use App\Support\StoredNotification;
@@ -323,4 +324,31 @@ it('still shows a notification written before the rows held keys', function () {
         'title' => 'Booking ABC dibuat',
         'body' => 'Sila semak.',
     ]);
+});
+
+it('leaves no Malay on the signed-in pages an English user sees', function () {
+    $this->seed(CategorySeeder::class);
+    $this->seed(SiteTemplateSeeder::class);
+
+    $couple = User::factory()->create(['locale' => 'en']);
+    Wedding::factory()->for($couple)->create(['city' => 'Alor Setar', 'state' => 'Kedah']);
+
+    // Controllers hand labels to Vue as props, and those were the last
+    // category still hardcoded: the sidebar, the stat cards, the table empty
+    // states and every page heading.
+    foreach (['/en/dashboard', '/en/budget', '/en/tetamu', '/en/bookings'] as $url) {
+        $html = $this->actingAs($couple)->get($url)->assertOk()->getContent();
+        $body = preg_replace('/<script[^>]*>.*?<\/script>/s', ' ', $html);
+
+        expect($body)
+            ->not->toContain('Majlis saya')
+            ->not->toContain('Senarai tetamu')
+            ->not->toContain('Cari vendor');
+    }
+
+    $this->actingAs($couple)->get('/en/budget')->assertOk()
+        ->assertSee('Wedding budget')->assertDontSee('Bajet majlis');
+
+    $this->actingAs($couple)->get('/en/tetamu')->assertOk()
+        ->assertSee('Guest list')->assertSee('Attending');
 });

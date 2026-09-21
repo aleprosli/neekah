@@ -1,4 +1,4 @@
-<x-layouts.customer title="Bajet" heading="Bajet majlis" subheading="Tetapkan bajet setiap kategori. Lajur Actual diambil terus daripada tempahan sebenar anda.">
+<x-layouts.customer :title="__('pages.dash.bajet')" :heading="__('pages.dash.bajet_majlis')" :subheading="__('pages.dash.tetapkan_bajet_setiap_kategori_lajur')">
     {{-- resources/js/components/customer/CustomerBudgetPage.vue --}}
     <div data-vue="customer-budget-page" data-props="@vueProps($props)"></div>
 </x-layouts.customer>

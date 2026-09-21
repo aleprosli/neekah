@@ -1,4 +1,4 @@
-@props(['series' => [], 'format' => null, 'empty' => 'Tiada data untuk tempoh ini.'])
+@props(['series' => [], 'format' => null, 'empty' => __('pages.tables.tiada_data_untuk_tempoh_ini')])
 
 @php
     $rows = collect($series)->values();
