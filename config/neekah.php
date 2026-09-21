@@ -78,6 +78,18 @@ return [
     | the seo.tags component, so the two can never disagree.
     */
 
+    /*
+    |--------------------------------------------------------------------------
+    | Uptime status page
+    |--------------------------------------------------------------------------
+    | Linked from the footer so a couple or a vendor can tell for themselves
+    | whether Neekah is down or their own connection is. Hosted elsewhere on
+    | purpose: a status page served by the thing it reports on is no use when
+    | that thing is the problem. Leave empty to drop the link.
+    */
+
+    'status_url' => env('NEEKAH_STATUS_URL', 'https://stats.uptimerobot.com/b8XX8KyPpB'),
+
     'seo' => [
         'tagline' => env('NEEKAH_SEO_TAGLINE', 'Semua Urusan Majlis, Satu Platform'),
         'description' => env('NEEKAH_SEO_DESCRIPTION', 'Cari dan tempah vendor perkahwinan di Malaysia. Checklist, bajet, timeline dan kad jemputan digital dalam satu platform.'),

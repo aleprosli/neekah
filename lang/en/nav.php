@@ -27,4 +27,5 @@ return [
     'home' => 'Home',
     'language' => 'Language',
 
+    'switch_to' => 'Switch to :language',
 ];

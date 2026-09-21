@@ -109,6 +109,7 @@ return [
     ],
 
     'footer' => [
+        'status_sistem' => 'System status',
         'footer' => 'Footer',
         'tentang' => 'About',
         'cari_vendor' => 'Find Vendors',

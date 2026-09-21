@@ -27,4 +27,5 @@ return [
     'home' => 'Laman utama',
     'language' => 'Bahasa',
 
+    'switch_to' => 'Tukar ke :language',
 ];

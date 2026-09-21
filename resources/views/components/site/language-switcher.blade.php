@@ -20,11 +20,16 @@
                      asks for an ordinary page load. --}}
                 data-no-swap
                 @class([
-                    'rounded-full px-2.5 py-1 transition',
-                    'bg-brand-600 text-white' => $code === $current,
-                    'text-ink-muted hover:text-ink' => $code !== $current,
+                    'rounded-full transition',
+                    // The header already carries a logo, a log-in and a
+                    // register button. Both halves of the pair would not fit
+                    // beside them on a phone without pushing into the logo, so
+                    // there it shows only the language you would move to.
+                    'hidden bg-brand-600 text-white sm:block sm:px-2.5 sm:py-1' => $code === $current,
+                    'px-3 py-1.5 text-ink-muted hover:text-ink sm:px-2.5 sm:py-1' => $code !== $current,
                 ])
                 @if ($code === $current) aria-current="true" @endif
+                aria-label="{{ $code === $current ? Locales::label($code) : __('nav.switch_to', ['language' => Locales::label($code)]) }}"
                 title="{{ Locales::label($code) }}"
             >{{ strtoupper($code) }}</a>
         @endforeach
