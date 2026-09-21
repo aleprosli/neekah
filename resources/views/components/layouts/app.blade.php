@@ -23,6 +23,10 @@
         @fonts
         @vite(['resources/css/app.css', 'resources/js/app.js'])
 
+        {{-- Read once by resources/js/i18n.js. Data, not a script that runs,
+             so the CSP has nothing to object to. --}}
+        <script type="application/json" id="translations">@json(App\Support\Translations::forClient())</script>
+
         <x-analytics />
     </head>
     <body class="min-h-screen bg-surface font-sans text-ink">

@@ -17,6 +17,7 @@ return [
     'search' => 'Search',
     'about' => 'About',
     'vendor' => 'Vendor',
+    'back_to_site' => 'Back to Neekah',
     'language' => 'Language',
 
 ];

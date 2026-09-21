@@ -96,3 +96,35 @@ it('offers the other language from the navigation on every width', function () {
     $page->assertSee('hreflang="en-MY"', false)->assertSee('>EN</a>', false);
     expect($page->getContent())->not->toContain('language-switcher class="mr-1 hidden');
 });
+
+it('gives every shell a way to change language, not just the public pages', function () {
+    // The switcher lived only in the public header, so login, the dashboards
+    // and the admin panel had no way to change language at all.
+    $this->get('/login')->assertOk()->assertSee('>EN</a>', false);
+    $this->get('/register')->assertOk()->assertSee('>EN</a>', false);
+    $this->get('/')->assertOk()->assertSee('>EN</a>', false);
+});
+
+it('translates the login page all the way through, blade and vue alike', function () {
+    $malay = $this->get('/login?as=pengantin')->assertOk();
+    $malay->assertSee('Kata laluan')->assertSee('Ingat saya');
+
+    $english = $this->get('/en/login?as=pengantin')->assertOk();
+    $english->assertSee('Password')
+        ->assertSee('Welcome back. Manage your wedding and your bookings.')
+        ->assertDontSee('Kata laluan')
+        ->assertDontSee('Ingat saya');
+});
+
+it('ships the browser its own dictionary, in the language of the page', function () {
+    $read = function (string $path): array {
+        $html = $this->get($path)->assertOk()->getContent();
+        preg_match('/id="translations">(.*?)<\/script>/s', $html, $m);
+
+        return json_decode(html_entity_decode($m[1] ?? '{}'), true) ?? [];
+    };
+
+    // Vue islands cannot call __(), so the page carries the strings instead.
+    expect($read('/login')['auth']['remember_me'])->toBe('Ingat saya')
+        ->and($read('/en/login')['auth']['remember_me'])->toBe('Remember me');
+});

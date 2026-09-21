@@ -139,6 +139,7 @@
                         <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1v-9.5Z"/></svg>
                         Laman utama
                     </a>
+                    <x-site.language-switcher />
                     <x-notification-bell />
                 </div>
             </header>

@@ -14,6 +14,8 @@
         </nav>
 
         <div class="flex shrink-0 items-center gap-1">
+            <x-site.language-switcher class="mr-1" />
+
             @auth
                 <x-notification-bell />
                 @if (auth()->user()->isAdmin())
@@ -41,10 +43,6 @@
                         @endif
                         <a href="{{ route('account.edit') }}" class="block rounded-xl px-3 py-2 hover:bg-surface-muted">{{ __('nav.account') }}</a>
 
-                        <div class="flex items-center justify-between gap-2 rounded-xl px-3 py-2">
-                            <span class="text-xs text-ink-muted">{{ __('nav.language') }}</span>
-                            <x-site.language-switcher />
-                        </div>
 
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
@@ -53,7 +51,6 @@
                     </div>
                 </details>
             @else
-                <x-site.language-switcher class="mr-1" />
                 <a href="{{ route('login') }}" class="rounded-full px-3 py-2 text-sm font-medium whitespace-nowrap transition hover:bg-surface-muted sm:px-4">{{ __('nav.login') }}</a>
                 <a href="{{ route('register') }}" class="rounded-full bg-brand-600 px-3 py-2 text-sm font-semibold whitespace-nowrap text-white transition hover:bg-brand-700 sm:px-4">{{ __('nav.register') }}</a>
             @endauth

@@ -17,6 +17,7 @@ return [
     'search' => 'Cari',
     'about' => 'Tentang',
     'vendor' => 'Vendor',
+    'back_to_site' => 'Kembali ke Neekah',
     'language' => 'Bahasa',
 
 ];

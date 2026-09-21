@@ -1,12 +1,12 @@
 @isset($chooser)
-    <x-auth-card title="Log masuk ke Neekah" subtitle="Pilih cara anda nak teruskan." :card="false">
+    <x-auth-card :title="__('auth_pages.login.chooser_title')" :subtitle="__('auth_pages.login.chooser_subtitle')" :card="false">
         {{-- resources/js/components/auth/AuthRoleChooser.vue --}}
         <div data-vue="auth-role-chooser" data-props="@vueProps($chooser)"></div>
     </x-auth-card>
 @else
     <x-auth-card
-        :title="$audience === App\Enums\AuthAudience::Vendor ? 'Log masuk vendor' : 'Log masuk'"
-        :subtitle="$audience === App\Enums\AuthAudience::Vendor ? 'Urus tempahan, enquiry dan profil perniagaan anda.' : 'Selamat kembali. Urus majlis dan tempahan anda.'"
+        :title="$audience === App\Enums\AuthAudience::Vendor ? __('auth_pages.login.vendor_title') : __('auth_pages.login.title')"
+        :subtitle="$audience === App\Enums\AuthAudience::Vendor ? __('auth_pages.login.vendor_subtitle') : __('auth_pages.login.subtitle')"
         :audience="$audience"
         :switch-url="route('login')"
     >

@@ -27,8 +27,8 @@ class LoginController extends Controller
         if (! $audience && ! AuthForm::isReturningWithInput($request)) {
             return view('auth.login', [
                 'chooser' => AuthForm::chooser(registering: false, footer: [
-                    'prefix' => 'Belum ada akaun?',
-                    'label' => 'Daftar percuma',
+                    'prefix' => __('auth_pages.links.no_account'),
+                    'label' => __('auth_pages.links.register_free'),
                     'url' => route('register'),
                 ]),
             ]);
@@ -40,7 +40,7 @@ class LoginController extends Controller
             'audience' => $audience,
             'props' => AuthForm::for([
                 'action' => route('login'),
-                'submitLabel' => 'Log masuk',
+                'submitLabel' => __('auth_pages.login.submit'),
                 'captcha' => true,
                 'remember' => true,
                 'forgotUrl' => route('password.request'),
@@ -49,13 +49,13 @@ class LoginController extends Controller
                 'googleUrl' => $vendor ? null : route('auth.google'),
                 'notice' => session('status'),
                 'fields' => [
-                    ['name' => 'email', 'label' => 'Emel', 'type' => 'email', 'autocomplete' => 'email', 'required' => true, 'value' => old('email')],
-                    ['name' => 'password', 'label' => 'Kata laluan', 'type' => 'password', 'autocomplete' => 'current-password', 'required' => true],
+                    ['name' => 'email', 'label' => __('auth_pages.fields.email'), 'type' => 'email', 'autocomplete' => 'email', 'required' => true, 'value' => old('email')],
+                    ['name' => 'password', 'label' => __('auth_pages.fields.password'), 'type' => 'password', 'autocomplete' => 'current-password', 'required' => true],
                 ],
                 'links' => [
                     $vendor
-                        ? ['prefix' => 'Belum berdaftar?', 'label' => 'Daftar sebagai vendor', 'url' => AuthAudience::Vendor->registerUrl()]
-                        : ['prefix' => 'Belum ada akaun?', 'label' => 'Daftar percuma', 'url' => $audience?->registerUrl() ?? route('register')],
+                        ? ['prefix' => __('auth_pages.links.not_registered'), 'label' => __('auth_pages.links.register_vendor'), 'url' => AuthAudience::Vendor->registerUrl()]
+                        : ['prefix' => __('auth_pages.links.no_account'), 'label' => __('auth_pages.links.register_free'), 'url' => $audience?->registerUrl() ?? route('register')],
                 ],
             ]),
         ]);

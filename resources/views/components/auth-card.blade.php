@@ -14,7 +14,7 @@
                 {{ $audience->label() }}
                 @if ($switchUrl)
                     <span class="text-line" aria-hidden="true">·</span>
-                    <a href="{{ $switchUrl }}" class="font-semibold text-brand-600 hover:underline">Tukar</a>
+                    <a href="{{ $switchUrl }}" class="font-semibold text-brand-600 hover:underline">{{ __('auth_pages.links.switch') }}</a>
                 @endif
             </p>
         @endif

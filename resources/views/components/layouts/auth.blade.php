@@ -24,9 +24,12 @@
             'max-w-2xl' => $wide,
             'max-w-[30rem]' => ! $wide,
         ])>
-            <a href="{{ route('vendors.index') }}" class="mx-auto mb-8 flex" aria-label="{{ config('app.name') }}">
-                <x-brand.lockup class="h-9 max-w-[60vw] object-contain sm:h-10" />
-            </a>
+            <div class="relative mb-8 flex w-full items-center justify-center">
+                <a href="{{ route('vendors.index') }}" class="flex" aria-label="{{ config('app.name') }}">
+                    <x-brand.lockup class="h-9 max-w-[60vw] object-contain sm:h-10" />
+                </a>
+                <x-site.language-switcher class="absolute end-0 top-1/2 -translate-y-1/2" />
+            </div>
 
             {{ $slot }}
         </div>
@@ -34,7 +37,7 @@
         <p class="pb-8 text-center text-sm text-ink-muted">
             <a href="{{ route('vendors.index') }}" class="inline-flex items-center gap-1.5 transition hover:text-ink">
                 <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-                Kembali ke Neekah
+                {{ __('nav.back_to_site') }}
             </a>
         </p>
     </div>
