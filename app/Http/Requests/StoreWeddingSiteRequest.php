@@ -133,18 +133,18 @@ class StoreWeddingSiteRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'subdomain' => 'alamat web',
-            'template' => 'template',
-            'bride_name' => 'nama pengantin perempuan',
-            'groom_name' => 'nama pengantin lelaki',
-            'event_date' => 'tarikh majlis',
-            'starts_at' => 'masa mula',
-            'ends_at' => 'masa tamat',
-            'map_url' => 'pautan peta',
-            'cover_image' => 'gambar utama',
-            'rsvp_deadline' => 'tarikh akhir RSVP',
-            'gift_note' => 'nota hadiah',
-            'gift_qr_image' => 'kod QR DuitNow',
+            'subdomain' => __('fields.alamat_web'),
+            'template' => __('fields.template'),
+            'bride_name' => __('fields.nama_pengantin_perempuan'),
+            'groom_name' => __('fields.nama_pengantin_lelaki'),
+            'event_date' => __('fields.tarikh_majlis'),
+            'starts_at' => __('fields.masa_mula'),
+            'ends_at' => __('fields.masa_tamat'),
+            'map_url' => __('fields.pautan_peta'),
+            'cover_image' => __('fields.gambar_utama'),
+            'rsvp_deadline' => __('fields.tarikh_akhir_rsvp'),
+            'gift_note' => __('fields.nota_hadiah'),
+            'gift_qr_image' => __('fields.kod_qr_duitnow'),
         ];
     }
 

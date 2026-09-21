@@ -42,13 +42,13 @@ class StoreReviewRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'rating' => 'rating keseluruhan',
-            'quality' => 'kualiti',
-            'service' => 'servis',
-            'communication' => 'komunikasi',
-            'value' => 'nilai',
-            'punctuality' => 'ketepatan masa',
-            'comment' => 'ulasan',
+            'rating' => __('fields.rating_keseluruhan'),
+            'quality' => __('fields.kualiti'),
+            'service' => __('fields.servis'),
+            'communication' => __('fields.komunikasi'),
+            'value' => __('fields.nilai'),
+            'punctuality' => __('fields.ketepatan_masa'),
+            'comment' => __('fields.ulasan'),
         ];
     }
 }

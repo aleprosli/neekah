@@ -85,13 +85,13 @@ class StoreAnnouncementRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'audience' => 'penerima',
-            'subject' => 'tajuk',
-            'body' => 'isi kandungan',
-            'user_ids' => 'penerima',
-            'emails' => 'alamat emel',
-            'action_label' => 'teks butang',
-            'action_url' => 'pautan butang',
+            'audience' => __('fields.penerima'),
+            'subject' => __('fields.tajuk'),
+            'body' => __('fields.isi_kandungan'),
+            'user_ids' => __('fields.penerima'),
+            'emails' => __('fields.alamat_emel'),
+            'action_label' => __('fields.teks_butang'),
+            'action_url' => __('fields.pautan_butang'),
         ];
     }
 }

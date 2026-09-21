@@ -8,6 +8,7 @@ use App\Models\SiteTemplate;
 use App\Models\User;
 use App\Models\Vendor;
 use App\Models\Wedding;
+use App\Models\WeddingSite;
 use App\Notifications\EnquiryReceived;
 use App\Support\Locales;
 use App\Support\StoredNotification;
@@ -442,4 +443,49 @@ it('names the person in a flash message in both languages', function () {
     // reordered in a language that needs it.
     $this->actingAs($admin)->post(route('en.admin.users.impersonate', $target))
         ->assertSessionHas('status', 'You are now viewing Neekah as Nur Photography.');
+});
+
+it('keeps a wedding card Malay no matter what the last request was', function () {
+    $this->seed(SiteTemplateSeeder::class);
+    $couple = User::factory()->create();
+    $wedding = Wedding::factory()->for($couple)->create();
+    WeddingSite::factory()->for($wedding)->create(['is_published' => true, 'subdomain' => 'aina-hakim']);
+
+    $host = 'http://aina-hakim.'.config('neekah.site_domain');
+
+    // Cards and sitemaps sit outside both language sets, so they used to take
+    // whatever App::setLocale the previous request in this process left.
+    $this->get('/en')->assertOk();
+
+    $this->get($host)->assertOk()
+        ->assertSee('<html lang="ms"', false)
+        ->assertDontSee('<html lang="en"', false)
+        ->assertSee('og:locale" content="ms_MY"', false);
+});
+
+it('does not change a signed-in reader preference from a page that has no language', function () {
+    $this->seed(SiteTemplateSeeder::class);
+    $couple = User::factory()->create(['locale' => 'en']);
+    $wedding = Wedding::factory()->for($couple)->create();
+    WeddingSite::factory()->for($wedding)->create(['is_published' => true, 'subdomain' => 'aina-hakim']);
+
+    // Previewing their own card must not silently switch their emails to Malay.
+    $this->actingAs($couple)->get('http://aina-hakim.'.config('neekah.site_domain'))->assertOk();
+
+    expect($couple->fresh()->locale)->toBe('en');
+});
+
+it('writes a validation error entirely in one language', function () {
+    $couple = User::factory()->create(['locale' => 'en']);
+
+    // The message came from the framework in English while the field name came
+    // from the FormRequest in Malay, so an English page said "The nama majlis
+    // field is required."
+    $this->actingAs($couple)->post(route('en.weddings.store'), [])
+        ->assertSessionHasErrors(['title' => 'The wedding name field is required.']);
+
+    // Written out: route() would itself come back in whatever language the
+    // previous request left behind.
+    $this->actingAs($couple)->post('/weddings', [])
+        ->assertSessionHasErrors(['title' => 'Medan nama majlis wajib diisi.']);
 });

@@ -61,9 +61,9 @@ class ImportWeddingGuestsRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'rows' => 'senarai tetamu',
-            'side' => 'pihak',
-            'group' => 'kumpulan',
+            'rows' => __('fields.senarai_tetamu'),
+            'side' => __('fields.pihak'),
+            'group' => __('fields.kumpulan'),
         ];
     }
 }

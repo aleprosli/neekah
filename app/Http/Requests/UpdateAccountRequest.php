@@ -41,10 +41,10 @@ class UpdateAccountRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'name' => 'nama',
-            'phone' => 'nombor telefon',
-            'email' => 'emel',
-            'current_password' => 'kata laluan semasa',
+            'name' => __('fields.nama'),
+            'phone' => __('fields.nombor_telefon'),
+            'email' => __('fields.emel'),
+            'current_password' => __('fields.kata_laluan_semasa'),
         ];
     }
 

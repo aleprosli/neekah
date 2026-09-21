@@ -54,12 +54,12 @@ class StoreChecklistItemRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'checklist_section_id' => 'fasa',
-            'category_id' => 'kategori',
-            'group' => 'kumpulan',
-            'title' => 'tugasan',
-            'notes' => 'nota',
-            'months_before' => 'bulan sebelum majlis',
+            'checklist_section_id' => __('fields.fasa'),
+            'category_id' => __('fields.kategori'),
+            'group' => __('fields.kumpulan'),
+            'title' => __('fields.tugasan'),
+            'notes' => __('fields.nota'),
+            'months_before' => __('fields.bulan_sebelum_majlis'),
         ];
     }
 }

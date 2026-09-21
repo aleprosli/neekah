@@ -23,7 +23,13 @@ class SetLocale
 
     public function handle(Request $request, Closure $next, ?string $locale = null): Response
     {
-        $locale = Locales::supported($locale) ? $locale : $this->locale;
+        // A route that names its language is one of the two language sets, and
+        // opening it is the reader choosing. A route that applies this with no
+        // language is only pinning one — the sitemaps and the wedding cards,
+        // which sit outside both sets and would otherwise inherit whatever
+        // language the last request in this process left behind.
+        $chosen = Locales::supported($locale);
+        $locale = $chosen ? $locale : $this->locale;
 
         App::setLocale($locale);
 
@@ -32,7 +38,7 @@ class SetLocale
         // what decides the language of their next email.
         $user = $request->user();
 
-        if ($user && $request->isMethod('GET') && $user->locale !== $locale) {
+        if ($chosen && $user && $request->isMethod('GET') && $user->locale !== $locale) {
             $user->forceFill(['locale' => $locale])->saveQuietly();
         }
 

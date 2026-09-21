@@ -64,14 +64,14 @@ class StorePostRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'title' => 'tajuk',
-            'slug' => 'slug URL',
-            'excerpt' => 'ringkasan',
-            'body' => 'isi artikel',
-            'cover_image' => 'gambar utama',
-            'meta_title' => 'tajuk SEO',
-            'meta_description' => 'deskripsi SEO',
-            'published_at' => 'tarikh siaran',
+            'title' => __('fields.tajuk'),
+            'slug' => __('fields.slug_url'),
+            'excerpt' => __('fields.ringkasan'),
+            'body' => __('fields.isi_artikel'),
+            'cover_image' => __('fields.gambar_utama'),
+            'meta_title' => __('fields.tajuk_seo'),
+            'meta_description' => __('fields.deskripsi_seo'),
+            'published_at' => __('fields.tarikh_siaran'),
         ];
     }
 

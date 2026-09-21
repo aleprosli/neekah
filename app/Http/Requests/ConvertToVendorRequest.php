@@ -46,12 +46,12 @@ class ConvertToVendorRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'phone' => 'nombor telefon',
-            'business_name' => 'nama perniagaan',
-            'category_id' => 'kategori',
-            'city' => 'bandar',
-            'state' => 'negeri',
-            'tagline' => 'tagline',
+            'phone' => __('fields.nombor_telefon'),
+            'business_name' => __('fields.nama_perniagaan'),
+            'category_id' => __('fields.kategori'),
+            'city' => __('fields.bandar'),
+            'state' => __('fields.negeri'),
+            'tagline' => __('fields.tagline'),
         ];
     }
 }

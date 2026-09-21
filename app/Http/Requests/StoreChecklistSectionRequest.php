@@ -45,9 +45,9 @@ class StoreChecklistSectionRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'title.'.Locales::DEFAULT => 'nama fasa',
-            'icon' => 'ikon',
-            'note' => 'nota',
+            'title.'.Locales::DEFAULT => __('fields.nama_fasa'),
+            'icon' => __('fields.ikon'),
+            'note' => __('fields.nota'),
         ];
     }
 }

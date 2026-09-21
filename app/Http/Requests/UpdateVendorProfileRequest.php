@@ -110,18 +110,18 @@ class UpdateVendorProfileRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'name' => 'nama perniagaan',
-            'category_id' => 'kategori utama',
-            'category_ids' => 'kategori',
-            'city' => 'bandar',
-            'state' => 'negeri asal',
-            'service_states' => 'negeri yang dicover',
-            'price_from' => 'harga bermula',
-            'price_unit' => 'unit harga',
-            'cover_tone' => 'warna',
-            'cover_image' => 'gambar muka depan',
-            'logo' => 'logo perniagaan',
-            ...collect(SocialLinks::PLATFORMS)->mapWithKeys(fn (array $details, string $platform): array => ['social_links.'.$platform => 'pautan '.$details['label']])->all(),
+            'name' => __('fields.nama_perniagaan'),
+            'category_id' => __('fields.kategori_utama'),
+            'category_ids' => __('fields.kategori'),
+            'city' => __('fields.bandar'),
+            'state' => __('fields.negeri_asal'),
+            'service_states' => __('fields.negeri_yang_dicover'),
+            'price_from' => __('fields.harga_bermula'),
+            'price_unit' => __('fields.unit_harga'),
+            'cover_tone' => __('fields.warna'),
+            'cover_image' => __('fields.gambar_muka_depan'),
+            'logo' => __('fields.logo_perniagaan'),
+            ...collect(SocialLinks::PLATFORMS)->mapWithKeys(fn (array $details, string $platform): array => ['social_links.'.$platform => __('fields.pautan').$details['label']])->all(),
         ];
     }
 }

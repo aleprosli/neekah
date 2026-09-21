@@ -32,8 +32,8 @@ class UpdateAccountPasswordRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'current_password' => 'kata laluan semasa',
-            'password' => 'kata laluan baru',
+            'current_password' => __('fields.kata_laluan_semasa'),
+            'password' => __('fields.kata_laluan_baru'),
         ];
     }
 }

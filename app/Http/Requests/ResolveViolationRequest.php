@@ -29,8 +29,8 @@ class ResolveViolationRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'decision' => 'keputusan',
-            'admin_note' => 'nota admin',
+            'decision' => __('fields.keputusan'),
+            'admin_note' => __('fields.nota_admin'),
         ];
     }
 }

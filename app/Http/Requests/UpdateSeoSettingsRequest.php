@@ -36,11 +36,11 @@ class UpdateSeoSettingsRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'tagline' => 'tagline',
-            'description' => 'penerangan',
-            'twitter' => 'akaun X',
-            'tagline_en' => 'tagline English',
-            'description_en' => 'penerangan English',
+            'tagline' => __('fields.tagline'),
+            'description' => __('fields.penerangan'),
+            'twitter' => __('fields.akaun_x'),
+            'tagline_en' => __('fields.tagline_english'),
+            'description_en' => __('fields.penerangan_english'),
         ];
     }
 

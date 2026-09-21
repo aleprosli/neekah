@@ -6,6 +6,7 @@ use App\Models\Category;
 use App\Models\Post;
 use App\Models\SiteTemplate;
 use App\Models\Vendor;
+use App\Support\Locales;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Carbon;
@@ -44,23 +45,46 @@ class SitemapController extends Controller
         $this->refuseOnCardHost($request);
 
         $urls = collect([
-            ['loc' => route('vendors.index'), 'priority' => '1.0', 'changefreq' => 'daily'],
-            ['loc' => route('landing'), 'priority' => '0.8', 'changefreq' => 'monthly'],
-            ['loc' => route('sites.templates'), 'priority' => '0.8', 'changefreq' => 'weekly'],
-            ['loc' => route('blog.index'), 'priority' => '0.8', 'changefreq' => 'weekly'],
-            ['loc' => route('vendor.register'), 'priority' => '0.6', 'changefreq' => 'monthly'],
+            ...$this->inEveryLanguage('vendors.index', [], ['priority' => '1.0', 'changefreq' => 'daily']),
+            ...$this->inEveryLanguage('landing', [], ['priority' => '0.8', 'changefreq' => 'monthly']),
+            ...$this->inEveryLanguage('sites.templates', [], ['priority' => '0.8', 'changefreq' => 'weekly']),
+            ...$this->inEveryLanguage('blog.index', [], ['priority' => '0.8', 'changefreq' => 'weekly']),
+            ...$this->inEveryLanguage('vendor.register', [], ['priority' => '0.6', 'changefreq' => 'monthly']),
         ]);
 
         // Category listings are real pages: each one is the canonical address
         // for its slice of the marketplace.
         $categories = Category::active()->ordered()->get()
-            ->map(fn (Category $category): array => [
-                'loc' => route('vendors.index', ['category' => $category->slug]),
-                'priority' => '0.7',
-                'changefreq' => 'daily',
-            ]);
+            ->flatMap(fn (Category $category): array => $this->inEveryLanguage(
+                'vendors.index',
+                ['category' => $category->slug],
+                ['priority' => '0.7', 'changefreq' => 'daily'],
+            ));
 
         return $this->xml('sitemaps.urls', ['urls' => $urls->concat($categories)]);
+    }
+
+    /**
+     * One entry per language for the same page, each naming the others through
+     * xhtml:link. Without this the sitemap would list whichever language the
+     * app happened to be in when it was built — and the English pages, which
+     * nothing else links to from outside, would never be found at all.
+     *
+     * @param  array<string, mixed>  $parameters
+     * @param  array<string, string|null>  $extra
+     * @return array<int, array<string, mixed>>
+     */
+    private function inEveryLanguage(string $name, array $parameters = [], array $extra = []): array
+    {
+        $alternates = collect(Locales::codes())
+            ->mapWithKeys(fn (string $code): array => [$code => url()->routeIn($code, $name, $parameters)])
+            ->filter()
+            ->all();
+
+        return collect($alternates)
+            ->map(fn (string $loc): array => ['loc' => $loc, 'alternates' => $alternates] + $extra)
+            ->values()
+            ->all();
     }
 
     /**
@@ -73,12 +97,11 @@ class SitemapController extends Controller
 
         return $this->xml('sitemaps.urls', [
             'urls' => Post::query()->published()->latest('published_at')->orderByDesc('id')->get(['id', 'slug', 'published_at', 'updated_at'])
-                ->map(fn (Post $post): array => [
-                    'loc' => $post->url(),
+                ->flatMap(fn (Post $post): array => $this->inEveryLanguage('blog.show', ['post' => $post], [
                     'lastmod' => $post->updated_at?->toAtomString(),
                     'priority' => '0.7',
                     'changefreq' => 'monthly',
-                ]),
+                ])),
         ]);
     }
 
@@ -98,12 +121,11 @@ class SitemapController extends Controller
                 ->withMax('portfolioItems', 'updated_at')
                 ->orderBy('id')
                 ->get()
-                ->map(fn (Vendor $vendor): array => [
-                    'loc' => route('vendors.show', $vendor),
+                ->flatMap(fn (Vendor $vendor): array => $this->inEveryLanguage('vendors.show', ['vendor' => $vendor], [
                     'lastmod' => $this->contentChangedAt($vendor)?->toAtomString(),
                     'priority' => '0.9',
                     'changefreq' => 'weekly',
-                ]),
+                ])),
         ]);
     }
 
@@ -140,12 +162,11 @@ class SitemapController extends Controller
 
         return $this->xml('sitemaps.urls', [
             'urls' => SiteTemplate::active()->ordered()->get()
-                ->map(fn (SiteTemplate $template): array => [
-                    'loc' => route('sites.templates.show', $template),
+                ->flatMap(fn (SiteTemplate $template): array => $this->inEveryLanguage('sites.templates.show', ['template' => $template], [
                     'lastmod' => $template->updated_at?->toAtomString(),
                     'priority' => '0.6',
                     'changefreq' => 'monthly',
-                ]),
+                ])),
         ]);
     }
 

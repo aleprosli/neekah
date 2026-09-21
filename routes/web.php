@@ -32,7 +32,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 // Published invitations live on their own subdomain, e.g. ainahakim.neekah.test
-Route::domain('{subdomain}.'.config('neekah.site_domain'))->group(function (): void {
+Route::domain('{subdomain}.'.config('neekah.site_domain'))->middleware('locale')->group(function (): void {
     Route::get('/', PublicSiteController::class)->middleware('throttle:60,1')->name('sites.show');
     Route::post('/rsvp', [RsvpController::class, 'store'])->middleware('throttle:10,1')->name('sites.rsvp');
     Route::get('/kalendar.ics', CalendarController::class)->name('sites.calendar');
@@ -274,8 +274,8 @@ foreach (Locales::codes() as $locale) {
 }
 
 // One sitemap for the whole site, which lists both languages itself.
-Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap.index');
-Route::get('/sitemap-blog.xml', [SitemapController::class, 'blog'])->name('sitemap.blog');
-Route::get('/sitemap-pages.xml', [SitemapController::class, 'pages'])->name('sitemap.pages');
-Route::get('/sitemap-vendors.xml', [SitemapController::class, 'vendors'])->name('sitemap.vendors');
-Route::get('/sitemap-templates.xml', [SitemapController::class, 'templates'])->name('sitemap.templates');
+Route::get('/sitemap.xml', [SitemapController::class, 'index'])->middleware('locale')->name('sitemap.index');
+Route::get('/sitemap-blog.xml', [SitemapController::class, 'blog'])->middleware('locale')->name('sitemap.blog');
+Route::get('/sitemap-pages.xml', [SitemapController::class, 'pages'])->middleware('locale')->name('sitemap.pages');
+Route::get('/sitemap-vendors.xml', [SitemapController::class, 'vendors'])->middleware('locale')->name('sitemap.vendors');
+Route::get('/sitemap-templates.xml', [SitemapController::class, 'templates'])->middleware('locale')->name('sitemap.templates');

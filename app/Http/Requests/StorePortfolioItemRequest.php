@@ -30,9 +30,9 @@ class StorePortfolioItemRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'images' => 'gambar',
-            'images.*' => 'gambar',
-            'caption' => 'kapsyen',
+            'images' => __('fields.gambar'),
+            'images.*' => __('fields.gambar'),
+            'caption' => __('fields.kapsyen'),
         ];
     }
 }

@@ -44,7 +44,7 @@ class UpdatePaymentSettingsRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'instructions' => 'arahan bayaran',
+            'instructions' => __('fields.arahan_bayaran'),
         ];
     }
 }

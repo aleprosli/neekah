@@ -38,6 +38,6 @@ class StorePhoneNumberRequest extends FormRequest
      */
     public function attributes(): array
     {
-        return ['phone' => 'nombor telefon'];
+        return ['phone' => __('fields.nombor_telefon')];
     }
 }

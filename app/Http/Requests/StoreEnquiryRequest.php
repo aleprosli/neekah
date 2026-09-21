@@ -36,10 +36,10 @@ class StoreEnquiryRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'message' => 'mesej',
-            'event_date' => 'tarikh majlis',
-            'package_id' => 'pakej',
-            'wedding_id' => 'majlis',
+            'message' => __('fields.mesej'),
+            'event_date' => __('fields.tarikh_majlis'),
+            'package_id' => __('fields.pakej'),
+            'wedding_id' => __('fields.majlis'),
         ];
     }
 }

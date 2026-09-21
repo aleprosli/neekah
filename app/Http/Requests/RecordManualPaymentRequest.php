@@ -63,10 +63,10 @@ class RecordManualPaymentRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'amount' => 'jumlah',
-            'paid_on' => 'tarikh bayaran',
-            'note' => 'nota',
-            'receipt' => 'resit',
+            'amount' => __('fields.jumlah'),
+            'paid_on' => __('fields.tarikh_bayaran'),
+            'note' => __('fields.nota'),
+            'receipt' => __('fields.resit'),
         ];
     }
 }

@@ -67,11 +67,11 @@ class StoreCategoryRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'name.'.Locales::DEFAULT => 'nama kategori',
-            'image' => 'gambar kategori',
-            'icon' => 'ikon',
-            'examples' => 'contoh',
-            'sort_order' => 'susunan',
+            'name.'.Locales::DEFAULT => __('fields.nama_kategori'),
+            'image' => __('fields.gambar_kategori'),
+            'icon' => __('fields.ikon'),
+            'examples' => __('fields.contoh'),
+            'sort_order' => __('fields.susunan'),
         ];
     }
 }

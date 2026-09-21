@@ -49,8 +49,8 @@ class UpdateTelegramSettingsRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'bot_token' => 'bot token',
-            'chat_id' => 'chat id',
+            'bot_token' => __('fields.bot_token'),
+            'chat_id' => __('fields.chat_id'),
         ];
     }
 }

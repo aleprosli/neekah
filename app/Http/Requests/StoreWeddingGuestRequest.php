@@ -35,12 +35,12 @@ class StoreWeddingGuestRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'name' => 'nama tetamu',
-            'phone' => 'nombor telefon',
-            'side' => 'pihak',
-            'group' => 'kumpulan',
-            'pax_invited' => 'bilangan jemputan',
-            'notes' => 'nota',
+            'name' => __('fields.nama_tetamu'),
+            'phone' => __('fields.nombor_telefon'),
+            'side' => __('fields.pihak'),
+            'group' => __('fields.kumpulan'),
+            'pax_invited' => __('fields.bilangan_jemputan'),
+            'notes' => __('fields.nota'),
         ];
     }
 }

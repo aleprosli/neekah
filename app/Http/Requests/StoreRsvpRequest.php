@@ -60,11 +60,11 @@ class StoreRsvpRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'name' => 'nama',
-            'phone' => 'nombor telefon',
-            'attending' => 'kehadiran',
-            'pax' => 'bilangan orang',
-            'message' => 'ucapan',
+            'name' => __('fields.nama'),
+            'phone' => __('fields.nombor_telefon'),
+            'attending' => __('fields.kehadiran'),
+            'pax' => __('fields.bilangan_orang'),
+            'message' => __('fields.ucapan'),
         ];
     }
 

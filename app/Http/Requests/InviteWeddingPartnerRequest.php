@@ -58,6 +58,6 @@ class InviteWeddingPartnerRequest extends FormRequest
      */
     public function attributes(): array
     {
-        return ['email' => 'emel pasangan'];
+        return ['email' => __('fields.emel_pasangan')];
     }
 }
