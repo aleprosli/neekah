@@ -107,7 +107,7 @@ const tone = (progress) => {
 
     <div class="mt-6 rounded-2xl border border-line bg-surface-raised p-5">
         <div class="flex flex-wrap items-center justify-between gap-x-3 text-sm">
-            <span class="font-medium">Kemajuan keseluruhan</span>
+            <span class="font-medium">{{ $t('checklist.kemajuan_keseluruhan') }}</span>
             <span class="text-ink-muted">{{ overall.done }} / {{ overall.total }}</span>
         </div>
         <div class="mt-3 h-2.5 overflow-hidden rounded-full bg-surface-muted">
@@ -119,25 +119,25 @@ const tone = (progress) => {
         <input type="hidden" name="_token" :value="csrf">
 
         <label class="flex min-w-0 flex-1 flex-col gap-1.5">
-            <span class="text-sm font-medium">Tambah tugasan</span>
-            <input type="text" name="title" placeholder="Contoh: Tempah kereta pengantin" required class="rounded-xl border border-line bg-surface px-4 py-2.5 text-sm focus:border-brand-400 focus:outline-none">
+            <span class="text-sm font-medium">{{ $t('checklist.tambah_tugasan') }}</span>
+            <input type="text" name="title" :placeholder="$t('checklist.contoh_tempah_kereta_pengantin')" required class="rounded-xl border border-line bg-surface px-4 py-2.5 text-sm focus:border-brand-400 focus:outline-none">
             <span v-if="errors.title" class="text-xs text-brand-700">{{ errors.title }}</span>
         </label>
 
         <label class="flex flex-col gap-1.5 sm:w-44">
-            <span class="text-sm font-medium">Kategori</span>
+            <span class="text-sm font-medium">{{ $t('checklist.kategori') }}</span>
             <select name="category_id" class="nk-select rounded-xl border border-line bg-surface px-3 py-2.5 pr-9 text-sm focus:border-brand-400 focus:outline-none">
-                <option value="">Tiada</option>
+                <option value="">{{ $t('checklist.tiada') }}</option>
                 <option v-for="category in categories" :key="category.id" :value="category.id">{{ category.icon }} {{ category.name }}</option>
             </select>
         </label>
 
         <label class="flex flex-col gap-1.5 sm:w-40">
-            <span class="text-sm font-medium">Tarikh akhir</span>
+            <span class="text-sm font-medium">{{ $t('checklist.tarikh_akhir') }}</span>
             <input type="date" name="due_date" class="rounded-xl border border-line bg-surface px-3 py-2.5 text-sm focus:border-brand-400 focus:outline-none">
         </label>
 
-        <button type="submit" class="rounded-full bg-brand-600 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700">Tambah</button>
+        <button type="submit" class="rounded-full bg-brand-600 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700">{{ $t('checklist.tambah') }}</button>
     </form>
 
     <!-- One form for the whole checklist: tick as many as you like, save once. -->
@@ -168,7 +168,7 @@ const tone = (progress) => {
                     <span class="shrink-0 text-right">
                         <span class="block text-sm font-semibold">{{ section.done }}/{{ section.total }}</span>
                         <span v-if="section.overdue" class="block text-xs font-medium text-red-600">{{ section.overdue }} lewat</span>
-                        <span v-else-if="section.done === section.total" class="block text-xs text-emerald-600">Selesai</span>
+                        <span v-else-if="section.done === section.total" class="block text-xs text-emerald-600">{{ $t('checklist.selesai') }}</span>
                     </span>
                 </button>
 
@@ -200,7 +200,7 @@ const tone = (progress) => {
                                     <p class="truncate font-medium" :class="isDone(task) ? 'text-ink-muted line-through' : ''">{{ task.title }}</p>
                                     <p class="flex flex-wrap items-center gap-x-2 text-xs text-ink-muted">
                                         <span v-if="isDone(task) && task.completed && !pending.has(task.id)">{{ task.completed }}</span>
-                                        <span v-else-if="pending.has(task.id)" class="font-medium text-brand-700">Belum disimpan</span>
+                                        <span v-else-if="pending.has(task.id)" class="font-medium text-brand-700">{{ $t('checklist.belum_disimpan') }}</span>
                                         <template v-else>
                                             <span v-if="task.category" class="flex items-center gap-1">
                                                 <img v-if="task.category.illustration" :src="task.category.illustration" alt="" class="size-5 object-contain mix-blend-multiply">
@@ -213,27 +213,25 @@ const tone = (progress) => {
                                     <p v-if="task.notes" class="mt-1 text-xs text-ink-muted">{{ task.notes }}</p>
                                 </div>
 
-                                <a v-if="task.category && !isDone(task)" :href="task.category.vendors_url" class="hidden shrink-0 rounded-full border border-line px-3 py-1.5 text-xs font-medium transition hover:border-brand-400 sm:inline">Cari vendor</a>
+                                <a v-if="task.category && !isDone(task)" :href="task.category.vendors_url" class="hidden shrink-0 rounded-full border border-line px-3 py-1.5 text-xs font-medium transition hover:border-brand-400 sm:inline">{{ $t('checklist.cari_vendor') }}</a>
 
                                 <UiConfirm
                                     :action="task.destroy_url"
                                     method="DELETE"
                                     tone="danger"
-                                    title="Padam tugasan ini?"
+                                    :title="$t('checklist.padam_tugasan_ini')"
                                     :message="task.title"
-                                    confirm-label="Padam"
+                                    confirm-:label="$t('checklist.padam')"
                                     trigger-class="shrink-0 text-xs font-medium text-ink-muted hover:text-brand-700"
                                     :csrf="csrf"
-                                >Padam</UiConfirm>
+                                >{{ $t('checklist.padam_2') }}</UiConfirm>
                             </li>
                         </ul>
                     </div>
                 </div>
             </div>
 
-            <p v-if="!sections.length" class="rounded-2xl border border-dashed border-line p-8 text-center text-sm text-ink-muted">
-                Checklist anda masih kosong. Tambah tugasan pertama di atas.
-            </p>
+            <p v-if="!sections.length" class="rounded-2xl border border-dashed border-line p-8 text-center text-sm text-ink-muted">{{ $t('checklist.checklist_anda_masih_kosong_tambah') }}</p>
         </section>
 
         <!-- lg:left-[17rem] keeps the bar beside the dashboard sidebar, not over it. -->
@@ -245,8 +243,8 @@ const tone = (progress) => {
                 </p>
 
                 <div class="flex items-center gap-2">
-                    <button type="button" class="rounded-full border border-line px-4 py-2 text-sm font-medium transition hover:bg-surface-muted" @click="discard">Batal</button>
-                    <button type="submit" class="rounded-full bg-brand-600 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700">Simpan</button>
+                    <button type="button" class="rounded-full border border-line px-4 py-2 text-sm font-medium transition hover:bg-surface-muted" @click="discard">{{ $t('checklist.batal') }}</button>
+                    <button type="submit" class="rounded-full bg-brand-600 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700">{{ $t('checklist.simpan') }}</button>
                 </div>
             </div>
         </div>

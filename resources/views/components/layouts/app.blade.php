@@ -25,7 +25,7 @@
 
         {{-- Read once by resources/js/i18n.js. Data, not a script that runs,
              so the CSP has nothing to object to. --}}
-        <script type="application/json" id="translations">@json(App\Support\Translations::forClient())</script>
+        <script type="application/json" id="translations">@json(App\Support\Translations::forClient($shell ?? 'site'))</script>
 
         <x-analytics />
     </head>

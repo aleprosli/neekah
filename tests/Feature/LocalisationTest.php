@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\SiteTemplate;
 use App\Models\Vendor;
 use App\Support\Locales;
 use Database\Seeders\CategorySeeder;
@@ -152,4 +153,21 @@ it('translates the vendor sign-up form, which is all Vue', function () {
 
     expect($dictionary['vendor_signup']['business_name'])->toBe('Business name')
         ->and($dictionary['vendor_signup']['owner_heading'])->toBe('Owner account');
+});
+
+it('gives a page only the strings its own islands read', function () {
+    $dictionary = function (string $path): array {
+        preg_match('/id="translations">(.*?)<\/script>/s', $this->get($path)->getContent(), $m);
+
+        return json_decode(html_entity_decode($m[1] ?? '{}'), true) ?? [];
+    };
+
+    // A wedding guest opening a couple's card was handed nine kilobytes of the
+    // couple's own editor strings — every label in the guest list, the budget
+    // and the booking screens — on a page that mounts no Vue at all.
+    $template = SiteTemplate::factory()->create();
+
+    expect($dictionary(route('sites.templates.show', $template)))->toBe([])
+        ->and(array_keys($dictionary('/login')))->toContain('auth')
+        ->and(array_keys($dictionary('/login')))->not->toContain('guests');
 });

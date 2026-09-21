@@ -25,18 +25,16 @@ const button = 'self-start rounded-full bg-brand-600 px-6 py-2.5 text-sm font-se
             <input type="hidden" name="_token" :value="csrf">
             <input type="hidden" name="_method" value="PUT">
 
-            <h2 class="font-semibold">Maklumat peribadi</h2>
+            <h2 class="font-semibold">{{ $t('account.maklumat_peribadi') }}</h2>
 
-            <p v-if="profileUrl" class="text-sm text-ink-muted">
-                Ini maklumat anda sebagai pemilik. Nama, logo dan maklumat perniagaan diuruskan di
-                <a :href="profileUrl" class="font-medium text-brand-600 underline underline-offset-4">Profil</a>.
+            <p v-if="profileUrl" class="text-sm text-ink-muted">{{ $t('account.ini_maklumat_anda_sebagai_pemilik') }}<a :href="profileUrl" class="font-medium text-brand-600 underline underline-offset-4">{{ $t('account.profil') }}</a>.
             </p>
 
-            <UiField :model-value="user.name" label="Nama penuh" name="name" autocomplete="name" :error="errors.name" required />
-            <UiField :model-value="user.phone" label="Nombor telefon" name="phone" type="tel" autocomplete="tel" placeholder="012-345 6789" :error="errors.phone" />
+            <UiField :model-value="user.name" :label="$t('account.nama_penuh')" name="name" autocomplete="name" :error="errors.name" required />
+            <UiField :model-value="user.phone" :label="$t('account.nombor_telefon')" name="phone" type="tel" autocomplete="tel" placeholder="012-345 6789" :error="errors.phone" />
             <UiField
                 :model-value="user.email"
-                label="Emel"
+                :label="$t('account.emel')"
                 name="email"
                 type="email"
                 autocomplete="email"
@@ -47,15 +45,15 @@ const button = 'self-start rounded-full bg-brand-600 px-6 py-2.5 text-sm font-se
 
             <UiField
                 v-if="user.has_password"
-                label="Kata laluan semasa"
+                :label="$t('account.kata_laluan_semasa')"
                 name="current_password"
                 type="password"
                 autocomplete="current-password"
-                help="Isi hanya jika anda menukar emel."
+                :help="$t('account.isi_hanya_jika_anda_menukar')"
                 :error="errors.current_password"
             />
 
-            <button type="submit" :class="button">Simpan maklumat</button>
+            <button type="submit" :class="button">{{ $t('account.simpan_maklumat') }}</button>
         </form>
 
         <form method="POST" :action="passwordUrl" :class="card">
@@ -65,16 +63,14 @@ const button = 'self-start rounded-full bg-brand-600 px-6 py-2.5 text-sm font-se
             <h2 class="font-semibold">{{ user.has_password ? 'Tukar kata laluan' : 'Tetapkan kata laluan' }}</h2>
 
             <template v-if="user.has_password">
-                <p class="text-sm text-ink-muted">Selepas ditukar, anda akan dilog keluar daripada peranti lain.</p>
-                <UiField label="Kata laluan semasa" name="current_password" type="password" autocomplete="current-password" :error="errors.current_password" required />
+                <p class="text-sm text-ink-muted">{{ $t('account.selepas_ditukar_anda_akan_dilog') }}</p>
+                <UiField :label="$t('account.kata_laluan_semasa_2')" name="current_password" type="password" autocomplete="current-password" :error="errors.current_password" required />
             </template>
 
-            <p v-else class="text-sm text-ink-muted">
-                Anda log masuk dengan Google, jadi akaun ini belum ada kata laluan. Tetapkan satu supaya anda boleh log masuk tanpa Google.
-            </p>
+            <p v-else class="text-sm text-ink-muted">{{ $t('account.anda_log_masuk_dengan_google') }}</p>
 
-            <UiField label="Kata laluan baru" name="password" type="password" autocomplete="new-password" :error="errors.password" required />
-            <UiField label="Sahkan kata laluan baru" name="password_confirmation" type="password" autocomplete="new-password" required />
+            <UiField :label="$t('account.kata_laluan_baru')" name="password" type="password" autocomplete="new-password" :error="errors.password" required />
+            <UiField :label="$t('account.sahkan_kata_laluan_baru')" name="password_confirmation" type="password" autocomplete="new-password" required />
 
             <button type="submit" :class="button">{{ user.has_password ? 'Tukar kata laluan' : 'Tetapkan kata laluan' }}</button>
         </form>

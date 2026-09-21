@@ -143,7 +143,7 @@ class VendorController extends Controller
 
         $description = $vendor->tagline ?: Str::of((string) $vendor->description)->squish()->value();
 
-        $seo->title($vendor->name.' — '.$vendor->category->name.' di '.$vendor->city)
+        $seo->title(__('seo.marketplace.vendor_title', ['name' => $vendor->name, 'category' => $vendor->category->name, 'city' => $vendor->city]))
             ->description($description)
             ->image($vendor->portfolioItems->first()?->url())
             ->type('profile')
@@ -247,12 +247,14 @@ class VendorController extends Controller
             'page' => $page > 1 ? $page : null,
         ]);
 
-        $where = $filters['state'] ? ' di '.$filters['state'] : ' di Malaysia';
+        $where = __('seo.marketplace.in', ['place' => $filters['state'] ?: __('seo.marketplace.malaysia')]);
 
-        $seo->title($category ? 'Vendor '.$category->name.$where : 'Cari vendor perkahwinan'.$where)
+        $seo->title($category
+                ? __('seo.marketplace.title_category', ['category' => $category->name, 'where' => $where])
+                : __('seo.marketplace.title', ['where' => $where]))
             ->description($category
-                ? 'Bandingkan dan tempah '.Str::lower($category->name).$where.'. Harga, pakej, rating dan review daripada pasangan yang benar-benar menempah.'
-                : 'Cari dan tempah vendor perkahwinan'.$where.': jurugambar, katering, pelamin, mak andam dan banyak lagi. Harga, pakej dan review sebenar.')
+                ? __('seo.marketplace.description_category', ['category' => Str::lower($category->name), 'where' => $where])
+                : __('seo.marketplace.description', ['where' => $where]))
             ->canonical(url()->current().($keep ? '?'.http_build_query($keep) : ''));
 
         if ($category) {

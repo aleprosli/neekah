@@ -28,7 +28,7 @@ class AccountConversionController extends Controller
             return $this->refuse($request);
         }
 
-        $seo->title('Tukar ke akaun vendor');
+        $seo->title(__('seo.vendor_convert.title'));
 
         return view('vendor.convert', [
             'props' => VueProps::for([

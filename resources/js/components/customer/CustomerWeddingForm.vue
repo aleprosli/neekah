@@ -24,23 +24,23 @@ const form = ref({ ...props.wedding });
         <input type="hidden" name="_token" :value="csrf">
         <input v-if="editing" type="hidden" name="_method" value="PUT">
 
-        <UiField v-model="form.title" label="Nama majlis" name="title" placeholder="Aina & Hakim" :error="errors.title" required />
+        <UiField v-model="form.title" :label="$t('wedding_form.nama_majlis')" name="title" :placeholder="$t('wedding_form.aina_hakim')" :error="errors.title" required />
 
         <div class="grid gap-4 sm:grid-cols-2">
-            <UiField v-model="form.event_date" label="Tarikh majlis" name="event_date" type="date" :error="errors.event_date" required />
-            <UiField v-model="form.budget" label="Bajet (RM)" name="budget" type="number" step="100" min="0" :error="errors.budget" required />
+            <UiField v-model="form.event_date" :label="$t('wedding_form.tarikh_majlis')" name="event_date" type="date" :error="errors.event_date" required />
+            <UiField v-model="form.budget" :label="$t('wedding_form.bajet_rm')" name="budget" type="number" step="100" min="0" :error="errors.budget" required />
         </div>
 
         <div class="grid gap-4 sm:grid-cols-2">
-            <UiField v-model="form.city" label="Bandar" name="city" placeholder="Alor Setar" :error="errors.city" required />
-            <UiFlagSelect v-model="form.state" label="Negeri" name="state" :options="states" placeholder="Pilih negeri" :error="errors.state" required />
+            <UiField v-model="form.city" :label="$t('wedding_form.bandar')" name="city" :placeholder="$t('wedding_form.alor_setar')" :error="errors.city" required />
+            <UiFlagSelect v-model="form.state" :label="$t('wedding_form.negeri')" name="state" :options="states" :placeholder="$t('wedding_form.pilih_negeri')" :error="errors.state" required />
         </div>
 
-        <UiTextarea v-model="form.notes" label="Nota (pilihan)" name="notes" :rows="3" placeholder="Tema, jumlah tetamu, permintaan khas" :error="errors.notes" />
+        <UiTextarea v-model="form.notes" :label="$t('wedding_form.nota_pilihan')" name="notes" :rows="3" :placeholder="$t('wedding_form.tema_jumlah_tetamu_permintaan_khas')" :error="errors.notes" />
 
         <div class="flex flex-wrap gap-2 pt-2">
             <button type="submit" class="rounded-full bg-brand-600 px-8 py-3 text-sm font-semibold text-white transition hover:bg-brand-700">{{ editing ? 'Simpan' : 'Cipta majlis' }}</button>
-            <a :href="cancelUrl" class="rounded-full px-6 py-3 text-sm font-medium text-ink-muted transition hover:bg-surface-muted">Batal</a>
+            <a :href="cancelUrl" class="rounded-full px-6 py-3 text-sm font-medium text-ink-muted transition hover:bg-surface-muted">{{ $t('wedding_form.batal') }}</a>
         </div>
     </form>
 </template>

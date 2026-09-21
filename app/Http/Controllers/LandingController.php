@@ -17,8 +17,8 @@ class LandingController extends Controller
      */
     public function __invoke(Seo $seo, ContactSettings $contact): View
     {
-        $seo->title('Cari vendor kahwin dan hubungi mereka terus')
-            ->description('Cari vendor kahwin ikut kategori, lokasi dan bajet, dan berurusan terus dengan mereka. Checklist, bajet dan kad jemputan digital percuma.');
+        $seo->title(__('seo.landing.title'))
+            ->description(__('seo.landing.description'));
 
         $categories = Category::active()->ordered()->get();
 
