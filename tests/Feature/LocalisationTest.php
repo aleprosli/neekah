@@ -1,10 +1,12 @@
 <?php
 
 use App\Models\Category;
+use App\Models\ChecklistItem;
 use App\Models\SiteTemplate;
 use App\Models\Vendor;
 use App\Support\Locales;
 use Database\Seeders\CategorySeeder;
+use Database\Seeders\ChecklistSeeder;
 use Database\Seeders\SiteTemplateSeeder;
 use Illuminate\Support\Facades\URL;
 
@@ -239,4 +241,25 @@ it('translates what a designer wrote about a template, not its name', function (
 
     app()->setLocale('ms');
     expect($template->description)->toBe('Merah jambu lembut dengan hujan kelopak.');
+});
+
+it('adds the language a checklist row is missing without duplicating or overwriting it', function () {
+    $this->seed(ChecklistSeeder::class);
+
+    $before = ChecklistItem::count();
+    $item = ChecklistItem::whereTranslated('title', 'Tempah katering')->sole();
+
+    // An admin has rewritten the English; a seeder has no business undoing it.
+    $item->title = ['en' => 'Book catering (edited)'];
+    $item->save();
+
+    $this->seed(ChecklistSeeder::class);
+
+    expect(ChecklistItem::count())->toBe($before);
+
+    app()->setLocale('en');
+    expect($item->fresh()->title)->toBe('Book catering (edited)');
+
+    app()->setLocale('ms');
+    expect($item->fresh()->title)->toBe('Tempah katering');
 });
