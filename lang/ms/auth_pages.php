@@ -3,6 +3,12 @@
 return [
 
     'register' => [
+        'chooser_title' => 'Daftar akaun Neekah',
+        'chooser_subtitle' => 'Anda mendaftar sebagai siapa?',
+        'accept_title' => 'Terima jemputan',
+        'accept_subtitle' => 'Daftar akaun untuk menyertai majlis ini. Anda akan terus dihubungkan selepas mendaftar.',
+        'couple_title' => 'Daftar sebagai pengantin',
+        'couple_subtitle' => 'Percuma. Rancang majlis, urus bajet dan cari vendor di satu tempat.',
         'vendor_title' => 'Sertai Neekah sebagai vendor',
         'vendor_subtitle' => 'Daftar percuma. Selepas admin meluluskan profil anda, perniagaan anda akan dipaparkan di marketplace dan pengantin boleh tempah terus.',
     ],

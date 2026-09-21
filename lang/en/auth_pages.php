@@ -3,6 +3,12 @@
 return [
 
     'register' => [
+        'chooser_title' => 'Create a Neekah account',
+        'chooser_subtitle' => 'Who are you signing up as?',
+        'accept_title' => 'Accept the invitation',
+        'accept_subtitle' => 'Create an account to join this wedding. You will be connected as soon as you sign up.',
+        'couple_title' => 'Sign up as a couple',
+        'couple_subtitle' => 'Free. Plan the wedding, manage the budget and find vendors in one place.',
         'vendor_title' => 'Join Neekah as a vendor',
         'vendor_subtitle' => 'Signing up is free. Once an admin approves your profile, your business appears in the marketplace and couples can book you directly.',
     ],
