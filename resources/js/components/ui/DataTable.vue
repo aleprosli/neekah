@@ -365,7 +365,7 @@ onMounted(load);
             </label>
 
             <p v-if="!isStatic" class="text-xs text-ink-muted" aria-live="polite">
-                <span v-if="loading">Memuatkan…</span>
+                <span v-if="loading">{{ $t('common.memuatkan') }}…</span>
                 <span v-else>{{ meta.total }} rekod</span>
             </p>
             <slot name="actions" />
@@ -486,7 +486,7 @@ onMounted(load);
             </li>
         </ul>
 
-        <p v-else-if="loading" class="rounded-2xl border border-dashed border-line p-8 text-center text-sm text-ink-muted md:hidden">Memuatkan…</p>
+        <p v-else-if="loading" class="rounded-2xl border border-dashed border-line p-8 text-center text-sm text-ink-muted md:hidden">{{ $t('common.memuatkan') }}…</p>
 
         <div v-else class="rounded-2xl border border-dashed border-line p-8 text-center md:hidden">
             <p class="font-medium">{{ emptyTitle }}</p>
@@ -530,7 +530,7 @@ onMounted(load);
 
                 <tbody class="divide-y divide-line">
                     <tr v-if="loading && !rows.length">
-                        <td :colspan="activeColumns.length + (rowAction || $slots.action ? 1 : 0) + (selectable ? 1 : 0)" class="px-4 py-10 text-center text-ink-muted">Memuatkan…</td>
+                        <td :colspan="activeColumns.length + (rowAction || $slots.action ? 1 : 0) + (selectable ? 1 : 0)" class="px-4 py-10 text-center text-ink-muted">{{ $t('common.memuatkan') }}…</td>
                     </tr>
                     <tr v-else-if="!rows.length">
                         <td :colspan="activeColumns.length + (rowAction || $slots.action ? 1 : 0) + (selectable ? 1 : 0)" class="px-4 py-12 text-center">

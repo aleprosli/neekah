@@ -10,6 +10,7 @@ return [
     ],
 
     'common' => [
+        'memuatkan' => 'Loading',
         'blog' => 'Blog',
         'login' => 'Log in',
         'close' => 'Close',

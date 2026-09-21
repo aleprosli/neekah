@@ -20,7 +20,7 @@
         @endif
 
         <div class="nk-preloader-bar" aria-hidden="true"><span></span></div>
-        <span class="sr-only">Memuatkan {{ $label ?? config('app.name') }}</span>
+        <span class="sr-only">{{ __('ui.common.memuatkan') }} {{ $label ?? config('app.name') }}</span>
     </div>
 </div>
 
