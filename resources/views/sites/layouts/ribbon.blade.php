@@ -5,7 +5,7 @@
     <div class="relative flex w-full flex-col items-center">
         @include('sites.partials.bismillah', ['template' => $template, 'class' => 'mb-6'])
         @if ($site->cover_image)
-            <img src="{{ Storage::disk('public')->url($site->cover_image) }}" alt="" class="mb-10 size-36 rounded-full object-cover" style="box-shadow: 0 0 0 5px var(--nk-page), 0 0 0 6px var(--nk-accent)">
+            <img data-card-cover src="{{ $site->coverUrl() }}" alt="" class="mb-10 size-36 rounded-full object-cover" style="box-shadow: 0 0 0 5px var(--nk-page), 0 0 0 6px var(--nk-accent)">
         @else
             <div class="mb-10">@include('sites.partials.monogram', ['site' => $site])</div>
         @endif

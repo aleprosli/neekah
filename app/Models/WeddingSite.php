@@ -34,6 +34,9 @@ class WeddingSite extends Model
      *
      * @var array<int, string>
      */
+    /** Stands in for a picture chosen in the editor but not yet saved. */
+    public const DRAFT_IMAGE = '__draft__';
+
     public const RESERVED_SUBDOMAINS = ['www', 'app', 'admin', 'api', 'mail', 'vendor', 'vendors', 'neekah', 'blog', 'help', 'support', 'status', 'assets', 'static', 'cdn'];
 
     /**
@@ -180,7 +183,30 @@ class WeddingSite extends Model
 
     public function giftQrUrl(): ?string
     {
-        return $this->gift_qr_image ? Storage::disk('public')->url($this->gift_qr_image) : null;
+        return $this->imageUrl($this->gift_qr_image);
+    }
+
+    public function coverUrl(): ?string
+    {
+        return $this->imageUrl($this->cover_image);
+    }
+
+    /**
+     * A stored image's URL — or, while the editor is drawing a picture the
+     * couple has chosen but not yet saved, a transparent pixel the editor
+     * replaces with the file straight from their own machine. Rendering the
+     * real <img> either way means the card does not jump about once the
+     * picture lands.
+     */
+    private function imageUrl(?string $path): ?string
+    {
+        if ($path === null || $path === '') {
+            return null;
+        }
+
+        return $path === self::DRAFT_IMAGE
+            ? 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'
+            : Storage::disk('public')->url($path);
     }
 
     #[Scope]

@@ -8,7 +8,7 @@
         @endif
         <div class="nk-plaque mt-7 flex flex-col items-center gap-6 px-5 py-7">
             @if ($site->giftQrUrl())
-                <img src="{{ $site->giftQrUrl() }}" alt="Kod QR DuitNow" class="w-48 rounded-lg bg-white p-3">
+                <img data-card-gift-qr src="{{ $site->giftQrUrl() }}" alt="Kod QR DuitNow" class="w-48 rounded-lg bg-white p-3">
             @endif
             @foreach ($site->gift_accounts ?? [] as $account)
                 <div class="w-full">

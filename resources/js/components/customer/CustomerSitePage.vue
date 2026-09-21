@@ -87,9 +87,50 @@ const moveSection = (at, by) => {
 
 const formEl = ref(null);
 const showPreview = ref(false);
+/**
+ * Pictures the couple has chosen but not saved. They stay on their own machine
+ * as object URLs: sending a cover photo back up on every keystroke would spend
+ * their data allowance watching their own card.
+ */
+const draftImages = ref({ cover: null, giftQr: null });
+
 const { frame, drawing, failed: previewFailed, paint, redraw, redrawSoon } = useLivePreview({
     url: props.limits.draft_preview_url,
     csrf: props.csrf,
+    afterDraw: (doc) => {
+        repaint();
+        showDraftImages(doc);
+    },
+});
+
+/**
+ * Put the couple's own pictures into the frame. Kept apart from the redraw on
+ * purpose: a picture they just chose has to appear whether or not the server
+ * answers, and a slow or failed redraw should not be the reason their photo
+ * never shows up.
+ */
+const showDraftImages = (doc) => {
+    const target = doc ?? frame.value?.contentDocument;
+    if (!target) return;
+
+    const slots = { cover: '[data-card-cover]', giftQr: '[data-card-gift-qr]' };
+
+    Object.entries(slots).forEach(([slot, selector]) => {
+        if (!draftImages.value[slot]) return;
+        target.querySelectorAll(selector).forEach((img) => {
+            img.src = draftImages.value[slot];
+        });
+    });
+};
+
+/** Swapping a picture frees the one before it; a blob left behind is a leak. */
+const holdDraftImage = (slot, file) => {
+    if (draftImages.value[slot]) URL.revokeObjectURL(draftImages.value[slot]);
+    draftImages.value[slot] = file ? URL.createObjectURL(file) : null;
+};
+
+onBeforeUnmount(() => {
+    Object.values(draftImages.value).forEach((url) => url && URL.revokeObjectURL(url));
 });
 
 /**
@@ -99,6 +140,15 @@ const { frame, drawing, failed: previewFailed, paint, redraw, redrawSoon } = use
  */
 const draftPayload = () => {
     const data = new FormData(formEl.value);
+
+    // The form saves with PUT, and carrying that spoof to the preview turns
+    // this POST into a PUT that matches no route at all — a silent 405 and a
+    // frame that never draws.
+    data.delete('_method');
+
+    // The card needs to leave room for a picture it will never be sent.
+    if (draftImages.value.cover) data.set('draft_cover', '1');
+    if (draftImages.value.giftQr) data.set('draft_gift_qr', '1');
 
     [...data.keys()].forEach((key) => {
         if (data.get(key) instanceof File) data.delete(key);
@@ -255,9 +305,24 @@ const allTemplates = props.templateGroups.flatMap((group) => group.templates.map
 const activeStyle = ref(allTemplates.find((template) => template.slug === props.site.template)?.style ?? props.templateGroups[0]?.style);
 const chosenTemplateName = computed(() => allTemplates.find((template) => template.slug === form.value.template)?.name ?? '—');
 
-const previewFile = (event, target) => {
+/**
+ * The slot is named rather than the ref passed in: a ref handed through a
+ * template expression arrives unwrapped, so assigning to its .value set a
+ * property on a string and the chosen picture never appeared at all.
+ */
+const previews = { cover: coverPreview, giftQr: qrPreview };
+
+const previewFile = (event, slot) => {
     const file = event.target.files?.[0];
-    if (file) target.value = URL.createObjectURL(file);
+    if (!file) return;
+
+    holdDraftImage(slot, file);
+    previews[slot].value = draftImages.value[slot];
+
+    // Straight into the frame if there is already a tag for it, and a redraw
+    // to ask the server for one if there is not. The file itself stays here.
+    showDraftImages();
+    redraw(draftPayload());
 };
 </script>
 
@@ -542,7 +607,7 @@ const previewFile = (event, target) => {
             <div class="flex flex-col gap-2">
                 <span class="text-sm font-medium">Gambar utama (pilihan)</span>
                 <img v-if="coverPreview" :src="coverPreview" alt="" class="h-32 w-full max-w-xs rounded-xl object-cover">
-                <input type="file" name="cover_image" accept="image/jpeg,image/png,image/webp" class="text-sm file:mr-3 file:rounded-full file:border-0 file:bg-brand-50 file:px-4 file:py-2 file:text-sm file:font-medium file:text-brand-700" @change="previewFile($event, coverPreview)">
+                <input type="file" name="cover_image" accept="image/jpeg,image/png,image/webp" class="text-sm file:mr-3 file:rounded-full file:border-0 file:bg-brand-50 file:px-4 file:py-2 file:text-sm file:font-medium file:text-brand-700" @change="previewFile($event, 'cover')">
                 <span class="text-xs text-ink-muted">{{ imageHint }}</span>
                 <span v-if="errors.cover_image" class="text-xs text-brand-700">{{ errors.cover_image }}</span>
             </div>
@@ -600,7 +665,7 @@ const previewFile = (event, target) => {
 
             <label class="flex flex-col gap-1.5">
                 <span class="text-sm font-medium">Kod QR DuitNow</span>
-                <input type="file" name="gift_qr_image" accept="image/jpeg,image/png,image/webp" class="text-sm" @change="previewFile($event, qrPreview)">
+                <input type="file" name="gift_qr_image" accept="image/jpeg,image/png,image/webp" class="text-sm" @change="previewFile($event, 'giftQr')">
                 <img v-if="qrPreview" :src="qrPreview" alt="Kod QR DuitNow" class="mt-2 w-32 rounded-xl border border-line">
                 <span v-if="errors.gift_qr_image" class="text-xs text-brand-700">{{ errors.gift_qr_image }}</span>
             </label>

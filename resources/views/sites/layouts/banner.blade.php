@@ -2,7 +2,7 @@
 <section class="relative flex min-h-[100svh] flex-col">
     <div class="relative h-[58svh] min-h-80 overflow-hidden">
         @if ($site->cover_image)
-            <img src="{{ Storage::disk('public')->url($site->cover_image) }}" alt="" class="size-full object-cover">
+            <img data-card-cover src="{{ $site->coverUrl() }}" alt="" class="size-full object-cover">
         @else
             <div class="nk-photo-fallback flex size-full items-center justify-center">@include('sites.partials.monogram', ['site' => $site, 'size' => 'size-24 text-4xl'])</div>
         @endif

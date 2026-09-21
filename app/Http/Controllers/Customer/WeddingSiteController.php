@@ -321,6 +321,16 @@ class WeddingSiteController extends Controller
             ? CardSections::sanitise((array) $request->input('sections'))
             : null;
 
+        // A picture chosen but not yet saved never reaches the server — the
+        // editor keeps it on the couple's own machine and drops it into the
+        // frame. All the card has to do is leave the <img> there to be filled,
+        // so the layout does not jump when the picture lands.
+        foreach (['cover_image' => 'draft_cover', 'gift_qr_image' => 'draft_gift_qr'] as $column => $flag) {
+            if ($request->boolean($flag)) {
+                $site->{$column} = WeddingSite::DRAFT_IMAGE;
+            }
+        }
+
         return view('sites.show', [
             'site' => $site,
             'template' => $site->design(),

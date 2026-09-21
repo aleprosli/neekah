@@ -5,7 +5,7 @@
         <div class="relative">
             <div class="absolute inset-0 translate-x-3 translate-y-3" style="border: 1px solid var(--nk-accent)"></div>
             @if ($site->cover_image)
-                <img src="{{ Storage::disk('public')->url($site->cover_image) }}" alt="" class="relative aspect-[4/5] w-full object-cover">
+                <img data-card-cover src="{{ $site->coverUrl() }}" alt="" class="relative aspect-[4/5] w-full object-cover">
             @else
                 <div class="nk-photo-fallback relative flex aspect-[4/5] w-full items-center justify-center">@include('sites.partials.monogram', ['site' => $site])</div>
             @endif

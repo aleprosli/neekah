@@ -337,3 +337,41 @@ it('never draws one couple card for another', function () {
         ->assertRedirect()
         ->assertDontSee('Aina');
 });
+
+it('draws the preview even though the payload carries the save form method', function () {
+    WeddingSite::factory()->for($this->wedding)->create(['template' => 'seri-gangsa']);
+
+    // The draft payload is built from the save form, which spoofs PUT. Left
+    // alone that turns this POST into a PUT matching no route, and the frame
+    // silently never draws.
+    $this->actingAs($this->aina)
+        ->call('POST', route('site.preview.draft'), ['_method' => 'PUT', 'bride_name' => 'Aina Zulkifli'])
+        ->assertOk()
+        ->assertSee('Aina Zulkifli');
+});
+
+it('leaves a slot for a picture the couple has chosen but not saved', function () {
+    WeddingSite::factory()->for($this->wedding)->create(['template' => 'seri-gangsa', 'cover_image' => null]);
+
+    $response = $this->actingAs($this->aina)
+        ->post(route('site.preview.draft'), ['draft_cover' => '1'])
+        ->assertOk();
+
+    // The tag is there for the editor to fill from the couple's own machine,
+    // holding a transparent pixel so the card does not jump when it lands.
+    $response->assertSee('data-card-cover', false)
+        ->assertSee('data:image/gif;base64', false);
+
+    // And the file itself was never asked for, so nothing was stored.
+    expect($this->wedding->fresh()->site->cover_image)->toBeNull();
+});
+
+it('shows a saved picture normally', function () {
+    WeddingSite::factory()->for($this->wedding)->create(['template' => 'seri-gangsa', 'cover_image' => 'sites/1/cover.webp']);
+
+    $this->actingAs($this->aina)
+        ->post(route('site.preview.draft'), [])
+        ->assertOk()
+        ->assertSee('sites/1/cover.webp')
+        ->assertDontSee('data:image/gif;base64', false);
+});

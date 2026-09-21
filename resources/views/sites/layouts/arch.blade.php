@@ -6,7 +6,7 @@
         @include('sites.partials.bismillah', ['template' => $template, 'class' => 'mb-6'])
         <div class="nk-arch relative flex aspect-[3/4] w-56 items-center justify-center overflow-hidden" style="border: 1px solid var(--nk-accent); box-shadow: 0 0 0 7px var(--nk-page), 0 0 0 8px color-mix(in oklab, var(--nk-accent) 45%, transparent)">
             @if ($site->cover_image)
-                <img src="{{ Storage::disk('public')->url($site->cover_image) }}" alt="" class="absolute inset-0 size-full object-cover">
+                <img data-card-cover src="{{ $site->coverUrl() }}" alt="" class="absolute inset-0 size-full object-cover">
             @else
                 <div class="nk-photo-fallback absolute inset-0"></div>
                 <div class="relative">@include('sites.partials.monogram', ['site' => $site])</div>

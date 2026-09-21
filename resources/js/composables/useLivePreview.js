@@ -10,7 +10,7 @@ import { onBeforeUnmount, ref } from 'vue';
  * is redrawn by the server, so the preview is the same Blade the guests get
  * rather than a second copy of the card written in JavaScript.
  */
-export const useLivePreview = ({ url, csrf }) => {
+export const useLivePreview = ({ url, csrf, afterDraw = () => {} }) => {
     const frame = ref(null);
     const drawing = ref(false);
     const failed = ref(false);
@@ -67,6 +67,10 @@ export const useLivePreview = ({ url, csrf }) => {
                         doc.open();
                         doc.write(html);
                         doc.close();
+
+                        // Everything the frame cannot know on its own — the
+                        // colours just picked, a picture still on this machine.
+                        afterDraw(doc);
                     }
 
                     failed.value = false;

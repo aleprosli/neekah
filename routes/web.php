@@ -173,7 +173,9 @@ Route::middleware('auth')->group(function (): void {
     // The live preview inside the editor: the card drawn from a form that has
     // not been saved. POST because it carries the whole draft, not because it
     // writes anything.
-    Route::post('/kad/preview', [CustomerArea\WeddingSiteController::class, 'previewDraft'])->middleware('wedding')->name('site.preview.draft');
+    // Both verbs: the payload is built from the save form, which spoofs PUT,
+    // and a preview that 405s tells the couple nothing.
+    Route::match(['post', 'put'], '/kad/preview', [CustomerArea\WeddingSiteController::class, 'previewDraft'])->middleware('wedding')->name('site.preview.draft');
     Route::get('/kad/alamat', [CustomerArea\WeddingSiteController::class, 'checkSubdomain'])->middleware(['wedding', 'throttle:60,1'])->name('site.subdomain');
     Route::put('/weddings/{wedding}/kad', [CustomerArea\WeddingSiteController::class, 'update'])->name('weddings.site.update');
     Route::post('/weddings/{wedding}/kad/galeri', [CustomerArea\WeddingSitePhotoController::class, 'store'])->name('weddings.site.photos.store');
