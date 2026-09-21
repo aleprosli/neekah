@@ -3,6 +3,13 @@
 return [
 
     'landing' => [
+        'stages' => [
+            'Find a vendor',
+            'Look at profiles & packages',
+            'Contact them directly',
+            'Talk it through & agree',
+            'The big day',
+        ],
         'whatsapp_message' => 'Hello Neekah, I am looking for vendors for my wedding. Could you help?',
         'flow' => [
             'plan' => 'Plan',

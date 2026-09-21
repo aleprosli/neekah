@@ -3,6 +3,13 @@
 return [
 
     'landing' => [
+        'stages' => [
+            'Cari vendor',
+            'Lihat profil & pakej',
+            'Hubungi terus',
+            'Bincang & deal',
+            'Hari bahagia',
+        ],
         'whatsapp_message' => 'Salam Neekah, saya sedang mencari vendor untuk majlis saya. Boleh bantu?',
         'flow' => [
             'plan' => 'Rancang',

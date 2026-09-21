@@ -198,7 +198,7 @@
                 </div>
 
                 <ol class="flex flex-col gap-3 text-sm">
-                    @foreach (['Cari vendor', 'Lihat profil & pakej', 'Hubungi terus', 'Bincang & deal', 'Hari bahagia'] as $index => $stage)
+                    @foreach (__('pages.landing.stages') as $index => $stage)
                         <li class="flex items-center gap-3">
                             <span class="flex size-7 shrink-0 items-center justify-center rounded-full bg-brand-50 text-xs font-semibold text-brand-700">{{ $index + 1 }}</span>
                             <span class="font-medium">{{ $stage }}</span>
