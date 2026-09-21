@@ -199,3 +199,88 @@ function siteData(): array
         ],
     ];
 }
+
+it('opens the appearance panel on what the card is set to now', function () {
+    $props = $this->actingAs($this->aina)->get(route('site.edit'))->assertOk()->viewData('props');
+
+    // Nothing has been overridden, so the panel shows the template's own
+    // choices rather than a row of empty fields.
+    expect($props['design']['current']['artwork'])->not->toBeNull()
+        ->and($props['design']['current']['palette'])->toHaveKey('accent')
+        ->and($props['design']['options']['artwork'])->not->toBeEmpty()
+        ->and(collect($props['sections'])->pluck('key'))->toContain('countdown', 'rsvp')
+        ->and(collect($props['sections'])->every(fn (array $s): bool => $s['on']))->toBeTrue();
+});
+
+it('keeps what a couple changed and throws away what it cannot draw', function () {
+    $this->actingAs($this->aina)
+        ->put(route('weddings.site.update', $this->wedding), [
+            ...siteData(),
+            'design_overrides' => [
+                'artwork' => 'gerbang',
+                'palette' => ['accent' => '#112233', 'page' => 'rgb(1,2,3)'],
+                'ornament' => 'definitely-not-an-ornament',
+                'type' => ['script' => "'Comic Sans MS', cursive"],
+                'onload' => 'alert(1)',
+            ],
+        ])
+        ->assertSessionHasNoErrors();
+
+    $overrides = $this->wedding->fresh()->site->design_overrides;
+
+    expect($overrides)->toBe([
+        'artwork' => 'gerbang',
+        'palette' => ['accent' => '#112233'],
+    ]);
+});
+
+it('leaves a card that changed nothing on the template exactly as designed', function () {
+    $this->actingAs($this->aina)
+        ->put(route('weddings.site.update', $this->wedding), siteData())
+        ->assertSessionHasNoErrors();
+
+    $site = $this->wedding->fresh()->site;
+
+    expect($site->design_overrides)->toBeNull()
+        ->and($site->sections)->toBeNull()
+        ->and($site->design()->artwork())->toBe('kalungan');
+});
+
+it('prints the sections in the order the couple arranged, and drops the ones they switched off', function () {
+    $this->actingAs($this->aina)
+        ->put(route('weddings.site.update', $this->wedding), [
+            ...siteData(),
+            'sections' => [
+                ['key' => 'venue', 'on' => '1'],
+                ['key' => 'countdown', 'on' => '0'],
+                ['key' => 'itinerary', 'on' => '1'],
+            ],
+        ])
+        ->assertSessionHasNoErrors();
+
+    $order = $this->wedding->fresh()->site->sectionOrder();
+
+    expect(array_slice($order, 0, 2))->toBe(['venue', 'itinerary'])
+        ->and($order)->not->toContain('countdown')
+        // A section the couple never saw is new, not switched off.
+        ->and($order)->toContain('rsvp');
+});
+
+it('renders the published card in the arranged order', function () {
+    $site = WeddingSite::factory()->for($this->wedding)->create([
+        'template' => 'mawar-pagi',
+        'is_published' => true,
+        'venue_name' => 'Dewan Seri Melati',
+        'itinerary' => [['time' => '11:00 pagi', 'label' => 'Ketibaan tetamu']],
+        'sections' => [
+            ['key' => 'itinerary', 'on' => true],
+            ['key' => 'venue', 'on' => true],
+            ['key' => 'countdown', 'on' => false],
+        ],
+    ]);
+
+    $this->get('http://'.$site->subdomain.'.'.config('neekah.site_domain'))
+        ->assertOk()
+        ->assertSeeInOrder(['Atur Cara Majlis', 'Dewan Seri Melati'], false)
+        ->assertDontSee('Menghitung Hari');
+});

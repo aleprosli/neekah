@@ -11,6 +11,7 @@ import { computed, onBeforeUnmount, ref, watch } from 'vue';
 import { useUploadForm } from '../../composables/useUploadForm.js';
 import UiConfirm from '../ui/UiConfirm.vue';
 import UiField from '../ui/UiField.vue';
+import UiSelect from '../ui/UiSelect.vue';
 import UiTextarea from '../ui/UiTextarea.vue';
 import UiUploadProgress from '../ui/UiUploadProgress.vue';
 
@@ -21,6 +22,8 @@ const props = defineProps({
     subdomainCheckUrl: { type: String, required: true },
     site: { type: Object, required: true },
     templateGroups: { type: Array, required: true },
+    design: { type: Object, required: true },
+    sections: { type: Array, required: true },
     limits: { type: Object, required: true },
     status: { type: Object, default: null },
     gallery: { type: Object, default: null },
@@ -43,6 +46,41 @@ const rowsOf = (saved, blank) => ref(saved.length ? saved.map((row) => ({ ...row
 const itinerary = rowsOf(props.site.itinerary, { time: '', label: '' });
 const contacts = rowsOf(props.site.contacts, { name: '', phone: '' });
 const giftAccounts = rowsOf(props.site.gift_accounts, { bank: '', holder: '', number: '' });
+
+const tabs = [
+    { key: 'preset', label: 'Preset' },
+    { key: 'rupa', label: 'Rupa' },
+    { key: 'seksyen', label: 'Seksyen' },
+    { key: 'data', label: 'Maklumat' },
+];
+const tab = ref('preset');
+
+/**
+ * The appearance panel opens on what the card is set to now — the template's
+ * own choices unless this couple has already changed something — so nothing
+ * ever starts blank and saving never wipes a design by accident.
+ */
+const design = ref({
+    ...props.design.current,
+    palette: { ...props.design.current.palette },
+    type: { ...props.design.current.type },
+});
+const designOptions = props.design.options;
+const paletteLabels = props.design.paletteLabels;
+
+const resetPalette = () => {
+    design.value.palette = { ...props.design.current.palette };
+};
+
+const sectionRows = ref(props.sections.map((row) => ({ ...row })));
+
+const moveSection = (at, by) => {
+    const to = at + by;
+    if (to < 0 || to >= sectionRows.value.length) return;
+
+    const rows = sectionRows.value;
+    [rows[at], rows[to]] = [rows[to], rows[at]];
+};
 
 const add = (rows, blank, limit) => {
     if (rows.value.length < limit) rows.value.push({ ...blank });
@@ -182,6 +220,25 @@ const previewFile = (event, target) => {
         <input type="hidden" name="_token" :value="csrf">
         <input type="hidden" name="_method" value="PUT">
 
+        <!-- One form, four views of it: the panels are v-show, not v-if, so
+             every field stays in the DOM and switching tab never drops what
+             was typed in another. -->
+        <div class="no-scrollbar -mx-1 flex gap-1 overflow-x-auto rounded-full border border-line bg-surface p-1" role="tablist">
+            <button
+                v-for="pane in tabs"
+                :key="pane.key"
+                type="button"
+                role="tab"
+                :aria-selected="tab === pane.key"
+                :class="[
+                    'shrink-0 rounded-full px-4 py-2 text-sm font-medium transition',
+                    tab === pane.key ? 'bg-brand-600 text-white' : 'text-ink-muted hover:text-ink',
+                ]"
+                @click="tab = pane.key"
+            >{{ pane.label }}</button>
+        </div>
+
+        <div v-show="tab === 'preset'" class="flex flex-col gap-8">
         <section id="template" class="flex scroll-mt-24 flex-col gap-5 rounded-2xl border border-line bg-surface-raised p-6">
             <div class="flex flex-wrap items-end justify-between gap-3">
                 <div>
@@ -226,7 +283,104 @@ const previewFile = (event, target) => {
 
             <p class="text-sm text-ink-muted">Dipilih: <span class="font-semibold text-ink">{{ chosenTemplateName }}</span> &middot; boleh ditukar bila-bila masa, maklumat anda kekal.</p>
         </section>
+        </div>
 
+        <div v-show="tab === 'rupa'" class="flex flex-col gap-8">
+            <section class="flex flex-col gap-5 rounded-2xl border border-line bg-surface-raised p-6">
+                <div>
+                    <h2 class="font-semibold">Rupa kad</h2>
+                    <p class="text-sm text-ink-muted">Bermula daripada template yang anda pilih. Ubah mana-mana yang anda suka — yang tidak disentuh kekal seperti reka bentuk asal.</p>
+                </div>
+
+                <div class="grid gap-4 sm:grid-cols-2">
+                    <UiSelect v-model="design.artwork" label="Hiasan" name="design_overrides[artwork]" :options="designOptions.artwork" help="Lukisan di kepala kad, di belakang nama." />
+                    <UiSelect v-model="design.texture" label="Kertas" name="design_overrides[texture]" :options="designOptions.texture" />
+                    <UiSelect v-model="design.ornament" label="Ornamen sudut" name="design_overrides[ornament]" :options="designOptions.ornament" />
+                    <UiSelect v-model="design.motion" label="Animasi" name="design_overrides[motion]" :options="designOptions.motion" />
+                    <UiSelect v-model="design.layout" label="Susunan muka depan" name="design_overrides[layout]" :options="designOptions.layout" />
+                    <UiField v-model="design.eyebrow" label="Perkataan atas nama" name="design_overrides[eyebrow]" maxlength="40" placeholder="Walimatulurus" />
+                </div>
+
+                <div class="grid gap-4 sm:grid-cols-2">
+                    <UiSelect v-model="design.type.script" label="Tulisan nama" name="design_overrides[type][script]" :options="designOptions.script" />
+                    <UiSelect v-model="design.type.body" label="Tulisan teks" name="design_overrides[type][body]" :options="designOptions.body" />
+                </div>
+
+                <label class="flex items-center gap-3 text-sm">
+                    <input type="hidden" name="design_overrides[bismillah]" value="0">
+                    <input v-model="design.bismillah" type="checkbox" name="design_overrides[bismillah]" value="1" class="size-4 accent-brand-600">
+                    Mulakan kad dengan Bismillah
+                </label>
+            </section>
+
+            <section class="flex flex-col gap-5 rounded-2xl border border-line bg-surface-raised p-6">
+                <div class="flex flex-wrap items-end justify-between gap-3">
+                    <div>
+                        <h2 class="font-semibold">Warna</h2>
+                        <p class="text-sm text-ink-muted">Sepuluh warna yang membentuk kad anda.</p>
+                    </div>
+                    <button type="button" class="text-sm font-medium text-brand-600 underline underline-offset-4" @click="resetPalette">Kembali ke warna template</button>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+                    <label v-for="(label, key) in paletteLabels" :key="key" class="flex flex-col gap-1.5">
+                        <span class="text-xs font-medium text-ink-muted">{{ label }}</span>
+                        <span class="flex items-center gap-2 rounded-xl border border-line px-2 py-1.5">
+                            <input
+                                v-model="design.palette[key]"
+                                type="color"
+                                :name="`design_overrides[palette][${key}]`"
+                                class="size-7 shrink-0 cursor-pointer rounded border-0 bg-transparent p-0"
+                            >
+                            <span class="min-w-0 truncate font-mono text-xs text-ink-muted">{{ design.palette[key] }}</span>
+                        </span>
+                    </label>
+                </div>
+            </section>
+        </div>
+
+        <div v-show="tab === 'seksyen'" class="flex flex-col gap-8">
+            <section class="flex flex-col gap-5 rounded-2xl border border-line bg-surface-raised p-6">
+                <div>
+                    <h2 class="font-semibold">Susunan seksyen</h2>
+                    <p class="text-sm text-ink-muted">
+                        Matikan apa yang anda tak perlukan, dan susun ikut turutan yang anda mahu.
+                        Muka depan dan tandatangan di hujung kekal di tempatnya — itu yang menjadikannya kad.
+                    </p>
+                </div>
+
+                <ul class="flex flex-col gap-2">
+                    <li
+                        v-for="(section, at) in sectionRows"
+                        :key="section.key"
+                        class="flex items-center gap-3 rounded-xl border border-line px-3 py-2.5"
+                    >
+                        <input type="hidden" :name="`sections[${at}][key]`" :value="section.key">
+                        <input type="hidden" :name="`sections[${at}][on]`" value="0">
+
+                        <span class="flex shrink-0 flex-col">
+                            <button type="button" class="px-1 text-ink-muted transition hover:text-ink disabled:opacity-30" :disabled="at === 0" :aria-label="`Naikkan ${section.label}`" @click="moveSection(at, -1)">
+                                <svg class="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>
+                            </button>
+                            <button type="button" class="px-1 text-ink-muted transition hover:text-ink disabled:opacity-30" :disabled="at === sectionRows.length - 1" :aria-label="`Turunkan ${section.label}`" @click="moveSection(at, 1)">
+                                <svg class="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                            </button>
+                        </span>
+
+                        <span class="min-w-0 flex-1 truncate text-sm" :class="section.on ? '' : 'text-ink-muted line-through'">{{ section.label }}</span>
+
+                        <label class="flex shrink-0 cursor-pointer items-center gap-2 text-xs text-ink-muted">
+                            <input v-model="section.on" type="checkbox" :name="`sections[${at}][on]`" value="1" class="size-4 accent-brand-600">
+                            {{ section.on ? 'Hidup' : 'Mati' }}
+                        </label>
+                    </li>
+                </ul>
+
+                <p class="text-xs text-ink-muted">Seksyen yang hidup tetapi tiada maklumat tidak akan dicetak, jadi ia tidak meninggalkan ruang kosong.</p>
+            </section>
+        </div>
+
+        <div v-show="tab === 'data'" class="flex flex-col gap-8">
         <section id="alamat" class="flex scroll-mt-24 flex-col gap-4 rounded-2xl border border-line bg-surface-raised p-6">
             <div>
                 <h2 class="font-semibold">Alamat web kad</h2>
@@ -382,6 +536,7 @@ const previewFile = (event, target) => {
                 Papar ucapan tetamu yang anda luluskan pada kad
             </label>
         </section>
+        </div>
 
         <UiUploadProgress :uploading="uploading" :percent="uploadPercent" :error="uploadError" label="Menyimpan kad" />
 

@@ -8,6 +8,9 @@ use App\Http\Requests\StoreWeddingSiteRequest;
 use App\Models\SiteTemplate;
 use App\Models\Wedding;
 use App\Models\WeddingSite;
+use App\Support\CardArt;
+use App\Support\CardDesign;
+use App\Support\CardSections;
 use App\Support\ImageSettings;
 use App\Support\VueProps;
 use Illuminate\Contracts\View\View;
@@ -87,6 +90,11 @@ class WeddingSiteController extends Controller
                     'contacts' => array_values(old('contacts', $site->contacts ?? [])),
                     'gift_accounts' => array_values(old('gift_accounts', $site->gift_accounts ?? [])),
                 ],
+                // What the card is set to right now — the template's own
+                // choices unless the couple has changed something — plus the
+                // arrangement, and the catalogue each picker draws from.
+                'design' => $this->designProps($site),
+                'sections' => CardSections::forEditor(old('sections', $site->sections)),
                 'templateGroups' => $templates->groupBy('style')
                     ->map(fn ($group, string $style): array => [
                         'style' => $style,
@@ -130,6 +138,58 @@ class WeddingSiteController extends Controller
                 ] : null,
             ]),
         ]);
+    }
+
+    /**
+     * The resolved design a couple is editing, beside the lists they may pick
+     * from. Values are the resolved ones, so a couple who has changed nothing
+     * still sees what their template chose rather than an empty form.
+     *
+     * @return array<string, mixed>
+     */
+    private function designProps(WeddingSite $site): array
+    {
+        $design = $site->design();
+
+        return [
+            'current' => [
+                'layout' => $design->layout(),
+                'ornament' => $design->ornament(),
+                'motion' => $design->motion(),
+                'artwork' => $design->artwork() ?? 'none',
+                'texture' => $design->texture() ?? 'none',
+                'eyebrow' => $design->eyebrow(),
+                'bismillah' => $design->showsBismillah(),
+                'palette' => collect(CardDesign::PALETTE_KEYS)
+                    ->mapWithKeys(fn (string $key): array => [$key => $design->palette()[$key] ?? '#ffffff'])
+                    ->all(),
+                'type' => [
+                    'script' => $design->toArray()['type']['script'] ?? null,
+                    'body' => $design->toArray()['type']['body'] ?? null,
+                ],
+            ],
+            'options' => [
+                'layout' => collect(SiteTemplate::LAYOUTS)->map(fn (string $v): array => ['value' => $v, 'label' => ucfirst($v)])->all(),
+                'ornament' => collect(SiteTemplate::ORNAMENTS)->map(fn (string $v): array => ['value' => $v, 'label' => ucfirst($v)])->all(),
+                'motion' => CardArt::options(CardArt::MOTION_LABELS),
+                'artwork' => CardArt::options(CardArt::ARTWORK),
+                'texture' => CardArt::options(CardArt::TEXTURES),
+                'script' => CardArt::fontOptions('script'),
+                'body' => CardArt::fontOptions('body'),
+            ],
+            'paletteLabels' => [
+                'page' => 'Kertas',
+                'ink' => 'Dakwat',
+                'name' => 'Nama',
+                'accent' => 'Aksen',
+                'body' => 'Teks',
+                'muted' => 'Teks pudar',
+                'panel' => 'Panel',
+                'line' => 'Garisan',
+                'buttonBg' => 'Butang',
+                'buttonText' => 'Teks butang',
+            ],
+        ];
     }
 
     public function update(StoreWeddingSiteRequest $request, Wedding $wedding, StoreOptimizedImage $storeImage): RedirectResponse

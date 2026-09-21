@@ -4,6 +4,8 @@ namespace App\Http\Requests;
 
 use App\Models\SiteTemplate;
 use App\Models\WeddingSite;
+use App\Support\CardDesign;
+use App\Support\CardSections;
 use App\Support\ImageSettings;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -32,6 +34,12 @@ class StoreWeddingSiteRequest extends FormRequest
         return [
             'subdomain' => self::subdomainRules($site),
             'template' => ['required', Rule::exists(SiteTemplate::class, 'slug')->where('is_active', true)],
+            // Both lists are narrowed by CardDesign::clean and
+            // CardSections::sanitise rather than by a rule per key: those two
+            // are the gate the card itself trusts, and a second list of rules
+            // here would be a second thing to keep in step with the catalogue.
+            'design_overrides' => ['nullable', 'array'],
+            'sections' => ['nullable', 'array', 'max:40'],
             'bride_name' => ['required', 'string', 'max:80'],
             'groom_name' => ['required', 'string', 'max:80'],
             'bride_parents' => ['nullable', 'string', 'max:160'],
@@ -119,6 +127,13 @@ class StoreWeddingSiteRequest extends FormRequest
             ->map(fn (array $row): array => ['bank' => $row['bank'], 'holder' => $row['holder'] ?? '', 'number' => $row['number']])
             ->values()
             ->all();
+
+        // Nothing changed means the template exactly as it was designed, which
+        // is null rather than an empty object.
+        $data['design_overrides'] = CardDesign::clean((array) $this->input('design_overrides', [])) ?: null;
+        $data['sections'] = $this->filled('sections')
+            ? CardSections::sanitise((array) $this->input('sections'))
+            : null;
 
         $data['rsvp_enabled'] = $this->boolean('rsvp_enabled');
         $data['gift_enabled'] = $this->boolean('gift_enabled');
