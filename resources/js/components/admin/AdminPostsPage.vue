@@ -24,8 +24,7 @@ const tones = {
 </script>
 
 <template>
-    <div v-if="!posts.length" class="rounded-2xl border border-dashed border-line p-10 text-center text-sm text-ink-muted">
-        Belum ada artikel. <a :href="createUrl" class="font-medium text-brand-700 underline underline-offset-4">Tulis yang pertama</a>.
+    <div v-if="!posts.length" class="rounded-2xl border border-dashed border-line p-10 text-center text-sm text-ink-muted">{{ $t('admin_posts.belum_ada_artikel') }}<a :href="createUrl" class="font-medium text-brand-700 underline underline-offset-4">{{ $t('admin_posts.tulis_yang_pertama') }}</a>.
     </div>
 
     <template v-else>
@@ -48,11 +47,11 @@ const tones = {
                     method="DELETE"
                     tone="danger"
                     :title="`Padam artikel ${row.title}?`"
-                    message="Artikel dan gambar utamanya akan dipadam. Tindakan ini tidak boleh dibatalkan."
-                    confirm-label="Padam artikel"
+                    :message="$t('admin_posts.artikel_dan_gambar_utamanya_akan')"
+                    confirm-:label="$t('admin_posts.padam_artikel')"
                     trigger-class="ml-3 text-xs font-medium text-ink-muted hover:text-brand-700"
                     :csrf="csrf"
-                >Padam</UiConfirm>
+                >{{ $t('admin_posts.padam') }}</UiConfirm>
             </template>
         </DataTable>
 

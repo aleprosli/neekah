@@ -99,7 +99,7 @@ const toggle = () => {
 
                 <!-- Where it lands on the public page, drawn rather than described. -->
                 <figure v-if="step.preview" class="rounded-xl border border-line bg-surface p-4">
-                    <figcaption class="mb-3 text-xs font-medium text-ink-muted">Di halaman awam anda</figcaption>
+                    <figcaption class="mb-3 text-xs font-medium text-ink-muted">{{ $t('onboarding.di_halaman_awam_anda') }}</figcaption>
 
                     <div class="flex flex-col gap-2">
                         <div class="grid h-24 grid-cols-4 grid-rows-2 gap-1 overflow-hidden rounded-lg">
@@ -132,9 +132,7 @@ const toggle = () => {
                     <a :href="step.href" class="rounded-full bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700">
                         {{ step.done ? 'Kemas kini' : step.action }}
                     </a>
-                    <a v-if="publicUrl" :href="publicUrl" target="_blank" rel="noopener" class="rounded-full border border-line px-5 py-2.5 text-sm font-medium transition hover:border-brand-400">
-                        Lihat halaman awam
-                    </a>
+                    <a v-if="publicUrl" :href="publicUrl" target="_blank" rel="noopener" class="rounded-full border border-line px-5 py-2.5 text-sm font-medium transition hover:border-brand-400">{{ $t('onboarding.lihat_halaman_awam') }}</a>
                 </div>
             </div>
         </div>

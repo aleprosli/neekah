@@ -131,7 +131,7 @@ const sendTest = (event) => {
             <input type="hidden" name="_token" :value="csrf">
 
             <fieldset class="flex flex-col gap-2">
-                <legend class="text-sm font-medium">Penerima</legend>
+                <legend class="text-sm font-medium">{{ $t('admin_announcements.penerima') }}</legend>
 
                 <div class="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
                     <label
@@ -156,14 +156,14 @@ const sendTest = (event) => {
 
             <div v-if="chosen?.custom" class="flex flex-col gap-3 rounded-xl border border-line p-4">
                 <label class="flex flex-col gap-1.5">
-                    <span class="text-sm font-medium">Cari pengguna</span>
+                    <span class="text-sm font-medium">{{ $t('admin_announcements.cari_pengguna') }}</span>
                     <input
                         v-model="search"
                         type="search"
-                        placeholder="Taip nama atau emel…"
+                        :placeholder="$t('admin_announcements.taip_nama_atau_emel')"
                         class="rounded-xl border border-line bg-surface px-4 py-2.5 text-sm focus:border-brand-400 focus:outline-none"
                     >
-                    <span class="text-xs text-ink-muted">Admin dan akaun yang dinyahaktifkan tidak disenaraikan.</span>
+                    <span class="text-xs text-ink-muted">{{ $t('admin_announcements.admin_dan_akaun_yang_dinyahaktifkan') }}</span>
                 </label>
 
                 <ul v-if="results.length" class="divide-y divide-line rounded-xl border border-line">
@@ -172,12 +172,12 @@ const sendTest = (event) => {
                             <p class="truncate text-sm font-medium">{{ user.name }}</p>
                             <p class="truncate text-xs text-ink-muted">{{ user.email }} · {{ user.role }}</p>
                         </div>
-                        <button type="button" class="shrink-0 rounded-full border border-line px-3 py-1.5 text-xs font-medium transition hover:border-brand-400" @click="add(user)">Tambah</button>
+                        <button type="button" class="shrink-0 rounded-full border border-line px-3 py-1.5 text-xs font-medium transition hover:border-brand-400" @click="add(user)">{{ $t('admin_announcements.tambah') }}</button>
                     </li>
                 </ul>
 
-                <p v-else-if="searching" class="text-xs text-ink-muted">Mencari…</p>
-                <p v-else-if="search.trim().length >= 2" class="text-xs text-ink-muted">Tiada pengguna sepadan.</p>
+                <p v-else-if="searching" class="text-xs text-ink-muted">{{ $t('admin_announcements.mencari') }}</p>
+                <p v-else-if="search.trim().length >= 2" class="text-xs text-ink-muted">{{ $t('admin_announcements.tiada_pengguna_sepadan') }}</p>
 
                 <div v-if="picked.length" class="flex flex-wrap gap-2">
                     <span v-for="user in picked" :key="user.id" class="inline-flex items-center gap-2 rounded-full bg-surface-muted px-3 py-1.5 text-xs">
@@ -191,54 +191,52 @@ const sendTest = (event) => {
 
                 <UiTextarea
                     v-model="form.emails"
-                    label="Atau taip alamat emel"
+                    :label="$t('admin_announcements.atau_taip_alamat_emel')"
                     name="emails"
                     rows="3"
                     placeholder="aina@example.com, hakim@example.com"
                     :error="errors.emails"
-                    help="Satu alamat setiap baris, atau dipisahkan dengan koma. Alamat tanpa akaun akan terima emel sahaja."
+                    :help="$t('admin_announcements.satu_alamat_setiap_baris_atau')"
                 />
             </div>
 
-            <UiField v-model="form.subject" label="Tajuk" name="subject" placeholder="Penambahbaikan checklist majlis" :error="errors.subject" required />
+            <UiField v-model="form.subject" :label="$t('admin_announcements.tajuk')" name="subject" :placeholder="$t('admin_announcements.penambahbaikan_checklist_majlis')" :error="errors.subject" required />
             <UiTextarea
                 v-model="form.body"
-                label="Isi kandungan"
+                :label="$t('admin_announcements.isi_kandungan')"
                 name="body"
                 rows="8"
-                placeholder="Tulis mesej anda di sini. Tinggalkan satu baris kosong antara perenggan."
+                :placeholder="$t('admin_announcements.tulis_mesej_anda_di_sini')"
                 :error="errors.body"
-                help="Setiap perenggan dipaparkan sebagai satu baris dalam emel."
+                :help="$t('admin_announcements.setiap_perenggan_dipaparkan_sebagai_satu')"
                 required
             />
 
             <div class="grid gap-3 sm:grid-cols-2">
-                <UiField v-model="form.action_label" label="Teks butang (pilihan)" name="action_label" placeholder="Buka checklist" :error="errors.action_label" />
-                <UiField v-model="form.action_url" label="Pautan butang (pilihan)" name="action_url" type="url" placeholder="https://neekah.my/checklist" :error="errors.action_url" />
+                <UiField v-model="form.action_label" :label="$t('admin_announcements.teks_butang_pilihan')" name="action_label" :placeholder="$t('admin_announcements.buka_checklist')" :error="errors.action_label" />
+                <UiField v-model="form.action_url" :label="$t('admin_announcements.pautan_butang_pilihan')" name="action_url" type="url" placeholder="https://neekah.my/checklist" :error="errors.action_url" />
             </div>
 
             <div class="flex flex-wrap items-center gap-3">
                 <UiConfirmSubmit
                     :title="`Hantar kepada ${total} penerima?`"
                     :message="`${chosen?.label}. Emel dan notifikasi akan dihantar, dan pengumuman yang sudah keluar tidak boleh ditarik balik.`"
-                    confirm-label="Hantar sekarang"
+                    confirm-:label="$t('admin_announcements.hantar_sekarang')"
                     button-class="rounded-full bg-brand-600 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700"
-                >Hantar pengumuman</UiConfirmSubmit>
+                >{{ $t('admin_announcements.hantar_pengumuman') }}</UiConfirmSubmit>
 
-                <button type="button" class="rounded-full border border-line px-5 py-2.5 text-sm font-medium transition hover:border-brand-400" @click="sendTest">
-                    Hantar ujian kepada saya
-                </button>
+                <button type="button" class="rounded-full border border-line px-5 py-2.5 text-sm font-medium transition hover:border-brand-400" @click="sendTest">{{ $t('admin_announcements.hantar_ujian_kepada_saya') }}</button>
             </div>
         </form>
 
         <section class="flex flex-col gap-3">
-            <h2 class="font-display text-xl font-semibold">Pengumuman lepas</h2>
+            <h2 class="font-display text-xl font-semibold">{{ $t('admin_announcements.pengumuman_lepas') }}</h2>
 
             <DataTable
                 :rows="announcements"
                 :columns="columns"
-                empty-title="Belum ada pengumuman"
-                empty-message="Pengumuman yang dihantar akan disenaraikan di sini."
+                empty-:title="$t('admin_announcements.belum_ada_pengumuman')"
+                empty-:message="$t('admin_announcements.pengumuman_yang_dihantar_akan_disenaraikan')"
                 :csrf="csrf"
             >
                 <template #cell-subject="{ row }">

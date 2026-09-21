@@ -95,15 +95,15 @@ const destroyUrl = (photo) => props.destroyUrlTemplate.replace('__ID__', photo.i
             <input type="hidden" name="_token" :value="csrf">
 
             <label class="flex min-w-0 flex-col gap-1.5">
-                <span class="text-sm font-medium">Muat naik gambar</span>
+                <span class="text-sm font-medium">{{ $t('portfolio.muat_naik_gambar') }}</span>
                 <input type="file" name="images[]" accept="image/jpeg,image/png,image/webp" multiple required class="text-sm file:mr-3 file:rounded-full file:border-0 file:bg-brand-50 file:px-4 file:py-2 file:text-sm file:font-medium file:text-brand-700">
                 <span class="text-xs text-ink-muted">{{ imageHint }}</span>
-                <span class="text-xs text-ink-muted">Sehingga 10 gambar sekali gus.</span>
+                <span class="text-xs text-ink-muted">{{ $t('portfolio.sehingga_10_gambar_sekali_gus') }}</span>
                 <span v-if="errors.images" class="text-xs text-brand-700">{{ errors.images }}</span>
             </label>
 
             <div class="flex flex-col gap-4 sm:flex-row sm:items-end">
-                <UiField name="caption" label="Kapsyen (pilihan)" placeholder="Majlis Aina & Hakim, Alor Setar" class="min-w-0 flex-1" :error="errors.caption" />
+                <UiField name="caption" :label="$t('portfolio.kapsyen_pilihan')" :placeholder="$t('portfolio.majlis_aina_hakim_alor_setar')" class="min-w-0 flex-1" :error="errors.caption" />
 
                 <button type="submit" class="rounded-full bg-brand-600 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700 disabled:opacity-50" :disabled="uploading">
                     {{ uploading ? 'Memuat naik…' : 'Muat naik' }}
@@ -113,20 +113,17 @@ const destroyUrl = (photo) => props.destroyUrlTemplate.replace('__ID__', photo.i
             <UiUploadProgress :uploading="uploading" :percent="uploadPercent" :error="uploadError" />
         </form>
 
-        <p v-if="!photos.length" class="rounded-2xl border border-dashed border-line p-6 text-center text-sm text-ink-muted">
-            Belum ada gambar. Portfolio yang menarik menaikkan kadar tempahan.
-        </p>
+        <p v-if="!photos.length" class="rounded-2xl border border-dashed border-line p-6 text-center text-sm text-ink-muted">{{ $t('portfolio.belum_ada_gambar_portfolio_yang') }}</p>
 
         <div v-else class="flex flex-col gap-4">
         <div class="flex flex-wrap items-center justify-between gap-3">
             <div>
-                <h2 class="font-semibold">Susunan galeri</h2>
-                <p class="text-sm text-ink-muted">
-                    Seret untuk susun. <strong>{{ HERO_COUNT }} gambar pertama</strong> mengisi grid di atas halaman awam anda; selebihnya muncul apabila pengantin menekan "Tunjuk semua gambar".
+                <h2 class="font-semibold">{{ $t('portfolio.susunan_galeri') }}</h2>
+                <p class="text-sm text-ink-muted">{{ $t('portfolio.seret_untuk_susun') }}<strong>{{ HERO_COUNT }} gambar pertama</strong> mengisi grid di atas halaman awam anda; selebihnya muncul apabila pengantin menekan "Tunjuk semua gambar".
                 </p>
             </div>
             <p class="text-xs text-ink-muted" aria-live="polite">
-                <span v-if="saving">Menyimpan…</span>
+                <span v-if="saving">{{ $t('portfolio.menyimpan') }}</span>
                 <span v-else>{{ visibleCount }} daripada {{ photos.length }} dipaparkan</span>
             </p>
         </div>
@@ -155,18 +152,14 @@ const destroyUrl = (photo) => props.destroyUrlTemplate.replace('__ID__', photo.i
                     :class="['aspect-square w-full cursor-grab object-cover transition', photo.is_visible ? '' : 'opacity-40 grayscale']"
                 >
 
-                <span v-if="heroIds.includes(photo.id)" class="absolute top-2 left-2 rounded-full bg-brand-600 px-2 py-0.5 text-[11px] font-semibold text-white">
-                    Grid utama
-                </span>
-                <span v-else-if="!photo.is_visible" class="absolute top-2 left-2 rounded-full bg-ink/70 px-2 py-0.5 text-[11px] font-semibold text-white">
-                    Disembunyikan
-                </span>
+                <span v-if="heroIds.includes(photo.id)" class="absolute top-2 left-2 rounded-full bg-brand-600 px-2 py-0.5 text-[11px] font-semibold text-white">{{ $t('portfolio.grid_utama') }}</span>
+                <span v-else-if="!photo.is_visible" class="absolute top-2 left-2 rounded-full bg-ink/70 px-2 py-0.5 text-[11px] font-semibold text-white">{{ $t('portfolio.disembunyikan') }}</span>
 
                 <p v-if="photo.caption" class="truncate px-3 py-2 text-xs text-ink-muted">{{ photo.caption }}</p>
 
                 <div class="flex items-center gap-1 border-t border-line px-2 py-2">
-                    <button type="button" class="rounded-full px-2 py-1 text-xs text-ink-muted transition hover:bg-surface-muted disabled:opacity-30" :disabled="at === 0" aria-label="Alih ke kiri" @click="move(at, at - 1)">←</button>
-                    <button type="button" class="rounded-full px-2 py-1 text-xs text-ink-muted transition hover:bg-surface-muted disabled:opacity-30" :disabled="at === photos.length - 1" aria-label="Alih ke kanan" @click="move(at, at + 1)">→</button>
+                    <button type="button" class="rounded-full px-2 py-1 text-xs text-ink-muted transition hover:bg-surface-muted disabled:opacity-30" :disabled="at === 0" :aria-label="$t('portfolio.alih_ke_kiri')" @click="move(at, at - 1)">←</button>
+                    <button type="button" class="rounded-full px-2 py-1 text-xs text-ink-muted transition hover:bg-surface-muted disabled:opacity-30" :disabled="at === photos.length - 1" :aria-label="$t('portfolio.alih_ke_kanan')" @click="move(at, at + 1)">→</button>
 
                     <button
                         type="button"
@@ -179,9 +172,9 @@ const destroyUrl = (photo) => props.destroyUrlTemplate.replace('__ID__', photo.i
                     <UiConfirm
                         :action="destroyUrl(photo)"
                         method="DELETE"
-                        title="Padam gambar ini?"
-                        message="Fail dibuang untuk selamanya, termasuk salinan thumbnail. Anda perlu memuat naiknya semula jika berubah fikiran."
-                        confirm-label="Ya, padam"
+                        :title="$t('portfolio.padam_gambar_ini')"
+                        :message="$t('portfolio.fail_dibuang_untuk_selamanya_termasuk')"
+                        confirm-:label="$t('portfolio.ya_padam')"
                         tone="danger"
                         trigger-class="rounded-full px-2 py-1 text-xs text-ink-muted transition hover:bg-surface-muted hover:text-brand-700"
                         :csrf="csrf"

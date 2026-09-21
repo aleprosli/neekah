@@ -22,17 +22,17 @@ const note = ref('');
     <div class="grid gap-6 break-words lg:grid-cols-[minmax(0,1fr)_340px]">
         <div class="flex min-w-0 flex-col gap-6">
             <div class="rounded-2xl border border-line p-5">
-                <p class="text-xs font-semibold tracking-wide text-ink-muted uppercase">Laporan</p>
+                <p class="text-xs font-semibold tracking-wide text-ink-muted uppercase">{{ $t('admin_violation.laporan') }}</p>
                 <p class="mt-2 text-sm leading-relaxed whitespace-pre-line">{{ violation.description }}</p>
 
                 <dl class="mt-4 grid gap-2 border-t border-line pt-4 text-sm sm:grid-cols-2 [&>div]:min-w-0">
                     <div>
-                        <dt class="text-ink-muted">Pelapor</dt>
+                        <dt class="text-ink-muted">{{ $t('admin_violation.pelapor') }}</dt>
                         <dd class="font-medium">{{ violation.reporter.name }}</dd>
                         <dd class="break-words text-ink-muted">{{ violation.reporter.email }}</dd>
                     </div>
                     <div v-if="violation.booking">
-                        <dt class="text-ink-muted">Booking</dt>
+                        <dt class="text-ink-muted">{{ $t('admin_violation.booking') }}</dt>
                         <dd class="font-medium"><a :href="violation.booking.url" class="hover:text-brand-700">{{ violation.booking.reference }}</a></dd>
                     </div>
                 </dl>
@@ -54,21 +54,21 @@ const note = ref('');
                 <input type="hidden" name="_token" :value="csrf">
                 <input type="hidden" name="_method" value="PUT">
 
-                <h2 class="text-sm font-semibold">Keputusan</h2>
+                <h2 class="text-sm font-semibold">{{ $t('admin_violation.keputusan') }}</h2>
 
                 <p class="rounded-xl bg-amber-50 p-3 text-xs text-amber-900">
                     Jika disahkan, ini adalah pelanggaran ke-{{ violation.next_offence_number }}. Tindakan automatik: <strong>{{ action }}</strong>.
                 </p>
 
-                <UiTextarea v-model="note" label="Nota admin (pilihan)" name="admin_note" :rows="4" placeholder="Hasil siasatan, bukti yang disemak…" :error="errors.admin_note" />
+                <UiTextarea v-model="note" :label="$t('admin_violation.nota_admin_pilihan')" name="admin_note" :rows="4" :placeholder="$t('admin_violation.hasil_siasatan_bukti_yang_disemak')" :error="errors.admin_note" />
 
-                <button type="submit" name="decision" value="uphold" class="rounded-full bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700">Sahkan &amp; kenakan tindakan</button>
-                <button type="submit" name="decision" value="dismiss" class="rounded-full border border-line px-5 py-2.5 text-sm font-medium transition hover:border-brand-400">Tolak laporan</button>
+                <button type="submit" name="decision" value="uphold" class="rounded-full bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700">{{ $t('admin_violation.sahkan_kenakan_tindakan') }}</button>
+                <button type="submit" name="decision" value="dismiss" class="rounded-full border border-line px-5 py-2.5 text-sm font-medium transition hover:border-brand-400">{{ $t('admin_violation.tolak_laporan') }}</button>
             </form>
 
             <div v-else class="flex flex-col gap-2 rounded-2xl border border-line bg-surface-raised p-5 text-sm">
                 <h2 class="font-semibold">{{ violation.status }}</h2>
-                <p v-if="violation.action">Tindakan: <strong>{{ violation.action }}</strong> (pelanggaran ke-{{ violation.offence_number }})</p>
+                <p v-if="violation.action">{{ $t('admin_violation.tindakan') }}<strong>{{ violation.action }}</strong> (pelanggaran ke-{{ violation.offence_number }})</p>
                 <p v-if="violation.admin_note" class="text-ink-muted">{{ violation.admin_note }}</p>
                 <p class="text-xs text-ink-muted">Diselesaikan oleh {{ violation.resolver }} pada {{ violation.resolved_at }}</p>
             </div>

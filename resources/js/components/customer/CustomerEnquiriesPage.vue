@@ -15,7 +15,7 @@ defineProps({
         v-if="!enquiries.length"
         icon="💬"
         :title="$t('customer.no_enquiries_title')"
-        message="Tanya vendor tentang pakej, tarikh atau harga sebelum menempah."
+        :message="$t('customer.tanya_vendor_tentang_pakej_tarikh')"
         :action-label="$t('common.find_vendors')"
         :action-url="findVendorsUrl"
     />

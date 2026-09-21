@@ -30,7 +30,7 @@ const values = ref(
 <template>
     <div class="flex max-w-3xl min-w-0 flex-col gap-6">
         <!-- A scrollable row of jump links on a phone, a plain row on a laptop. -->
-        <nav class="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4 sm:mx-0 sm:flex-wrap sm:px-0" aria-label="Bahagian tetapan">
+        <nav class="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4 sm:mx-0 sm:flex-wrap sm:px-0" :aria-label="$t('admin_settings.bahagian_tetapan')">
             <a
                 v-for="section in sections"
                 :key="`link-${section.id}`"
@@ -119,7 +119,7 @@ const values = ref(
 
                 <!-- What the tagline and description will look like in Google. -->
                 <div v-if="section.preview" class="rounded-xl bg-surface-muted px-4 py-3">
-                    <p class="text-xs font-medium text-ink-muted">Pratonton hasil carian</p>
+                    <p class="text-xs font-medium text-ink-muted">{{ $t('admin_settings.pratonton_hasil_carian') }}</p>
                     <p class="mt-2 truncate text-sm text-brand-700">{{ section.preview.site }} — {{ values[section.id].tagline }}</p>
                     <p class="text-xs break-words text-ink-muted">{{ values[section.id].description }}</p>
                 </div>

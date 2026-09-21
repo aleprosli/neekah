@@ -30,7 +30,10 @@ class Translations
     private const GROUPS_BY_SHELL = [
         'card' => [],
         'auth' => ['common', 'auth', 'vendor_signup'],
-        'site' => ['common', 'auth', 'blog', 'invitation', 'notifications', 'gallery', 'report', 'vendor_signup'],
+        // vendor_signup is not here: the sign-up form is an auth page, and its
+        // placeholder examples were turning up in the markup of every public
+        // page, where two tests reasonably assert that a vendor's name is not.
+        'site' => ['common', 'auth', 'blog', 'invitation', 'notifications', 'gallery', 'report'],
     ];
 
     /**

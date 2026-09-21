@@ -35,10 +35,10 @@ const onCoverChosen = (event) => {
         <div class="flex min-w-0 flex-col gap-5">
             <UiField
                 v-model="form.title"
-                label="Tajuk"
+                :label="$t('admin_post.tajuk')"
                 name="title"
                 maxlength="160"
-                placeholder="Contoh: 10 Tips Memilih Pelamin untuk Majlis Kecil"
+                :placeholder="$t('admin_post.contoh_10_tips_memilih_pelamin')"
                 :error="errors.title"
                 required
             />
@@ -46,8 +46,8 @@ const onCoverChosen = (event) => {
             <UiRichEditor
                 v-model="form.body"
                 name="body"
-                label="Isi artikel"
-                help="Guna H2 untuk setiap bahagian utama dan H3 di bawahnya. Google membaca struktur ini."
+                :label="$t('admin_post.isi_artikel')"
+                :help="$t('admin_post.guna_h2_untuk_setiap_bahagian')"
                 :upload-url="imageUploadUrl"
                 :csrf="csrf"
                 :error="errors.body"
@@ -55,34 +55,30 @@ const onCoverChosen = (event) => {
 
             <UiTextarea
                 v-model="form.excerpt"
-                label="Ringkasan"
+                :label="$t('admin_post.ringkasan')"
                 name="excerpt"
                 :rows="3"
                 maxlength="300"
-                help="Dipaparkan dalam senarai blog. Jika kosong, pembukaan artikel digunakan."
+                :help="$t('admin_post.dipaparkan_dalam_senarai_blog_jika')"
                 :error="errors.excerpt"
             />
         </div>
 
         <aside class="flex flex-col gap-5">
             <section class="flex flex-col gap-3 rounded-2xl border border-line bg-surface-raised p-5">
-                <h2 class="font-semibold">Siaran</h2>
+                <h2 class="font-semibold">{{ $t('admin_post.siaran') }}</h2>
 
                 <label class="flex items-center gap-2 text-sm">
-                    <input v-model="form.status" type="radio" name="status" value="draft" class="accent-brand-600">
-                    Draf
-                </label>
+                    <input v-model="form.status" type="radio" name="status" value="draft" class="accent-brand-600">{{ $t('admin_post.draf') }}</label>
                 <label class="flex items-center gap-2 text-sm">
-                    <input v-model="form.status" type="radio" name="status" value="published" class="accent-brand-600">
-                    Siarkan
-                </label>
+                    <input v-model="form.status" type="radio" name="status" value="published" class="accent-brand-600">{{ $t('admin_post.siarkan') }}</label>
 
                 <UiField
                     v-model="form.published_at"
-                    label="Tarikh siaran"
+                    :label="$t('admin_post.tarikh_siaran')"
                     name="published_at"
                     type="datetime-local"
-                    help="Waktu Malaysia. Kosongkan untuk siar sekarang; tarikh akan datang menjadikannya dijadualkan."
+                    :help="$t('admin_post.waktu_malaysia_kosongkan_untuk_siar')"
                     :error="errors.published_at"
                 />
 
@@ -94,22 +90,22 @@ const onCoverChosen = (event) => {
             </section>
 
             <section class="flex flex-col gap-3 rounded-2xl border border-line bg-surface-raised p-5">
-                <h2 class="font-semibold">Gambar utama</h2>
+                <h2 class="font-semibold">{{ $t('admin_post.gambar_utama') }}</h2>
 
                 <img v-if="coverPreview" :src="coverPreview" alt="" class="aspect-[16/10] w-full rounded-xl object-cover">
 
                 <input type="file" name="cover_image" accept="image/jpeg,image/png,image/webp" class="text-sm file:mr-3 file:rounded-full file:border-0 file:bg-brand-50 file:px-4 file:py-2 file:text-sm file:font-medium file:text-brand-700" @change="onCoverChosen">
 
-                <p class="text-xs text-ink-muted">Juga menjadi gambar pratonton apabila pautan dikongsi di WhatsApp dan Facebook. Nisbah 16:9 paling sesuai.</p>
+                <p class="text-xs text-ink-muted">{{ $t('admin_post.juga_menjadi_gambar_pratonton_apabila') }}</p>
                 <span v-if="errors.cover_image" class="text-xs text-brand-700">{{ errors.cover_image }}</span>
             </section>
 
             <section class="flex flex-col gap-3 rounded-2xl border border-line bg-surface-raised p-5">
                 <h2 class="font-semibold">SEO</h2>
 
-                <UiField v-model="form.slug" label="Slug URL" name="slug" maxlength="180" help="neekah.my/blog/slug-anda. Kosongkan untuk jana daripada tajuk." :error="errors.slug" />
-                <UiField v-model="form.meta_title" label="Tajuk SEO" name="meta_title" maxlength="70" help="Tajuk dalam hasil carian Google, sekitar 60 aksara. Kosongkan untuk guna tajuk artikel." :error="errors.meta_title" />
-                <UiTextarea v-model="form.meta_description" label="Deskripsi SEO" name="meta_description" :rows="3" maxlength="170" help="Ayat di bawah tajuk dalam Google, sekitar 160 aksara. Masukkan kata kunci utama." :error="errors.meta_description" />
+                <UiField v-model="form.slug" :label="$t('admin_post.slug_url')" name="slug" maxlength="180" help="neekah.my/blog/slug-anda. Kosongkan untuk jana daripada tajuk." :error="errors.slug" />
+                <UiField v-model="form.meta_title" :label="$t('admin_post.tajuk_seo')" name="meta_title" maxlength="70" :help="$t('admin_post.tajuk_dalam_hasil_carian_google')" :error="errors.meta_title" />
+                <UiTextarea v-model="form.meta_description" :label="$t('admin_post.deskripsi_seo')" name="meta_description" :rows="3" maxlength="170" :help="$t('admin_post.ayat_di_bawah_tajuk_dalam')" :error="errors.meta_description" />
             </section>
         </aside>
     </form>

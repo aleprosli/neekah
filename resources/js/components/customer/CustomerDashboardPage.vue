@@ -24,7 +24,7 @@ defineProps({
         v-if="!hasWedding"
         icon="💍"
         :title="$t('customer.start_project_title')"
-        message="Tetapkan tarikh, lokasi dan bajet. Neekah akan jejak vendor, bayaran dan baki bajet anda."
+        :message="$t('customer.tetapkan_tarikh_lokasi_dan_bajet')"
         action-:label="$t('customer.start_project_action')"
         :action-url="createUrl"
     />
@@ -53,8 +53,7 @@ defineProps({
             <section class="flex min-w-0 flex-col gap-4">
                 <h2 class="font-display text-xl font-semibold">{{ $t('customer.your_vendors') }}</h2>
 
-                <p v-if="!bookings.length" class="rounded-2xl border border-dashed border-line p-6 text-sm text-ink-muted">
-                    Belum ada vendor ditempah. <a :href="findVendorsUrl" class="font-medium text-brand-600 underline underline-offset-4">{{ $t('common.find_vendors') }}</a> untuk mula.
+                <p v-if="!bookings.length" class="rounded-2xl border border-dashed border-line p-6 text-sm text-ink-muted">{{ $t('customer.belum_ada_vendor_ditempah') }}<a :href="findVendorsUrl" class="font-medium text-brand-600 underline underline-offset-4">{{ $t('common.find_vendors') }}</a> untuk mula.
                 </p>
 
                 <ul v-else class="divide-y divide-line rounded-2xl border border-line">

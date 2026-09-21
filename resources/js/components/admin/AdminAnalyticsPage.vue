@@ -31,7 +31,7 @@ const charted = {
     </div>
 
     <section class="mt-6 rounded-2xl border border-line bg-surface-raised p-5">
-        <h2 class="font-semibold">Vendor terbaik mengikut skor</h2>
+        <h2 class="font-semibold">{{ $t('admin_analytics.vendor_terbaik_mengikut_skor') }}</h2>
         <ul class="mt-4 flex flex-col gap-2">
             <li v-for="vendor in topVendors" :key="vendor.name" class="flex items-center justify-between gap-3 text-sm">
                 <a :href="vendor.url" class="flex min-w-0 items-center gap-2 hover:text-brand-700">

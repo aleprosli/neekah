@@ -41,11 +41,11 @@ defineProps({
     <div class="mt-8 grid gap-8 lg:grid-cols-2">
         <section class="flex min-w-0 flex-col gap-4">
             <div class="flex items-center justify-between">
-                <h2 class="font-display text-xl font-semibold">Menunggu kelulusan</h2>
-                <a :href="pendingUrl" class="text-sm font-medium text-brand-600 hover:underline">Semua</a>
+                <h2 class="font-display text-xl font-semibold">{{ $t('admin_dashboard.menunggu_kelulusan') }}</h2>
+                <a :href="pendingUrl" class="text-sm font-medium text-brand-600 hover:underline">{{ $t('admin_dashboard.semua') }}</a>
             </div>
 
-            <p v-if="!pending.length" class="rounded-2xl border border-dashed border-line p-6 text-sm text-ink-muted">Tiada permohonan vendor baharu.</p>
+            <p v-if="!pending.length" class="rounded-2xl border border-dashed border-line p-6 text-sm text-ink-muted">{{ $t('admin_dashboard.tiada_permohonan_vendor_baharu') }}</p>
 
             <ul v-else class="min-w-0 divide-y divide-line rounded-2xl border border-line">
                 <li v-for="vendor in pending" :key="vendor.id" class="flex items-center gap-3 p-4">
@@ -65,17 +65,17 @@ defineProps({
                         :action="vendor.approve_url"
                         :fields="{ status: 'approved' }"
                         :title="`Luluskan ${vendor.name}?`"
-                        message="Profil ini akan dipaparkan di marketplace dan vendor akan menerima emel kelulusan."
-                        confirm-label="Ya, luluskan"
+                        :message="$t('admin_dashboard.profil_ini_akan_dipaparkan_di')"
+                        confirm-:label="$t('admin_dashboard.ya_luluskan')"
                         trigger-class="shrink-0 rounded-full bg-brand-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-brand-700"
                         :csrf="csrf"
-                    >Lulus</UiConfirm>
+                    >{{ $t('admin_dashboard.lulus') }}</UiConfirm>
                 </li>
             </ul>
         </section>
 
         <section class="flex min-w-0 flex-col gap-4">
-            <h2 class="font-display text-xl font-semibold">Vendor teratas</h2>
+            <h2 class="font-display text-xl font-semibold">{{ $t('admin_dashboard.vendor_teratas') }}</h2>
             <ol class="min-w-0 divide-y divide-line rounded-2xl border border-line">
                 <li v-for="(vendor, at) in topVendors" :key="vendor.id" class="flex items-center gap-3 p-4 text-sm">
                     <span class="w-5 shrink-0 text-center font-semibold text-ink-muted">{{ at + 1 }}</span>
@@ -91,8 +91,8 @@ defineProps({
 
     <section class="mt-8 flex min-w-0 flex-col gap-4">
         <div class="flex items-center justify-between">
-            <h2 class="font-display text-xl font-semibold">Tempahan terkini</h2>
-            <a :href="bookingsUrl" class="text-sm font-medium text-brand-600 hover:underline">Semua</a>
+            <h2 class="font-display text-xl font-semibold">{{ $t('admin_dashboard.tempahan_terkini') }}</h2>
+            <a :href="bookingsUrl" class="text-sm font-medium text-brand-600 hover:underline">{{ $t('admin_dashboard.semua_2') }}</a>
         </div>
 
         <DataTable :rows="recentBookings" :columns="BOOKING_COLUMNS" :csrf="csrf">

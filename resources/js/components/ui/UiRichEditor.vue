@@ -210,7 +210,7 @@ onBeforeUnmount(() => editor.value?.destroy());
         <span class="text-sm font-medium">{{ label }}</span>
 
         <div class="rounded-2xl border border-line bg-surface focus-within:border-brand-400 focus-within:ring-2 focus-within:ring-brand-400/40">
-            <div class="sticky top-0 z-10 flex flex-wrap gap-1 rounded-t-2xl border-b border-line bg-surface-muted/90 p-2 backdrop-blur" role="toolbar" aria-label="Format teks">
+            <div class="sticky top-0 z-10 flex flex-wrap gap-1 rounded-t-2xl border-b border-line bg-surface-muted/90 p-2 backdrop-blur" role="toolbar" :aria-label="$t('editor.format_teks')">
                 <template v-for="(button, at) in TOOLBAR" :key="at">
                     <span v-if="!button" class="mx-1 w-px self-stretch bg-line" aria-hidden="true"></span>
                     <button

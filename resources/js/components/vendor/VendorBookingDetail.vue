@@ -29,18 +29,18 @@ const tones = {
         <div class="flex min-w-0 flex-col gap-6">
             <dl class="grid gap-3 rounded-2xl border border-line p-5 text-sm sm:grid-cols-2 [&>div]:min-w-0">
                 <div>
-                    <dt class="text-ink-muted">Pelanggan</dt>
+                    <dt class="text-ink-muted">{{ $t('vendor_booking.pelanggan') }}</dt>
                     <dd class="font-semibold">{{ booking.customer.name }}</dd>
                     <dd class="break-words text-ink-muted">{{ booking.customer.contact }}</dd>
                 </div>
-                <div><dt class="text-ink-muted">Pakej</dt><dd class="font-semibold">{{ booking.package_name }}</dd></div>
-                <div><dt class="text-ink-muted">Tarikh majlis</dt><dd class="font-semibold">{{ booking.event_date }}</dd></div>
-                <div><dt class="text-ink-muted">Dibuat</dt><dd class="font-semibold">{{ booking.created_at }}</dd></div>
-                <div v-if="booking.notes" class="sm:col-span-2"><dt class="text-ink-muted">Nota</dt><dd>{{ booking.notes }}</dd></div>
+                <div><dt class="text-ink-muted">{{ $t('vendor_booking.pakej') }}</dt><dd class="font-semibold">{{ booking.package_name }}</dd></div>
+                <div><dt class="text-ink-muted">{{ $t('vendor_booking.tarikh_majlis') }}</dt><dd class="font-semibold">{{ booking.event_date }}</dd></div>
+                <div><dt class="text-ink-muted">{{ $t('vendor_booking.dibuat') }}</dt><dd class="font-semibold">{{ booking.created_at }}</dd></div>
+                <div v-if="booking.notes" class="sm:col-span-2"><dt class="text-ink-muted">{{ $t('vendor_booking.nota') }}</dt><dd>{{ booking.notes }}</dd></div>
             </dl>
 
             <section v-if="timeline.length" class="rounded-2xl border border-line p-5">
-                <p class="text-xs font-semibold tracking-wide text-ink-muted uppercase">Slot anda pada hari majlis</p>
+                <p class="text-xs font-semibold tracking-wide text-ink-muted uppercase">{{ $t('vendor_booking.slot_anda_pada_hari_majlis') }}</p>
                 <ol class="mt-3 flex flex-col gap-3">
                     <li v-for="item in timeline" :key="item.id" class="flex gap-4 text-sm">
                         <span class="w-24 shrink-0 font-display font-semibold">{{ item.time }}</span>
@@ -51,18 +51,18 @@ const tones = {
                         </div>
                     </li>
                 </ol>
-                <p class="mt-3 border-t border-line pt-3 text-xs text-ink-muted">Anda hanya melihat slot yang ditugaskan kepada anda. Pengantin menguruskan timeline penuh.</p>
+                <p class="mt-3 border-t border-line pt-3 text-xs text-ink-muted">{{ $t('vendor_booking.anda_hanya_melihat_slot_yang') }}</p>
             </section>
 
             <div v-if="booking.review" class="rounded-2xl border border-line p-5">
-                <p class="text-xs font-semibold tracking-wide text-ink-muted uppercase">Review pelanggan</p>
+                <p class="text-xs font-semibold tracking-wide text-ink-muted uppercase">{{ $t('vendor_booking.review_pelanggan') }}</p>
                 <p class="mt-2 text-gold-500">{{ '★'.repeat(booking.review.rating) }}</p>
                 <p class="mt-1 text-sm">{{ booking.review.comment }}</p>
             </div>
         </div>
 
         <aside class="flex min-w-0 flex-col gap-3 rounded-2xl border border-line bg-surface-raised p-5">
-            <p class="text-xs font-semibold tracking-wide text-ink-muted uppercase">Pembayaran</p>
+            <p class="text-xs font-semibold tracking-wide text-ink-muted uppercase">{{ $t('vendor_booking.pembayaran') }}</p>
             <p class="font-display text-2xl font-semibold">{{ booking.total }}</p>
 
             <ul v-if="booking.payments.length" class="flex flex-col gap-3 text-sm">
@@ -75,38 +75,38 @@ const tones = {
                     <p class="text-xs text-ink-muted">{{ payment.paid_on }} · direkod oleh {{ payment.recorded_by }}</p>
                     <p v-if="payment.note" class="text-xs break-words text-ink-muted">{{ payment.note }}</p>
 
-                    <a v-if="payment.receipt_url" :href="payment.receipt_url" target="_blank" rel="noopener" class="text-xs font-medium text-brand-700 underline underline-offset-4">Lihat resit</a>
+                    <a v-if="payment.receipt_url" :href="payment.receipt_url" target="_blank" rel="noopener" class="text-xs font-medium text-brand-700 underline underline-offset-4">{{ $t('vendor_booking.lihat_resit') }}</a>
 
                     <div v-if="payment.awaiting" class="flex flex-wrap gap-2 pt-1">
                         <UiConfirm
                             :action="payment.verify_url"
-                            title="Sahkan bayaran ini diterima?"
+                            :title="$t('vendor_booking.sahkan_bayaran_ini_diterima')"
                             :message="`Pastikan ${payment.amount} benar-benar masuk ke akaun anda. Booking akan disahkan dan pengantin dimaklumkan.`"
-                            confirm-label="Ya, saya telah terima"
+                            confirm-:label="$t('vendor_booking.ya_saya_telah_terima')"
                             trigger-class="rounded-full bg-emerald-600 px-4 py-1.5 text-xs font-semibold text-white transition hover:bg-emerald-700"
                             :csrf="csrf"
-                        >Sahkan diterima</UiConfirm>
+                        >{{ $t('vendor_booking.sahkan_diterima') }}</UiConfirm>
 
                         <UiConfirm
                             :action="payment.reject_url"
                             method="DELETE"
-                            title="Tanda bayaran ini tidak diterima?"
-                            message="Pengantin akan diminta menyemak resit dan tarikh, kemudian merekodkannya semula."
-                            confirm-label="Ya, saya tidak jumpa"
+                            :title="$t('vendor_booking.tanda_bayaran_ini_tidak_diterima')"
+                            :message="$t('vendor_booking.pengantin_akan_diminta_menyemak_resit')"
+                            confirm-:label="$t('vendor_booking.ya_saya_tidak_jumpa')"
                             tone="danger"
                             :csrf="csrf"
-                        >Tidak diterima</UiConfirm>
+                        >{{ $t('vendor_booking.tidak_diterima') }}</UiConfirm>
                     </div>
                 </li>
             </ul>
 
-            <p v-else class="rounded-xl bg-surface-muted p-3 text-xs text-ink-muted">Pengantin belum merekodkan sebarang bayaran. Berbincang terus dengan mereka; setelah mereka bayar dan merekodkannya, ia muncul di sini untuk anda sahkan.</p>
+            <p v-else class="rounded-xl bg-surface-muted p-3 text-xs text-ink-muted">{{ $t('vendor_booking.pengantin_belum_merekodkan_sebarang_bayaran') }}</p>
 
             <dl class="flex flex-col gap-1 border-t border-line pt-3 text-sm">
-                <div class="flex justify-between text-ink-muted"><dt>Belum disahkan</dt><dd>{{ booking.outstanding }}</dd></div>
+                <div class="flex justify-between text-ink-muted"><dt>{{ $t('vendor_booking.belum_disahkan') }}</dt><dd>{{ booking.outstanding }}</dd></div>
                 <!-- Only bookings made under a commission show one; while Neekah is free, the vendor keeps it all. -->
                 <div v-if="booking.has_commission" class="flex justify-between text-ink-muted"><dt>Komisen platform ({{ booking.commission_rate }}%)</dt><dd>- {{ booking.commission }}</dd></div>
-                <div class="flex justify-between font-semibold"><dt>Anda terima</dt><dd>{{ booking.payout }}</dd></div>
+                <div class="flex justify-between font-semibold"><dt>{{ $t('vendor_booking.anda_terima') }}</dt><dd>{{ booking.payout }}</dd></div>
             </dl>
         </aside>
     </div>

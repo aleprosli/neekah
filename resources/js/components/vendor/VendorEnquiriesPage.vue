@@ -7,9 +7,7 @@ defineProps({
 </script>
 
 <template>
-    <p v-if="!enquiries.length" class="rounded-2xl border border-dashed border-line p-8 text-center text-sm text-ink-muted">
-        Belum ada enquiry. Pengantin boleh menghantar enquiry dari halaman vendor anda.
-    </p>
+    <p v-if="!enquiries.length" class="rounded-2xl border border-dashed border-line p-8 text-center text-sm text-ink-muted">{{ $t('vendor_enquiries.belum_ada_enquiry_pengantin_boleh') }}</p>
 
     <template v-else>
         <ul class="divide-y divide-line rounded-2xl border border-line">
@@ -18,7 +16,7 @@ defineProps({
                     <div class="min-w-0 flex-1">
                         <div class="flex items-center gap-2">
                             <p class="truncate font-medium">{{ enquiry.customer }}</p>
-                            <span v-if="enquiry.is_open" class="rounded-full bg-brand-600 px-2 py-0.5 text-[11px] font-semibold text-white">Baru</span>
+                            <span v-if="enquiry.is_open" class="rounded-full bg-brand-600 px-2 py-0.5 text-[11px] font-semibold text-white">{{ $t('vendor_enquiries.baru') }}</span>
                         </div>
                         <p class="truncate text-sm text-ink-muted">{{ enquiry.message }}</p>
                     </div>
