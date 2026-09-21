@@ -13,11 +13,11 @@ enum VendorTier: string
     public function label(): string
     {
         return match ($this) {
-            self::New => 'New',
-            self::Verified => 'Verified',
-            self::Trusted => 'Trusted',
-            self::Top => 'Top',
-            self::Recommended => 'Recommended',
+            self::New => __('enums.vendor_tier.new'),
+            self::Verified => __('enums.vendor_tier.verified'),
+            self::Trusted => __('enums.vendor_tier.trusted'),
+            self::Top => __('enums.vendor_tier.top'),
+            self::Recommended => __('enums.vendor_tier.recommended'),
         };
     }
 

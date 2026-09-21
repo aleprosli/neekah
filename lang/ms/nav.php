@@ -13,6 +13,10 @@ return [
     'dashboard' => 'Dashboard',
     'my_wedding' => 'Majlis saya',
     'account' => 'Akaun',
+    'mobile' => 'Navigasi mudah alih',
+    'search' => 'Cari',
+    'about' => 'Tentang',
+    'vendor' => 'Vendor',
     'language' => 'Bahasa',
 
 ];

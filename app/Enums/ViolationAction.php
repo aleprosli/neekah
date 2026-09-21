@@ -16,10 +16,10 @@ enum ViolationAction: string
     public function label(): string
     {
         return match ($this) {
-            self::Warning => 'Amaran',
-            self::PointDeduction => 'Potongan point + turun ranking',
-            self::Suspension => 'Penggantungan sementara',
-            self::Removal => 'Penyingkiran vendor',
+            self::Warning => __('enums.violation_action.warning'),
+            self::PointDeduction => __('enums.violation_action.point_deduction'),
+            self::Suspension => __('enums.violation_action.suspension'),
+            self::Removal => __('enums.violation_action.removal'),
         };
     }
 

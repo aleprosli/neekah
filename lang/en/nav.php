@@ -13,6 +13,10 @@ return [
     'dashboard' => 'Dashboard',
     'my_wedding' => 'My wedding',
     'account' => 'Account',
+    'mobile' => 'Mobile navigation',
+    'search' => 'Search',
+    'about' => 'About',
+    'vendor' => 'Vendor',
     'language' => 'Language',
 
 ];

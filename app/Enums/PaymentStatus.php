@@ -15,11 +15,11 @@ enum PaymentStatus: string
     public function label(): string
     {
         return match ($this) {
-            self::Pending => 'Belum dibayar',
-            self::AwaitingVerification => 'Menunggu pengesahan',
-            self::Paid => 'Dibayar',
-            self::Failed => 'Gagal',
-            self::Refunded => 'Dipulangkan',
+            self::Pending => __('enums.payment_status.pending'),
+            self::AwaitingVerification => __('enums.payment_status.awaiting_verification'),
+            self::Paid => __('enums.payment_status.paid'),
+            self::Failed => __('enums.payment_status.failed'),
+            self::Refunded => __('enums.payment_status.refunded'),
         };
     }
 

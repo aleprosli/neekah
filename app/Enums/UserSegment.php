@@ -23,11 +23,11 @@ enum UserSegment: string
     public function label(): string
     {
         return match ($this) {
-            self::VendorSetupComplete => 'Vendor setup lengkap',
-            self::VendorSetupPending => 'Vendor setup belum lengkap',
-            self::CoupleNoWedding => 'Belum cipta majlis',
-            self::CoupleNoCard => 'Belum cipta kad digital',
-            self::CoupleNoPartner => 'Belum jemput pasangan',
+            self::VendorSetupComplete => __('enums.user_segment.vendor_setup_complete'),
+            self::VendorSetupPending => __('enums.user_segment.vendor_setup_pending'),
+            self::CoupleNoWedding => __('enums.user_segment.couple_no_wedding'),
+            self::CoupleNoCard => __('enums.user_segment.couple_no_card'),
+            self::CoupleNoPartner => __('enums.user_segment.couple_no_partner'),
         };
     }
 

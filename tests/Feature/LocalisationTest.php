@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Vendor;
 use App\Support\Locales;
 use Database\Seeders\CategorySeeder;
 use Illuminate\Support\Facades\URL;
@@ -63,4 +64,35 @@ it('keeps the sitemap at the root, where a crawler looks for it', function () {
     $this->get('/sitemap.xml')->assertOk();
     // One sitemap for the site, not one per language.
     $this->get('/en/sitemap.xml')->assertNotFound();
+});
+
+it('translates the marketplace, not just the navigation', function () {
+    Vendor::factory()->count(3)->create();
+
+    $this->get('/')->assertOk()
+        ->assertSee('Cari vendor majlis anda')
+        ->assertSee('Semua filter');
+
+    $this->get('/en')->assertOk()
+        ->assertSee('Find your wedding vendors')
+        ->assertSee('All filters')
+        ->assertDontSee('Semua filter');
+});
+
+it('counts vendors correctly in a language with no plural form', function () {
+    Vendor::factory()->count(3)->create();
+
+    // Laravel has no pluralisation rule for Malay, so a choice string would
+    // fall to its first branch whatever the number was — which read
+    // "Tiada vendor" on a page listing three of them.
+    $this->get('/')->assertOk()->assertSee('3 vendor')->assertDontSee('Tiada vendor');
+    $this->get('/en')->assertOk()->assertSee('3 vendors');
+});
+
+it('offers the other language from the navigation on every width', function () {
+    $page = $this->get('/')->assertOk();
+
+    // A phone hid the switcher entirely at first.
+    $page->assertSee('hreflang="en-MY"', false)->assertSee('>EN</a>', false);
+    expect($page->getContent())->not->toContain('language-switcher class="mr-1 hidden');
 });

@@ -15,10 +15,10 @@ enum AnnouncementAudience: string
     public function label(): string
     {
         return match ($this) {
-            self::Everyone => 'Semua pengguna',
-            self::Customers => 'Pengantin sahaja',
-            self::Vendors => 'Vendor sahaja',
-            self::Custom => 'Pilih sendiri',
+            self::Everyone => __('enums.announcement_audience.everyone'),
+            self::Customers => __('enums.announcement_audience.customers'),
+            self::Vendors => __('enums.announcement_audience.vendors'),
+            self::Custom => __('enums.announcement_audience.custom'),
         };
     }
 

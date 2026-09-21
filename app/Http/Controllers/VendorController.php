@@ -18,13 +18,22 @@ use Illuminate\Support\Str;
 
 class VendorController extends Controller
 {
-    public const SORTS = [
-        'recommended' => 'Disyorkan',
-        'rating' => 'Rating tertinggi',
-        'price_asc' => 'Harga: rendah ke tinggi',
-        'price_desc' => 'Harga: tinggi ke rendah',
-        'reviews' => 'Paling banyak review',
-    ];
+    /**
+     * The orders the list can be put in. A method rather than a constant: the
+     * labels are translated, and a constant cannot hold a function call.
+     *
+     * @return array<string, string>
+     */
+    public static function sorts(): array
+    {
+        return [
+            'recommended' => __('marketplace.sorts.recommended'),
+            'rating' => __('marketplace.sorts.rating'),
+            'price_asc' => __('marketplace.sorts.price_asc'),
+            'price_desc' => __('marketplace.sorts.price_desc'),
+            'reviews' => __('marketplace.sorts.reviews'),
+        ];
+    }
 
     /**
      * List approved vendors with search, filters, sorting and pagination.
@@ -42,7 +51,7 @@ class VendorController extends Controller
             'max_price' => $request->filled('max_price') ? $request->integer('max_price') : null,
             'min_rating' => $request->filled('min_rating') ? (float) $request->input('min_rating') : null,
             'tier' => VendorTier::tryFrom($request->string('tier')->toString())?->value,
-            'sort' => array_key_exists($sort, self::SORTS) ? $sort : 'recommended',
+            'sort' => array_key_exists($sort, self::sorts()) ? $sort : 'recommended',
         ];
 
         $activeCategory = $filters['category'] ? $categories->firstWhere('slug', $filters['category']) : null;
@@ -78,7 +87,7 @@ class VendorController extends Controller
             'states' => States::names(),
             'stateOptions' => States::options(),
             'tiers' => VendorTier::cases(),
-            'sorts' => self::SORTS,
+            'sorts' => self::sorts(),
             'activeFilterCount' => count(array_filter([$filters['state'], $filters['min_price'], $filters['max_price'], $filters['min_rating'], $filters['tier']], fn ($value) => $value !== null)),
             'helpUrl' => $vendors->isEmpty() ? $this->helpUrl($activeCategory, $filters) : null,
         ]);

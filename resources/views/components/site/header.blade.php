@@ -53,7 +53,7 @@
                     </div>
                 </details>
             @else
-                <x-site.language-switcher class="mr-1 hidden sm:flex" />
+                <x-site.language-switcher class="mr-1" />
                 <a href="{{ route('login') }}" class="rounded-full px-3 py-2 text-sm font-medium whitespace-nowrap transition hover:bg-surface-muted sm:px-4">{{ __('nav.login') }}</a>
                 <a href="{{ route('register') }}" class="rounded-full bg-brand-600 px-3 py-2 text-sm font-semibold whitespace-nowrap text-white transition hover:bg-brand-700 sm:px-4">{{ __('nav.register') }}</a>
             @endauth

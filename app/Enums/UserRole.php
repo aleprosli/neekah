@@ -11,9 +11,9 @@ enum UserRole: string
     public function label(): string
     {
         return match ($this) {
-            self::Customer => 'Pengantin',
-            self::Vendor => 'Vendor',
-            self::Admin => 'Admin',
+            self::Customer => __('enums.user_role.customer'),
+            self::Vendor => __('enums.user_role.vendor'),
+            self::Admin => __('enums.user_role.admin'),
         };
     }
 }

@@ -14,12 +14,12 @@ enum ViolationType: string
     public function label(): string
     {
         return match ($this) {
-            self::PaymentBypass => 'Cuba bypass pembayaran platform',
-            self::CancelledBooking => 'Batalkan booking tanpa sebab',
-            self::NoShow => 'Tidak hadir pada hari majlis',
-            self::MisleadingListing => 'Listing atau portfolio mengelirukan',
-            self::PoorService => 'Kualiti perkhidmatan tidak memuaskan',
-            self::Other => 'Lain-lain',
+            self::PaymentBypass => __('enums.violation_type.payment_bypass'),
+            self::CancelledBooking => __('enums.violation_type.cancelled_booking'),
+            self::NoShow => __('enums.violation_type.no_show'),
+            self::MisleadingListing => __('enums.violation_type.misleading_listing'),
+            self::PoorService => __('enums.violation_type.poor_service'),
+            self::Other => __('enums.violation_type.other'),
         };
     }
 }

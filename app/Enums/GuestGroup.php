@@ -13,11 +13,11 @@ enum GuestGroup: string
     public function label(): string
     {
         return match ($this) {
-            self::Family => 'Keluarga',
-            self::Friends => 'Kawan',
-            self::Work => 'Kerja',
-            self::Neighbours => 'Jiran',
-            self::Other => 'Lain-lain',
+            self::Family => __('enums.guest_group.family'),
+            self::Friends => __('enums.guest_group.friends'),
+            self::Work => __('enums.guest_group.work'),
+            self::Neighbours => __('enums.guest_group.neighbours'),
+            self::Other => __('enums.guest_group.other'),
         };
     }
 }
