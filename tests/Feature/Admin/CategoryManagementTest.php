@@ -51,10 +51,10 @@ it('puts a new category at the end of the list when no position is given', funct
     Category::query()->update(['sort_order' => 5]);
 
     $this->actingAs($this->admin)
-        ->post(route('admin.categories.store'), ['name' => 'Kereta Pengantin', 'icon' => '🚗', 'is_active' => 1])
+        ->post(route('admin.categories.store'), ['name' => ['ms' => 'Kereta Pengantin', 'en' => 'Bridal car'], 'icon' => '🚗', 'is_active' => 1])
         ->assertRedirect(route('admin.categories.index'));
 
-    expect(Category::where('name', 'Kereta Pengantin')->sole()->sort_order)->toBe(6);
+    expect(Category::whereTranslated('name', 'Kereta Pengantin')->sole()->sort_order)->toBe(6);
 });
 
 it('uploads a category picture, shows it wherever the illustration goes, and replaces it', function () {
@@ -63,7 +63,7 @@ it('uploads a category picture, shows it wherever the illustration goes, and rep
 
     $this->actingAs($this->admin)
         ->put(route('admin.categories.update', $category), [
-            'name' => $category->name,
+            'name' => ['ms' => $category->name],
             'icon' => $category->icon,
             'is_active' => 1,
             'image' => UploadedFile::fake()->image('kategori.jpg', 512, 512),
@@ -77,7 +77,7 @@ it('uploads a category picture, shows it wherever the illustration goes, and rep
 
     // A second upload replaces the first rather than leaving it behind.
     $this->actingAs($this->admin)->put(route('admin.categories.update', $category), [
-        'name' => $category->name,
+        'name' => ['ms' => $category->name],
         'icon' => $category->icon,
         'is_active' => 1,
         'image' => UploadedFile::fake()->image('baru.jpg', 512, 512),
@@ -92,7 +92,7 @@ it('falls back to the shipped illustration when the upload is removed', function
     $category = Category::where('slug', 'catering')->sole();
 
     $this->actingAs($this->admin)->put(route('admin.categories.update', $category), [
-        'name' => $category->name,
+        'name' => ['ms' => $category->name],
         'icon' => $category->icon,
         'is_active' => 1,
         'image' => UploadedFile::fake()->image('kategori.jpg', 512, 512),
@@ -101,7 +101,7 @@ it('falls back to the shipped illustration when the upload is removed', function
     $uploaded = $category->fresh()->image;
 
     $this->actingAs($this->admin)->put(route('admin.categories.update', $category), [
-        'name' => $category->name,
+        'name' => ['ms' => $category->name],
         'icon' => $category->icon,
         'is_active' => 1,
         'remove_image' => 1,
@@ -117,7 +117,7 @@ it('removes the picture of a deleted category', function () {
     $category = Category::factory()->create();
 
     $this->actingAs($this->admin)->put(route('admin.categories.update', $category), [
-        'name' => $category->name,
+        'name' => ['ms' => $category->name],
         'icon' => $category->icon,
         'is_active' => 1,
         'image' => UploadedFile::fake()->image('kategori.jpg', 512, 512),

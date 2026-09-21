@@ -14,6 +14,7 @@ import { useUploadForm } from '../../composables/useUploadForm.js';
 
 const props = defineProps({
     categories: { type: Array, required: true },
+    locales: { type: Array, required: true },
     stats: { type: Array, required: true },
     storeUrl: { type: String, required: true },
     orderUrl: { type: String, required: true },
@@ -37,8 +38,13 @@ const removeImage = ref(false);
 
 const action = computed(() => (editing.value?.id ? editing.value.update_url : props.storeUrl));
 
+/** An empty value for every language the site is served in. */
+function blankPerLocale() {
+    return Object.fromEntries(props.locales.map((locale) => [locale.code, '']));
+}
+
 function blankForm() {
-    return { name: '', icon: '', examples: '', is_active: true };
+    return { name: blankPerLocale(), icon: '', examples: blankPerLocale(), is_active: true };
 }
 
 const openAdd = () => {
@@ -50,7 +56,7 @@ const openAdd = () => {
 
 const openEdit = (row) => {
     editing.value = row;
-    form.value = { name: row.name, icon: row.icon, examples: row.examples ?? '', is_active: row.is_active };
+    form.value = { name: { ...row.names }, icon: row.icon, examples: { ...row.examples_all }, is_active: row.is_active };
     removeImage.value = false;
     panelOpen.value = true;
 };
@@ -183,9 +189,26 @@ const saveOrder = async () => {
                         <input v-model="removeImage" type="checkbox" name="remove_image" value="1" class="accent-brand-600">{{ $t('admin_categories.buang_gambar_yang_dimuat_naik') }}</label>
                 </div>
 
-                <UiField v-model="form.name" :label="$t('admin_categories.nama_kategori')" name="name" :placeholder="$t('admin_categories.kereta_pengantin')" :error="errors.name" required />
+                <UiField
+                    v-for="locale in locales"
+                    :key="`name-${locale.code}`"
+                    v-model="form.name[locale.code]"
+                    :label="`${$t('admin_categories.nama_kategori')} · ${locale.label}`"
+                    :name="`name[${locale.code}]`"
+                    :placeholder="$t('admin_categories.kereta_pengantin')"
+                    :error="errors[`name.${locale.code}`]"
+                    :required="locale.code === locales[0].code"
+                />
                 <UiField v-model="form.icon" :label="$t('admin_categories.ikon_emoji')" name="icon" placeholder="🚗" :error="errors.icon" :help="$t('admin_categories.dipakai_jika_kategori_ini_tiada')" required />
-                <UiField v-model="form.examples" :label="$t('admin_categories.contoh')" name="examples" :placeholder="$t('admin_categories.sewa_kereta_deco_kereta')" :error="errors.examples" />
+                <UiField
+                    v-for="locale in locales"
+                    :key="`examples-${locale.code}`"
+                    v-model="form.examples[locale.code]"
+                    :label="`${$t('admin_categories.contoh')} · ${locale.label}`"
+                    :name="`examples[${locale.code}]`"
+                    :placeholder="$t('admin_categories.sewa_kereta_deco_kereta')"
+                    :error="errors[`examples.${locale.code}`]"
+                />
 
                 <label class="flex flex-col gap-1 text-sm">
                     <span class="font-medium">{{ $t('admin_categories.gambar_kategori') }}</span>

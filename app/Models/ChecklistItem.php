@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Casts\Translatable;
+use App\Models\Concerns\HasTranslatedText;
 use Database\Factories\ChecklistItemFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Scope;
@@ -21,12 +23,17 @@ class ChecklistItem extends Model
     /** @use HasFactory<ChecklistItemFactory> */
     use HasFactory;
 
+    use HasTranslatedText;
+
     /**
      * @return array<string, string>
      */
     protected function casts(): array
     {
         return [
+            'group' => Translatable::class,
+            'title' => Translatable::class,
+            'notes' => Translatable::class,
             'is_active' => 'boolean',
         ];
     }

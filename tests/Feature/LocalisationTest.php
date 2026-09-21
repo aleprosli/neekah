@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Category;
 use App\Models\SiteTemplate;
 use App\Models\Vendor;
 use App\Support\Locales;
@@ -170,4 +171,45 @@ it('gives a page only the strings its own islands read', function () {
     expect($dictionary(route('sites.templates.show', $template)))->toBe([])
         ->and(array_keys($dictionary('/login')))->toContain('auth')
         ->and(array_keys($dictionary('/login')))->not->toContain('guests');
+});
+
+it('serves admin-written data in the language of the page', function () {
+    // Categories are added by admins, so they cannot live in a language file:
+    // a category added tomorrow would have nowhere to be translated.
+    $category = Category::where('slug', 'invitation')->sole();
+
+    app()->setLocale('ms');
+    expect($category->name)->toBe('Invitation');
+
+    app()->setLocale('en');
+    expect($category->name)->toBe('Invitations');
+});
+
+it('falls back rather than showing a blank where a translation is missing', function () {
+    $category = Category::where('slug', 'catering')->sole();
+    $category->name = ['en' => null];
+    $category->save();
+
+    // An admin who has not filled in the English name yet should not take the
+    // page down with them.
+    app()->setLocale('en');
+    expect($category->fresh()->name)->toBe('Catering');
+});
+
+it('keeps one language when the other is written', function () {
+    $category = Category::where('slug', 'venue')->sole();
+
+    $category->name = ['en' => 'Venues'];
+    $category->save();
+
+    app()->setLocale('ms');
+    expect($category->fresh()->name)->toBe('Venue');
+    app()->setLocale('en');
+    expect($category->fresh()->name)->toBe('Venues');
+});
+
+it('finds a row by its text in whichever language the caller knows', function () {
+    // where('name', ...) compares against the whole JSON document now.
+    expect(Category::whereTranslated('name', 'Invitations')->sole()->slug)->toBe('invitation')
+        ->and(Category::whereTranslated('name', 'Invitation')->sole()->slug)->toBe('invitation');
 });

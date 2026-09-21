@@ -3,11 +3,13 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Actions\StoreOptimizedImage;
+use App\Casts\Translatable;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreCategoryRequest;
 use App\Models\Category;
 use App\Models\Vendor;
 use App\Support\ImageSettings;
+use App\Support\Locales;
 use App\Support\VueProps;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
@@ -27,6 +29,9 @@ class CategoryController extends Controller
             'props' => VueProps::for([
                 'storeUrl' => route('admin.categories.store'),
                 'orderUrl' => route('admin.categories.order'),
+                'locales' => collect(Locales::codes())
+                    ->map(fn (string $code): array => ['code' => $code, 'label' => Locales::label($code)])
+                    ->all(),
                 'imageHint' => $images->uploadHint('512 × 512px, latar lutsinar'),
                 'stats' => [
                     ['label' => 'Jumlah kategori', 'value' => $categories->count()],
@@ -38,10 +43,14 @@ class CategoryController extends Controller
                     ->map(fn (Category $category): array => [
                         'id' => $category->id,
                         'name' => $category->name,
+                        // Every language side by side, so an admin can fill in
+                        // the one that is missing without leaving the row.
+                        'names' => Translatable::all($category, 'name'),
                         'icon' => $category->icon,
                         'illustration' => $category->illustrationUrl(),
                         'has_upload' => filled($category->image),
                         'examples' => $category->examples,
+                        'examples_all' => Translatable::all($category, 'examples'),
                         'is_active' => $category->is_active,
                         'vendors_count' => $category->vendors_count,
                         'update_url' => route('admin.categories.update', $category),

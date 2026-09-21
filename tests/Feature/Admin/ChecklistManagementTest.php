@@ -33,7 +33,7 @@ it('adds a phase at the end and a task at the end of its phase', function () {
         ->post(route('admin.checklist.sections.store'), ['title' => 'Bulan Madu', 'icon' => '🌴', 'is_active' => 1])
         ->assertRedirect();
 
-    $added = ChecklistSection::where('title', 'Bulan Madu')->sole();
+    $added = ChecklistSection::whereTranslated('title', 'Bulan Madu')->sole();
     expect($added->sort_order)->toBe((int) ChecklistSection::where('id', '!=', $added->id)->max('sort_order') + 1);
 
     $this->actingAs($this->admin)
@@ -45,7 +45,7 @@ it('adds a phase at the end and a task at the end of its phase', function () {
         ])
         ->assertRedirect();
 
-    $item = ChecklistItem::where('title', 'Tempah kereta pengantin')->sole();
+    $item = ChecklistItem::whereTranslated('title', 'Tempah kereta pengantin')->sole();
     expect($item->sort_order)->toBe($lastPosition + 1)
         ->and($item->checklist_section_id)->toBe($section->id);
 });
@@ -60,7 +60,7 @@ it('keeps a task without a deadline when no month is given', function () {
         ])
         ->assertRedirect();
 
-    expect(ChecklistItem::where('title', 'Rancang takaful')->sole()->months_before)->toBeNull();
+    expect(ChecklistItem::whereTranslated('title', 'Rancang takaful')->sole()->months_before)->toBeNull();
 });
 
 it('edits a phase and a task', function () {
