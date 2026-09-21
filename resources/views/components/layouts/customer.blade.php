@@ -6,7 +6,7 @@
     $wedding = $user->weddings()->latest('event_date')->first();
     $outstandingTasks = $wedding?->tasks()->outstanding()->whereNotNull('due_date')->whereDate('due_date', '<=', today())->count();
     $item = fn (string $label, string $icon, string $route, string|array $pattern, ?int $badge = null): array => [
-        'label' => $label, 'icon' => $icon, 'href' => route($route), 'active' => request()->routeIs($pattern), 'badge' => $badge ?: null,
+        'label' => $label, 'icon' => $icon, 'href' => route($route), 'active' => App\Support\Locales::routeIs($pattern), 'badge' => $badge ?: null,
     ];
     $nav = [
         ['label' => null, 'items' => [

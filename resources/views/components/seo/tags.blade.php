@@ -4,6 +4,15 @@
 <meta name="description" content="{{ $seo->resolvedDescription() }}">
 <link rel="canonical" href="{{ $seo->resolvedCanonical() }}">
 
+{{-- Each language is its own page, and each says where the other one is.
+     Without this pair Google reads two near-identical sites and picks one. --}}
+@if ($seo->isIndexable() && ($alternates = App\Support\Locales::alternates()))
+    @foreach ($alternates as $code => $href)
+        <link rel="alternate" hreflang="{{ App\Support\Locales::hreflang($code) }}" href="{{ $href }}">
+    @endforeach
+    <link rel="alternate" hreflang="x-default" href="{{ $alternates[App\Support\Locales::DEFAULT] ?? reset($alternates) }}">
+@endif
+
 @unless ($seo->isIndexable())
     {{-- Private, token-gated or a search result. None of it is ours to publish. --}}
     <meta name="robots" content="noindex, nofollow">
@@ -20,7 +29,7 @@
     <meta property="og:image:width" content="{{ $seo->imageWidth() }}">
     <meta property="og:image:height" content="{{ $seo->imageHeight() }}">
 @endif
-<meta property="og:locale" content="{{ str_replace('-', '_', app()->getLocale()) }}_MY">
+<meta property="og:locale" content="{{ str_replace('-', '_', App\Support\Locales::hreflang(App\Support\Locales::current())) }}">
 @if ($seo->publishedTime())
     <meta property="article:published_time" content="{{ $seo->publishedTime() }}">
 @endif

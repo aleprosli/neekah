@@ -8,7 +8,7 @@
         $user->isVendor() => route('vendor.dashboard'),
         default => route('dashboard'),
     };
-    $onAccount = request()->routeIs('account.*');
+    $onAccount = App\Support\Locales::routeIs('account.*');
 @endphp
 
 {{-- The web-app shell every signed-in role works in: a sidebar that runs the

@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Enums\UserRole;
+use App\Support\Locales;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -29,7 +30,7 @@ class EnsurePhoneNumber
             && $user->role === UserRole::Customer
             && filled($user->google_id)
             && blank($user->phone)
-            && ! $request->routeIs(...self::ALLOWED);
+            && ! Locales::routeIs(...self::ALLOWED);
 
         return $mustAsk ? redirect()->route('phone.create') : $next($request);
     }

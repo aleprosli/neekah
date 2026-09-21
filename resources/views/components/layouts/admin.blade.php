@@ -5,7 +5,7 @@
     $openViolations = \App\Models\VendorViolation::where('status', \App\Enums\ViolationStatus::Open)->count();
     $reportedReviews = \App\Models\Review::whereNotNull('reported_at')->whereNull('hidden_at')->count();
     $item = fn (string $label, string $icon, string $route, string $pattern, ?int $badge = null): array => [
-        'label' => $label, 'icon' => $icon, 'href' => route($route), 'active' => request()->routeIs($pattern), 'badge' => $badge ?: null,
+        'label' => $label, 'icon' => $icon, 'href' => route($route), 'active' => App\Support\Locales::routeIs($pattern), 'badge' => $badge ?: null,
     ];
     $nav = [
         ['label' => null, 'items' => [
@@ -30,7 +30,7 @@
         ]],
         ['label' => 'Sistem', 'items' => [
             $item('Tetapan', 'settings', 'admin.settings.edit', 'admin.settings.*'),
-            ['label' => 'Log sistem', 'icon' => 'pulse', 'href' => route('log-viewer.index'), 'active' => request()->routeIs('log-viewer.*'), 'badge' => null],
+            ['label' => 'Log sistem', 'icon' => 'pulse', 'href' => route('log-viewer.index'), 'active' => App\Support\Locales::routeIs('log-viewer.*'), 'badge' => null],
         ]],
     ];
     $context = ['title' => 'Panel admin', 'detail' => now()->translatedFormat('l, j F Y')];

@@ -3,10 +3,12 @@
 namespace App\Providers;
 
 use App\Models\User;
+use App\Routing\LocalisedUrlGenerator;
 use App\Support\Seo;
 use Illuminate\Auth\Middleware\RedirectIfAuthenticated;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\Paginator;
+use Illuminate\Routing\UrlGenerator;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
@@ -21,6 +23,18 @@ class AppServiceProvider extends ServiceProvider
         // One description of the current page, shared by the layout and by
         // whichever controller knows what the page actually is.
         $this->app->scoped(Seo::class);
+
+        // route() has to answer with the page in the language being served.
+        $this->app->extend('url', function (UrlGenerator $url, $app): LocalisedUrlGenerator {
+            $localised = new LocalisedUrlGenerator($app['router']->getRoutes(), $app['request'], $app['config']->get('app.asset_url'));
+
+            $localised->setSessionResolver(fn () => $app['session'] ?? null);
+            $localised->setKeyResolver(fn () => $app->make('config')->get('app.key'));
+
+            $app->rebinding('request', fn ($app, $request) => $localised->setRequest($request));
+
+            return $localised;
+        });
     }
 
     /**

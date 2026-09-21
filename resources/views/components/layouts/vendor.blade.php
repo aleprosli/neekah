@@ -4,7 +4,7 @@
     $vendor = auth()->user()->vendor;
     $openEnquiries = $vendor?->enquiries()->where('status', \App\Enums\EnquiryStatus::Open)->count();
     $item = fn (string $label, string $icon, string $route, string $pattern, ?int $badge = null): array => [
-        'label' => $label, 'icon' => $icon, 'href' => route($route), 'active' => request()->routeIs($pattern), 'badge' => $badge ?: null,
+        'label' => $label, 'icon' => $icon, 'href' => route($route), 'active' => App\Support\Locales::routeIs($pattern), 'badge' => $badge ?: null,
     ];
     $nav = [
         ['label' => null, 'items' => [
