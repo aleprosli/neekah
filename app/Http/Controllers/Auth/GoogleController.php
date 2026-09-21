@@ -18,7 +18,7 @@ class GoogleController extends Controller
     public function redirect(): SymfonyRedirect|RedirectResponse
     {
         if (! config('services.google.client_id')) {
-            return redirect()->route('login')->withErrors(['email' => 'Log masuk Google belum dikonfigurasi.']);
+            return redirect()->route('login')->withErrors(['email' => __('flash.account.google_not_configured')]);
         }
 
         return Socialite::driver('google')->redirect();
@@ -32,11 +32,11 @@ class GoogleController extends Controller
         try {
             $googleUser = Socialite::driver('google')->user();
         } catch (Throwable) {
-            return redirect()->route('login')->withErrors(['email' => 'Log masuk Google dibatalkan atau gagal. Sila cuba lagi.']);
+            return redirect()->route('login')->withErrors(['email' => __('flash.account.google_failed')]);
         }
 
         if (! $googleUser->getEmail()) {
-            return redirect()->route('login')->withErrors(['email' => 'Akaun Google anda tidak berkongsi alamat emel.']);
+            return redirect()->route('login')->withErrors(['email' => __('flash.account.google_no_email')]);
         }
 
         $user = User::where('google_id', $googleUser->getId())
@@ -71,7 +71,7 @@ class GoogleController extends Controller
         if ($invitation = $accept->fromSession($user)) {
             return redirect()
                 ->route('dashboard')
-                ->with('status', 'Anda kini menguruskan "'.$invitation->wedding->title.'" bersama '.$invitation->inviter->name.'.');
+                ->with('status', __('flash.account.now_planning', ['wedding' => $invitation->wedding->title, 'inviter' => $invitation->inviter->name]));
         }
 
         return redirect()->intended($user->homeRoute());

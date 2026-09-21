@@ -47,6 +47,6 @@ class ReportVendorController extends Controller
 
         return redirect()
             ->route('vendors.show', $vendor)
-            ->with('status', 'Laporan anda telah dihantar. Admin akan menyiasat sebelum sebarang tindakan diambil.');
+            ->with('status', __('flash.couple.report_sent'));
     }
 }

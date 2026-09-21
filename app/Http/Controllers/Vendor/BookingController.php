@@ -135,7 +135,7 @@ class BookingController extends Controller
 
         return redirect()
             ->route('vendor.bookings.show', $booking)
-            ->with('status', 'Booking '.$booking->reference.' direkod. Pelanggan boleh merekodkan bayaran mereka dari akaun mereka.');
+            ->with('status', __('flash.vendor.booking_recorded', ['reference' => $booking->reference]));
     }
 
     public function show(Booking $booking): View

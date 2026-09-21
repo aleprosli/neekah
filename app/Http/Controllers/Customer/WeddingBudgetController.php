@@ -177,6 +177,6 @@ class WeddingBudgetController extends Controller
             );
         }
 
-        return back()->with('status', 'Bajet dikemas kini.');
+        return back()->with('status', __('flash.couple.budget_updated'));
     }
 }

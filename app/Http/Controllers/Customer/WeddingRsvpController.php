@@ -30,7 +30,7 @@ class WeddingRsvpController extends Controller
         if ($request->boolean('detach')) {
             $rsvp->update(['wedding_guest_id' => null, 'matched_by' => null]);
 
-            return back()->with('status', 'Padanan tetamu dibuang.');
+            return back()->with('status', __('flash.couple.rsvp_unmatched'));
         }
 
         if ($request->has('approve_message')) {
@@ -39,14 +39,14 @@ class WeddingRsvpController extends Controller
             $rsvp->update(['message_approved_at' => $approved ? now() : null]);
 
             return back()->with('status', $approved
-                ? 'Ucapan dipaparkan pada kad jemputan.'
-                : 'Ucapan disembunyikan dari kad jemputan.');
+                ? __('flash.couple.wish_shown')
+                : __('flash.couple.wish_hidden'));
         }
 
         $rsvp->update(['counted' => (bool) ($validated['counted'] ?? false)]);
 
         return back()->with('status', $rsvp->counted
-            ? 'Jawapan dikira semula dalam jumlah kehadiran.'
-            : 'Jawapan dikeluarkan dari jumlah kehadiran.');
+            ? __('flash.couple.rsvp_counted')
+            : __('flash.couple.rsvp_uncounted'));
     }
 }

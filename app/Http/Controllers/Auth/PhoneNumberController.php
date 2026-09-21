@@ -74,6 +74,6 @@ class PhoneNumberController extends Controller
             ]);
         }
 
-        return redirect()->intended($user->homeRoute())->with('status', 'Terima kasih! Nombor telefon anda disimpan.');
+        return redirect()->intended($user->homeRoute())->with('status', __('flash.account.phone_saved'));
     }
 }

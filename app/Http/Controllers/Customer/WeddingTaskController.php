@@ -117,7 +117,7 @@ class WeddingTaskController extends Controller
             'sort_order' => (int) $wedding->tasks()->max('sort_order') + 1,
         ]);
 
-        return back()->with('status', 'Tugasan ditambah.');
+        return back()->with('status', __('flash.couple.task_added'));
     }
 
     /**
@@ -144,7 +144,7 @@ class WeddingTaskController extends Controller
         });
 
         return back()->with('status', match (true) {
-            $changed === 0 => 'Tiada perubahan untuk disimpan.',
+            $changed === 0 => __('flash.couple.no_changes'),
             $changed === 1 => '1 tugasan dikemas kini.',
             default => $changed.' tugasan dikemas kini.',
         });
@@ -157,6 +157,6 @@ class WeddingTaskController extends Controller
 
         $task->delete();
 
-        return back()->with('status', 'Tugasan dipadam.');
+        return back()->with('status', __('flash.couple.task_deleted'));
     }
 }

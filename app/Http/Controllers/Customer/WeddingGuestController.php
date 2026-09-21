@@ -81,7 +81,7 @@ class WeddingGuestController extends Controller
     {
         $wedding->guests()->create($request->validated());
 
-        return back()->with('status', 'Tetamu ditambah ke senarai.');
+        return back()->with('status', __('flash.couple.guest_added'));
     }
 
     public function update(StoreWeddingGuestRequest $request, Wedding $wedding, WeddingGuest $guest): RedirectResponse
@@ -90,7 +90,7 @@ class WeddingGuestController extends Controller
 
         $guest->update($request->validated());
 
-        return back()->with('status', 'Maklumat tetamu dikemas kini.');
+        return back()->with('status', __('flash.couple.guest_updated'));
     }
 
     public function destroy(Wedding $wedding, WeddingGuest $guest): RedirectResponse
@@ -100,7 +100,7 @@ class WeddingGuestController extends Controller
 
         $guest->delete();
 
-        return back()->with('status', 'Tetamu dipadam dari senarai.');
+        return back()->with('status', __('flash.couple.guest_deleted'));
     }
 
     /**

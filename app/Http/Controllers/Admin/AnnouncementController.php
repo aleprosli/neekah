@@ -115,7 +115,7 @@ class AnnouncementController extends Controller
 
         return redirect()
             ->route('admin.announcements.index')
-            ->with('status', 'Pengumuman dihantar kepada '.$this->audienceSummary($announcement).'. Emel dihantar melalui queue.');
+            ->with('status', __('flash.admin.announcement_sent', ['audience' => $this->audienceSummary($announcement)]));
     }
 
     public function show(Announcement $announcement): View
@@ -166,7 +166,7 @@ class AnnouncementController extends Controller
         // only carry a model it can load back from the database.
         $request->user()->notifyNow(new AnnouncementPublished($draft, mailOnly: true));
 
-        return back()->with('status', 'Ujian dihantar ke '.$request->user()->email.'.');
+        return back()->with('status', __('flash.admin.test_sent', ['email' => $request->user()->email]));
     }
 
     private function audienceSummary(Announcement $announcement): string

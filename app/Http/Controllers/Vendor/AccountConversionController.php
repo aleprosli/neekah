@@ -48,7 +48,7 @@ class AccountConversionController extends Controller
 
         return redirect()
             ->route('vendor.dashboard')
-            ->with('status', 'Akaun anda kini akaun vendor. Lengkapkan profil anda sementara admin menyemak permohonan.');
+            ->with('status', __('flash.vendor.converted'));
     }
 
     private function refuse(Request $request): RedirectResponse
@@ -56,7 +56,7 @@ class AccountConversionController extends Controller
         $user = $request->user();
 
         return redirect($user->homeRoute())->with('status', $user->isCustomer()
-            ? 'Akaun ini sudah ada majlis, tempahan atau enquiry, jadi tidak boleh ditukar sendiri. Sila hubungi admin Neekah.'
-            : 'Akaun ini bukan akaun pengantin.');
+            ? __('flash.vendor.convert_has_activity')
+            : __('flash.vendor.convert_not_customer'));
     }
 }

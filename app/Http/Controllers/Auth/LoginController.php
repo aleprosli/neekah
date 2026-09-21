@@ -69,7 +69,7 @@ class LoginController extends Controller
         if ($invitation = $accept->fromSession($request->user())) {
             return redirect()
                 ->route('dashboard')
-                ->with('status', 'Anda kini menguruskan "'.$invitation->wedding->title.'" bersama '.$invitation->inviter->name.'.');
+                ->with('status', __('flash.account.now_planning', ['wedding' => $invitation->wedding->title, 'inviter' => $invitation->inviter->name]));
         }
 
         return redirect()->intended($request->user()->homeRoute());

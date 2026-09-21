@@ -96,12 +96,12 @@ class CategoryController extends Controller
     public function destroy(Category $category, StoreOptimizedImage $storeImage): RedirectResponse
     {
         if ($category->vendors()->exists()) {
-            return back()->withErrors(['category' => 'Kategori ini masih digunakan oleh vendor. Nyahaktifkan sahaja.']);
+            return back()->withErrors(['category' => __('flash.admin.category_in_use')]);
         }
 
         $storeImage->delete($category->image);
         $category->delete();
 
-        return back()->with('status', 'Kategori dipadam.');
+        return back()->with('status', __('flash.admin.category_deleted'));
     }
 }

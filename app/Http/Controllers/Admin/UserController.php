@@ -386,6 +386,6 @@ class UserController extends Controller
 
         return redirect()
             ->route('admin.users.index')
-            ->with('status', 'Akaun '.$user->name.' ('.$user->email.') telah dipadam.');
+            ->with('status', __('flash.admin.user_deleted', ['name' => $user->name, 'email' => $user->email]));
     }
 }

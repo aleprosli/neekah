@@ -46,6 +46,6 @@ class RegisterController extends Controller
 
         return redirect()
             ->route('vendor.dashboard')
-            ->with('status', 'Pendaftaran diterima. Lengkapkan profil anda sementara admin menyemak permohonan.');
+            ->with('status', __('flash.vendor.registered'));
     }
 }

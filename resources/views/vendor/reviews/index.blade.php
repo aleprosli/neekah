@@ -123,10 +123,10 @@
                             'method' => 'DELETE',
                             'csrf' => csrf_token(),
                             'tone' => 'danger',
-                            'title' => 'Padam review oleh '.$review->author_name.'?',
-                            'message' => 'Review ini dan gambarnya dipadam kekal. Tindakan ini tidak boleh diundur.',
-                            'confirmLabel' => 'Ya, padam',
-                            'label' => 'Padam review yang anda tambah ini',
+                            'title' => __('flash.confirm.delete_review_title', ['author' => $review->author_name]),
+                            'message' => __('flash.confirm.delete_review_message'),
+                            'confirmLabel' => __('flash.confirm.yes_delete'),
+                            'label' => __('flash.confirm.delete_review_label'),
                             'triggerClass' => 'rounded-full border border-line px-3 py-1.5 text-xs font-medium transition hover:border-brand-400',
                         ])"></div>
                     @endcan

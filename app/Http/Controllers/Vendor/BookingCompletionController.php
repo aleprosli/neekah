@@ -19,7 +19,7 @@ class BookingCompletionController extends Controller
         abort_unless($booking->vendor_id === $request->user()->vendor?->id, 403);
 
         if ($booking->event_date->isFuture()) {
-            return back()->withErrors(['booking' => 'Booking hanya boleh ditandakan selesai selepas tarikh majlis.']);
+            return back()->withErrors(['booking' => __('flash.vendor.completion_too_early')]);
         }
 
         try {
@@ -28,6 +28,6 @@ class BookingCompletionController extends Controller
             return back()->withErrors(['booking' => $exception->getMessage()]);
         }
 
-        return back()->with('status', 'Booking '.$booking->reference.' ditandakan selesai. Pelanggan kini boleh memberi review.');
+        return back()->with('status', __('flash.vendor.booking_completed', ['reference' => $booking->reference]));
     }
 }

@@ -72,7 +72,7 @@ class ReviewController extends Controller
         $author = $review->author_name;
         $moderate->delete($review);
 
-        return back()->with('status', 'Review oleh '.$author.' dipadam.');
+        return back()->with('status', __('flash.vendor.review_deleted', ['author' => $author]));
     }
 
     public function reply(Request $request, Review $review): RedirectResponse
@@ -88,7 +88,7 @@ class ReviewController extends Controller
             'replied_at' => now(),
         ])->save();
 
-        return back()->with('status', 'Jawapan anda dipaparkan di bawah review itu.');
+        return back()->with('status', __('flash.vendor.reply_published'));
     }
 
     public function report(Request $request, Review $review): RedirectResponse
@@ -104,6 +104,6 @@ class ReviewController extends Controller
             'reported_reason' => $validated['reason'],
         ])->save();
 
-        return back()->with('status', 'Laporan anda dihantar. Review ini kekal dipaparkan sehingga admin memeriksanya.');
+        return back()->with('status', __('flash.vendor.review_reported'));
     }
 }

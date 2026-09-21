@@ -65,7 +65,7 @@ class EnquiryController extends Controller
 
         return redirect()
             ->route('enquiries.show', $enquiry)
-            ->with('status', 'Enquiry dihantar kepada '.$vendor->name.'. Anda akan lihat balasan di sini.');
+            ->with('status', __('flash.couple.enquiry_sent', ['vendor' => $vendor->name]));
     }
 
     public function show(Enquiry $enquiry): View

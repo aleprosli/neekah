@@ -25,6 +25,6 @@ class EnsureAccountIsActive
 
         return redirect()
             ->route('login')
-            ->with('status', 'Akaun anda telah dinyahaktifkan. Sila hubungi admin Neekah.');
+            ->with('status', __('flash.account.deactivated'));
     }
 }

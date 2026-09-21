@@ -58,6 +58,6 @@ class NewPasswordController extends Controller
             ]);
         }
 
-        return redirect()->route('login')->with('status', 'Kata laluan anda telah dikemas kini. Sila log masuk.');
+        return redirect()->route('login')->with('status', __('flash.account.password_reset'));
     }
 }

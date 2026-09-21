@@ -32,7 +32,7 @@ class ImpersonationController extends Controller
         $admin->impersonate($user);
 
         return redirect($user->homeRoute())
-            ->with('status', 'Anda kini melihat Neekah sebagai '.$user->name.'.');
+            ->with('status', __('flash.admin.impersonating', ['name' => $user->name]));
     }
 
     public function destroy(Request $request): RedirectResponse
@@ -51,6 +51,6 @@ class ImpersonationController extends Controller
 
         $user->leaveImpersonation();
 
-        return redirect()->route('admin.users.index')->with('status', 'Anda kembali sebagai admin.');
+        return redirect()->route('admin.users.index')->with('status', __('flash.admin.impersonation_stopped'));
     }
 }

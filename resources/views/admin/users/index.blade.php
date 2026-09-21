@@ -16,9 +16,9 @@
                 'urlKey' => 'impersonate_url',
                 'labelKey' => 'name',
                 'label' => 'Impersonate',
-                'title' => 'Log masuk sebagai __ROW__?',
-                'message' => 'Anda akan melihat Neekah persis seperti pengguna ini. Pembayaran dimatikan, dan tindakan ini direkod dalam log sistem.',
-                'confirmLabel' => 'Ya, impersonate',
+                'title' => __('flash.confirm.impersonate_title'),
+                'message' => __('flash.confirm.impersonate_message'),
+                'confirmLabel' => __('flash.confirm.yes_impersonate'),
             ],
         ])"
     ></div>

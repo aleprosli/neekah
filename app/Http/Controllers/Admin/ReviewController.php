@@ -156,7 +156,7 @@ class ReviewController extends Controller
             'confirm' => [
                 'title' => __('props.admin.paparkan_semula_review_oleh').$review->authorName().'?',
                 'message' => __('props.admin.review_ini_akan_kembali_ke').$review->vendor->name.'.'.($review->isVerified() ? ' Rating dan mata vendor dikira semula.' : ''),
-                'confirmLabel' => 'Ya, paparkan',
+                'confirmLabel' => __('flash.confirm.yes_show'),
             ],
         ];
     }
@@ -174,7 +174,7 @@ class ReviewController extends Controller
             'confirm' => [
                 'title' => __('props.admin.sembunyikan_review_oleh').$review->authorName().'?',
                 'message' => __('props.admin.ia_hilang_dari_profil').$review->vendor->name.' serta-merta. Rekodnya kekal dan anda boleh paparkannya semula.'.($review->isVerified() ? ' Rating dan mata vendor dikira semula.' : ''),
-                'confirmLabel' => 'Ya, sembunyikan',
+                'confirmLabel' => __('flash.confirm.yes_hide'),
                 'tone' => 'danger',
             ],
         ];
@@ -193,7 +193,7 @@ class ReviewController extends Controller
             'confirm' => [
                 'title' => __('props.admin.padam_review_oleh').$review->authorName().' untuk selamanya?',
                 'message' => __('props.admin.ulasan_dan_setiap_gambarnya_dipadam'),
-                'confirmLabel' => 'Ya, padam kekal',
+                'confirmLabel' => __('flash.confirm.yes_delete_forever'),
                 'tone' => 'danger',
             ],
         ];
@@ -219,7 +219,7 @@ class ReviewController extends Controller
 
         return redirect()
             ->route('admin.reviews.index')
-            ->with('status', 'Review oleh '.$review->author_name.' ditambah pada profil '.$vendor->name.'.');
+            ->with('status', __('flash.admin.review_added', ['author' => $review->author_name, 'vendor' => $vendor->name]));
     }
 
     public function hide(Request $request, Review $review, ModerateReview $moderate): RedirectResponse
@@ -228,7 +228,7 @@ class ReviewController extends Controller
 
         $moderate->hide($review, $request->user(), $request->string('reason')->limit(200)->toString() ?: 'Disembunyikan oleh admin');
 
-        return back()->with('status', 'Review oleh '.$review->authorName().' disembunyikan.');
+        return back()->with('status', __('flash.admin.review_hidden', ['author' => $review->authorName()]));
     }
 
     public function restore(Review $review, ModerateReview $moderate): RedirectResponse
@@ -237,7 +237,7 @@ class ReviewController extends Controller
 
         $moderate->restore($review);
 
-        return back()->with('status', 'Review oleh '.$review->authorName().' dipaparkan semula.');
+        return back()->with('status', __('flash.admin.review_shown', ['author' => $review->authorName()]));
     }
 
     public function destroy(Review $review, ModerateReview $moderate): RedirectResponse
@@ -247,6 +247,6 @@ class ReviewController extends Controller
         $author = $review->authorName();
         $moderate->delete($review);
 
-        return back()->with('status', 'Review oleh '.$author.' dipadam kekal.');
+        return back()->with('status', __('flash.admin.review_deleted', ['author' => $author]));
     }
 }

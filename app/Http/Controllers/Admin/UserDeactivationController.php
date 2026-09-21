@@ -24,7 +24,7 @@ class UserDeactivationController extends Controller
             $user->vendor?->update(['status' => VendorStatus::Suspended]);
         });
 
-        return back()->with('status', 'Akaun '.$user->name.' dinyahaktifkan.');
+        return back()->with('status', __('flash.admin.user_deactivated', ['name' => $user->name]));
     }
 
     /**
@@ -38,7 +38,7 @@ class UserDeactivationController extends Controller
         $user->update(['deactivated_at' => null]);
 
         return back()->with('status', $user->vendor
-            ? 'Akaun '.$user->name.' diaktifkan semula. Profil vendornya masih digantung; luluskan semula di halaman vendor.'
-            : 'Akaun '.$user->name.' diaktifkan semula.');
+            ? __('flash.admin.user_reactivated_vendor_suspended', ['name' => $user->name])
+            : __('flash.admin.user_reactivated', ['name' => $user->name]));
     }
 }

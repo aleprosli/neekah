@@ -84,6 +84,6 @@ class PortfolioItemController extends Controller
         $storeImage->delete($item->path);
         $item->delete();
 
-        return redirect()->route('vendor.portfolio.index')->with('status', 'Gambar dipadam.');
+        return redirect()->route('vendor.portfolio.index')->with('status', __('flash.vendor.photo_deleted'));
     }
 }

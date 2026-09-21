@@ -152,8 +152,8 @@ class WeddingSiteController extends Controller
         return redirect()
             ->route('site.edit')
             ->with('status', $site->is_published
-                ? 'Kad jemputan dikemas kini dan sudah tersiar di '.$site->url()
-                : 'Kad jemputan disimpan. Tekan "Siarkan" apabila anda sudah bersedia.');
+                ? __('flash.couple.site_updated_published', ['url' => $site->url()])
+                : __('flash.couple.site_saved_draft'));
     }
 
     /**
@@ -169,8 +169,8 @@ class WeddingSiteController extends Controller
         $site->update(['is_published' => $request->boolean('published')]);
 
         return back()->with('status', $site->is_published
-            ? 'Kad jemputan anda kini tersiar di '.$site->url()
-            : 'Kad jemputan ditarik daripada paparan awam.');
+            ? __('flash.couple.site_published', ['url' => $site->url()])
+            : __('flash.couple.site_unpublished'));
     }
 
     /**

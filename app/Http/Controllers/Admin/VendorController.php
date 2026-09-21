@@ -56,7 +56,7 @@ class VendorController extends Controller
                     'confirm' => [
                         'title' => __('props.admin.luluskan_count_vendor'),
                         'message' => __('props.admin.setiap_profil_akan_dipaparkan_di'),
-                        'confirmLabel' => 'Ya, luluskan __COUNT__',
+                        'confirmLabel' => __('flash.confirm.yes_approve_count'),
                     ],
                 ],
                 [
@@ -68,7 +68,7 @@ class VendorController extends Controller
                     'confirm' => [
                         'title' => __('props.admin.tolak_count_permohonan'),
                         'message' => __('props.admin.setiap_vendor_menerima_emel_penolakan'),
-                        'confirmLabel' => 'Ya, tolak __COUNT__',
+                        'confirmLabel' => __('flash.confirm.yes_reject_count'),
                         'tone' => 'danger',
                     ],
                 ],
@@ -81,7 +81,7 @@ class VendorController extends Controller
                     'confirm' => [
                         'title' => __('props.admin.gantung_count_vendor'),
                         'message' => __('props.admin.profil_mereka_akan_hilang_dari'),
-                        'confirmLabel' => 'Ya, gantung __COUNT__',
+                        'confirmLabel' => __('flash.confirm.yes_suspend_count'),
                         'tone' => 'danger',
                     ],
                 ],
@@ -237,7 +237,7 @@ class VendorController extends Controller
                         'confirm' => [
                             'title' => __('props.admin.gantung_3').$vendor->name.'?',
                             'message' => __('props.admin.profil_ini_akan_hilang_dari'),
-                            'confirmLabel' => 'Ya, gantung',
+                            'confirmLabel' => __('flash.confirm.yes_suspend'),
                             'tone' => 'danger',
                         ],
                     ]
@@ -249,7 +249,7 @@ class VendorController extends Controller
                         'confirm' => [
                             'title' => __('props.admin.luluskan_2').$vendor->name.'?',
                             'message' => __('props.admin.profil_ini_akan_dipaparkan_di'),
-                            'confirmLabel' => 'Ya, luluskan',
+                            'confirmLabel' => __('flash.confirm.yes_approve'),
                         ],
                     ],
             ])->all(),

@@ -80,14 +80,14 @@ class ChecklistSectionController extends Controller
             'sort_order' => (int) ChecklistSection::max('sort_order') + 1,
         ]);
 
-        return back()->with('status', 'Fasa ditambah.');
+        return back()->with('status', __('flash.admin.section_added'));
     }
 
     public function update(StoreChecklistSectionRequest $request, ChecklistSection $section): RedirectResponse
     {
         $section->update($request->attributesForSection());
 
-        return back()->with('status', 'Fasa dikemas kini.');
+        return back()->with('status', __('flash.admin.section_updated'));
     }
 
     /**
@@ -99,6 +99,6 @@ class ChecklistSectionController extends Controller
     {
         $section->delete();
 
-        return back()->with('status', 'Fasa dipadam. Checklist pengantin sedia ada tidak berubah.');
+        return back()->with('status', __('flash.admin.section_deleted'));
     }
 }

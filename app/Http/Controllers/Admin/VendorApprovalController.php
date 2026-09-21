@@ -53,7 +53,7 @@ class VendorApprovalController extends Controller
         $vendors->each(fn (Vendor $vendor) => $changeStatus->handle($vendor, $status));
 
         return back()->with('status', $vendors->isEmpty()
-            ? 'Tiada perubahan: vendor yang dipilih sudah '.$status->label().'.'
+            ? __('flash.admin.vendors_unchanged', ['status' => $status->label()])
             : $vendors->count().' vendor kini '.$status->label().'.');
     }
 }

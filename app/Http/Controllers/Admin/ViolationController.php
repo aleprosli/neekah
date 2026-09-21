@@ -146,7 +146,7 @@ class ViolationController extends Controller
     public function update(ResolveViolationRequest $request, VendorViolation $violation, ApplyViolationAction $applyAction): RedirectResponse
     {
         if (! $violation->isOpen()) {
-            return back()->withErrors(['decision' => 'Laporan ini telah diselesaikan.']);
+            return back()->withErrors(['decision' => __('flash.admin.violation_resolved')]);
         }
 
         $note = $request->string('admin_note')->toString() ?: null;
@@ -154,11 +154,11 @@ class ViolationController extends Controller
         if ($request->string('decision')->toString() === 'uphold') {
             $applyAction->uphold($violation, $request->user(), $note);
 
-            return back()->with('status', 'Laporan disahkan. Tindakan '.$violation->fresh()->action->label().' telah dikenakan.');
+            return back()->with('status', __('flash.admin.violation_upheld', ['action' => $violation->fresh()->action->label()]));
         }
 
         $applyAction->dismiss($violation, $request->user(), $note);
 
-        return back()->with('status', 'Laporan ditolak. Tiada tindakan dikenakan ke atas vendor.');
+        return back()->with('status', __('flash.admin.violation_rejected'));
     }
 }

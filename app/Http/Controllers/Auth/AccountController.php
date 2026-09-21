@@ -41,7 +41,7 @@ class AccountController extends Controller
     {
         $request->user()->update($request->safe()->only(['name', 'phone', 'email']));
 
-        return redirect()->route('account.edit')->with('status', 'Maklumat akaun dikemas kini.');
+        return redirect()->route('account.edit')->with('status', __('flash.account.updated'));
     }
 
     /**
@@ -55,6 +55,6 @@ class AccountController extends Controller
         Auth::logoutOtherDevices($request->string('password')->toString());
         $request->session()->regenerate();
 
-        return redirect()->route('account.edit')->with('status', 'Kata laluan dikemas kini.');
+        return redirect()->route('account.edit')->with('status', __('flash.account.password_updated'));
     }
 }

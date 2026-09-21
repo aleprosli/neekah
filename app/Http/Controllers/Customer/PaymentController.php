@@ -27,7 +27,7 @@ class PaymentController extends Controller
         // An admin looking through a couple's eyes must not leave a payment
         // record behind in their name.
         if ($request->user()->isImpersonated()) {
-            return back()->withErrors(['payment' => 'Rekod bayaran dimatikan semasa mod impersonate.']);
+            return back()->withErrors(['payment' => __('flash.impersonation.payments_off')]);
         }
 
         $payment = $recordPayment->handle($booking, $request->user(), [
@@ -62,6 +62,6 @@ class PaymentController extends Controller
 
         $payment->delete();
 
-        return redirect()->route('bookings.show', $booking)->with('status', 'Rekod bayaran dibuang.');
+        return redirect()->route('bookings.show', $booking)->with('status', __('flash.couple.payment_removed'));
     }
 }

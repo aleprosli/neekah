@@ -74,7 +74,7 @@ class BookingController extends Controller
 
         return redirect()
             ->route('bookings.show', $booking)
-            ->with('status', 'Booking '.$booking->reference.' dibuat. Berbincang dengan vendor, kemudian rekodkan bayaran anda di sini.');
+            ->with('status', __('flash.couple.booking_created', ['reference' => $booking->reference]));
     }
 
     public function show(Request $request, Booking $booking, PaymentSettings $paymentSettings, ImageSettings $images): View|RedirectResponse

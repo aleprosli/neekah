@@ -26,7 +26,7 @@ class WeddingController extends Controller
         $wedding->addMember($request->user(), WeddingRole::Owner);
         $seedChecklist->handle($wedding);
 
-        return redirect()->route('dashboard')->with('status', 'Wedding project dicipta, lengkap dengan checklist dan cadangan bajet. Langkah seterusnya: cipta kad kahwin digital anda.');
+        return redirect()->route('dashboard')->with('status', __('flash.couple.wedding_created'));
     }
 
     public function edit(Wedding $wedding): View
@@ -40,7 +40,7 @@ class WeddingController extends Controller
     {
         $wedding->update($request->validated());
 
-        return redirect()->route('dashboard')->with('status', 'Maklumat majlis dikemas kini.');
+        return redirect()->route('dashboard')->with('status', __('flash.couple.wedding_updated'));
     }
 
     /**

@@ -16,6 +16,6 @@ class ReviewController extends Controller
 
         return redirect()
             ->route('bookings.show', $booking)
-            ->with('status', 'Terima kasih! Review anda kini dipaparkan pada profil '.$booking->vendor->name.'.');
+            ->with('status', __('flash.couple.review_published', ['vendor' => $booking->vendor->name]));
     }
 }

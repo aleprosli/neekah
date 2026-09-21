@@ -27,7 +27,7 @@ class WeddingSitePhotoController extends Controller
             ]);
         }
 
-        return back()->with('status', count($request->file('images')).' gambar ditambah ke galeri.');
+        return back()->with('status', __('flash.couple.photos_added', ['count' => count($request->file('images'))]));
     }
 
     public function destroy(Wedding $wedding, WeddingSitePhoto $photo, StoreOptimizedImage $storeImage): RedirectResponse
@@ -38,6 +38,6 @@ class WeddingSitePhotoController extends Controller
         $storeImage->delete($photo->path);
         $photo->delete();
 
-        return back()->with('status', 'Gambar dipadam dari galeri.');
+        return back()->with('status', __('flash.couple.photos_deleted'));
     }
 }

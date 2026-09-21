@@ -415,3 +415,31 @@ it('walks a brand new English vendor through their onboarding in English', funct
         ->toContain('The first sentence couples read about you')
         ->not->toContain('Ayat pertama yang pengantin baca');
 });
+
+it('writes the flash messages after an action in the reader language', function () {
+    // Flash messages only exist after a POST, so no page sweep could ever see
+    // them: they were the last whole category still hardcoded in Malay.
+    $couple = User::factory()->create(['locale' => 'en']);
+    $wedding = Wedding::factory()->for($couple)->create();
+
+    $this->actingAs($couple)
+        ->post(route('en.weddings.timeline.store', $wedding), [
+            'title' => 'Akad nikah',
+            'starts_at' => '09:00',
+        ])
+        ->assertSessionHasNoErrors()
+        ->assertSessionHas('status', 'The activity has been added to the timeline.');
+
+    app()->setLocale('ms');
+    expect(__('flash.couple.timeline_added'))->toBe('Aktiviti ditambah ke timeline.');
+});
+
+it('names the person in a flash message in both languages', function () {
+    $admin = User::factory()->admin()->create(['locale' => 'en']);
+    $target = User::factory()->create(['name' => 'Nur Photography']);
+
+    // The name is a parameter now, not a concatenation, so the sentence can be
+    // reordered in a language that needs it.
+    $this->actingAs($admin)->post(route('en.admin.users.impersonate', $target))
+        ->assertSessionHas('status', 'You are now viewing Neekah as Nur Photography.');
+});

@@ -23,7 +23,7 @@ class VendorReviewController extends Controller
         // A vendor talking up their own profile is the one case worth refusing
         // outright, because it is the only one we can detect for certain.
         if ($request->user()?->id === $vendor->user_id) {
-            return back()->withErrors(['comment' => 'Anda tidak boleh menulis review untuk profil anda sendiri.'], 'review')->withInput();
+            return back()->withErrors(['comment' => __('flash.couple.own_profile_review')], 'review')->withInput();
         }
 
         $submitReview->handle(
