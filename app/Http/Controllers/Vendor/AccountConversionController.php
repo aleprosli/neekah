@@ -8,6 +8,7 @@ use App\Http\Requests\ConvertToVendorRequest;
 use App\Models\Category;
 use App\Models\Vendor;
 use App\Support\Seo;
+use App\Support\States;
 use App\Support\VueProps;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
@@ -34,7 +35,7 @@ class AccountConversionController extends Controller
                 'action' => route('vendor.convert'),
                 'loginUrl' => route('login'),
                 'categories' => Category::active()->ordered()->get(['id', 'name', 'icon']),
-                'states' => Vendor::STATES,
+                'states' => States::options(),
                 'old' => ['phone' => $user->phone, ...old()],
                 'account' => ['name' => $user->name, 'email' => $user->email],
             ]),

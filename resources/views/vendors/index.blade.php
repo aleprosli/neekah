@@ -1,6 +1,6 @@
 <x-layouts.app :title="$activeCategory?->name ?? 'Cari Vendor'">
     <x-site.header />
-    <x-vendor-search filter-dialog="filters" :categories="$categories" :states="$states" />
+    <x-vendor-search filter-dialog="filters" :categories="$categories" :states="$states" :state-options="$stateOptions" />
 
     <main class="mx-auto max-w-[1760px] px-4 pb-24 sm:px-6 md:pb-10 lg:px-10">
         {{-- Category tiles --}}
@@ -56,12 +56,23 @@
                 <x-filter-popover label="Negeri" :active="$filters['state']">
                     <form method="GET" action="{{ route('vendors.index') }}" class="flex flex-col gap-3">
                         <x-filter-hidden :filters="$filters" except="state" />
-                        <select name="state" class="nk-select pr-9 {{ $fieldClasses }}" onchange="this.form.requestSubmit()">
-                            <option value="">Mana-mana negeri</option>
-                            @foreach ($states as $state)
-                                <option value="{{ $state }}" @selected($filters['state'] === $state)>{{ $state }}</option>
-                            @endforeach
-                        </select>
+                        <div
+                            data-vue="ui-flag-select"
+                            data-props="@vueProps([
+                                'name' => 'state',
+                                'options' => $stateOptions,
+                                'modelValue' => $filters['state'] ?? '',
+                                'placeholder' => 'Mana-mana negeri',
+                                'submitOnChange' => true,
+                            ])"
+                        >
+                            <select name="state" class="nk-select pr-9 {{ $fieldClasses }}" onchange="this.form.requestSubmit()">
+                                <option value="">Mana-mana negeri</option>
+                                @foreach ($states as $state)
+                                    <option value="{{ $state }}" @selected($filters['state'] === $state)>{{ $state }}</option>
+                                @endforeach
+                            </select>
+                        </div>
                     </form>
                 </x-filter-popover>
 
@@ -219,7 +230,17 @@
                     <input id="q" type="search" name="q" value="{{ $filters['q'] }}" placeholder="Nama vendor, pakej, bandar…" class="rounded-xl border border-line bg-surface px-4 py-3 text-sm focus:border-brand-400 focus:outline-none">
                 </div>
 
-                <div class="flex flex-col gap-2">
+                <div
+                    class="flex flex-col gap-2"
+                    data-vue="ui-flag-select"
+                    data-props="@vueProps([
+                        'name' => 'state',
+                        'label' => 'Negeri',
+                        'options' => $stateOptions,
+                        'modelValue' => $filters['state'] ?? '',
+                        'placeholder' => 'Mana-mana negeri',
+                    ])"
+                >
                     <label for="state" class="font-semibold">Negeri</label>
                     <select id="state" name="state" class="nk-select rounded-xl border border-line bg-surface px-4 py-3 pr-10 text-sm focus:border-brand-400 focus:outline-none">
                         <option value="">Mana-mana negeri</option>

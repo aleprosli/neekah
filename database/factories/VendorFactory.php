@@ -8,6 +8,7 @@ use App\Enums\VendorTier;
 use App\Models\Category;
 use App\Models\User;
 use App\Models\Vendor;
+use App\Support\States;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
@@ -31,7 +32,7 @@ class VendorFactory extends Factory
             'tagline' => fake()->sentence(6),
             'description' => fake()->paragraph(),
             'city' => fake()->city(),
-            'state' => fake()->randomElement(Vendor::STATES),
+            'state' => fake()->randomElement(States::names()),
             'phone' => fake()->numerify('01#-### ####'),
             'whatsapp' => fake()->numerify('601########'),
             'price_from' => fake()->numberBetween(5, 100) * 100,
@@ -46,6 +47,17 @@ class VendorFactory extends Factory
             'score' => 0,
             'approved_at' => now(),
         ];
+    }
+
+    /**
+     * A vendor who travels: the home state is kept by the model, these are the
+     * extra negeri they cover.
+     *
+     * @param  array<int, string>  $states
+     */
+    public function covering(array $states): static
+    {
+        return $this->state(fn () => ['service_states' => $states]);
     }
 
     public function pending(): static

@@ -29,3 +29,10 @@ A vendor CANNOT hide or delete a review; ReviewPolicy gives them reply() and rep
 Admins may also enter a review on someone's behalf (migrating one from Google etc.): stored as open, stamped with added_by, and created_at may be backdated.
 
 The five aspect scores (quality, service, …) are nullable now: the open form asks for a star and a sentence. Photos go through StoreOptimizedImage, which re-encodes and strips EXIF — that matters more here than anywhere, because the uploader may be a stranger.
+
+## A vendor has many categories and covers many negeri; the primary is always inside both
+vendors.category_id and vendors.state stay the one category and the one address shown on the card, the profile heading, the breadcrumb and the SEO. The full lists are the `category_vendor` pivot (Vendor::categories()) and vendors.service_states (JSON, Vendor::serviceStates()).
+
+Vendor::booted() keeps the primary category in the pivot and the home state in service_states on every model save, so search reads one place and trusts it: scope inCategory() and servingState(), never where('category_id') or where('state'), and never whereBelongsTo(category). A query-builder update bypasses the hook — save the model.
+
+A vendor may untick an extra category but never the primary: Vendor\ProfileController pushes category_id back into the sync, and UpdateVendorProfileRequest::prepareForValidation folds category_id and state into the posted lists so MAX_CATEGORIES counts what is really saved. Covered by Vendor/VendorServiceAreaTest and VendorMarketplaceTest.

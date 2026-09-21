@@ -1,6 +1,7 @@
 ---
 paths:
   - resources/js/components/ui/DataTable.vue
+  - resources/js/components/ui/UiFlagSelect.vue
 ---
 
 # Ui
@@ -19,3 +20,12 @@ Every flex or grid child in that chain needs min-w-0; break-words alone does not
 DataTable adds page/per_page/search/sort to dataUrl itself. Passing a url that already had a query (route('admin.vendors.data', ['status' => ...])) produced "...?status=pending?page=2", so the server read status="pending?page=2": the filter silently did nothing and paging stuck on page one. Every admin/vendor list had it.
 
 Status chips are now the `filters` prop — [{key, label?, value, allLabel?, hint?, options: [{value, label, count?, description?}]}], built with App\Support\TableFilter::fromEnum() — and the table swaps rows in place, writing the choice back to the address bar with replaceState. Groups are mutually exclusive (users: segment clears role, as the endpoint already did). A data() response may also return `columns`, which wins over the prop; that is how the segment views change columns without a page load. ResponsiveTablesTest fails on any dataUrl built with route parameters.
+
+## Negeri pickers are a teleported listbox over a real select, not a styled select
+A native select can only hold text, so every negeri picker is UiFlagSelect: a button, a listbox and a hidden input carrying the value. Blade mounts it as an island over an ordinary select, which is what a visitor without JavaScript keeps — leave that select in place (SelectStylingTest still demands nk-select and a pr-* on it).
+
+The list is teleported and positioned with getBoundingClientRect, because the marketplace hero is overflow-hidden and would cut an absolutely positioned menu off. Inside a dialog it teleports into that dialog, not the body: a modal dialog sits in the browser's top layer and would paint over anything left behind. Outside-click closing must test the teleported menu as well as the root, or picking an option closes the list before the click lands.
+
+The negeri list is static data in config/states.php ({name, slug}), read only through App\Support\States — never config('states') directly, and there is no Vendor::STATES any more. Validation uses Rule::in(States::names()); dropdowns get States::options() ({value, label, flag}), which controllers pass as `states` to the Vue forms. The 16 SVGs live in public/img/flag named after each entry's slug, which is written in the config rather than derived so renaming a negeri cannot silently break its flag. StatesTest fails if one is missing.
+
+Picking several of something (categories, negeri covered) uses UiMultiSelect, not a wrap of checkboxes: thirteen or sixteen chips run off the bottom of a phone. What is picked shows as removable chips above the field, each row in the list says "Dipilih", and a `locked` option (the primary category, the home state) posts a value nobody can take off. Both it and UiFlagSelect share the popup placement in composables/useAnchoredMenu.js.

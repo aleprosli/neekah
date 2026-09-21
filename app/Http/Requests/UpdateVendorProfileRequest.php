@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\Vendor;
 use App\Support\ImageSettings;
 use App\Support\SocialLinks;
+use App\Support\States;
 use Closure;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Str;
@@ -14,6 +15,9 @@ use Illuminate\Validation\Rule;
 
 class UpdateVendorProfileRequest extends FormRequest
 {
+    /** Enough for a vendor who really does several things, short of listing the whole marketplace. */
+    public const MAX_CATEGORIES = 5;
+
     public const TONES = [
         'from-rose-400 to-amber-300', 'from-amber-500 to-orange-300', 'from-fuchsia-400 to-rose-300',
         'from-slate-700 to-slate-400', 'from-pink-400 to-rose-200', 'from-emerald-500 to-teal-300',
@@ -27,11 +31,31 @@ class UpdateVendorProfileRequest extends FormRequest
     }
 
     /**
-     * Turn "@kedai" and pasted addresses into the one link that is stored, so
+     * Fold the primary category and home state into the multi-value lists, and
+     * turn "@kedai" and pasted addresses into the one link that is stored, so
      * the rules below only ever judge a full address.
      */
     protected function prepareForValidation(): void
     {
+        // The primary category and the home state are part of the two lists
+        // whether or not the form posted them, so the limit below counts what
+        // is really saved.
+        $this->merge([
+            'category_ids' => collect((array) $this->input('category_ids', []))
+                ->push($this->input('category_id'))
+                ->filter()
+                ->map(fn (mixed $id): int => (int) $id)
+                ->unique()
+                ->values()
+                ->all(),
+            'service_states' => collect((array) $this->input('service_states', []))
+                ->push($this->input('state'))
+                ->filter()
+                ->unique()
+                ->values()
+                ->all(),
+        ]);
+
         if (! is_array($this->input('social_links'))) {
             return;
         }
@@ -51,10 +75,14 @@ class UpdateVendorProfileRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:120', Rule::unique(Vendor::class, 'name')->ignore($this->user()->vendor)],
             'category_id' => ['required', Rule::exists(Category::class, 'id')->where('is_active', true)],
+            'category_ids' => ['nullable', 'array', 'max:'.self::MAX_CATEGORIES],
+            'category_ids.*' => [Rule::exists(Category::class, 'id')->where('is_active', true)],
             'tagline' => ['nullable', 'string', 'max:160'],
             'description' => ['nullable', 'string', 'max:2000'],
             'city' => ['required', 'string', 'max:80'],
-            'state' => ['required', Rule::in(Vendor::STATES)],
+            'state' => ['required', Rule::in(States::names())],
+            'service_states' => ['nullable', 'array'],
+            'service_states.*' => [Rule::in(States::names())],
             'phone' => ['nullable', 'string', 'max:30'],
             'whatsapp' => ['nullable', 'string', 'max:30'],
             'social_links' => ['nullable', 'array:'.implode(',', array_keys(SocialLinks::PLATFORMS))],
@@ -83,9 +111,11 @@ class UpdateVendorProfileRequest extends FormRequest
     {
         return [
             'name' => 'nama perniagaan',
-            'category_id' => 'kategori',
+            'category_id' => 'kategori utama',
+            'category_ids' => 'kategori',
             'city' => 'bandar',
-            'state' => 'negeri',
+            'state' => 'negeri asal',
+            'service_states' => 'negeri yang dicover',
             'price_from' => 'harga bermula',
             'price_unit' => 'unit harga',
             'cover_tone' => 'warna',

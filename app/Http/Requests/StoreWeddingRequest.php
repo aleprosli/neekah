@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests;
 
-use App\Models\Vendor;
+use App\Support\States;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -26,7 +26,7 @@ class StoreWeddingRequest extends FormRequest
             'title' => ['required', 'string', 'max:120'],
             'event_date' => ['required', 'date', 'after:today'],
             'city' => ['required', 'string', 'max:80'],
-            'state' => ['required', Rule::in(Vendor::STATES)],
+            'state' => ['required', Rule::in(States::names())],
             'budget' => ['required', 'numeric', 'min:0', 'max:99999999'],
             'notes' => ['nullable', 'string', 'max:1000'],
         ];

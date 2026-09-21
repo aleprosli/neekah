@@ -59,6 +59,7 @@ class VendorComparisonController extends Controller
         return [
             $this->row('Kategori', $vendors->map(fn (Vendor $v): string => $v->category->icon.' '.$v->category->name)->all()),
             $this->row('Lokasi', $vendors->map(fn (Vendor $v): string => $v->city.', '.$v->state)->all()),
+            $this->row('Kawasan dicover', $vendors->map(fn (Vendor $v): string => implode(', ', $v->serviceStates()))->all()),
             $this->row('Tahap', $vendors->map(fn (Vendor $v): string => $v->tier->label())->all(), $this->bestIndex($vendors, fn (Vendor $v): float => $v->tier->rank())),
             $this->row('Rating', $vendors->map(fn (Vendor $v): string => $v->reviews_count ? '★ '.number_format($v->rating_avg, 1).' ('.$v->reviews_count.')' : 'Baru')->all(), $this->bestIndex($vendors, fn (Vendor $v): float => (float) $v->rating_avg)),
             $this->row('Harga bermula', $vendors->map(fn (Vendor $v): string => 'RM'.number_format($v->price_from).' / '.$v->price_unit->label())->all(), $this->bestIndex($vendors, fn (Vendor $v): float => -(float) $v->price_from)),

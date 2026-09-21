@@ -55,7 +55,7 @@
                         <span class="text-ink-muted">·</span>
                         <a href="#review" class="underline underline-offset-4">{{ $publishedReviewsCount }} review</a>
                         <span class="text-ink-muted">·</span>
-                        <span class="text-ink-muted">{{ $vendor->city }}, {{ $vendor->state }}</span>
+                        <span class="text-ink-muted"><x-state-flag :state="$vendor->state" /> {{ $vendor->city }}, {{ $vendor->state }}</span>
                     </p>
                 </div>
 
@@ -65,6 +65,31 @@
                     <div class="min-w-0">
                         <p class="font-semibold">Dikendalikan oleh {{ $vendor->name }}</p>
                         <p class="text-sm text-ink-muted">@if ($vendor->tier === VendorTier::Recommended)🏆 @endif{{ $vendor->tier->label() }} Vendor · Response rate {{ $vendor->responseRateLabel() }}</p>
+                    </div>
+                </div>
+
+                {{-- What they do and where they go. A vendor is rarely one
+                     category and rarely one negeri, and a couple planning in
+                     Melaka needs to know a KL studio travels. --}}
+                <div class="flex flex-col gap-4 py-6">
+                    @if ($extraCategories->isNotEmpty())
+                        <div class="flex flex-col gap-2">
+                            <p class="text-sm font-medium">Juga menawarkan</p>
+                            <ul class="flex flex-wrap gap-2 text-xs font-semibold">
+                                @foreach ($extraCategories as $extra)
+                                    <li><a href="{{ route('vendors.index', ['category' => $extra->slug]) }}" class="block rounded-full border border-line px-3.5 py-2 transition hover:border-brand-400"><x-category-icon class="inline-block size-4 shrink-0 align-[-0.25em]" :category="$extra" /> {{ $extra->name }}</a></li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+
+                    <div class="flex flex-col gap-2">
+                        <p class="text-sm font-medium">Kawasan perkhidmatan</p>
+                        <ul class="flex flex-wrap gap-2 text-xs font-semibold">
+                            @foreach ($vendor->serviceStates() as $serviceState)
+                                <li><a href="{{ route('vendors.index', ['state' => $serviceState]) }}" @class(['flex items-center gap-2 rounded-full border px-3.5 py-2 transition hover:border-brand-400', 'border-brand-300 bg-brand-50 text-brand-700' => $serviceState === $vendor->state, 'border-line' => $serviceState !== $vendor->state])><x-state-flag :state="$serviceState" /> {{ $serviceState }}</a></li>
+                            @endforeach
+                        </ul>
                     </div>
                 </div>
 

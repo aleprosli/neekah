@@ -7,6 +7,8 @@
 import { computed, ref } from 'vue';
 import { useUploadForm } from '../../composables/useUploadForm.js';
 import UiField from '../ui/UiField.vue';
+import UiFlagSelect from '../ui/UiFlagSelect.vue';
+import UiMultiSelect from '../ui/UiMultiSelect.vue';
 import UiUploadProgress from '../ui/UiUploadProgress.vue';
 import UiSelect from '../ui/UiSelect.vue';
 import UiTextarea from '../ui/UiTextarea.vue';
@@ -16,6 +18,7 @@ const props = defineProps({
     csrf: { type: String, required: true },
     vendor: { type: Object, required: true },
     categories: { type: Array, required: true },
+    maxCategories: { type: Number, required: true },
     states: { type: Array, required: true },
     tones: { type: Array, required: true },
     priceUnits: { type: Array, required: true },
@@ -26,7 +29,12 @@ const props = defineProps({
 });
 
 const { uploading, percent: uploadPercent, error: uploadError, submit: submitUpload } = useUploadForm();
-const form = ref({ ...props.vendor, social_links: { ...props.vendor.social_links } });
+const form = ref({
+    ...props.vendor,
+    social_links: { ...props.vendor.social_links },
+    category_ids: [...props.vendor.category_ids],
+    service_states: [...props.vendor.service_states],
+});
 const coverPreview = ref(props.vendor.cover_image_url);
 const logoPreview = ref(props.vendor.logo_url);
 const removeLogo = ref(false);
@@ -46,7 +54,26 @@ const onLogoChosen = (event) => {
 };
 
 const categoryOptions = computed(() => props.categories.map((c) => ({ value: c.id, label: `${c.icon} ${c.name}` })));
-const stateOptions = computed(() => props.states.map((state) => ({ value: state, label: state })));
+
+/** The primary category and the home state are ticked for good: the card, the
+ *  profile heading and the address all print them, so they cannot be dropped. */
+const categoryChoices = computed(() =>
+    props.categories.map((category) => ({
+        value: category.id,
+        label: category.name,
+        icon: category.icon,
+        locked: String(category.id) === String(form.value.category_id),
+        note: String(category.id) === String(form.value.category_id) ? 'utama' : null,
+    })),
+);
+
+const stateChoices = computed(() =>
+    props.states.map((option) => ({
+        ...option,
+        locked: option.value === form.value.state,
+        note: option.value === form.value.state ? 'asal' : null,
+    })),
+);
 </script>
 
 <template>
@@ -60,11 +87,34 @@ const stateOptions = computed(() => props.states.map((state) => ({ value: state,
             <UiField v-model="form.name" label="Nama perniagaan" name="name" :error="errors.name" required />
 
             <div class="grid gap-4 sm:grid-cols-2">
-                <UiSelect v-model="form.category_id" label="Kategori" name="category_id" :options="categoryOptions" :error="errors.category_id" required />
-                <UiSelect v-model="form.state" label="Negeri" name="state" :options="stateOptions" :error="errors.state" required />
+                <UiSelect v-model="form.category_id" label="Kategori utama" name="category_id" :options="categoryOptions" :error="errors.category_id" required help="Kategori ini yang dipaparkan pada kad dan profil anda." />
+                <UiFlagSelect v-model="form.state" label="Negeri asal" name="state" :options="states" :error="errors.state" required />
             </div>
 
             <UiField v-model="form.city" label="Bandar" name="city" :error="errors.city" required />
+
+            <div class="grid gap-4 sm:grid-cols-2">
+                <UiMultiSelect
+                    v-model="form.category_ids"
+                    label="Kategori yang anda buat"
+                    name="category_ids[]"
+                    placeholder="Pilih kategori"
+                    :options="categoryChoices"
+                    :max="maxCategories"
+                    :error="errors.category_ids || errors['category_ids.0']"
+                    :help="`Maksimum ${maxCategories}. Pencari akan jumpa anda dalam setiap satu.`"
+                />
+
+                <UiMultiSelect
+                    v-model="form.service_states"
+                    label="Negeri yang anda cover"
+                    name="service_states[]"
+                    placeholder="Pilih negeri"
+                    :options="stateChoices"
+                    :error="errors.service_states || errors['service_states.0']"
+                    help="Setiap negeri yang anda sanggup pergi. Anda akan muncul dalam carian untuk negeri itu."
+                />
+            </div>
             <UiField v-model="form.tagline" label="Tagline" name="tagline" :error="errors.tagline" maxlength="160" help="Satu ayat pendek pada kad vendor, maksimum 160 aksara." />
             <UiTextarea v-model="form.description" label="Penerangan" name="description" :rows="6" :error="errors.description" help="Ceritakan perkhidmatan, pengalaman dan apa yang membezakan anda." />
         </section>

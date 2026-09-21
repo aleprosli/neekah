@@ -2,6 +2,7 @@
 /** The wedding project itself: date, place and budget everything else reads. */
 import { ref } from 'vue';
 import UiField from '../ui/UiField.vue';
+import UiFlagSelect from '../ui/UiFlagSelect.vue';
 import UiSelect from '../ui/UiSelect.vue';
 import UiTextarea from '../ui/UiTextarea.vue';
 
@@ -16,7 +17,6 @@ const props = defineProps({
 });
 
 const form = ref({ ...props.wedding });
-const stateOptions = props.states.map((state) => ({ value: state, label: state }));
 </script>
 
 <template>
@@ -33,7 +33,7 @@ const stateOptions = props.states.map((state) => ({ value: state, label: state }
 
         <div class="grid gap-4 sm:grid-cols-2">
             <UiField v-model="form.city" label="Bandar" name="city" placeholder="Alor Setar" :error="errors.city" required />
-            <UiSelect v-model="form.state" label="Negeri" name="state" :options="stateOptions" placeholder="Pilih negeri" :error="errors.state" required />
+            <UiFlagSelect v-model="form.state" label="Negeri" name="state" :options="states" placeholder="Pilih negeri" :error="errors.state" required />
         </div>
 
         <UiTextarea v-model="form.notes" label="Nota (pilihan)" name="notes" :rows="3" placeholder="Tema, jumlah tetamu, permintaan khas" :error="errors.notes" />

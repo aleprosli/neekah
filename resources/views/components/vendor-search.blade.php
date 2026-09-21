@@ -1,4 +1,4 @@
-@props(['filterDialog' => null, 'categories', 'states'])
+@props(['filterDialog' => null, 'categories', 'states', 'stateOptions'])
 
 @php
     // Budget left the search bar: a couple knows what they are looking for
@@ -48,15 +48,30 @@
                     @endforeach
                 </select>
             </label>
-            <label class="flex flex-1 cursor-pointer flex-col gap-0.5 px-5 py-2">
-                <span class="text-[11px] font-semibold tracking-wide text-ink-muted uppercase">Negeri</span>
-                <select name="state" class="nk-select w-full bg-transparent pr-6 text-sm font-medium focus:outline-none">
-                    <option value="">Mana-mana negeri</option>
-                    @foreach ($states as $state)
-                        <option value="{{ $state }}" @selected($current['state'] === $state)>{{ $state }}</option>
-                    @endforeach
-                </select>
-            </label>
+            {{-- A native select can only hold text, so the flag list is a Vue
+                 island over a real select: no JavaScript still gets the field. --}}
+            <div
+                class="flex flex-1 flex-col justify-center px-5 py-2"
+                data-vue="ui-flag-select"
+                data-props="@vueProps([
+                    'name' => 'state',
+                    'label' => 'Negeri',
+                    'options' => $stateOptions,
+                    'modelValue' => $current['state'] ?? '',
+                    'placeholder' => 'Mana-mana negeri',
+                    'variant' => 'bare',
+                ])"
+            >
+                <label class="flex cursor-pointer flex-col gap-0.5">
+                    <span class="text-[11px] font-semibold tracking-wide text-ink-muted uppercase">Negeri</span>
+                    <select name="state" class="nk-select w-full bg-transparent pr-6 text-sm font-medium focus:outline-none">
+                        <option value="">Mana-mana negeri</option>
+                        @foreach ($states as $state)
+                            <option value="{{ $state }}" @selected($current['state'] === $state)>{{ $state }}</option>
+                        @endforeach
+                    </select>
+                </label>
+            </div>
             <div class="flex items-center pl-1.5">
                 <button type="submit" class="flex h-full items-center gap-2 rounded-xl bg-brand-600 px-5 text-sm font-semibold text-white transition hover:bg-brand-700">
                     <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>

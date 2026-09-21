@@ -5,8 +5,9 @@
  */
 import { computed, ref } from 'vue';
 import UiField from '../ui/UiField.vue';
-import UiTurnstile from '../ui/UiTurnstile.vue';
+import UiFlagSelect from '../ui/UiFlagSelect.vue';
 import UiSelect from '../ui/UiSelect.vue';
+import UiTurnstile from '../ui/UiTurnstile.vue';
 
 const props = defineProps({
     action: { type: String, required: true },
@@ -35,7 +36,6 @@ const form = ref({
 
 const messages = computed(() => Object.entries(props.errors).filter(([key]) => key !== 'existing_customer').map(([, message]) => message));
 const categoryOptions = computed(() => props.categories.map((c) => ({ value: c.id, label: `${c.icon} ${c.name}` })));
-const stateOptions = computed(() => props.states.map((state) => ({ value: state, label: state })));
 </script>
 
 <template>
@@ -58,7 +58,7 @@ const stateOptions = computed(() => props.states.map((state) => ({ value: state,
 
             <div class="grid gap-4 sm:grid-cols-2">
                 <UiSelect v-model="form.category_id" label="Kategori" name="category_id" :options="categoryOptions" placeholder="Pilih kategori" :error="errors.category_id" required />
-                <UiSelect v-model="form.state" label="Negeri" name="state" :options="stateOptions" placeholder="Pilih negeri" :error="errors.state" required />
+                <UiFlagSelect v-model="form.state" label="Negeri" name="state" :options="states" placeholder="Pilih negeri" :error="errors.state" required />
             </div>
 
             <UiField v-model="form.city" label="Bandar" name="city" placeholder="Alor Setar" :error="errors.city" required />

@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\User;
 use App\Models\Vendor;
+use App\Support\States;
 use App\Support\TableFilter;
 use App\Support\VueProps;
 use Illuminate\Contracts\View\View;
@@ -261,7 +262,7 @@ class UserController extends Controller
                     'action' => route('admin.users.vendor.store', $user),
                     'loginUrl' => route('login'),
                     'categories' => Category::active()->ordered()->get(['id', 'name', 'icon']),
-                    'states' => Vendor::STATES,
+                    'states' => States::options(),
                     'old' => ['phone' => $user->phone, ...old()],
                     'account' => ['name' => $user->name, 'email' => $user->email],
                 ]) : null,

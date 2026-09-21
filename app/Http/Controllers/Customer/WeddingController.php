@@ -6,8 +6,8 @@ use App\Actions\SeedWeddingChecklist;
 use App\Enums\WeddingRole;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreWeddingRequest;
-use App\Models\Vendor;
 use App\Models\Wedding;
+use App\Support\States;
 use App\Support\VueProps;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
@@ -58,7 +58,7 @@ class WeddingController extends Controller
                 'editing' => $editing,
                 'action' => $editing ? route('weddings.update', $wedding) : route('weddings.store'),
                 'cancelUrl' => route('dashboard'),
-                'states' => Vendor::STATES,
+                'states' => States::options(),
                 'wedding' => [
                     'title' => old('title', $wedding->title),
                     'event_date' => old('event_date', $wedding->event_date?->toDateString()),

@@ -7,8 +7,8 @@ use App\Enums\AuthAudience;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\RegisterVendorRequest;
 use App\Models\Category;
-use App\Models\Vendor;
 use App\Support\Seo;
+use App\Support\States;
 use App\Support\TurnstileSettings;
 use App\Support\VueProps;
 use Illuminate\Contracts\View\View;
@@ -30,7 +30,7 @@ class RegisterController extends Controller
                 'loginUrl' => AuthAudience::Vendor->loginUrl(),
                 'convertUrl' => route('vendor.convert'),
                 'categories' => Category::active()->ordered()->get(['id', 'name', 'icon']),
-                'states' => Vendor::STATES,
+                'states' => States::options(),
                 'old' => old(),
                 'turnstileSiteKey' => $turnstile->isEnabled() ? $turnstile->siteKey() : null,
             ]),

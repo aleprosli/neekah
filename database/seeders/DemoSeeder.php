@@ -55,7 +55,9 @@ class DemoSeeder extends Seeder
         foreach ($this->vendors() as $data) {
             $packages = $data['packages'];
             $categorySlug = $data['category'];
-            unset($data['packages'], $data['category']);
+            $alsoSlugs = $data['also'] ?? [];
+            $data['service_states'] = $data['covers'] ?? null;
+            unset($data['packages'], $data['category'], $data['also'], $data['covers']);
 
             $owner = User::factory()->vendor()->create([
                 'name' => $data['name'],
@@ -70,6 +72,10 @@ class DemoSeeder extends Seeder
                 'approved_at' => now()->subMonths(3),
                 'description' => $data['tagline'].' Kami telah mengendalikan '.$data['completed_bookings_count'].' majlis melalui Neekah. Semua booking dan pembayaran direkod dalam platform untuk perlindungan anda.',
             ]);
+
+            $vendor->categories()->syncWithoutDetaching(
+                collect($alsoSlugs)->map(fn (string $slug): int => $categories[$slug]->id)->all()
+            );
 
             foreach ($packages as $index => [$name, $price, $duration, $features]) {
                 $vendor->packages()->create([
@@ -355,8 +361,9 @@ class DemoSeeder extends Seeder
      */
     private function vendors(): array
     {
-        $v = fn (string $name, string $category, string $city, string $state, float $rating, int $reviews, float $priceFrom, VendorTier $tier, string $tone, string $tagline, int $completed, int $responseRate, array $packages, PriceUnit $unit = PriceUnit::Package): array => [
+        $v = fn (string $name, string $category, string $city, string $state, float $rating, int $reviews, float $priceFrom, VendorTier $tier, string $tone, string $tagline, int $completed, int $responseRate, array $packages, PriceUnit $unit = PriceUnit::Package, array $also = [], array $covers = []): array => [
             'name' => $name, 'category' => $category, 'city' => $city, 'state' => $state,
+            'also' => $also, 'covers' => $covers,
             'rating_avg' => $rating, 'reviews_count' => $reviews, 'price_from' => $priceFrom, 'price_unit' => $unit,
             'tier' => $tier, 'cover_tone' => $tone, 'tagline' => $tagline,
             'completed_bookings_count' => $completed, 'response_rate' => $responseRate, 'packages' => $packages,
@@ -367,11 +374,11 @@ class DemoSeeder extends Seeder
             $v('ABC Wedding Photography', 'photography', 'Alor Setar', 'Kedah', 4.9, 128, 1500, VendorTier::Recommended, 'from-rose-400 to-amber-300', 'Candid, natural light wedding photography.', 214, 98, [
                 ['Basic Package', 1500, '6 jam', ['1 photographer', '300 edited photos', 'Online gallery']],
                 ['Premium Package', 2500, '10 jam', ['2 photographers', '500 edited photos', 'Highlight video', 'Album 30 muka surat']],
-            ]),
+            ], also: ['videography'], covers: ['Pulau Pinang', 'Perlis', 'Perak']),
             $v('Dapur Warisan Catering', 'catering', 'Sungai Petani', 'Kedah', 4.8, 214, 18, VendorTier::Top, 'from-amber-500 to-orange-300', 'Masakan kampung tradisional untuk majlis besar.', 342, 95, [
                 ['Buffet Standard', 18, 'per pax', ['5 lauk', 'Nasi putih & minyak', 'Air & pencuci mulut']],
                 ['Buffet Premium', 28, 'per pax', ['8 lauk', 'Food station', 'Dome & kek', 'Crew berpakaian seragam']],
-            ], PriceUnit::Pax),
+            ], PriceUnit::Pax, covers: ['Pulau Pinang', 'Perlis']),
             $v('Seri Pelamin Studio', 'pelamin', 'Shah Alam', 'Selangor', 4.9, 96, 2800, VendorTier::Recommended, 'from-fuchsia-400 to-rose-300', 'Pelamin moden dengan bunga segar.', 156, 97, [
                 ['Pelamin Basic', 2800, '1 hari', ['Backdrop 12 kaki', 'Bunga tiruan', 'Set sofa']],
                 ['Pelamin Premium', 5500, '1 hari', ['Backdrop 20 kaki', 'Bunga segar', 'Aisle & pintu gerbang', 'Lighting']],
@@ -383,7 +390,7 @@ class DemoSeeder extends Seeder
             $v('Glow by Nadia', 'makeup', 'Johor Bahru', 'Johor', 5.0, 152, 650, VendorTier::Top, 'from-pink-400 to-rose-200', 'Makeup pengantin airbrush tahan lama.', 260, 99, [
                 ['Bride Only', 650, '1 sesi', ['Airbrush makeup', 'Hairdo', 'Touch-up kit']],
                 ['Bride & Groom', 900, '1 sesi', ['Makeup pengantin lelaki & perempuan', 'Hairdo', 'Touch-up on site']],
-            ]),
+            ], also: ['photography'], covers: ['Melaka', 'Negeri Sembilan']),
             $v('Dewan Seri Melati', 'venue', 'Ipoh', 'Perak', 4.6, 41, 4500, VendorTier::Verified, 'from-emerald-500 to-teal-300', 'Dewan berhawa dingin untuk 800 tetamu.', 52, 88, [
                 ['Sewa Dewan', 4500, '1 hari', ['800 kerusi & meja', 'PA system', 'Parking 200 kereta']],
                 ['Dewan + Katering', 22000, '1 hari', ['Dewan penuh', 'Buffet 500 pax', 'Pelamin standard']],

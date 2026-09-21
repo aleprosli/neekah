@@ -9,6 +9,7 @@ use App\Enums\VendorStatus;
 use App\Enums\VendorTier;
 use App\Support\PhoneNumber;
 use App\Support\SocialLinks;
+use App\Support\States;
 use Database\Factories\VendorFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Scope;
@@ -16,11 +17,13 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 
 #[Fillable([
-    'user_id', 'category_id', 'name', 'slug', 'tagline', 'description', 'city', 'state',
+    'user_id', 'category_id', 'name', 'slug', 'tagline', 'description', 'city', 'state', 'service_states',
     'phone', 'whatsapp', 'social_links', 'price_from', 'price_unit', 'cover_image', 'logo', 'cover_tone',
     'status', 'tier', 'rating_avg', 'reviews_count', 'completed_bookings_count',
     'response_rate', 'completion_rate', 'score', 'points_total', 'tier_locked', 'penalty_points', 'violations_count', 'approved_at',
@@ -30,11 +33,6 @@ class Vendor extends Model
     /** @use HasFactory<VendorFactory> */
     use HasFactory;
 
-    public const STATES = [
-        'Kedah', 'Pulau Pinang', 'Perak', 'Selangor', 'Kuala Lumpur', 'Negeri Sembilan',
-        'Melaka', 'Johor', 'Pahang', 'Terengganu', 'Kelantan', 'Sabah', 'Sarawak', 'Perlis', 'Putrajaya', 'Labuan',
-    ];
-
     /**
      * @return array<string, string>
      */
@@ -42,6 +40,7 @@ class Vendor extends Model
     {
         return [
             'social_links' => 'array',
+            'service_states' => 'array',
             'price_from' => 'decimal:2',
             'price_unit' => PriceUnit::class,
             'status' => VendorStatus::class,
@@ -66,6 +65,63 @@ class Vendor extends Model
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
+    }
+
+    /**
+     * Every category the vendor works in, primary one included. A hantaran
+     * maker who also does makeup is one business, not two profiles, so the
+     * pivot is what the marketplace filters on; category_id stays the one
+     * shown on the card, the profile heading and the breadcrumb.
+     *
+     * @return BelongsToMany<Category, $this>
+     */
+    public function categories(): BelongsToMany
+    {
+        return $this->belongsToMany(Category::class)->orderBy('sort_order')->orderBy('name');
+    }
+
+    /**
+     * The categories beyond the primary one, for the places that already print
+     * the primary and want the rest beside it.
+     *
+     * @return Collection<int, Category>
+     */
+    public function extraCategories(): Collection
+    {
+        return $this->categories->reject(fn (Category $category): bool => $category->is($this->category))->values();
+    }
+
+    /**
+     * Every negeri the vendor travels to, home state first. Never empty: a
+     * vendor covers at least where they are.
+     *
+     * @return array<int, string>
+     */
+    public function serviceStates(): array
+    {
+        return $this->service_states ?: array_filter([$this->state]);
+    }
+
+    /**
+     * The two lists are kept whole here rather than at each call site, so a
+     * vendor saved by the profile form, the admin, a seeder or a factory all
+     * end up with the primary category in the pivot and the home state in the
+     * coverage. Search may then read one place and trust it.
+     */
+    protected static function booted(): void
+    {
+        static::saving(function (self $vendor): void {
+            $covered = collect($vendor->service_states ?? [])
+                ->filter(fn (mixed $state): bool => States::has(is_string($state) ? $state : null));
+
+            $vendor->service_states = $covered->prepend($vendor->state)->filter()->unique()->values()->all();
+        });
+
+        static::saved(function (self $vendor): void {
+            if ($vendor->category_id && ($vendor->wasRecentlyCreated || $vendor->wasChanged('category_id'))) {
+                $vendor->categories()->syncWithoutDetaching([$vendor->category_id]);
+            }
+        });
     }
 
     public function packages(): HasMany
@@ -233,7 +289,10 @@ class Vendor extends Model
                         ->orWhere('description', 'like', $like)
                         ->orWhere('city', 'like', $like)
                         ->orWhere('state', 'like', $like)
-                        ->orWhereHas('category', fn (Builder $category) => $category->where('name', 'like', $like))
+                        // The coverage list is a JSON array of negeri names,
+                        // and LIKE over it is enough to find one by name.
+                        ->orWhere('service_states', 'like', $like)
+                        ->orWhereHas('categories', fn (Builder $categories) => $categories->where('name', 'like', $like))
                         ->orWhereHas('packages', fn (Builder $packages) => $packages
                             ->where('is_active', true)
                             ->where(fn (Builder $package) => $package->where('name', 'like', $like)->orWhere('description', 'like', $like)));
@@ -246,6 +305,28 @@ class Vendor extends Model
     protected function approved(Builder $query): Builder
     {
         return $query->where('status', VendorStatus::Approved);
+    }
+
+    /**
+     * Vendors who work in this category, whether it is their primary one or
+     * one they added.
+     */
+    #[Scope]
+    protected function inCategory(Builder $query, Category $category): Builder
+    {
+        return $query->whereHas('categories', fn (Builder $categories) => $categories->whereKey($category->getKey()));
+    }
+
+    /**
+     * Vendors who cover this negeri. A KL studio that travels to Johor belongs
+     * in a Johor search, so this reads the coverage, not the home address.
+     */
+    #[Scope]
+    protected function servingState(Builder $query, string $state): Builder
+    {
+        return $query->where(fn (Builder $query) => $query
+            ->whereJsonContains('service_states', $state)
+            ->orWhere(fn (Builder $query) => $query->whereNull('service_states')->where('state', $state)));
     }
 
     public function isApproved(): bool

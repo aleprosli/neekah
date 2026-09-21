@@ -319,3 +319,54 @@ it('leaves the WhatsApp button out of an empty search when no number is set', fu
         ->assertSee('Maaf, belum ada vendor yang sepadan')
         ->assertDontSee('WhatsApp kami');
 });
+
+it('finds a vendor under every category they work in, not only the primary one', function () {
+    $studio = Vendor::factory()->for($this->photography)->create(['name' => 'Studio Dua Kerja']);
+    $studio->categories()->attach($this->catering);
+
+    Vendor::factory()->for($this->catering)->create(['name' => 'Katerer Sahaja']);
+
+    $this->get(route('vendors.index', ['category' => 'catering']))
+        ->assertOk()
+        ->assertSee('Studio Dua Kerja')
+        ->assertSee('Katerer Sahaja');
+
+    $this->get(route('vendors.index', ['category' => 'photography']))
+        ->assertOk()
+        ->assertSee('Studio Dua Kerja')
+        ->assertDontSee('Katerer Sahaja');
+});
+
+it('finds a vendor in every negeri they cover, not only where they sit', function () {
+    Vendor::factory()->for($this->photography)->covering(['Johor', 'Melaka'])->create([
+        'name' => 'Studio Merentas',
+        'state' => 'Selangor',
+    ]);
+
+    Vendor::factory()->for($this->photography)->create(['name' => 'Studio Duduk Diam', 'state' => 'Selangor']);
+
+    $this->get(route('vendors.index', ['state' => 'Johor']))
+        ->assertOk()
+        ->assertSee('Studio Merentas')
+        ->assertDontSee('Studio Duduk Diam');
+
+    $this->get(route('vendors.index', ['state' => 'Selangor']))
+        ->assertOk()
+        ->assertSee('Studio Merentas')
+        ->assertSee('Studio Duduk Diam');
+});
+
+it('lists the extra categories and the whole service area on the public profile', function () {
+    $vendor = Vendor::factory()->for($this->photography)->covering(['Melaka'])->create([
+        'name' => 'Studio Merentas',
+        'state' => 'Johor',
+    ]);
+    $vendor->categories()->attach($this->catering);
+
+    $this->get(route('vendors.show', $vendor))
+        ->assertOk()
+        ->assertSee('Juga menawarkan')
+        ->assertSee('Kawasan perkhidmatan')
+        ->assertSee($this->catering->name)
+        ->assertSeeInOrder(['Kawasan perkhidmatan', 'Johor', 'Melaka']);
+});

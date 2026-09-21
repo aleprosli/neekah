@@ -9,6 +9,7 @@ use App\Models\Vendor;
 use App\Support\ContactSettings;
 use App\Support\Seo;
 use App\Support\SeoSettings;
+use App\Support\States;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
@@ -50,8 +51,8 @@ class VendorController extends Controller
             ->approved()
             ->with('category')
             ->when($filters['q'], fn (Builder $query, string $keyword) => $query->matching($keyword))
-            ->when($activeCategory, fn (Builder $query, Category $category) => $query->whereBelongsTo($category))
-            ->when($filters['state'], fn (Builder $query, string $state) => $query->where('state', $state))
+            ->when($activeCategory, fn (Builder $query, Category $category) => $query->inCategory($category))
+            ->when($filters['state'], fn (Builder $query, string $state) => $query->servingState($state))
             ->when($filters['min_price'] !== null, fn (Builder $query) => $query->where('price_from', '>=', $filters['min_price']))
             ->when($filters['max_price'] !== null, fn (Builder $query) => $query->where('price_from', '<=', $filters['max_price']))
             ->when($filters['min_rating'] !== null, fn (Builder $query) => $query->where('rating_avg', '>=', $filters['min_rating']))
@@ -74,7 +75,8 @@ class VendorController extends Controller
             'filters' => $filters,
             'categories' => $categories,
             'activeCategory' => $activeCategory,
-            'states' => Vendor::STATES,
+            'states' => States::names(),
+            'stateOptions' => States::options(),
             'tiers' => VendorTier::cases(),
             'sorts' => self::SORTS,
             'activeFilterCount' => count(array_filter([$filters['state'], $filters['min_price'], $filters['max_price'], $filters['min_rating'], $filters['tier']], fn ($value) => $value !== null)),
@@ -111,6 +113,7 @@ class VendorController extends Controller
 
         $vendor->load([
             'category',
+            'categories',
             'packages' => fn ($query) => $query->active(),
             'portfolioItems' => fn ($query) => $query->visible(),
             'reviews' => fn ($query) => $query->published()->with(['user', 'photos'])->latest()->limit(12),
@@ -123,7 +126,7 @@ class VendorController extends Controller
         $related = Vendor::query()
             ->approved()
             ->with('category')
-            ->whereBelongsTo($vendor->category)
+            ->inCategory($vendor->category)
             ->whereKeyNot($vendor->getKey())
             ->orderByDesc('score')
             ->limit(3)
@@ -148,6 +151,7 @@ class VendorController extends Controller
                 'url' => route('vendors.show', $vendor),
                 'image' => $vendor->portfolioItems->take(3)->map(fn ($item): string => $item->url())->values()->all(),
                 'address' => ['@type' => 'PostalAddress', 'addressLocality' => $vendor->city, 'addressRegion' => $vendor->state, 'addressCountry' => 'MY'],
+                'areaServed' => array_map(fn (string $state): array => ['@type' => 'AdministrativeArea', 'name' => $state], $vendor->serviceStates()),
                 'priceRange' => 'Dari RM'.number_format((float) $vendor->price_from),
                 // Stars in results are only claimed once real reviews exist.
                 'aggregateRating' => $vendor->reviews_count > 0 ? [
@@ -169,6 +173,7 @@ class VendorController extends Controller
             'publishedReviewsCount' => $vendor->reviews_count + $openReviews['total'],
             'gallery' => $this->gallery($vendor),
             'category' => $vendor->category,
+            'extraCategories' => $vendor->extraCategories(),
             'related' => $related,
             'defaultEventDate' => $request->user()?->weddings()->latest('event_date')->first()?->event_date->toDateString(),
         ]);

@@ -10,6 +10,7 @@ use App\Models\Category;
 use App\Models\Vendor;
 use App\Support\ImageSettings;
 use App\Support\SocialLinks;
+use App\Support\States;
 use App\Support\VueProps;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
@@ -29,7 +30,9 @@ class ProfileController extends Controller
                 'vendor' => [
                     'name' => old('name', $vendor->name),
                     'category_id' => (int) old('category_id', $vendor->category_id),
+                    'category_ids' => array_map('intval', old('category_ids', $vendor->categories->modelKeys())),
                     'state' => old('state', $vendor->state),
+                    'service_states' => old('service_states', $vendor->serviceStates()),
                     'city' => old('city', $vendor->city),
                     'tagline' => old('tagline', $vendor->tagline),
                     'description' => old('description', $vendor->description),
@@ -44,7 +47,8 @@ class ProfileController extends Controller
                     'initial' => mb_substr($vendor->name, 0, 1),
                 ],
                 'categories' => Category::active()->ordered()->get(['id', 'name', 'icon']),
-                'states' => Vendor::STATES,
+                'maxCategories' => UpdateVendorProfileRequest::MAX_CATEGORIES,
+                'states' => States::options(),
                 'socialPlatforms' => collect(SocialLinks::PLATFORMS)
                     ->map(fn (array $details, string $platform): array => ['key' => $platform, 'label' => $details['label'], 'placeholder' => $details['placeholder']])
                     ->values()
@@ -62,7 +66,7 @@ class ProfileController extends Controller
     public function update(UpdateVendorProfileRequest $request, StoreOptimizedImage $storeImage): RedirectResponse|JsonResponse
     {
         $vendor = $request->user()->vendor;
-        $data = $request->safe()->except(['cover_image', 'logo', 'remove_logo']);
+        $data = $request->safe()->except(['cover_image', 'logo', 'remove_logo', 'category_ids']);
 
         if (array_key_exists('social_links', $data)) {
             $data['social_links'] = array_filter($data['social_links'] ?? []) ?: null;
@@ -84,6 +88,10 @@ class ProfileController extends Controller
         }
 
         $vendor->update($data);
+
+        // The primary category is put back by the model, so a vendor cannot
+        // save themselves out of the category their card and profile show.
+        $vendor->categories()->sync($request->safe()->collect('category_ids')->push($vendor->category_id)->unique()->all());
 
         return $this->redirectOrJson($request, route('vendor.profile.edit'), 'Profil dikemas kini.');
     }

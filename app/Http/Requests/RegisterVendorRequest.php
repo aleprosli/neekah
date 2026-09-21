@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\User;
 use App\Models\Vendor;
 use App\Rules\Turnstile;
+use App\Support\States;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
@@ -32,7 +33,7 @@ class RegisterVendorRequest extends FormRequest
             'business_name' => ['required', 'string', 'max:120', Rule::unique(Vendor::class, 'name')],
             'category_id' => ['required', Rule::exists(Category::class, 'id')->where('is_active', true)],
             'city' => ['required', 'string', 'max:80'],
-            'state' => ['required', Rule::in(Vendor::STATES)],
+            'state' => ['required', Rule::in(States::names())],
             'tagline' => ['nullable', 'string', 'max:160'],
             'cf-turnstile-response' => [app(Turnstile::class)],
         ];

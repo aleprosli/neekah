@@ -265,7 +265,7 @@ class VendorController extends Controller
 
     public function show(Vendor $vendor): View
     {
-        $vendor->load(['category', 'user', 'packages', 'portfolioItems']);
+        $vendor->load(['category', 'categories', 'user', 'packages', 'portfolioItems']);
 
         return view('admin.vendors.show', [
             'vendor' => $vendor,
@@ -279,6 +279,8 @@ class VendorController extends Controller
                 'facts' => [
                     ['label' => 'Pemilik', 'value' => $vendor->user->name, 'detail' => collect([$vendor->user->email, $vendor->user->phone])->filter()->implode(' · ')],
                     ['label' => 'Didaftar', 'value' => $vendor->created_at->translatedFormat('j M Y')],
+                    ['label' => 'Kategori', 'value' => $vendor->category->name, 'detail' => $vendor->extraCategories()->pluck('name')->implode(' · ') ?: null],
+                    ['label' => 'Kawasan perkhidmatan', 'value' => implode(' · ', $vendor->serviceStates())],
                     ['label' => 'Rating', 'value' => '★ '.number_format((float) $vendor->rating_avg, 2).' ('.$vendor->reviews_count.' review)'],
                     ['label' => 'Booking', 'value' => $vendor->bookings()->count().' jumlah · '.$vendor->completed_bookings_count.' selesai'],
                     ['label' => 'Harga bermula', 'value' => 'RM'.number_format((float) $vendor->price_from, 2).' / '.$vendor->price_unit->label()],
