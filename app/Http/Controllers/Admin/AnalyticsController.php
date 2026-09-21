@@ -44,7 +44,7 @@ class AnalyticsController extends Controller
                     ['label' => __('props.admin.tempahan_baharu'), 'value' => number_format(Booking::query()->whereBetween('created_at', [$period->start, $period->end])->count()), 'hint' => __('props.admin.dicipta_dalam_tempoh')],
                     ['label' => __('props.admin.enquiry_dijawab'), 'value' => $enquiryCount > 0
                         ? round($enquiries->clone()->whereIn('status', [EnquiryStatus::Replied, EnquiryStatus::Closed])->count() / $enquiryCount * 100).'%'
-                        : 'Tiada data', 'hint' => $enquiryCount.' enquiry diterima'],
+                        : 'Tiada data', 'hint' => __('props.units.enquiries_received', ['count' => $enquiryCount])],
                 ],
                 'charts' => [
                     ['title' => __('props.admin.nilai_transaksi_mengikut_bulan'), 'type' => 'bars', 'series' => $this->formatted($period->series($gross), $money)],

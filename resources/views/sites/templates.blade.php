@@ -12,9 +12,9 @@
         <section class="mx-auto max-w-3xl px-4 text-center sm:px-6">
             <p class="text-sm font-semibold tracking-wide text-brand-600 uppercase">{{ __('pages.gallery_page.kad_kahwin_digital') }}</p>
             <h1 class="mt-3 font-display text-3xl font-semibold tracking-tight text-balance sm:text-5xl">{{ __('pages.gallery_page.kad_jemputan_yang_terasa_seperti') }}</h1>
-            <p class="mx-auto mt-4 max-w-xl text-ink-muted">{{ __('pages.gallery_page.sampul_yang_dibuka_kertas_bertekstur') }}<span class="font-medium text-ink">{{ $templates->count() }} template untuk dipilih</span>, percuma.</p>
+            <p class="mx-auto mt-4 max-w-xl text-ink-muted">{{ __('pages.gallery_page.sampul_yang_dibuka_kertas_bertekstur') }}<span class="font-medium text-ink">{{ __('pages.gallery_page.template_untuk_dipilih', ['count' => $templates->count()]) }}</span>{{ __('pages.gallery_page.percuma') }}</p>
             <a href="{{ $startUrl }}" class="mt-7 inline-flex rounded-full bg-brand-600 px-7 py-3 text-sm font-semibold text-white shadow-lg shadow-brand-600/20 transition hover:bg-brand-700">
-                {{ auth()->check() ? 'Cipta kad saya' : 'Daftar & cipta kad percuma' }}
+                {{ auth()->check() ? __('pages.gallery_page.cipta_kad_saya') : __('pages.gallery_page.daftar_cipta_kad_percuma') }}
             </a>
         </section>
 
@@ -80,7 +80,7 @@
             <p class="font-display text-xl font-semibold">{{ __('pages.gallery_page.sudah_jumpa_yang_berkenan') }}</p>
             <p class="mt-2 text-sm text-ink-muted">{{ __('pages.gallery_page.anda_boleh_tukar_template_bila') }}</p>
             <a href="{{ $startUrl }}" class="mt-5 inline-flex rounded-full bg-brand-600 px-8 py-3 text-sm font-semibold text-white transition hover:bg-brand-700">
-                {{ auth()->check() ? 'Cipta kad jemputan saya' : 'Daftar untuk mula' }}
+                {{ auth()->check() ? __('pages.gallery_page.cipta_kad_jemputan_saya') : __('pages.gallery_page.daftar_untuk_mula') }}
             </a>
         </div>
     </main>

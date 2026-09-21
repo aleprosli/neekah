@@ -29,6 +29,7 @@ return [
     ],
 
     'vendor' => [
+        'tiada_enquiry' => 'No enquiries',
         'penalties' => '− :count violation penalties',
         'no_penalties' => 'No penalties',
         'not_measured' => 'Not measured yet',
@@ -67,6 +68,17 @@ return [
     ],
 
     'admin' => [
+        'simpan_maklumat_perhubungan' => 'Save contact details',
+        'simpan_tetapan_seo' => 'Save SEO settings',
+        'simpan_tetapan_turnstile' => 'Save Turnstile settings',
+        'simpan_tetapan_telegram' => 'Save Telegram settings',
+        'simpan_tetapan_bayaran' => 'Save payment settings',
+        'simpan_tetapan_gambar' => 'Save image settings',
+        'aksara' => ':count characters.',
+        'tagline_bahasa' => 'Tagline · :language',
+        'penerangan_lalai_bahasa' => 'Default description · :language',
+        'bahasa_kedua_pilihan' => 'Optional. Left empty, the Malay version is used.',
+        'tarikh_tidak_direkod' => 'Date not recorded',
         'nilai_transaksi' => 'Transaction value',
         'bayaran_diterima_dalam_tempoh' => 'Payments received in the period',
         'komisen' => 'Commission',
@@ -293,5 +305,21 @@ return [
         'remaining' => 'Left',
         'saved_leave_blank' => 'Saved — leave blank to keep it',
         'not_set' => 'Not set yet',
+    ],
+
+    'units' => [
+        'people' => ':count people',
+        'up_to_people' => 'up to :count people',
+        'replies' => ':count replies',
+        'guests_on_list' => ':count guests on the list',
+        'shared_created' => ':shared shared · :created created',
+        'total_completed' => ':total total · :completed completed',
+        'penalties' => '− :count penalties',
+        'awaiting_approval' => ':count awaiting approval',
+        'active_completed' => ':active active · :completed completed',
+        'enquiries_received' => ':count enquiries received',
+        'active_list' => ':list active',
+        'recipients' => ':count recipients',
+        'weddings_completed' => ':count weddings completed',
     ],
 ];

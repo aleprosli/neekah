@@ -34,8 +34,8 @@
         ? [
             'title' => $wedding->title,
             'detail' => $wedding->event_date->translatedFormat('j F Y').' · '.match (true) {
-                $daysLeft > 0 => $daysLeft.' hari lagi',
-                $daysLeft === 0 => 'Hari ini!',
+                $daysLeft > 0 => __('pages.sidebar_couple.hari_lagi', ['count' => $daysLeft]),
+                $daysLeft === 0 => __('pages.sidebar_couple.hari_ini'),
                 default => __('pages.sidebar_couple.selamat_pengantin_baru'),
             },
             'wedding' => true,

@@ -62,12 +62,12 @@
                                 'name' => 'state',
                                 'options' => $stateOptions,
                                 'modelValue' => $filters['state'] ?? '',
-                                'placeholder' => 'Mana-mana negeri',
+                                'placeholder' => __('pages.dash.mana_mana_negeri'),
                                 'submitOnChange' => true,
                             ])"
                         >
                             <select name="state" class="nk-select pr-9 {{ $fieldClasses }}" onchange="this.form.requestSubmit()">
-                                <option value="">Mana-mana negeri</option>
+                                <option value="">{{ __('pages.dash.mana_mana_negeri') }}</option>
                                 @foreach ($states as $state)
                                     <option value="{{ $state }}" @selected($filters['state'] === $state)>{{ $state }}</option>
                                 @endforeach
@@ -187,7 +187,7 @@
                 </div>
             </div>
         @else
-            <h1 class="sr-only">{{ $activeCategory?->name ?? 'Semua vendor' }}</h1>
+            <h1 class="sr-only">{{ $activeCategory?->name ?? __('pages.dash.semua_vendor') }}</h1>
             <ul class="grid grid-cols-2 gap-x-3 gap-y-8 sm:gap-x-6 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
                 @foreach ($vendors as $vendor)
                     <li><x-vendor-card :vendor="$vendor" comparable /></li>
@@ -238,12 +238,12 @@
                         'label' => 'Negeri',
                         'options' => $stateOptions,
                         'modelValue' => $filters['state'] ?? '',
-                        'placeholder' => 'Mana-mana negeri',
+                        'placeholder' => __('pages.dash.mana_mana_negeri'),
                     ])"
                 >
                     <label for="state" class="font-semibold">{{ __('marketplace.search.state') }}</label>
                     <select id="state" name="state" class="nk-select rounded-xl border border-line bg-surface px-4 py-3 pr-10 text-sm focus:border-brand-400 focus:outline-none">
-                        <option value="">Mana-mana negeri</option>
+                        <option value="">{{ __('pages.dash.mana_mana_negeri') }}</option>
                         @foreach ($states as $state)
                             <option value="{{ $state }}" @selected($filters['state'] === $state)>{{ $state }}</option>
                         @endforeach

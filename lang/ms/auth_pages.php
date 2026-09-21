@@ -41,4 +41,13 @@ return [
         'vendor_description' => 'Urus perniagaan, tempahan dan enquiry.',
     ],
 
+    'forgot' => [
+        'title' => 'Lupa kata laluan',
+        'subtitle' => 'Masukkan emel anda dan kami akan hantar pautan untuk set semula kata laluan.',
+    ],
+
+    'phone' => [
+        'title' => 'Satu langkah lagi',
+        'subtitle' => 'Masukkan nombor telefon anda supaya vendor boleh menghubungi anda selepas anda menempah.',
+    ],
 ];

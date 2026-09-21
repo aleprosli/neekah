@@ -41,4 +41,13 @@ return [
         'vendor_description' => 'Manage your business, bookings and enquiries.',
     ],
 
+    'forgot' => [
+        'title' => 'Forgot your password',
+        'subtitle' => 'Enter your email and we will send you a link to set a new password.',
+    ],
+
+    'phone' => [
+        'title' => 'One more step',
+        'subtitle' => 'Enter your phone number so vendors can reach you after you book.',
+    ],
 ];

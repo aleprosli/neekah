@@ -43,7 +43,7 @@
                         <p class="text-xs font-medium text-ink-muted">{{ __('pages.landing.kad_jemputan_digital') }}</p>
                         <p class="mt-1 flex items-center gap-2 text-sm font-semibold">
                             <span class="size-2 rounded-full bg-emerald-500"></span>
-                            186 tetamu sahkan hadir
+                            {{ __('pages.reviews.tetamu_sahkan_hadir', ['count' => 186]) }}
                         </p>
                     </div>
 

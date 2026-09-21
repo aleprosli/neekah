@@ -10,7 +10,7 @@
                 @if ($sharedCategory)
                     <x-category-icon class="inline-block size-5 shrink-0 align-[-0.3em]" :category="$sharedCategory" /> {{ $sharedCategory->name }} · {{ $vendors->count() }} vendor dibandingkan
                 @else
-                    Pilih sehingga {{ \App\Http\Controllers\VendorComparisonController::MAX_VENDORS }} vendor daripada marketplace.
+                    {{ __('pages.reviews.pilih_sehingga_vendor', ['count' => \App\Http\Controllers\VendorComparisonController::MAX_VENDORS]) }}
                 @endif
             </p>
         </div>

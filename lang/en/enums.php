@@ -107,6 +107,11 @@ return [
         'couple_no_wedding' => 'No wedding created yet',
         'couple_no_card' => 'No digital card yet',
         'couple_no_partner' => 'Partner not invited yet',
+        'vendor_setup_complete_desc' => 'A full profile (tagline, description, phone, pricing) and a full catalogue (at least one active package and three portfolio photos).',
+        'vendor_setup_pending_desc' => 'Still missing at least one of the above, so their profile is not ready for couples to judge.',
+        'couple_no_wedding_desc' => 'Couples who registered but have no wedding at all — neither as owner nor as partner.',
+        'couple_no_card_desc' => 'Couples who created a wedding but that wedding has no digital card yet. Those who have not created a wedding are not counted here.',
+        'couple_no_partner_desc' => 'Couples who created the wedding alone: the partner has not joined, and no invitation is still valid.',
     ],
 
     'vendor_status' => [
@@ -149,6 +154,13 @@ return [
     'wedding_role' => [
         'owner' => 'Wedding owner',
         'partner' => 'Partner',
+    ],
+
+    'review_source' => [
+        'verified' => '✓ Booking verified',
+        'vendor_added' => 'Added by the vendor',
+        'platform_added' => 'Added by Neekah',
+        'open' => 'Open review',
     ],
 
 ];

@@ -48,7 +48,7 @@ class AnnouncementController extends Controller
                     'subject' => $announcement->subject,
                     'audience' => $announcement->audience->label(),
                     'recipients' => $announcement->status === AnnouncementStatus::Sent
-                        ? $announcement->recipients_count.' penerima'
+                        ? __('props.units.recipients', ['count' => $announcement->recipients_count])
                         : '—',
                     'sent_at' => $announcement->sent_at?->translatedFormat('j M Y, g:i A') ?? '—',
                     'author' => $announcement->author?->name ?? 'Admin',
@@ -134,7 +134,7 @@ class AnnouncementController extends Controller
                 ],
                 'facts' => [
                     ['label' => __('props.admin.penerima'), 'value' => $announcement->audience->label()],
-                    ['label' => __('props.admin.dihantar_kepada'), 'value' => $sent ? $announcement->recipients_count.' penerima' : '—'],
+                    ['label' => __('props.admin.dihantar_kepada'), 'value' => $sent ? __('props.units.recipients', ['count' => $announcement->recipients_count]) : '—'],
                     ['label' => __('props.admin.status'), 'value' => $announcement->status->label(), 'tone' => $announcement->status->tone()],
                     ['label' => __('props.admin.tarikh_hantar'), 'value' => $announcement->sent_at?->translatedFormat('j M Y, g:i A') ?? '—'],
                     ['label' => __('props.admin.ditulis_oleh'), 'value' => $announcement->author?->name ?? 'Admin'],

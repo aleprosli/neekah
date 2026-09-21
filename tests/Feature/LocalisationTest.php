@@ -3,6 +3,7 @@
 use App\Models\Category;
 use App\Models\ChecklistItem;
 use App\Models\Enquiry;
+use App\Models\Setting;
 use App\Models\SiteTemplate;
 use App\Models\User;
 use App\Models\Vendor;
@@ -351,4 +352,43 @@ it('leaves no Malay on the signed-in pages an English user sees', function () {
 
     $this->actingAs($couple)->get('/en/tetamu')->assertOk()
         ->assertSee('Guest list')->assertSee('Attending');
+});
+
+it('gives the English pages their own tagline and meta description', function () {
+    Setting::put([
+        'seo.tagline' => 'Semua Urusan Majlis, Satu Platform',
+        'seo.description' => str_repeat('Cari vendor perkahwinan di Malaysia. ', 3),
+        'seo.tagline_en' => 'Every Wedding Errand, One Platform',
+        'seo.description_en' => str_repeat('Find wedding vendors in Malaysia. ', 3),
+    ]);
+
+    // The footer and the <title> are the last Malay left on a page Google
+    // reads in English.
+    $this->get('/en')->assertOk()
+        ->assertSee('Every Wedding Errand, One Platform')
+        ->assertDontSee('Semua Urusan Majlis, Satu Platform');
+
+    $this->get('/')->assertOk()->assertSee('Semua Urusan Majlis, Satu Platform');
+});
+
+it('falls back to the Malay tagline when the admin has not written the English one', function () {
+    Setting::put(['seo.tagline' => 'Semua Urusan Majlis, Satu Platform', 'seo.tagline_en' => '']);
+
+    // Better the Malay words than an empty <title>.
+    $this->get('/en')->assertOk()->assertSee('Semua Urusan Majlis, Satu Platform');
+});
+
+it('walks an English couple through creating their card in their own language', function () {
+    $this->seed(SiteTemplateSeeder::class);
+
+    $couple = User::factory()->create(['locale' => 'en']);
+    Wedding::factory()->for($couple)->create();
+
+    // The four-step guide builds its steps inside a PHP array, which is why it
+    // stayed Malay long after the pages around it were translated.
+    $this->actingAs($couple)->get('/en/dashboard')->assertOk()
+        ->assertSee('Create your card in 4 steps')
+        ->assertSee('Pick a template &amp; web address', false)
+        ->assertDontSee('Pilih template')
+        ->assertDontSee('langkah selesai');
 });

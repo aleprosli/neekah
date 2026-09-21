@@ -12,6 +12,7 @@ use App\Http\Requests\UpdateTelegramSettingsRequest;
 use App\Http\Requests\UpdateTurnstileSettingsRequest;
 use App\Support\ContactSettings;
 use App\Support\ImageSettings;
+use App\Support\Locales;
 use App\Support\PaymentSettings;
 use App\Support\Seo;
 use App\Support\SeoSettings;
@@ -52,7 +53,7 @@ class SettingController extends Controller
             'title' => __('props.admin.maklumat_perhubungan'),
             'description' => __('props.admin.dipaparkan_di_footer_setiap_halaman'),
             'action' => route('admin.settings.contact'),
-            'submit' => 'Simpan maklumat perhubungan',
+            'submit' => __('props.admin.simpan_maklumat_perhubungan'),
             'columns' => true,
             'fields' => [
                 ['name' => 'phone', 'label' => __('props.admin.nombor_telefon'), 'type' => 'tel', 'value' => $values['phone'], 'placeholder' => '03-1234 5678', 'help' => __('props.admin.dipaparkan_sebagai_pautan_panggilan')],
@@ -80,14 +81,54 @@ class SettingController extends Controller
             'title' => __('props.admin.seo_dan_pratonton_pautan'),
             'description' => __('props.admin.digunakan_pada_halaman_yang_tidak'),
             'action' => route('admin.settings.seo'),
-            'submit' => 'Simpan tetapan SEO',
+            'submit' => __('props.admin.simpan_tetapan_seo'),
             'preview' => ['site' => config('app.name')],
             'fields' => [
-                ['name' => 'tagline', 'label' => __('props.admin.tagline'), 'value' => $values['tagline'], 'required' => true, 'maxlength' => SeoSettings::TAGLINE_LIMIT, 'help' => __('props.admin.muncul_selepas_nama_laman_pada')],
-                ['name' => 'description', 'label' => __('props.admin.penerangan_lalai'), 'type' => 'textarea', 'rows' => 3, 'value' => $values['description'], 'required' => true, 'maxlength' => Seo::DESCRIPTION_LIMIT, 'help' => __('props.admin.google_memotong_sekitar').Seo::DESCRIPTION_LIMIT.' aksara.'],
+                ...$this->seoTextFields($values),
                 ['name' => 'twitter', 'label' => __('props.admin.akaun_x_pilihan'), 'value' => $values['twitter'], 'placeholder' => '@neekahmy', 'help' => __('props.admin.dikreditkan_pada_kad_pratonton_x')],
             ],
         ];
+    }
+
+    /**
+     * The title tagline and meta description, one field per language. English
+     * pages are indexed separately, so they get their own words; leaving the
+     * English field empty falls back to the Malay one.
+     *
+     * @param  array<string, mixed>  $values
+     * @return array<int, array<string, mixed>>
+     */
+    private function seoTextFields(array $values): array
+    {
+        $fields = [];
+
+        foreach (Locales::ALL as $code => $locale) {
+            $suffix = $code === Locales::DEFAULT ? '' : '_'.$code;
+            $isDefault = $suffix === '';
+
+            $fields[] = [
+                'name' => 'tagline'.$suffix,
+                'label' => __('props.admin.tagline_bahasa', ['language' => $locale['label']]),
+                'value' => $values['tagline'.$suffix],
+                'required' => $isDefault,
+                'maxlength' => SeoSettings::TAGLINE_LIMIT,
+                'help' => $isDefault ? __('props.admin.muncul_selepas_nama_laman_pada') : __('props.admin.bahasa_kedua_pilihan'),
+            ];
+            $fields[] = [
+                'name' => 'description'.$suffix,
+                'label' => __('props.admin.penerangan_lalai_bahasa', ['language' => $locale['label']]),
+                'type' => 'textarea',
+                'rows' => 3,
+                'value' => $values['description'.$suffix],
+                'required' => $isDefault,
+                'maxlength' => Seo::DESCRIPTION_LIMIT,
+                'help' => $isDefault
+                    ? __('props.admin.google_memotong_sekitar').__('props.admin.aksara', ['count' => Seo::DESCRIPTION_LIMIT])
+                    : __('props.admin.bahasa_kedua_pilihan'),
+            ];
+        }
+
+        return $fields;
     }
 
     /**
@@ -103,7 +144,7 @@ class SettingController extends Controller
             'title' => __('props.admin.cloudflare_turnstile'),
             'description' => __('props.admin.semakan_tanpa_teka_teki_pada'),
             'action' => route('admin.settings.turnstile'),
-            'submit' => 'Simpan tetapan Turnstile',
+            'submit' => __('props.admin.simpan_tetapan_turnstile'),
             'badge' => ['active' => $active, 'label' => $active ? 'Aktif' : 'Tidak aktif'],
             'fields' => [
                 ['name' => 'enabled', 'label' => __('props.admin.hidupkan_turnstile'), 'type' => 'checkbox', 'value' => $values['enabled'], 'help' => __('props.admin.hanya_berjalan_apabila_kedua_dua')],
@@ -126,7 +167,7 @@ class SettingController extends Controller
             'title' => __('props.admin.makluman_telegram'),
             'description' => __('props.admin.setiap_pendaftaran_vendor_dan_pengantin'),
             'action' => route('admin.settings.telegram'),
-            'submit' => 'Simpan tetapan Telegram',
+            'submit' => __('props.admin.simpan_tetapan_telegram'),
             'badge' => ['active' => $active, 'label' => $active ? 'Aktif' : 'Tidak aktif'],
             'fields' => [
                 ['name' => 'enabled', 'label' => __('props.admin.hantar_makluman_ke_telegram'), 'type' => 'checkbox', 'value' => $values['enabled'], 'help' => __('props.admin.dihantar_melalui_queue_jadi_pendaftaran')],
@@ -151,10 +192,10 @@ class SettingController extends Controller
             'title' => __('props.admin.kaedah_bayaran'),
             'description' => __('props.admin.hidupkan_kaedah_yang_boleh_digunakan'),
             'action' => route('admin.settings.payments'),
-            'submit' => 'Simpan tetapan bayaran',
+            'submit' => __('props.admin.simpan_tetapan_bayaran'),
             'badge' => [
                 'active' => $offered !== [],
-                'label' => $offered === [] ? 'Tiada kaedah bayaran' : collect($offered)->map->label()->join(', ').' aktif',
+                'label' => $offered === [] ? 'Tiada kaedah bayaran' : __('props.units.active_list', ['list' => collect($offered)->map->label()->join(', ')]),
             ],
             'fields' => [
                 ...collect(PaymentMethod::cases())->map(fn (PaymentMethod $method): array => [
@@ -185,7 +226,7 @@ class SettingController extends Controller
             'title' => __('props.admin.gambar_2'),
             'description' => __('props.admin.setiap_gambar_yang_dimuat_naik'),
             'action' => route('admin.settings.update'),
-            'submit' => 'Simpan tetapan gambar',
+            'submit' => __('props.admin.simpan_tetapan_gambar'),
             'columns' => true,
             'warning' => $images->isLimitedByServer()
                 ? 'Server ini hanya menerima <strong>'.$images->serverUploadMegabytes().'MB</strong> setiap muat naik, jadi had di bawah tidak digunakan sepenuhnya. Naikkan <code class="font-mono">upload_max_filesize</code> dan <code class="font-mono">post_max_size</code> dalam php.ini (serta <code class="font-mono">client_max_body_size</code> pada nginx), kemudian mulakan semula PHP.'

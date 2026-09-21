@@ -3,7 +3,7 @@
         @if ($vendor->isApproved())
             <a href="{{ route('vendors.show', $vendor) }}" class="rounded-full border border-line px-4 py-2 text-sm font-medium transition hover:border-brand-400">{{ __('pages.dash.lihat_profil_awam') }}</a>
         @endif
-        <a href="{{ route('vendor.bookings.create') }}" class="rounded-full bg-brand-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-700">+ Rekod booking</a>
+        <a href="{{ route('vendor.bookings.create') }}" class="rounded-full bg-brand-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-700">+ {{ __('pages.dash.rekod_booking') }}</a>
     </x-slot:actions>
 
     {{-- resources/js/components/vendor/VendorOnboarding.vue --}}

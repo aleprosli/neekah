@@ -125,6 +125,10 @@ return [
     ],
 
     'dash' => [
+        'kad_digital_saya' => 'Kad digital saya',
+        'buat_kad_digital' => 'Buat kad digital',
+        'mana_mana_negeri' => 'Mana-mana negeri',
+        'semua_vendor' => 'Semua vendor',
         'timeline' => 'Timeline',
         'wedding_timeline' => 'Wedding timeline',
         'bajet' => 'Bajet',
@@ -234,6 +238,11 @@ return [
     ],
 
     'reviews' => [
+        'review_ditambah' => 'Review oleh :author ditambah. Ia dilabel "Ditambah oleh vendor" pada profil awam anda.',
+        'apa_yang_pelanggan_tulis' => 'Apa yang pelanggan tulis tentang :vendor.',
+        'ditambah_oleh_vendor_penjelasan' => ', supaya pengantin tahu ia datang daripada anda dan bukan dihantar melalui Neekah. Ia tidak menaikkan rating, mata atau ranking anda.',
+        'tetamu_sahkan_hadir' => ':count tetamu sahkan hadir',
+        'pilih_sehingga_vendor' => 'Pilih sehingga :count vendor daripada marketplace.',
         'review' => 'Review',
         'review_2' => 'Review',
         'salin_apa_yang_pelanggan_tulis' => 'Salin apa yang pelanggan tulis.',
@@ -381,6 +390,12 @@ return [
     ],
 
     'gallery_page' => [
+        'template_untuk_dipilih' => ':count template untuk dipilih',
+        'percuma' => ', percuma.',
+        'cipta_kad_saya' => 'Cipta kad saya',
+        'daftar_cipta_kad_percuma' => 'Daftar & cipta kad percuma',
+        'cipta_kad_jemputan_saya' => 'Cipta kad jemputan saya',
+        'daftar_untuk_mula' => 'Daftar untuk mula',
         'designs' => ':count reka bentuk',
         'step_pick' => 'Pilih template',
         'step_pick_detail' => 'Tekan mana-mana reka bentuk di bawah untuk melihat contoh penuh.',
@@ -397,6 +412,27 @@ return [
         'lihat' => 'Lihat &rarr;',
         'sudah_jumpa_yang_berkenan' => 'Sudah jumpa yang berkenan?',
         'anda_boleh_tukar_template_bila' => 'Anda boleh tukar template bila-bila masa; maklumat majlis kekal.',
+    ],
+
+    'card_setup' => [
+        'aria' => 'Panduan kad digital',
+        'eyebrow' => 'Kad kahwin digital',
+        'heading_start' => 'Cipta kad dalam 4 langkah',
+        'heading_continue' => 'Teruskan kad anda',
+        'progress' => ':done daripada :total langkah selesai.',
+        'done_label' => 'Selesai:',
+        'template_title' => 'Pilih template & alamat web',
+        'template_hint' => 'Pilih reka bentuk dan alamat sendiri, contohnya aina-hakim:domain.',
+        'template_action' => 'Pilih template',
+        'details_title' => 'Lengkapkan maklumat majlis',
+        'details_hint' => 'Tempat, alamat dan atur cara, supaya tetamu tahu ke mana dan bila.',
+        'details_action' => 'Isi maklumat',
+        'publish_title' => 'Siarkan kad',
+        'publish_hint' => 'Semak pratonton dahulu. Kad hanya boleh dibuka tetamu selepas disiarkan.',
+        'publish_action' => 'Pratonton & siarkan',
+        'share_title' => 'Kongsi dengan tetamu',
+        'share_hint' => 'Hantar pautan di WhatsApp, atau pautan peribadi setiap tetamu dari senarai tetamu.',
+        'share_action' => 'Buka senarai tetamu',
     ],
 
     'card_shell' => [
@@ -447,6 +483,8 @@ return [
     ],
 
     'sidebar_couple' => [
+        'hari_lagi' => ':count hari lagi',
+        'hari_ini' => 'Hari ini!',
         'majlis_saya' => 'Majlis saya',
         'perancangan' => 'Perancangan',
         'checklist' => 'Checklist',

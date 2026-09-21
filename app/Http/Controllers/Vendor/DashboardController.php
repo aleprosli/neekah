@@ -47,7 +47,7 @@ class DashboardController extends Controller
                     ['label' => __('props.vendor.majlis_akan_datang'), 'value' => $stats['upcoming'], 'href' => route('vendor.bookings.index', ['status' => 'confirmed'])],
                     ['label' => __('props.vendor.menunggu_deposit'), 'value' => $stats['pending'], 'href' => route('vendor.bookings.index', ['status' => 'pending_payment'])],
                     ['label' => __('props.vendor.enquiry_baru'), 'value' => $stats['open_enquiries'], 'href' => route('vendor.enquiries.index')],
-                    ['label' => __('props.vendor.bayaran_diterima'), 'value' => 'RM'.number_format($stats['paid_total'], 2), 'hint' => $stats['completed'].' majlis selesai'],
+                    ['label' => __('props.vendor.bayaran_diterima'), 'value' => 'RM'.number_format($stats['paid_total'], 2), 'hint' => __('props.units.weddings_completed', ['count' => $stats['completed']])],
                 ],
                 'upcoming' => $upcomingBookings->map(fn (Booking $booking): array => [
                     'reference' => $booking->reference,

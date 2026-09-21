@@ -107,6 +107,11 @@ return [
         'couple_no_wedding' => 'Belum cipta majlis',
         'couple_no_card' => 'Belum cipta kad digital',
         'couple_no_partner' => 'Belum jemput pasangan',
+        'vendor_setup_complete_desc' => 'Profil penuh (tagline, penerangan, telefon, harga) dan katalog penuh (sekurang-kurangnya satu pakej aktif dan tiga gambar portfolio).',
+        'vendor_setup_pending_desc' => 'Masih kurang sekurang-kurangnya satu daripada perkara di atas, jadi profil mereka belum layak dinilai pengantin.',
+        'couple_no_wedding_desc' => 'Pengantin yang mendaftar tetapi tiada majlis langsung — bukan pemilik, bukan pasangan.',
+        'couple_no_card_desc' => 'Pengantin yang sudah cipta majlis tetapi majlis itu belum ada kad digital. Mereka yang belum cipta majlis tidak dikira di sini.',
+        'couple_no_partner_desc' => 'Pengantin yang cipta majlis seorang diri: pasangan belum menyertai, dan tiada jemputan yang masih sah.',
     ],
 
     'vendor_status' => [
@@ -149,6 +154,13 @@ return [
     'wedding_role' => [
         'owner' => 'Pemilik majlis',
         'partner' => 'Pasangan',
+    ],
+
+    'review_source' => [
+        'verified' => '✓ Tempahan disahkan',
+        'vendor_added' => 'Ditambah oleh vendor',
+        'platform_added' => 'Ditambah oleh Neekah',
+        'open' => 'Review terbuka',
     ],
 
 ];

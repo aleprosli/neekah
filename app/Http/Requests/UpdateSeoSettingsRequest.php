@@ -24,6 +24,9 @@ class UpdateSeoSettingsRequest extends FormRequest
             'tagline' => ['required', 'string', 'max:'.SeoSettings::TAGLINE_LIMIT],
             'description' => ['required', 'string', 'min:50', 'max:'.Seo::DESCRIPTION_LIMIT],
             'twitter' => ['nullable', 'string', 'max:30', 'regex:/^@?[A-Za-z0-9_]+$/'],
+            // Optional: an empty English field falls back to the Malay one.
+            'tagline_en' => ['nullable', 'string', 'max:'.SeoSettings::TAGLINE_LIMIT],
+            'description_en' => ['nullable', 'string', 'min:50', 'max:'.Seo::DESCRIPTION_LIMIT],
         ];
     }
 
@@ -36,6 +39,8 @@ class UpdateSeoSettingsRequest extends FormRequest
             'tagline' => 'tagline',
             'description' => 'penerangan',
             'twitter' => 'akaun X',
+            'tagline_en' => 'tagline English',
+            'description_en' => 'penerangan English',
         ];
     }
 

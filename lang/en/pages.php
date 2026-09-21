@@ -125,6 +125,10 @@ return [
     ],
 
     'dash' => [
+        'kad_digital_saya' => 'My digital card',
+        'buat_kad_digital' => 'Create my digital card',
+        'mana_mana_negeri' => 'Any state',
+        'semua_vendor' => 'All vendors',
         'timeline' => 'Timeline',
         'wedding_timeline' => 'Wedding timeline',
         'bajet' => 'Budget',
@@ -234,6 +238,11 @@ return [
     ],
 
     'reviews' => [
+        'review_ditambah' => 'The review by :author has been added. It is labelled "Added by the vendor" on your public profile.',
+        'apa_yang_pelanggan_tulis' => 'What customers write about :vendor.',
+        'ditambah_oleh_vendor_penjelasan' => ', so couples know it came from you and was not submitted through Neekah. It does not raise your rating, points or ranking.',
+        'tetamu_sahkan_hadir' => ':count guests confirmed',
+        'pilih_sehingga_vendor' => 'Pick up to :count vendors from the marketplace.',
         'review' => 'Reviews',
         'review_2' => 'Reviews',
         'salin_apa_yang_pelanggan_tulis' => 'Copy what the customer wrote.',
@@ -381,6 +390,12 @@ return [
     ],
 
     'gallery_page' => [
+        'template_untuk_dipilih' => ':count templates to choose from',
+        'percuma' => ', free.',
+        'cipta_kad_saya' => 'Create my card',
+        'daftar_cipta_kad_percuma' => 'Sign up & create a free card',
+        'cipta_kad_jemputan_saya' => 'Create my invitation card',
+        'daftar_untuk_mula' => 'Sign up to start',
         'designs' => ':count designs',
         'step_pick' => 'Pick a template',
         'step_pick_detail' => 'Tap any design below to see the full card.',
@@ -397,6 +412,27 @@ return [
         'lihat' => 'View &rarr;',
         'sudah_jumpa_yang_berkenan' => 'Found one you like?',
         'anda_boleh_tukar_template_bila' => 'You can change template whenever you like; your details stay put.',
+    ],
+
+    'card_setup' => [
+        'aria' => 'Digital card guide',
+        'eyebrow' => 'Digital wedding card',
+        'heading_start' => 'Create your card in 4 steps',
+        'heading_continue' => 'Continue your card',
+        'progress' => ':done of :total steps done.',
+        'done_label' => 'Done:',
+        'template_title' => 'Pick a template & web address',
+        'template_hint' => 'Choose a design and your own address, for example aina-hakim:domain.',
+        'template_action' => 'Pick a template',
+        'details_title' => 'Fill in the wedding details',
+        'details_hint' => 'Venue, address and itinerary, so guests know where and when.',
+        'details_action' => 'Fill in details',
+        'publish_title' => 'Publish the card',
+        'publish_hint' => 'Check the preview first. Guests can only open the card once it is published.',
+        'publish_action' => 'Preview & publish',
+        'share_title' => 'Share it with your guests',
+        'share_hint' => 'Send the link on WhatsApp, or each guest their own private link from the guest list.',
+        'share_action' => 'Open the guest list',
     ],
 
     'card_shell' => [
@@ -447,6 +483,8 @@ return [
     ],
 
     'sidebar_couple' => [
+        'hari_lagi' => ':count days to go',
+        'hari_ini' => 'Today!',
         'majlis_saya' => 'My wedding',
         'perancangan' => 'Planning',
         'checklist' => 'Checklist',

@@ -127,7 +127,7 @@ class BookingController extends Controller
                     'payments' => $booking->payments
                         ->sortBy('created_at')
                         ->map(fn (Payment $payment): array => [
-                            'label' => $payment->paid_on?->translatedFormat('j M Y') ?? 'Tarikh tidak direkod',
+                            'label' => $payment->paid_on?->translatedFormat('j M Y') ?? __('props.admin.tarikh_tidak_direkod'),
                             'reference' => $payment->reference,
                             'amount' => 'RM'.number_format((float) $payment->amount, 2),
                             'status' => $payment->status->label(),

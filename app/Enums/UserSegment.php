@@ -39,11 +39,11 @@ enum UserSegment: string
     public function description(): string
     {
         return match ($this) {
-            self::VendorSetupComplete => 'Profil penuh (tagline, penerangan, telefon, harga) dan katalog penuh (sekurang-kurangnya satu pakej aktif dan tiga gambar portfolio).',
-            self::VendorSetupPending => 'Masih kurang sekurang-kurangnya satu daripada perkara di atas, jadi profil mereka belum layak dinilai pengantin.',
-            self::CoupleNoWedding => 'Pengantin yang mendaftar tetapi tiada majlis langsung — bukan pemilik, bukan pasangan.',
-            self::CoupleNoCard => 'Pengantin yang sudah cipta majlis tetapi majlis itu belum ada kad digital. Mereka yang belum cipta majlis tidak dikira di sini.',
-            self::CoupleNoPartner => 'Pengantin yang cipta majlis seorang diri: pasangan belum menyertai, dan tiada jemputan yang masih sah.',
+            self::VendorSetupComplete => __('enums.user_segment.vendor_setup_complete_desc'),
+            self::VendorSetupPending => __('enums.user_segment.vendor_setup_pending_desc'),
+            self::CoupleNoWedding => __('enums.user_segment.couple_no_wedding_desc'),
+            self::CoupleNoCard => __('enums.user_segment.couple_no_card_desc'),
+            self::CoupleNoPartner => __('enums.user_segment.couple_no_partner_desc'),
         };
     }
 

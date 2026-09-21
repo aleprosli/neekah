@@ -58,7 +58,7 @@ class ReviewController extends Controller
             $review->forceFill(['created_at' => $writtenOn])->save();
         }
 
-        return back()->with('status', 'Review oleh '.$review->author_name.' ditambah. Ia dilabel "Ditambah oleh vendor" pada profil awam anda.');
+        return back()->with('status', __('pages.reviews.review_ditambah', ['author' => $review->author_name]));
     }
 
     /**

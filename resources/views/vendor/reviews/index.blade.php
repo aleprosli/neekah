@@ -1,4 +1,4 @@
-<x-layouts.vendor :title="__('pages.reviews.review')" :heading="__('pages.reviews.review_2')" subheading="Apa yang pelanggan tulis tentang {{ $vendor->name }}.">
+<x-layouts.vendor :title="__('pages.reviews.review')" :heading="__('pages.reviews.review_2')" :subheading="__('pages.reviews.apa_yang_pelanggan_tulis', ['vendor' => $vendor->name])">
     @if (session('status'))
         <p class="mb-6 rounded-xl bg-emerald-50 px-4 py-3 text-sm text-emerald-800">{{ session('status') }}</p>
     @endif
@@ -9,7 +9,7 @@
     <details class="mb-6 min-w-0 rounded-2xl border border-line bg-surface-muted/40 p-4 sm:p-6" @if ($errors->addReview->any()) open @endif>
         <summary class="cursor-pointer text-sm font-semibold">{{ __('pages.reviews.tambah_review_dari_tempat_lain') }}</summary>
 
-        <p class="mt-2 max-w-2xl text-sm text-ink-muted">{{ __('pages.reviews.untuk_review_sebenar_yang_anda') }}<span class="font-medium text-ink">"Ditambah oleh vendor"</span>, supaya pengantin tahu ia datang daripada anda dan bukan dihantar melalui Neekah. Ia tidak menaikkan rating, mata atau ranking anda.
+        <p class="mt-2 max-w-2xl text-sm text-ink-muted">{{ __('pages.reviews.untuk_review_sebenar_yang_anda') }}<span class="font-medium text-ink">&ldquo;{{ __('enums.review_source.vendor_added') }}&rdquo;</span>{{ __('pages.reviews.ditambah_oleh_vendor_penjelasan') }}
         </p>
 
         <form method="POST" action="{{ route('vendor.reviews.store') }}" enctype="multipart/form-data" class="mt-4 flex flex-col gap-4">

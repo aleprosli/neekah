@@ -29,6 +29,7 @@ return [
     ],
 
     'vendor' => [
+        'tiada_enquiry' => 'Tiada enquiry',
         'penalties' => '− :count penalti pelanggaran',
         'no_penalties' => 'Tiada penalti',
         'not_measured' => 'Belum diukur',
@@ -67,6 +68,17 @@ return [
     ],
 
     'admin' => [
+        'simpan_maklumat_perhubungan' => 'Simpan maklumat perhubungan',
+        'simpan_tetapan_seo' => 'Simpan tetapan SEO',
+        'simpan_tetapan_turnstile' => 'Simpan tetapan Turnstile',
+        'simpan_tetapan_telegram' => 'Simpan tetapan Telegram',
+        'simpan_tetapan_bayaran' => 'Simpan tetapan bayaran',
+        'simpan_tetapan_gambar' => 'Simpan tetapan gambar',
+        'aksara' => ':count aksara.',
+        'tagline_bahasa' => 'Tagline · :language',
+        'penerangan_lalai_bahasa' => 'Penerangan lalai · :language',
+        'bahasa_kedua_pilihan' => 'Pilihan. Jika kosong, versi Bahasa Melayu digunakan.',
+        'tarikh_tidak_direkod' => 'Tarikh tidak direkod',
         'nilai_transaksi' => 'Nilai transaksi',
         'bayaran_diterima_dalam_tempoh' => 'Bayaran diterima dalam tempoh',
         'komisen' => 'Komisen',
@@ -293,5 +305,21 @@ return [
         'remaining' => 'Baki',
         'saved_leave_blank' => 'Tersimpan — biarkan kosong untuk kekalkan',
         'not_set' => 'Belum ditetapkan',
+    ],
+
+    'units' => [
+        'people' => ':count orang',
+        'up_to_people' => 'sehingga :count orang',
+        'replies' => ':count jawapan',
+        'guests_on_list' => ':count tetamu dalam senarai',
+        'shared_created' => ':shared dikongsi · :created dicipta',
+        'total_completed' => ':total jumlah · :completed selesai',
+        'penalties' => '− :count penalti',
+        'awaiting_approval' => ':count menunggu kelulusan',
+        'active_completed' => ':active aktif · :completed selesai',
+        'enquiries_received' => ':count enquiry diterima',
+        'active_list' => ':list aktif',
+        'recipients' => ':count penerima',
+        'weddings_completed' => ':count majlis selesai',
     ],
 ];
