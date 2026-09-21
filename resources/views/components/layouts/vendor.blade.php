@@ -38,7 +38,7 @@
     @if ($vendor && ! $vendor->isApproved())
         <div class="mb-6 rounded-2xl border border-amber-200 bg-amber-50 px-5 py-4 text-sm text-amber-900">
             <p class="font-semibold">Status: {{ $vendor->status->label() }}</p>
-            <p class="mt-1">Profil anda belum dipaparkan di marketplace. Lengkapkan profil, pakej dan portfolio sementara menunggu semakan admin.</p>
+            <p class="mt-1">{{ __('props.vendor_onboarding.belum_dipaparkan') }}</p>
         </div>
     @endif
 

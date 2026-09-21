@@ -46,7 +46,7 @@ const split = computed(() => {
 </script>
 
 <template>
-    <p v-if="!packages.length" class="rounded-2xl border border-dashed border-line p-6 text-sm text-ink-muted">{{ $t('vendor_booking_form.anda_perlu') }}<a :href="createPackageUrl" class="font-medium text-brand-600 underline underline-offset-4">tambah pakej aktif</a> sebelum merekod booking.
+    <p v-if="!packages.length" class="rounded-2xl border border-dashed border-line p-6 text-sm text-ink-muted">{{ $t('vendor_booking_form.anda_perlu') }} <a :href="createPackageUrl" class="font-medium text-brand-600 underline underline-offset-4">{{ $t('vendor_booking_form.tambah_pakej_aktif') }}</a>{{ $t('vendor_booking_form.sebelum_merekod_booking') }}
     </p>
 
     <form v-else :action="action" method="POST" class="flex max-w-2xl flex-col gap-4 rounded-2xl border border-line bg-surface-raised p-6">

@@ -47,12 +47,12 @@ const toggle = () => {
         <header class="flex flex-wrap items-center gap-4 p-5">
             <div class="min-w-0 flex-1">
                 <h2 class="font-display text-lg font-semibold">
-                    {{ allDone ? 'Profil anda sudah lengkap' : 'Langkah wajib sebelum profil anda dipaparkan' }}
+                    {{ allDone ? $t('onboarding.profil_sudah_lengkap') : $t('onboarding.langkah_wajib') }}
                 </h2>
                 <p class="mt-0.5 text-sm text-ink-muted">
                     {{ allDone
-                        ? 'Semua yang pengantin perlu lihat sudah ada. Kemas kini bila-bila masa.'
-                        : `${done} daripada ${steps.length} selesai. Profil yang lengkap disemak lebih cepat dan muncul lebih tinggi dalam carian.` }}
+                        ? $t('onboarding.semua_sudah_ada')
+                        : $t('onboarding.progres', { done, total: steps.length }) }}
                 </p>
 
                 <div class="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-surface-muted" role="progressbar" :aria-valuenow="percent" aria-valuemin="0" aria-valuemax="100">
@@ -61,7 +61,7 @@ const toggle = () => {
             </div>
 
             <button v-if="dismissible" type="button" class="shrink-0 rounded-full border border-line px-4 py-2 text-sm font-medium transition hover:border-brand-400" @click="toggle">
-                {{ collapsed ? 'Buka panduan' : 'Sembunyikan' }}
+                {{ collapsed ? $t('onboarding.buka_panduan') : $t('onboarding.sembunyikan') }}
             </button>
         </header>
 
@@ -130,7 +130,7 @@ const toggle = () => {
 
                 <div class="mt-auto flex flex-wrap gap-2">
                     <a :href="step.href" class="rounded-full bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700">
-                        {{ step.done ? 'Kemas kini' : step.action }}
+                        {{ step.done ? $t('onboarding.kemas_kini') : step.action }}
                     </a>
                     <a v-if="publicUrl" :href="publicUrl" target="_blank" rel="noopener" class="rounded-full border border-line px-5 py-2.5 text-sm font-medium transition hover:border-brand-400">{{ $t('onboarding.lihat_halaman_awam') }}</a>
                 </div>

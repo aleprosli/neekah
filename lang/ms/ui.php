@@ -367,6 +367,8 @@ return [
         'nota_pilihan' => 'Nota (pilihan)',
         'lokasi_jumlah_tetamu_permintaan_khas' => 'Lokasi, jumlah tetamu, permintaan khas',
         'anda_perlu' => 'Anda perlu',
+        'tambah_pakej_aktif' => 'tambah pakej aktif',
+        'sebelum_merekod_booking' => ' sebelum merekod booking.',
         'jumlah_pakej' => 'Jumlah pakej',
         'anda_terima' => 'Anda terima',
         'tiada_komisen_platform_anda_terima' => 'Tiada komisen platform. Anda terima jumlah penuh.',
@@ -428,6 +430,13 @@ return [
     ],
 
     'onboarding' => [
+        'profil_sudah_lengkap' => 'Profil anda sudah lengkap',
+        'langkah_wajib' => 'Langkah wajib sebelum profil anda dipaparkan',
+        'semua_sudah_ada' => 'Semua yang pengantin perlu lihat sudah ada. Kemas kini bila-bila masa.',
+        'progres' => ':done daripada :total selesai. Profil yang lengkap disemak lebih cepat dan muncul lebih tinggi dalam carian.',
+        'buka_panduan' => 'Buka panduan',
+        'sembunyikan' => 'Sembunyikan',
+        'kemas_kini' => 'Kemas kini',
         'di_halaman_awam_anda' => 'Di halaman awam anda',
         'lihat_halaman_awam' => 'Lihat halaman awam',
     ],

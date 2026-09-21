@@ -125,6 +125,11 @@ return [
     ],
 
     'dash' => [
+        'edit_pakej' => 'Edit package',
+        'cipta_wedding_project' => 'Create a wedding project',
+        'cipta_wedding_project_sub' => 'Create a wedding project to start planning.',
+        'cipta_majlis_dahulu' => 'Create your wedding first, before using the planning tools.',
+        'tambah_pakej' => 'Add a package',
         'kad_digital_saya' => 'My digital card',
         'buat_kad_digital' => 'Create my digital card',
         'mana_mana_negeri' => 'Any state',

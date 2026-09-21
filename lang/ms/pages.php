@@ -125,6 +125,11 @@ return [
     ],
 
     'dash' => [
+        'edit_pakej' => 'Edit pakej',
+        'cipta_wedding_project' => 'Cipta wedding project',
+        'cipta_wedding_project_sub' => 'Cipta wedding project untuk mula merancang.',
+        'cipta_majlis_dahulu' => 'Cipta majlis anda dahulu sebelum menggunakan alat perancangan.',
+        'tambah_pakej' => 'Tambah pakej',
         'kad_digital_saya' => 'Kad digital saya',
         'buat_kad_digital' => 'Buat kad digital',
         'mana_mana_negeri' => 'Mana-mana negeri',

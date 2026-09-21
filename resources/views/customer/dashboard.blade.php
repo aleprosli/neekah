@@ -1,4 +1,4 @@
-<x-layouts.customer :title="__('pages.dash.majlis_saya')" :heading="$wedding?->title ?? 'Majlis saya'" :subheading="$wedding ? $wedding->event_date->translatedFormat('l, j F Y').' · '.$wedding->city.', '.$wedding->state : 'Cipta wedding project untuk mula merancang.'">
+<x-layouts.customer :title="__('pages.dash.majlis_saya')" :heading="$wedding?->title ?? __('pages.dash.majlis_saya')" :subheading="$wedding ? $wedding->event_date->translatedFormat('l, j F Y').' · '.$wedding->city.', '.$wedding->state : __('pages.dash.cipta_wedding_project_sub')">
     <x-slot:actions>
         {{-- On a phone the buttons get a fixed shape instead of wrapping
              wherever they land: the digital card on a row of its own, first,

@@ -392,3 +392,26 @@ it('walks an English couple through creating their card in their own language', 
         ->assertDontSee('Pilih template')
         ->assertDontSee('langkah selesai');
 });
+
+it('walks a brand new English vendor through their onboarding in English', function () {
+    // Every earlier sweep used a finished, approved vendor, so the onboarding
+    // panel and the pending banner never rendered and stayed Malay.
+    $vendor = Vendor::factory()->pending()->create([
+        'tagline' => null,
+        'description' => null,
+        'cover_image' => null,
+        'price_from' => 0,
+    ]);
+    $vendor->user->update(['locale' => 'en']);
+
+    $html = $this->actingAs($vendor->user)->get('/en/vendor')->assertOk()->getContent();
+
+    expect($html)
+        ->toContain('not shown in the marketplace yet')
+        ->not->toContain('belum dipaparkan di marketplace');
+
+    // The step copy is handed to Vue as props, so it lives in data-props.
+    expect(html_entity_decode($html))
+        ->toContain('The first sentence couples read about you')
+        ->not->toContain('Ayat pertama yang pengantin baca');
+});

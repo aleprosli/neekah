@@ -367,6 +367,8 @@ return [
         'nota_pilihan' => 'Notes (optional)',
         'lokasi_jumlah_tetamu_permintaan_khas' => 'Location, guest count, special requests',
         'anda_perlu' => 'You need',
+        'tambah_pakej_aktif' => 'add an active package',
+        'sebelum_merekod_booking' => ' before you can record a booking.',
         'jumlah_pakej' => 'Package total',
         'anda_terima' => 'You receive',
         'tiada_komisen_platform_anda_terima' => 'No platform commission. You receive the full amount.',
@@ -428,6 +430,13 @@ return [
     ],
 
     'onboarding' => [
+        'profil_sudah_lengkap' => 'Your profile is complete',
+        'langkah_wajib' => 'What you must do before your profile is shown',
+        'semua_sudah_ada' => 'Everything couples need to see is there. Update it whenever you like.',
+        'progres' => ':done of :total done. A complete profile is reviewed faster and ranks higher in search.',
+        'buka_panduan' => 'Open the guide',
+        'sembunyikan' => 'Hide',
+        'kemas_kini' => 'Update',
         'di_halaman_awam_anda' => 'On your public page',
         'lihat_halaman_awam' => 'View public page',
     ],
