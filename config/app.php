@@ -59,13 +59,15 @@ return [
     | Application Timezone
     |--------------------------------------------------------------------------
     |
-    | Here you may specify the default timezone for your application, which
-    | will be used by the PHP date and date-time functions. The timezone
-    | is set to "UTC" by default as it is suitable for most use cases.
+    | Neekah is a Malaysian product: every couple, vendor and admin reading a
+    | time is reading it in Kuala Lumpur. Storing UTC meant the server clock,
+    | the nginx log and the Laravel log disagreed, and every timestamp shown to
+    | a person was eight hours behind — often on the wrong day. Malaysia has no
+    | daylight saving, so +08 is the offset for good.
     |
     */
 
-    'timezone' => 'UTC',
+    'timezone' => env('APP_TIMEZONE', 'Asia/Kuala_Lumpur'),
 
     /*
     |--------------------------------------------------------------------------
