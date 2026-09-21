@@ -308,6 +308,12 @@ return [
     ],
 
     'gallery_page' => [
+        'step_pick' => 'Pick a template',
+        'step_pick_detail' => 'Tap any design below to see the full card.',
+        'step_fill' => 'Fill in the details',
+        'step_fill_detail' => 'Names, date, place and itinerary. We draft it from your wedding.',
+        'step_share' => 'Choose an address & share',
+        'step_share_detail' => 'For example aina-hakim.:domain — send it on WhatsApp.',
         'template_kad_jemputan' => 'Invitation templates',
         'gaya' => 'Style',
         'kad_kahwin_digital' => 'Digital wedding cards',

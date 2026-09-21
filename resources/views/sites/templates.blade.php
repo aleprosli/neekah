@@ -27,9 +27,9 @@
         {{-- How it works --}}
         <ol class="mx-auto mt-14 grid max-w-4xl gap-3 px-4 sm:grid-cols-3 sm:px-6">
             @foreach ([
-                ['Pilih template', 'Tekan mana-mana reka bentuk di bawah untuk melihat contoh penuh.'],
-                ['Isi maklumat majlis', 'Nama, tarikh, tempat dan atur cara. Kami isi draf daripada majlis anda.'],
-                ['Pilih alamat & kongsi', 'Contohnya aina-hakim.'.config('neekah.site_domain').' — hantar di WhatsApp.'],
+                [__('pages.gallery_page.step_pick'), __('pages.gallery_page.step_pick_detail')],
+                [__('pages.gallery_page.step_fill'), __('pages.gallery_page.step_fill_detail')],
+                [__('pages.gallery_page.step_share'), __('pages.gallery_page.step_share_detail', ['domain' => config('neekah.site_domain')])],
             ] as [$title, $body])
                 <li class="flex gap-4 rounded-2xl border border-line bg-surface-raised p-5">
                     <span class="flex size-8 shrink-0 items-center justify-center rounded-full bg-brand-50 font-display text-sm font-semibold text-brand-700">{{ $loop->iteration }}</span>

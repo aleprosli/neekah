@@ -308,6 +308,12 @@ return [
     ],
 
     'gallery_page' => [
+        'step_pick' => 'Pilih template',
+        'step_pick_detail' => 'Tekan mana-mana reka bentuk di bawah untuk melihat contoh penuh.',
+        'step_fill' => 'Isi maklumat majlis',
+        'step_fill_detail' => 'Nama, tarikh, tempat dan atur cara. Kami isi draf daripada majlis anda.',
+        'step_share' => 'Pilih alamat & kongsi',
+        'step_share_detail' => 'Contohnya aina-hakim.:domain — hantar di WhatsApp.',
         'template_kad_jemputan' => 'Template kad jemputan',
         'gaya' => 'Gaya',
         'kad_kahwin_digital' => 'Kad kahwin digital',
