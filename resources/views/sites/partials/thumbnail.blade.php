@@ -13,6 +13,14 @@
 <span class="nk-card nk-paper @container relative flex aspect-[3/4] w-full flex-col items-center overflow-hidden text-center" style="{{ $template->cssVariables() }}">
     <span class="absolute inset-[5px] z-[1] border" style="border-color: color-mix(in oklab, var(--nk-accent) 50%, transparent)"></span>
 
+    {{-- The same drawn piece the real sheet carries, behind the words: the
+         gallery is where a template is chosen, so it has to show what it is. --}}
+    @if ($template->artwork() && $template->artwork() !== 'none')
+        <span class="pointer-events-none absolute inset-x-0 top-0 z-0 block h-[62%] overflow-hidden">
+            @include('sites.artwork.'.$template->artwork())
+        </span>
+    @endif
+
     @if ($ornament !== 'none')
         @include('sites.ornaments.'.$ornament, ['position' => 'top-left', 'ornamentSize' => 'w-[30%]'])
         @include('sites.ornaments.'.$ornament, ['position' => 'bottom-right', 'ornamentSize' => 'w-[30%]'])

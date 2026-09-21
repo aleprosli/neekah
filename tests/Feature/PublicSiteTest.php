@@ -300,3 +300,27 @@ it('keeps the guest list off the public card', function () {
         ->assertDontSee('Kak Ani Rahmah')
         ->assertDontSee('012-345 6789');
 });
+
+it('draws the artwork a template asks for, on the sheet and in the gallery', function () {
+    $template = SiteTemplate::where('slug', 'seri-gangsa')->sole();
+
+    expect($template->toCardDesign()->artwork())->toBe('gerbang');
+
+    $this->get(route('sites.templates.show', $template))
+        ->assertOk()
+        // The arch is struck from one circle; the flowers ride that same arc.
+        ->assertSee('A 200 200 0 0 1', false);
+
+    $this->get(route('sites.templates'))->assertOk()->assertSee('A 200 200 0 0 1', false);
+});
+
+it('prints the paper stock as a custom property rather than a class per design', function () {
+    $template = SiteTemplate::where('slug', 'mawar-pagi')->sole();
+
+    expect($template->toCardDesign()->texture())->toBe('linen')
+        ->and($template->toCardDesign()->cssVariables())->toContain('--nk-texture:url(');
+
+    // Moden is bare on purpose, and "none" paints nothing at all.
+    expect(SiteTemplate::where('slug', 'putih-tenang')->sole()->toCardDesign()->cssVariables())
+        ->toContain('--nk-texture:none');
+});

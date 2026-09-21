@@ -18,6 +18,15 @@
     <div data-card class="nk-sheet nk-paper relative z-10 mx-auto max-w-md overflow-hidden pb-28">
         <div class="nk-sheet-frame"></div>
 
+        {{-- The drawn piece at the head of the sheet, behind the hero. It is
+             what stops a kad reading as a web page, so it is laid on the paper
+             itself rather than inside one layout. --}}
+        @if ($template->artwork() && $template->artwork() !== 'none')
+            <div class="pointer-events-none absolute inset-x-0 top-0 z-0 h-[100svh] overflow-hidden">
+                @include('sites.artwork.'.$template->artwork())
+            </div>
+        @endif
+
         @include('sites.layouts.'.$template->layout(), ['site' => $site, 'template' => $template, 'preview' => $preview, 'ornament' => $ornament, 'eyebrow' => $eyebrow])
 
         <div class="relative z-[2] px-8 sm:px-10">

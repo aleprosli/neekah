@@ -173,6 +173,8 @@ class SiteTemplateSeeder extends Seeder
         string $script,
         string $body,
         bool $bismillah = false,
+        ?string $artwork = null,
+        ?string $texture = null,
     ): array {
         return [
             'slug' => $slug,
@@ -182,6 +184,8 @@ class SiteTemplateSeeder extends Seeder
             'design' => [
                 'layout' => $layout,
                 'ornament' => $ornament,
+                'artwork' => $artwork ?? self::artworkFor($style, $layout),
+                'texture' => $texture ?? self::textureFor($style),
                 'motion' => $motion,
                 'eyebrow' => $eyebrow,
                 'bismillah' => $bismillah,
@@ -190,6 +194,40 @@ class SiteTemplateSeeder extends Seeder
                 'petals' => $petals,
             ],
         ];
+    }
+
+    /**
+     * The drawn piece at the head of the sheet. A layout whose hero is already
+     * filled by the couple's own photograph gets none, because artwork behind
+     * a photo is artwork nobody sees.
+     */
+    private static function artworkFor(string $style, string $layout): string
+    {
+        if (in_array($layout, ['banner', 'arch', 'mosaic'], true)) {
+            return 'none';
+        }
+
+        return match ($style) {
+            'Klasik' => 'gerbang',
+            'Islamik' => 'bulan-bintang',
+            'Bunga' => 'kalungan',
+            'Malam' => 'songket',
+            default => 'none',
+        };
+    }
+
+    /**
+     * The stock the sheet is printed on. Moden is deliberately bare: that
+     * whole group is built on flat paper and plenty of room.
+     */
+    private static function textureFor(string $style): string
+    {
+        return match ($style) {
+            'Klasik', 'Islamik' => 'kertas',
+            'Bunga' => 'linen',
+            'Malam' => 'marmar',
+            default => 'none',
+        };
     }
 
     public function run(): void

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16">
+  <g stroke="#000" stroke-opacity=".055" stroke-width="1">
+    <path d="M0 .5H16M0 8.5H16"/>
+    <path d="M.5 0V16M8.5 0V16"/>
+  </g>
+  <g stroke="#000" stroke-opacity=".03" stroke-width="1">
+    <path d="M0 4.5H16M0 12.5H16"/>
+    <path d="M4.5 0V16M12.5 0V16"/>
+  </g>
+</svg>

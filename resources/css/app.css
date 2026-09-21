@@ -393,10 +393,18 @@ html {
 */
 .nk-paper {
     background-color: var(--nk-page);
+
+    /* The couple's chosen stock sits on top of the grain every card has. It is
+       drawn without colour of its own, so one file works under all sixteen
+       palettes and any colour a couple mixes; a photographic texture would
+       carry its own hue and fight half of them. --nk-texture is "none" when
+       no stock is chosen, which simply paints nothing. */
     background-image:
+        var(--nk-texture, none),
         radial-gradient(ellipse 120% 60% at 50% 0%, color-mix(in oklab, var(--nk-accent) 9%, transparent), transparent 70%),
         radial-gradient(ellipse 120% 60% at 50% 100%, color-mix(in oklab, var(--nk-accent) 7%, transparent), transparent 70%),
         url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .045 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-repeat: repeat, no-repeat, no-repeat, repeat;
 }
 
 /* What the sheet lies on from sm up: the page colour, a shade deeper. */

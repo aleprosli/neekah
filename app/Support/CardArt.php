@@ -96,7 +96,7 @@ class CardArt
             return 'none';
         }
 
-        return 'url("'.asset('img/card/texture/'.$key.'.webp').'")';
+        return 'url("'.asset('img/card/texture/'.$key.'.svg').'")';
     }
 
     /**
