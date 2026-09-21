@@ -39,6 +39,20 @@ class Locales
         return $locale !== null && array_key_exists($locale, self::ALL);
     }
 
+    /**
+     * The language a URL asks for, read from its first segment.
+     *
+     * A URL matching no route never reaches the locale middleware, so an error
+     * page had no language to render in and always came back in Malay — even
+     * under /en, where the reader has said which one they want.
+     */
+    public static function fromPath(string $path): string
+    {
+        $first = explode('/', trim($path, '/'))[0] ?? '';
+
+        return self::supported($first) ? $first : self::DEFAULT;
+    }
+
     public static function current(): string
     {
         $locale = app()->getLocale();

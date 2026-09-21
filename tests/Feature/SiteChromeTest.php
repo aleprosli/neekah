@@ -1,6 +1,11 @@
 <?php
 
+use App\Models\Category;
+use App\Models\User;
+use App\Models\Vendor;
+use App\Support\ContactSettings;
 use Database\Seeders\CategorySeeder;
+use Illuminate\Support\Facades\DB;
 
 beforeEach(function () {
     $this->seed(CategorySeeder::class);
@@ -58,7 +63,7 @@ it('lets the logo give ground so the header cannot overflow a phone', function (
 });
 
 it('shows the opening hours in the language of the page', function () {
-    app(App\Support\ContactSettings::class)->save([
+    app(ContactSettings::class)->save([
         'hours' => 'Ahad - Khamis, 9 Pagi - 5 Petang',
         'hours_en' => 'Sunday - Thursday, 9am - 5pm',
     ]);
@@ -70,14 +75,14 @@ it('shows the opening hours in the language of the page', function () {
 });
 
 it('falls back to the Malay hours when the English ones are not written', function () {
-    app(App\Support\ContactSettings::class)->save(['hours' => 'Ahad - Khamis, 9 Pagi - 5 Petang', 'hours_en' => '']);
+    app(ContactSettings::class)->save(['hours' => 'Ahad - Khamis, 9 Pagi - 5 Petang', 'hours_en' => '']);
 
     // Better the Malay hours than a blank line where the hours should be.
     $this->get('/en')->assertOk()->assertSee('Ahad - Khamis, 9 Pagi - 5 Petang');
 });
 
 it('gives an admin one field for the hours in each language', function () {
-    $html = $this->actingAs(App\Models\User::factory()->admin()->create())
+    $html = $this->actingAs(User::factory()->admin()->create())
         ->get(route('admin.settings.edit'))->assertOk()->getContent();
 
     expect(html_entity_decode($html))
@@ -86,7 +91,7 @@ it('gives an admin one field for the hours in each language', function () {
 });
 
 it('accepts the hours an admin writes in each language', function () {
-    $this->actingAs(App\Models\User::factory()->admin()->create())
+    $this->actingAs(User::factory()->admin()->create())
         ->put(route('admin.settings.contact'), [
             'hours' => 'Ahad - Khamis, 9 Pagi - 5 Petang',
             'hours_en' => 'Sunday - Thursday, 9am - 5pm',
@@ -94,14 +99,49 @@ it('accepts the hours an admin writes in each language', function () {
         ->assertRedirect()
         ->assertSessionHasNoErrors();
 
-    expect(app(App\Support\ContactSettings::class)->all())
+    expect(app(ContactSettings::class)->all())
         ->toMatchArray(['hours' => 'Ahad - Khamis, 9 Pagi - 5 Petang', 'hours_en' => 'Sunday - Thursday, 9am - 5pm']);
 });
 
 it('keeps the address single, because a place reads the same in any language', function () {
-    expect(array_keys(App\Support\ContactSettings::defaults()))
+    expect(array_keys(ContactSettings::defaults()))
         ->toContain('hours')
         ->toContain('hours_en')
         ->toContain('address')
         ->not->toContain('address_en');
+});
+
+it('writes an error page in the language the reader asked for', function () {
+    // Error pages are never 200, so every render-and-compare sweep skipped
+    // them and all six stayed Malay.
+    $this->get('/en/tidak-wujud')->assertNotFound()
+        ->assertSee(__('pages.errors.e404_title', [], 'en'))
+        ->assertDontSee(__('pages.errors.e404_title', [], 'ms'));
+
+    $this->get('/tidak-wujud')->assertNotFound()
+        ->assertSee(__('pages.errors.e404_title', [], 'ms'));
+});
+
+it('still renders an error page without touching the database', function () {
+    // An error page has to survive the failure that caused it: it renders
+    // standalone HTML, with no settings lookup and no session user. Reading a
+    // language file is not a query, but the rule is worth holding here too.
+    $queries = [];
+    DB::listen(function ($query) use (&$queries): void {
+        $queries[] = $query->sql;
+    });
+
+    $this->get('/tidak-wujud')->assertNotFound();
+
+    expect($queries)->toBe([]);
+});
+
+it('counts the pages in the reader language', function () {
+    $this->seed(CategorySeeder::class);
+    Vendor::factory()->count(30)->for(Category::first())->create();
+
+    // The phone drops the numbered window for "Page 1 of 2", which is the
+    // only pager text a narrow screen ever shows.
+    $this->get('/en')->assertOk()->assertSee('Page 1 of', false);
+    $this->get('/')->assertOk()->assertSee('Halaman 1 / ', false);
 });

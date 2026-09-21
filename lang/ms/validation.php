@@ -181,6 +181,8 @@ return [
     */
 
     'custom' => [
+        'file_too_large' => 'Fail terlalu besar. Had server ini ialah :sizeMB setiap muat naik.',
+
         'remaining_balance' => 'Baki yang belum direkod hanya RM:amount.',
         'own_email' => 'Itu emel anda sendiri.',
         'wedding_already_full' => 'Majlis ini sudah ada dua ahli. Buang pasangan sedia ada dahulu.',

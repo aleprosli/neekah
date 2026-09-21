@@ -7,11 +7,13 @@ use App\Http\Middleware\EnsureUserHasRole;
 use App\Http\Middleware\EnsureUserHasWedding;
 use App\Http\Middleware\SetLocale;
 use App\Support\ImageSettings;
+use App\Support\Locales;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Exceptions\PostTooLargeException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\App;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -36,6 +38,17 @@ return Application::configure(basePath: dirname(__DIR__))
         );
 
         /**
+         * A URL that matches no route never reaches the locale middleware, so
+         * a 404 under /en was answered in Malay. Returning null lets Laravel
+         * render the page as it normally would, now in the right language.
+         */
+        $exceptions->render(function (Throwable $exception, Request $request) {
+            App::setLocale(Locales::fromPath($request->path()));
+
+            return null;
+        });
+
+        /**
          * A POST larger than post_max_size is dropped by PHP before the form
          * ever reaches a controller, which otherwise surfaces as a blank
          * "page expired". Say what actually happened instead.
@@ -47,6 +60,8 @@ return Application::configure(basePath: dirname(__DIR__))
 
             return back()
                 ->withInput($request->except('_token'))
-                ->withErrors(['image' => 'Fail terlalu besar. Had server ini ialah '.app(ImageSettings::class)->effectiveUploadMegabytes().'MB setiap muat naik.']);
+                ->withErrors(['image' => __('validation.custom.file_too_large', [
+                    'size' => app(ImageSettings::class)->effectiveUploadMegabytes(),
+                ])]);
         });
     })->create();

@@ -181,6 +181,8 @@ return [
     */
 
     'custom' => [
+        'file_too_large' => 'That file is too large. This server accepts :sizeMB per upload.',
+
         'remaining_balance' => 'Only RM:amount is left to record.',
         'own_email' => 'That is your own email.',
         'wedding_already_full' => 'This wedding already has two members. Remove the existing partner first.',

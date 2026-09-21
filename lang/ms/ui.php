@@ -10,6 +10,7 @@ return [
     ],
 
     'common' => [
+        'halaman_x_daripada_y' => 'Halaman :current daripada :last',
         'memuat_naik' => 'Memuat naik…',
         'simpan' => 'Simpan',
         'teruskan' => 'Teruskan',

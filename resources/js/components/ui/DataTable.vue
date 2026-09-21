@@ -607,7 +607,7 @@ onMounted(load);
         </div>
 
         <div v-if="meta.last_page > 1" class="flex flex-wrap items-center justify-between gap-3">
-            <p class="text-xs text-ink-muted">Halaman {{ meta.current_page }} daripada {{ meta.last_page }}</p>
+            <p class="text-xs text-ink-muted">{{ $t('common.halaman_x_daripada_y', { current: meta.current_page, last: meta.last_page }) }}</p>
             <div class="flex gap-2">
                 <button type="button" class="rounded-full border border-line px-4 py-2 text-sm font-medium transition hover:border-brand-400 disabled:opacity-40" :disabled="meta.current_page <= 1" @click="go(meta.current_page - 1)">{{ $t('common.previous') }}</button>
                 <button type="button" class="rounded-full border border-line px-4 py-2 text-sm font-medium transition hover:border-brand-400 disabled:opacity-40" :disabled="meta.current_page >= meta.last_page" @click="go(meta.current_page + 1)">{{ $t('common.next') }}</button>

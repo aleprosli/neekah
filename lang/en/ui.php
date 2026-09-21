@@ -10,6 +10,7 @@ return [
     ],
 
     'common' => [
+        'halaman_x_daripada_y' => 'Page :current of :last',
         'memuat_naik' => 'Uploading…',
         'simpan' => 'Save',
         'teruskan' => 'Continue',

@@ -1,5 +1,5 @@
 <x-errors.layout
     code="503"
-    title="Neekah sedang dinaik taraf"
-    message="Kami sedang membuat penyelenggaraan singkat. Halaman ini akan kembali dalam beberapa minit."
+    :title="__('pages.errors.e503_title')"
+    :message="__('pages.errors.e503_message')"
 />
