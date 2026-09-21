@@ -124,4 +124,17 @@ class CardArt
             ->values()
             ->all();
     }
+
+    /**
+     * Every stock with the value --nk-texture takes, so the editor can swap
+     * paper in the live preview without asking the server to redraw the card.
+     *
+     * @return array<string, string>
+     */
+    public static function textureCssMap(): array
+    {
+        return collect(self::TEXTURES)
+            ->map(fn (string $label, string $key): string => self::textureCss($key))
+            ->all();
+    }
 }

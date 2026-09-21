@@ -170,6 +170,10 @@ Route::middleware('auth')->group(function (): void {
 
     Route::get('/kad', [CustomerArea\WeddingSiteController::class, 'edit'])->middleware('wedding')->name('site.edit');
     Route::get('/kad/preview', [CustomerArea\WeddingSiteController::class, 'preview'])->middleware('wedding')->name('site.preview');
+    // The live preview inside the editor: the card drawn from a form that has
+    // not been saved. POST because it carries the whole draft, not because it
+    // writes anything.
+    Route::post('/kad/preview', [CustomerArea\WeddingSiteController::class, 'previewDraft'])->middleware('wedding')->name('site.preview.draft');
     Route::get('/kad/alamat', [CustomerArea\WeddingSiteController::class, 'checkSubdomain'])->middleware(['wedding', 'throttle:60,1'])->name('site.subdomain');
     Route::put('/weddings/{wedding}/kad', [CustomerArea\WeddingSiteController::class, 'update'])->name('weddings.site.update');
     Route::post('/weddings/{wedding}/kad/galeri', [CustomerArea\WeddingSitePhotoController::class, 'store'])->name('weddings.site.photos.store');

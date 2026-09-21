@@ -8,7 +8,7 @@
 
 {{-- One sheet of card stock with a double rule round its edge. On a phone the
      sheet is the screen; from sm up it lies on a darker "table" like a real kad. --}}
-<div class="nk-card nk-table relative min-h-screen overflow-hidden" style="{{ $template->cssVariables() }}">
+<div data-card-root class="nk-card nk-table relative min-h-screen overflow-hidden" style="{{ $template->cssVariables() }}">
     @include('sites.partials.motion', ['template' => $template])
 
     @unless ($preview)

@@ -7,7 +7,8 @@
  * three empty ones, and a couple with eight should not be told they may have
  * six. The server's own limits are passed in and enforced here too.
  */
-import { computed, onBeforeUnmount, ref, watch } from 'vue';
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import { useLivePreview } from '../../composables/useLivePreview.js';
 import { useUploadForm } from '../../composables/useUploadForm.js';
 import UiConfirm from '../ui/UiConfirm.vue';
 import UiField from '../ui/UiField.vue';
@@ -81,6 +82,88 @@ const moveSection = (at, by) => {
     const rows = sectionRows.value;
     [rows[at], rows[to]] = [rows[to], rows[at]];
 };
+
+/* ── Live preview ──────────────────────────────────────────────────────── */
+
+const formEl = ref(null);
+const showPreview = ref(false);
+const { frame, drawing, failed: previewFailed, paint, redraw, redrawSoon } = useLivePreview({
+    url: props.limits.draft_preview_url,
+    csrf: props.csrf,
+});
+
+/**
+ * Exactly what the form would post, minus the files: a cover photo re-uploaded
+ * on every keystroke would cost the couple their data allowance to watch their
+ * own card. The picture appears in the preview once it is saved.
+ */
+const draftPayload = () => {
+    const data = new FormData(formEl.value);
+
+    [...data.keys()].forEach((key) => {
+        if (data.get(key) instanceof File) data.delete(key);
+    });
+
+    return data;
+};
+
+const PALETTE_VARS = {
+    page: '--nk-page',
+    ink: '--nk-ink',
+    name: '--nk-name',
+    accent: '--nk-accent',
+    body: '--nk-body',
+    muted: '--nk-muted',
+    panel: '--nk-panel',
+    line: '--nk-line',
+    buttonBg: '--nk-button-bg',
+    buttonText: '--nk-button-text',
+};
+
+/** The design choices the frame can take without being redrawn. */
+const repaint = () => {
+    const variables = { '--nk-texture': props.design.textureCss[design.value.texture] ?? 'none' };
+
+    Object.entries(PALETTE_VARS).forEach(([key, name]) => {
+        variables[name] = design.value.palette[key];
+    });
+
+    if (design.value.type.script) variables['--nk-script'] = design.value.type.script;
+    if (design.value.type.body) variables['--nk-serif'] = design.value.type.body;
+
+    return paint(variables);
+};
+
+onMounted(() => {
+    nextTick(() => redraw(draftPayload()));
+});
+
+// Colour, face and paper land straight in the frame. If it is mid-redraw and
+// has no card to paint yet, the redraw that follows carries them anyway.
+watch(
+    () => [design.value.palette, design.value.type, design.value.texture],
+    () => repaint(),
+    { deep: true },
+);
+
+// Everything else changes the markup, so the server draws it.
+watch(
+    () => [
+        form.value,
+        design.value.layout,
+        design.value.ornament,
+        design.value.motion,
+        design.value.artwork,
+        design.value.eyebrow,
+        design.value.bismillah,
+        sectionRows.value,
+        itinerary.value,
+        contacts.value,
+        giftAccounts.value,
+    ],
+    () => redrawSoon(draftPayload),
+    { deep: true },
+);
 
 const add = (rows, blank, limit) => {
     if (rows.value.length < limit) rows.value.push({ ...blank });
@@ -216,7 +299,8 @@ const previewFile = (event, target) => {
         </form>
     </div>
 
-    <form :action="action" method="POST" enctype="multipart/form-data" class="flex flex-col gap-8" @submit="submitUpload">
+    <div class="flex items-start lg:flex-row">
+    <form ref="formEl" :action="action" method="POST" enctype="multipart/form-data" class="flex min-w-0 flex-col gap-8" @submit="submitUpload">
         <input type="hidden" name="_token" :value="csrf">
         <input type="hidden" name="_method" value="PUT">
 
@@ -544,9 +628,58 @@ const previewFile = (event, target) => {
             <button type="submit" class="rounded-full bg-brand-600 px-8 py-3 text-sm font-semibold text-white transition hover:bg-brand-700 disabled:opacity-50" :disabled="uploading">
                 {{ uploading ? 'Menyimpan…' : exists ? 'Simpan kad' : 'Cipta kad jemputan' }}
             </button>
-            <a :href="limits.preview_url" target="_blank" rel="noopener" class="rounded-full border border-line px-6 py-3 text-sm font-medium transition hover:border-brand-400">Pratonton</a>
+            <a :href="limits.preview_url" target="_blank" rel="noopener" class="rounded-full border border-line px-6 py-3 text-sm font-medium transition hover:border-brand-400">Buka penuh</a>
         </div>
     </form>
+
+    <!-- The card, drawn live from the form beside it. On a large screen it
+         stands next to the fields; on a phone there is no room for both, so it
+         opens over them from a button that follows the page. -->
+    <div
+        :class="[
+            'bg-surface/95 fixed inset-0 z-40 flex flex-col backdrop-blur',
+            'lg:static lg:z-auto lg:ml-8 lg:block lg:w-[380px] lg:shrink-0 lg:bg-transparent lg:backdrop-blur-none',
+            showPreview ? 'flex' : 'hidden lg:block',
+        ]"
+    >
+        <div class="flex items-center justify-between gap-3 border-b border-line px-4 py-3 lg:hidden">
+            <p class="text-sm font-semibold">Pratonton kad</p>
+            <button type="button" class="rounded-full border border-line px-4 py-1.5 text-sm font-medium" @click="showPreview = false">Tutup</button>
+        </div>
+
+        <div class="lg:sticky lg:top-6">
+            <div class="mb-2 hidden items-center justify-between gap-2 lg:flex">
+                <p class="text-sm font-semibold">Pratonton langsung</p>
+                <span v-if="drawing" class="text-xs text-ink-muted">Melukis…</span>
+                <span v-else-if="previewFailed" class="text-xs text-brand-700">Gagal melukis</span>
+            </div>
+
+            <div class="relative flex-1 overflow-hidden border-line bg-white lg:aspect-[9/16] lg:rounded-2xl lg:border lg:shadow-lg">
+                <iframe
+                    ref="frame"
+                    title="Pratonton kad jemputan"
+                    class="size-full"
+                    :class="drawing ? 'opacity-70 transition-opacity' : 'transition-opacity'"
+                ></iframe>
+            </div>
+
+            <p class="mt-2 hidden text-xs text-ink-muted lg:block">
+                Warna dan tulisan berubah serta-merta. Gambar muncul selepas disimpan.
+            </p>
+        </div>
+    </div>
+
+    <!-- Phone only: the way back to the card without scrolling to find it. -->
+    <button
+        v-if="!showPreview"
+        type="button"
+        class="fixed right-4 bottom-20 z-30 flex items-center gap-2 rounded-full bg-ink px-5 py-3 text-sm font-semibold text-surface shadow-xl lg:hidden"
+        @click="showPreview = true"
+    >
+        <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+        Lihat kad
+    </button>
+    </div>
 
     <section v-if="gallery" class="mt-10 flex flex-col gap-4">
         <h2 class="font-display text-xl font-semibold">Galeri gambar</h2>

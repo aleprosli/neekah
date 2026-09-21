@@ -284,3 +284,56 @@ it('renders the published card in the arranged order', function () {
         ->assertSeeInOrder(['Atur Cara Majlis', 'Dewan Seri Melati'], false)
         ->assertDontSee('Menghitung Hari');
 });
+
+it('draws the card from a form that has not been saved, and saves nothing', function () {
+    $site = WeddingSite::factory()->for($this->wedding)->create([
+        'template' => 'seri-gangsa',
+        'bride_name' => 'Aina',
+        'groom_name' => 'Hakim',
+        'venue_name' => 'Dewan Lama',
+    ]);
+
+    $this->actingAs($this->aina)
+        ->post(route('site.preview.draft'), [
+            'bride_name' => 'Aina Zulkifli',
+            'venue_name' => 'Dewan Seri Melati',
+            'template' => 'mawar-pagi',
+            'design_overrides' => ['palette' => ['accent' => '#112233']],
+        ])
+        ->assertOk()
+        ->assertSee('Aina Zulkifli')
+        ->assertSee('Dewan Seri Melati')
+        ->assertSee('--nk-accent:#112233', false)
+        // The frame has no room for the preview bar the full-page view carries.
+        ->assertDontSee('Kembali ke editor');
+
+    $site->refresh();
+
+    expect($site->bride_name)->toBe('Aina')
+        ->and($site->venue_name)->toBe('Dewan Lama')
+        ->and($site->template)->toBe('seri-gangsa')
+        ->and($site->design_overrides)->toBeNull();
+});
+
+it('refuses a design the card cannot draw, even in the preview', function () {
+    WeddingSite::factory()->for($this->wedding)->create(['template' => 'seri-gangsa']);
+
+    // The preview prints these into a style attribute like the real card does.
+    $this->actingAs($this->aina)
+        ->post(route('site.preview.draft'), [
+            'design_overrides' => ['palette' => ['accent' => '#fff" onload="alert(1)']],
+        ])
+        ->assertOk()
+        ->assertDontSee('onload=', false);
+});
+
+it('never draws one couple card for another', function () {
+    WeddingSite::factory()->for($this->wedding)->create(['template' => 'seri-gangsa', 'bride_name' => 'Aina']);
+
+    // Somebody with no wedding of their own is sent off to make one; what
+    // matters is that they are never handed this card.
+    $this->actingAs(User::factory()->create())
+        ->post(route('site.preview.draft'), ['bride_name' => 'Bukan Saya'])
+        ->assertRedirect()
+        ->assertDontSee('Aina');
+});

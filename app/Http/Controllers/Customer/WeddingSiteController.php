@@ -57,6 +57,7 @@ class WeddingSiteController extends Controller
                     'templates' => $templates->count(),
                     'gallery_url' => route('sites.templates'),
                     'preview_url' => route('site.preview'),
+                    'draft_preview_url' => route('site.preview.draft'),
                     // The same ceilings StoreWeddingSiteRequest enforces, so the
                     // form cannot offer a row the server will reject.
                     'itinerary' => 12,
@@ -177,6 +178,8 @@ class WeddingSiteController extends Controller
                 'script' => CardArt::fontOptions('script'),
                 'body' => CardArt::fontOptions('body'),
             ],
+            // --nk-texture for each stock, so the frame can repaint without a redraw.
+            'textureCss' => CardArt::textureCssMap(),
             'paletteLabels' => [
                 'page' => 'Kertas',
                 'ink' => 'Dakwat',
@@ -268,6 +271,80 @@ class WeddingSiteController extends Controller
     /**
      * A live preview of the couple's own content, without publishing it.
      */
+    /**
+     * The card as it would look right now, from a form that has not been saved.
+     *
+     * The preview is rendered by the same Blade the published card is, so what
+     * a couple is looking at cannot drift from what their guests will get — a
+     * second copy of the card in JavaScript would.
+     *
+     * Nothing here is persisted. Validation is deliberately loose: a couple
+     * halfway through typing a date should see their card, not an error. The
+     * one thing still held to the catalogue is the design, because those
+     * values are printed into a style attribute.
+     */
+    public function previewDraft(Request $request): View
+    {
+        $wedding = $request->user()->weddings()->latest('event_date')->firstOrFail();
+        Gate::authorize('view', $wedding);
+
+        $site = $wedding->site ?? $this->draftFor($wedding);
+
+        $site->fill(collect($request->only([
+            'bride_name', 'groom_name', 'bride_parents', 'groom_parents', 'salutation',
+            'invitation_note', 'venue_name', 'venue_address', 'map_url', 'closing_note',
+            'gift_note',
+        ]))->filter(fn (mixed $value): bool => is_string($value))->all());
+
+        foreach (['event_date' => 'date', 'starts_at' => 'time', 'ends_at' => 'time', 'rsvp_deadline' => 'date'] as $field => $kind) {
+            if ($request->filled($field)) {
+                $site->{$field} = $request->input($field);
+            }
+        }
+
+        foreach (['rsvp_enabled', 'gift_enabled', 'wishes_enabled'] as $flag) {
+            $site->{$flag} = $request->boolean($flag);
+        }
+
+        $site->itinerary = $this->previewRows($request, 'itinerary', ['time', 'label']);
+        $site->contacts = $this->previewRows($request, 'contacts', ['name', 'phone']);
+        $site->gift_accounts = $this->previewRows($request, 'gift_accounts', ['bank', 'number']);
+
+        if (SiteTemplate::active()->where('slug', $request->input('template'))->exists()) {
+            $site->template = $request->input('template');
+            // design() reads the relation, which still holds the old row.
+            $site->unsetRelation('siteTemplate');
+        }
+
+        $site->design_overrides = CardDesign::clean((array) $request->input('design_overrides', [])) ?: null;
+        $site->sections = $request->filled('sections')
+            ? CardSections::sanitise((array) $request->input('sections'))
+            : null;
+
+        return view('sites.show', [
+            'site' => $site,
+            'template' => $site->design(),
+            'preview' => true,
+            'draft' => true,
+        ]);
+    }
+
+    /**
+     * A repeater's rows, keeping only those with every column filled in, so a
+     * half-typed row does not print as a blank line on the card.
+     *
+     * @param  array<int, string>  $columns
+     * @return array<int, array<string, string>>
+     */
+    private function previewRows(Request $request, string $field, array $columns): array
+    {
+        return collect($request->input($field, []))
+            ->filter(fn (mixed $row): bool => is_array($row) && collect($columns)->every(fn (string $c): bool => filled($row[$c] ?? null)))
+            ->map(fn (array $row): array => collect($row)->only(array_merge($columns, ['holder']))->map(fn ($v): string => (string) $v)->all())
+            ->values()
+            ->all();
+    }
+
     public function preview(Request $request): View
     {
         $wedding = $request->user()->weddings()->latest('event_date')->firstOrFail();

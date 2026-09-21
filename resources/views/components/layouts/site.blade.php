@@ -1,6 +1,6 @@
 {{-- $template is the resolved CardDesign the card is drawn from; $siteTemplate
      is the SiteTemplate row, which only the sample preview bar needs by name. --}}
-@props(['site', 'template', 'siteTemplate' => null, 'preview' => false, 'sample' => false])
+@props(['site', 'template', 'siteTemplate' => null, 'preview' => false, 'sample' => false, 'draft' => false])
 
 <x-layouts.app :title="$site->coupleNames()" :description="'Jemputan majlis perkahwinan '.$site->coupleNames()" :preloader="false" shell="card">
     {{-- The invitation opens with the couple's own names in their own colours.
@@ -13,7 +13,7 @@
         </p>
     </x-site.preloader>
 
-    @if ($preview)
+    @if ($preview && ! $draft)
         <div class="sticky top-0 z-50 bg-ink text-surface">
             <div class="mx-auto flex max-w-4xl flex-col items-center justify-between gap-2 px-4 py-2 text-sm sm:flex-row sm:px-6">
                 <p class="flex items-center gap-2">
