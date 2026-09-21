@@ -31,7 +31,7 @@ class ContactSettings extends SettingGroup
 
     public function hours(): string
     {
-        return $this->string('hours');
+        return $this->localised('hours');
     }
 
     /**
@@ -95,11 +95,23 @@ class ContactSettings extends SettingGroup
             'whatsapp' => '',
             'email' => (string) config('mail.from.address'),
             'address' => '',
-            'hours' => '',
+            ...self::localisedDefaults('hours'),
             'facebook' => '',
             'instagram' => '',
             'tiktok' => '',
         ];
+    }
+
+    /**
+     * The opening hours read differently in each language — "Ahad - Khamis"
+     * is not something to show someone reading English — while the address is
+     * a place and reads the same wherever you are from.
+     *
+     * @return array<string, string>
+     */
+    private static function localisedDefaults(string $key): array
+    {
+        return array_fill_keys(array_values(self::localisedKeys($key)), '');
     }
 
     protected static function prefix(): string

@@ -126,6 +126,7 @@ return [
     'unit_harga' => 'price unit',
     'vendor' => 'vendor',
     'waktu_operasi' => 'opening hours',
+    'waktu_operasi_en' => 'English opening hours',
     'warna' => 'colour',
 
 ];

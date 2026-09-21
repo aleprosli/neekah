@@ -115,6 +115,8 @@ return [
     ],
 
     'admin' => [
+        'waktu_operasi_bahasa' => 'Waktu operasi · :language',
+        'isnin_jumaat_9_pagi_6_en' => 'Monday – Friday, 9am – 6pm',
         'upload_server_warning' => 'Server ini hanya menerima <strong>:sizeMB</strong> setiap muat naik, jadi had di bawah tidak digunakan sepenuhnya. Naikkan <code class="font-mono">upload_max_filesize</code> dan <code class="font-mono">post_max_size</code> dalam php.ini (serta <code class="font-mono">client_max_body_size</code> pada nginx), kemudian mulakan semula PHP.',
         'max_dimension_help' => '1920 sudah tajam untuk skrin penuh. Lebih besar bermakna fail lebih berat.',
         'tiada_majlis' => 'Tiada majlis',

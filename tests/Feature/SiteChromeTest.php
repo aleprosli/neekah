@@ -56,3 +56,52 @@ it('lets the logo give ground so the header cannot overflow a phone', function (
         ->toContain('max-w-full')
         ->not->toContain('max-w-[42vw]');
 });
+
+it('shows the opening hours in the language of the page', function () {
+    app(App\Support\ContactSettings::class)->save([
+        'hours' => 'Ahad - Khamis, 9 Pagi - 5 Petang',
+        'hours_en' => 'Sunday - Thursday, 9am - 5pm',
+    ]);
+
+    // They sit in the footer of every page, and "Ahad - Khamis" is not
+    // something to show someone reading English.
+    $this->get('/')->assertOk()->assertSee('Ahad - Khamis, 9 Pagi - 5 Petang')->assertDontSee('Sunday - Thursday');
+    $this->get('/en')->assertOk()->assertSee('Sunday - Thursday, 9am - 5pm')->assertDontSee('Ahad - Khamis');
+});
+
+it('falls back to the Malay hours when the English ones are not written', function () {
+    app(App\Support\ContactSettings::class)->save(['hours' => 'Ahad - Khamis, 9 Pagi - 5 Petang', 'hours_en' => '']);
+
+    // Better the Malay hours than a blank line where the hours should be.
+    $this->get('/en')->assertOk()->assertSee('Ahad - Khamis, 9 Pagi - 5 Petang');
+});
+
+it('gives an admin one field for the hours in each language', function () {
+    $html = $this->actingAs(App\Models\User::factory()->admin()->create())
+        ->get(route('admin.settings.edit'))->assertOk()->getContent();
+
+    expect(html_entity_decode($html))
+        ->toContain(__('props.admin.waktu_operasi_bahasa', ['language' => 'Bahasa Melayu']))
+        ->toContain(__('props.admin.waktu_operasi_bahasa', ['language' => 'English']));
+});
+
+it('accepts the hours an admin writes in each language', function () {
+    $this->actingAs(App\Models\User::factory()->admin()->create())
+        ->put(route('admin.settings.contact'), [
+            'hours' => 'Ahad - Khamis, 9 Pagi - 5 Petang',
+            'hours_en' => 'Sunday - Thursday, 9am - 5pm',
+        ])
+        ->assertRedirect()
+        ->assertSessionHasNoErrors();
+
+    expect(app(App\Support\ContactSettings::class)->all())
+        ->toMatchArray(['hours' => 'Ahad - Khamis, 9 Pagi - 5 Petang', 'hours_en' => 'Sunday - Thursday, 9am - 5pm']);
+});
+
+it('keeps the address single, because a place reads the same in any language', function () {
+    expect(array_keys(App\Support\ContactSettings::defaults()))
+        ->toContain('hours')
+        ->toContain('hours_en')
+        ->toContain('address')
+        ->not->toContain('address_en');
+});

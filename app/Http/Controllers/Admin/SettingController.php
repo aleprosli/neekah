@@ -59,7 +59,7 @@ class SettingController extends Controller
                 ['name' => 'phone', 'label' => __('props.admin.nombor_telefon'), 'type' => 'tel', 'value' => $values['phone'], 'placeholder' => '03-1234 5678', 'help' => __('props.admin.dipaparkan_sebagai_pautan_panggilan')],
                 ['name' => 'whatsapp', 'label' => __('props.admin.nombor_whatsapp'), 'type' => 'tel', 'value' => $values['whatsapp'], 'placeholder' => '60123456789', 'help' => __('props.admin.dengan_kod_negara_kosong_bermakna')],
                 ['name' => 'email', 'label' => __('props.admin.emel'), 'type' => 'email', 'value' => $values['email'], 'placeholder' => 'hello@neekah.my'],
-                ['name' => 'hours', 'label' => __('props.admin.waktu_operasi'), 'value' => $values['hours'], 'placeholder' => __('props.admin.isnin_jumaat_9_pagi_6')],
+                ...$this->hoursFields($values),
                 ['name' => 'address', 'label' => __('props.admin.alamat'), 'type' => 'textarea', 'rows' => 2, 'wide' => true, 'value' => $values['address'], 'placeholder' => __('props.admin.no_1_jalan_contoh_50000')],
                 ['name' => 'facebook', 'label' => __('props.admin.facebook'), 'type' => 'url', 'value' => $values['facebook'], 'placeholder' => 'https://facebook.com/neekahmy'],
                 ['name' => 'instagram', 'label' => __('props.admin.instagram'), 'type' => 'url', 'value' => $values['instagram'], 'placeholder' => 'https://instagram.com/neekahmy'],
@@ -88,6 +88,37 @@ class SettingController extends Controller
                 ['name' => 'twitter', 'label' => __('props.admin.akaun_x_pilihan'), 'value' => $values['twitter'], 'placeholder' => '@neekahmy', 'help' => __('props.admin.dikreditkan_pada_kad_pratonton_x')],
             ],
         ];
+    }
+
+    /**
+     * Opening hours, one field per language.
+     *
+     * "Ahad - Khamis, 9 Pagi - 5 Petang" is not something to show someone
+     * reading English, and it sits in the footer of every page. The address
+     * beside it stays single: a place reads the same wherever you are from.
+     *
+     * @param  array<string, mixed>  $values
+     * @return array<int, array<string, mixed>>
+     */
+    private function hoursFields(array $values): array
+    {
+        $fields = [];
+
+        foreach (ContactSettings::localisedKeys('hours') as $code => $key) {
+            $isDefault = $code === Locales::DEFAULT;
+
+            $fields[] = [
+                'name' => $key,
+                'label' => __('props.admin.waktu_operasi_bahasa', ['language' => Locales::label($code)]),
+                'value' => $values[$key],
+                'placeholder' => $isDefault
+                    ? __('props.admin.isnin_jumaat_9_pagi_6')
+                    : __('props.admin.isnin_jumaat_9_pagi_6_en'),
+                'help' => $isDefault ? null : __('props.admin.bahasa_kedua_pilihan'),
+            ];
+        }
+
+        return $fields;
     }
 
     /**

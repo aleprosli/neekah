@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Support\ContactSettings;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateContactSettingsRequest extends FormRequest
@@ -24,7 +25,11 @@ class UpdateContactSettingsRequest extends FormRequest
             'whatsapp' => ['nullable', 'string', 'max:30'],
             'email' => ['nullable', 'email', 'max:120'],
             'address' => ['nullable', 'string', 'max:300'],
-            'hours' => ['nullable', 'string', 'max:120'],
+            // One rule per language, from the same list the form is built
+            // from, so a language cannot appear in one and not the other.
+            ...collect(ContactSettings::localisedKeys('hours'))
+                ->mapWithKeys(fn (string $key): array => [$key => ['nullable', 'string', 'max:120']])
+                ->all(),
             'facebook' => ['nullable', 'url', 'max:200'],
             'instagram' => ['nullable', 'url', 'max:200'],
             'tiktok' => ['nullable', 'url', 'max:200'],
@@ -54,6 +59,7 @@ class UpdateContactSettingsRequest extends FormRequest
             'email' => __('fields.emel'),
             'address' => __('fields.alamat'),
             'hours' => __('fields.waktu_operasi'),
+            'hours_en' => __('fields.waktu_operasi_en'),
         ];
     }
 }

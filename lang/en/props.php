@@ -115,6 +115,8 @@ return [
     ],
 
     'admin' => [
+        'waktu_operasi_bahasa' => 'Opening hours · :language',
+        'isnin_jumaat_9_pagi_6_en' => 'Monday – Friday, 9am – 6pm',
         'upload_server_warning' => 'This server accepts only <strong>:sizeMB</strong> per upload, so the limit below is not used in full. Raise <code class="font-mono">upload_max_filesize</code> and <code class="font-mono">post_max_size</code> in php.ini (and <code class="font-mono">client_max_body_size</code> on nginx), then restart PHP.',
         'max_dimension_help' => '1920 is already sharp on a full screen. Larger just means heavier files.',
         'tiada_majlis' => 'No wedding',

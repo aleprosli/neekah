@@ -56,4 +56,45 @@ abstract class SettingGroup
     {
         return trim((string) $this->value($key));
     }
+
+    /**
+     * A value an admin writes once per language.
+     *
+     * Stored as the key itself for the default language and "key_en" for the
+     * others, so a group gains a language without a migration and a value
+     * written before any of this existed is still the default one.
+     *
+     * Falls back to the default language when the admin has not written the
+     * other yet: better the Malay opening hours on an English page than a
+     * blank line where the hours should be.
+     */
+    protected function localised(string $key): string
+    {
+        $locale = Locales::current();
+        $forLocale = $key.'_'.$locale;
+
+        if ($locale !== Locales::DEFAULT
+            && array_key_exists($forLocale, static::defaults())
+            && ($value = $this->string($forLocale)) !== '') {
+            return $value;
+        }
+
+        return $this->string($key);
+    }
+
+    /**
+     * The stored keys for a value that is written once per language, in the
+     * order the languages are served. The admin form and the validation rules
+     * are both built from this, so they cannot disagree.
+     *
+     * @return array<string, string> keyed by locale code
+     */
+    public static function localisedKeys(string $key): array
+    {
+        return collect(Locales::codes())
+            ->mapWithKeys(fn (string $code): array => [
+                $code => $code === Locales::DEFAULT ? $key : $key.'_'.$code,
+            ])
+            ->all();
+    }
 }

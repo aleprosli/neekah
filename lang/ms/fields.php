@@ -126,6 +126,7 @@ return [
     'unit_harga' => 'unit harga',
     'vendor' => 'vendor',
     'waktu_operasi' => 'waktu operasi',
+    'waktu_operasi_en' => 'waktu operasi English',
     'warna' => 'warna',
 
 ];
