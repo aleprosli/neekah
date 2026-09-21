@@ -74,18 +74,31 @@ onBeforeUnmount(() => {
                     :key="photo.id"
                     type="button"
                     :class="[
-                        'group relative overflow-hidden',
+                        'group relative overflow-hidden bg-surface-muted',
                         at === 0 ? 'col-span-4 row-span-2 md:col-span-2' : 'hidden md:block',
                     ]"
                     @click="show(at)"
                 >
+                    <!-- Vendors upload portrait photos straight off a phone, and
+                         cropping one into this landscape box hid half of it. The
+                         photo is shown whole, over a blurred copy of itself so the
+                         cell is still filled. A landscape photo is so close to the
+                         cell's own shape that it covers the blur entirely. -->
+                    <img
+                        :src="photo.thumbnail || photo.url"
+                        alt=""
+                        aria-hidden="true"
+                        loading="lazy"
+                        decoding="async"
+                        class="absolute inset-0 size-full scale-110 object-cover blur-xl"
+                    >
                     <img
                         :src="at === 0 ? photo.url : photo.thumbnail"
                         :alt="photo.caption || vendorName"
                         :fetchpriority="at === 0 ? 'high' : undefined"
                         :loading="at === 0 ? undefined : 'lazy'"
                         decoding="async"
-                        class="size-full object-cover transition duration-300 group-hover:scale-[1.03]"
+                        class="relative size-full object-contain transition duration-300 group-hover:scale-[1.03]"
                     >
                 </button>
             </template>
