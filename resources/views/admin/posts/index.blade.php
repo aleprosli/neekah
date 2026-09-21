@@ -1,6 +1,6 @@
-<x-layouts.admin title="Blog" heading="Blog" subheading="Artikel yang tersiar muncul di neekah.my/blog dan dalam sitemap untuk Google.">
+<x-layouts.admin :title="__('pages.dash.blog')" :heading="__('pages.dash.blog_2')" :subheading="__('pages.dash.artikel_yang_tersiar_muncul_di')">
     <x-slot:actions>
-        <a href="{{ route('admin.posts.create') }}" class="rounded-full bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700">Tulis artikel</a>
+        <a href="{{ route('admin.posts.create') }}" class="rounded-full bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700">{{ __('pages.dash.tulis_artikel') }}</a>
     </x-slot:actions>
 
     {{-- resources/js/components/admin/AdminPostsPage.vue --}}

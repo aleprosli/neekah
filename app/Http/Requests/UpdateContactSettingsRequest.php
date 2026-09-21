@@ -49,11 +49,11 @@ class UpdateContactSettingsRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'phone' => 'nombor telefon',
-            'whatsapp' => 'nombor WhatsApp',
-            'email' => 'emel',
-            'address' => 'alamat',
-            'hours' => 'waktu operasi',
+            'phone' => __('fields.nombor_telefon'),
+            'whatsapp' => __('fields.nombor_whatsapp'),
+            'email' => __('fields.emel'),
+            'address' => __('fields.alamat'),
+            'hours' => __('fields.waktu_operasi'),
         ];
     }
 }

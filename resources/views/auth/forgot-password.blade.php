@@ -1,4 +1,4 @@
-<x-auth-card title="Lupa kata laluan" subtitle="Masukkan emel anda dan kami akan hantar pautan untuk set semula kata laluan.">
+<x-auth-card :title="__('auth_pages.forgot.title')" :subtitle="__('auth_pages.forgot.subtitle')">
     {{-- resources/js/components/auth/AuthForm.vue --}}
     <div data-vue="auth-form" data-props="@vueProps($props)"></div>
 </x-auth-card>

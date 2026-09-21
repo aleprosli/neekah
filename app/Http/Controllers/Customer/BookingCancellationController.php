@@ -22,7 +22,7 @@ class BookingCancellationController extends Controller
         Gate::authorize('cancel', $booking);
 
         if ($request->user()->isImpersonated()) {
-            return back()->withErrors(['booking' => 'Pembatalan dimatikan semasa mod impersonate.']);
+            return back()->withErrors(['booking' => __('flash.impersonation.cancellation_off')]);
         }
 
         $validated = $request->validate(['reason' => ['nullable', 'string', 'max:200']]);
@@ -31,6 +31,6 @@ class BookingCancellationController extends Controller
 
         return redirect()
             ->route('bookings.show', $booking)
-            ->with('status', 'Booking '.$booking->reference.' dibatalkan.');
+            ->with('status', __('flash.couple.booking_cancelled', ['reference' => $booking->reference]));
     }
 }

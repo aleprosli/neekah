@@ -18,7 +18,7 @@ class VendorComparisonController extends Controller
      */
     public function __invoke(Request $request, Seo $seo): View
     {
-        $seo->title('Banding vendor')->noindex();
+        $seo->title(__('seo.compare.title'))->noindex();
 
         $slugs = collect($request->query('vendors'))
             ->flatten()

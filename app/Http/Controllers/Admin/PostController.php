@@ -117,7 +117,7 @@ class PostController extends Controller
         $storeImage->delete($post->cover_image);
         $post->delete();
 
-        return redirect()->route('admin.posts.index')->with('status', 'Artikel dipadam.');
+        return redirect()->route('admin.posts.index')->with('status', __('flash.admin.post_deleted'));
     }
 
     private function savedMessage(Post $post): string

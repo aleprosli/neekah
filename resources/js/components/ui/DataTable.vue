@@ -353,7 +353,7 @@ onMounted(load);
             <!-- w-full, because a select is otherwise as wide as its longest
                  option, and "Nama perniagaan ↓" is wider than a phone. -->
             <label v-if="sortableColumns.length && !isStatic" class="min-w-0 flex-1 md:hidden">
-                <span class="sr-only">Susun ikut</span>
+                <span class="sr-only">{{ $t('common.sort_by') }}</span>
                 <select
                     class="nk-select w-full rounded-xl border border-line bg-surface px-3 py-2.5 pr-9 text-sm focus:border-brand-400 focus:outline-none"
                     :value="`${sort}:${direction}`"
@@ -407,7 +407,7 @@ onMounted(load);
                     :csrf="csrf"
                 >{{ action.label }}</UiConfirm>
             </div>
-            <button type="button" class="ml-auto text-xs font-medium text-ink-muted underline underline-offset-4 hover:text-ink" @click="picked = []">Kosongkan pilihan</button>
+            <button type="button" class="ml-auto text-xs font-medium text-ink-muted underline underline-offset-4 hover:text-ink" @click="picked = []">{{ $t('common.clear_selection') }}</button>
         </div>
 
         <p v-if="failed" class="rounded-xl bg-brand-50 px-4 py-3 text-sm text-brand-800">
@@ -503,7 +503,7 @@ onMounted(load);
                                 class="size-4 accent-brand-600"
                                 :checked="allPagePicked"
                                 :disabled="!pageIds.length"
-                                aria-label="Pilih semua di halaman ini"
+                                :aria-label="$t('common.select_all_page')"
                                 @change="togglePage"
                             >
                         </th>
@@ -524,7 +524,7 @@ onMounted(load);
                             </button>
                             <span v-else>{{ header.column.columnDef.header }}</span>
                         </th>
-                        <th v-if="rowAction || $slots.action" scope="col" class="px-4 py-3"><span class="sr-only">Tindakan</span></th>
+                        <th v-if="rowAction || $slots.action" scope="col" class="px-4 py-3"><span class="sr-only">{{ $t('common.actions') }}</span></th>
                     </tr>
                 </thead>
 
@@ -609,8 +609,8 @@ onMounted(load);
         <div v-if="meta.last_page > 1" class="flex flex-wrap items-center justify-between gap-3">
             <p class="text-xs text-ink-muted">Halaman {{ meta.current_page }} daripada {{ meta.last_page }}</p>
             <div class="flex gap-2">
-                <button type="button" class="rounded-full border border-line px-4 py-2 text-sm font-medium transition hover:border-brand-400 disabled:opacity-40" :disabled="meta.current_page <= 1" @click="go(meta.current_page - 1)">Sebelum</button>
-                <button type="button" class="rounded-full border border-line px-4 py-2 text-sm font-medium transition hover:border-brand-400 disabled:opacity-40" :disabled="meta.current_page >= meta.last_page" @click="go(meta.current_page + 1)">Seterusnya</button>
+                <button type="button" class="rounded-full border border-line px-4 py-2 text-sm font-medium transition hover:border-brand-400 disabled:opacity-40" :disabled="meta.current_page <= 1" @click="go(meta.current_page - 1)">{{ $t('common.previous') }}</button>
+                <button type="button" class="rounded-full border border-line px-4 py-2 text-sm font-medium transition hover:border-brand-400 disabled:opacity-40" :disabled="meta.current_page >= meta.last_page" @click="go(meta.current_page + 1)">{{ $t('common.next') }}</button>
             </div>
         </div>
     </div>

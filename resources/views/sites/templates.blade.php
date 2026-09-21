@@ -1,35 +1,29 @@
 @php
-    $notes = [
-        'Klasik' => 'Kertas krim, dakwat marun dan emas — gaya kad cetak tradisional.',
-        'Islamik' => 'Dibuka dengan Bismillah, bercorak geometri dan gerbang mihrab.',
-        'Bunga' => 'Warna pastel dengan kelopak yang gugur perlahan.',
-        'Moden' => 'Tipografi bersih, ruang lapang dan tona tanah.',
-        'Malam' => 'Latar gelap dan kilauan emas untuk resepsi malam.',
-    ];
+    $notes = __('pages.template_style_notes');
     $groups = $templates->groupBy('style');
     $startUrl = auth()->check() ? route('site.edit') : route('register');
 @endphp
 
-<x-layouts.app title="Template kad jemputan">
+<x-layouts.app :title="__('pages.gallery_page.template_kad_jemputan')">
     <x-site.header />
 
     <main class="pt-24 pb-24 lg:pt-28">
         {{-- Intro --}}
         <section class="mx-auto max-w-3xl px-4 text-center sm:px-6">
-            <p class="text-sm font-semibold tracking-wide text-brand-600 uppercase">Kad kahwin digital</p>
-            <h1 class="mt-3 font-display text-3xl font-semibold tracking-tight text-balance sm:text-5xl">Kad jemputan yang terasa seperti kad sebenar</h1>
-            <p class="mx-auto mt-4 max-w-xl text-ink-muted">Sampul yang dibuka, kertas bertekstur dan nama anda dalam tulisan khat. Tetamu dapat peta, kalendar dan RSVP dalam satu pautan &mdash; <span class="font-medium text-ink">{{ $templates->count() }} template untuk dipilih</span>, percuma.</p>
+            <p class="text-sm font-semibold tracking-wide text-brand-600 uppercase">{{ __('pages.gallery_page.kad_kahwin_digital') }}</p>
+            <h1 class="mt-3 font-display text-3xl font-semibold tracking-tight text-balance sm:text-5xl">{{ __('pages.gallery_page.kad_jemputan_yang_terasa_seperti') }}</h1>
+            <p class="mx-auto mt-4 max-w-xl text-ink-muted">{{ __('pages.gallery_page.sampul_yang_dibuka_kertas_bertekstur') }}<span class="font-medium text-ink">{{ __('pages.gallery_page.template_untuk_dipilih', ['count' => $templates->count()]) }}</span>{{ __('pages.gallery_page.percuma') }}</p>
             <a href="{{ $startUrl }}" class="mt-7 inline-flex rounded-full bg-brand-600 px-7 py-3 text-sm font-semibold text-white shadow-lg shadow-brand-600/20 transition hover:bg-brand-700">
-                {{ auth()->check() ? 'Cipta kad saya' : 'Daftar & cipta kad percuma' }}
+                {{ auth()->check() ? __('pages.gallery_page.cipta_kad_saya') : __('pages.gallery_page.daftar_cipta_kad_percuma') }}
             </a>
         </section>
 
         {{-- How it works --}}
         <ol class="mx-auto mt-14 grid max-w-4xl gap-3 px-4 sm:grid-cols-3 sm:px-6">
             @foreach ([
-                ['Pilih template', 'Tekan mana-mana reka bentuk di bawah untuk melihat contoh penuh.'],
-                ['Isi maklumat majlis', 'Nama, tarikh, tempat dan atur cara. Kami isi draf daripada majlis anda.'],
-                ['Pilih alamat & kongsi', 'Contohnya aina-hakim.'.config('neekah.site_domain').' — hantar di WhatsApp.'],
+                [__('pages.gallery_page.step_pick'), __('pages.gallery_page.step_pick_detail')],
+                [__('pages.gallery_page.step_fill'), __('pages.gallery_page.step_fill_detail')],
+                [__('pages.gallery_page.step_share'), __('pages.gallery_page.step_share_detail', ['domain' => config('neekah.site_domain')])],
             ] as [$title, $body])
                 <li class="flex gap-4 rounded-2xl border border-line bg-surface-raised p-5">
                     <span class="flex size-8 shrink-0 items-center justify-center rounded-full bg-brand-50 font-display text-sm font-semibold text-brand-700">{{ $loop->iteration }}</span>
@@ -42,11 +36,11 @@
         </ol>
 
         {{-- Style filter --}}
-        <nav class="sticky top-[5.25rem] z-20 mt-12 border-y border-line bg-surface/90 backdrop-blur" aria-label="Gaya">
+        <nav class="sticky top-[5.25rem] z-20 mt-12 border-y border-line bg-surface/90 backdrop-blur" :aria-label="__('pages.gallery_page.gaya')">
             <div class="no-scrollbar mx-auto flex max-w-6xl gap-2 overflow-x-auto px-4 py-3 sm:justify-center sm:px-6">
-                <a href="{{ route('sites.templates') }}" @class(['shrink-0 rounded-full border px-4 py-1.5 text-sm font-medium transition', 'border-brand-600 bg-brand-600 text-white' => ! $style, 'border-line hover:border-brand-400' => $style])>Semua</a>
+                <a href="{{ route('sites.templates') }}" @class(['shrink-0 rounded-full border px-4 py-1.5 text-sm font-medium transition', 'border-brand-600 bg-brand-600 text-white' => ! $style, 'border-line hover:border-brand-400' => $style])>{{ __('pages.gallery_page.semua') }}</a>
                 @foreach ($styles as $name)
-                    <a href="{{ route('sites.templates', ['style' => $name]) }}" @class(['shrink-0 rounded-full border px-4 py-1.5 text-sm font-medium transition', 'border-brand-600 bg-brand-600 text-white' => $style === $name, 'border-line hover:border-brand-400' => $style !== $name])>{{ $name }}</a>
+                    <a href="{{ route('sites.templates', ['style' => $name]) }}" @class(['shrink-0 rounded-full border px-4 py-1.5 text-sm font-medium transition', 'border-brand-600 bg-brand-600 text-white' => $style === $name, 'border-line hover:border-brand-400' => $style !== $name])>{{ __('pages.template_style.'.$name) }}</a>
                 @endforeach
             </div>
         </nav>
@@ -56,8 +50,8 @@
             @foreach ($groups as $name => $group)
                 <section>
                     <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-line pb-3">
-                        <h2 class="font-display text-2xl font-semibold">{{ $name }}</h2>
-                        <p class="text-sm text-ink-muted">{{ $notes[$name] ?? '' }} <span class="whitespace-nowrap">· {{ $group->count() }} reka bentuk</span></p>
+                        <h2 class="font-display text-2xl font-semibold">{{ __('pages.template_style.'.$name) }}</h2>
+                        <p class="text-sm text-ink-muted">{{ $notes[$name] ?? '' }} <span class="whitespace-nowrap">· {{ __('pages.gallery_page.designs', ['count' => $group->count()]) }}</span></p>
                     </div>
 
                     <ul class="mt-6 grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 lg:grid-cols-4">
@@ -71,7 +65,7 @@
                                     </span>
                                     <span class="mt-3 flex items-center justify-between gap-2">
                                         <span class="truncate text-sm font-semibold group-hover:text-brand-700">{{ $template->name }}</span>
-                                        <span class="shrink-0 text-xs font-medium text-brand-600 opacity-0 transition group-hover:opacity-100">Lihat &rarr;</span>
+                                        <span class="shrink-0 text-xs font-medium text-brand-600 opacity-0 transition group-hover:opacity-100">{{ __('pages.gallery_page.lihat') }}</span>
                                     </span>
                                     <span class="mt-0.5 line-clamp-2 block text-xs text-ink-muted">{{ $template->description }}</span>
                                 </a>
@@ -83,10 +77,10 @@
         </div>
 
         <div class="mx-auto mt-16 max-w-xl px-4 text-center">
-            <p class="font-display text-xl font-semibold">Sudah jumpa yang berkenan?</p>
-            <p class="mt-2 text-sm text-ink-muted">Anda boleh tukar template bila-bila masa; maklumat majlis kekal.</p>
+            <p class="font-display text-xl font-semibold">{{ __('pages.gallery_page.sudah_jumpa_yang_berkenan') }}</p>
+            <p class="mt-2 text-sm text-ink-muted">{{ __('pages.gallery_page.anda_boleh_tukar_template_bila') }}</p>
             <a href="{{ $startUrl }}" class="mt-5 inline-flex rounded-full bg-brand-600 px-8 py-3 text-sm font-semibold text-white transition hover:bg-brand-700">
-                {{ auth()->check() ? 'Cipta kad jemputan saya' : 'Daftar untuk mula' }}
+                {{ auth()->check() ? __('pages.gallery_page.cipta_kad_jemputan_saya') : __('pages.gallery_page.daftar_untuk_mula') }}
             </a>
         </div>
     </main>

@@ -23,7 +23,7 @@ class WeddingGuestShareController extends Controller
         $url = $guest->whatsappUrl();
 
         if ($url === null) {
-            return back()->with('status', 'Terbitkan kad jemputan dahulu sebelum berkongsi pautan.');
+            return back()->with('status', __('flash.couple.publish_before_sharing'));
         }
 
         $guest->forceFill(['shared_at' => $guest->shared_at ?? now()])->save();
@@ -41,6 +41,6 @@ class WeddingGuestShareController extends Controller
 
         $guest->forceFill(['shared_at' => null])->save();
 
-        return back()->with('status', 'Tanda hantar dibuang.');
+        return back()->with('status', __('flash.couple.sent_mark_removed'));
     }
 }

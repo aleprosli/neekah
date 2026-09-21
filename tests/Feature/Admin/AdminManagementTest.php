@@ -69,14 +69,14 @@ it('keeps the booking table endpoint to admins', function () {
 
 it('creates, updates and deletes categories', function () {
     $this->actingAs($this->admin)
-        ->post(route('admin.categories.store'), ['name' => 'Kereta Pengantin', 'icon' => '🚗', 'examples' => 'Sewa kereta', 'sort_order' => 20, 'is_active' => 1])
+        ->post(route('admin.categories.store'), ['name' => ['ms' => 'Kereta Pengantin', 'en' => 'Bridal car'], 'icon' => '🚗', 'examples' => ['ms' => 'Sewa kereta'], 'sort_order' => 20, 'is_active' => 1])
         ->assertRedirect();
 
     $category = Category::where('slug', 'kereta-pengantin')->sole();
     expect($category->icon)->toBe('🚗');
 
     $this->actingAs($this->admin)
-        ->put(route('admin.categories.update', $category), ['name' => 'Kereta', 'icon' => '🚙', 'is_active' => 0])
+        ->put(route('admin.categories.update', $category), ['name' => ['ms' => 'Kereta'], 'icon' => '🚙', 'is_active' => 0])
         ->assertRedirect();
 
     expect($category->fresh()->is_active)->toBeFalse();
@@ -100,7 +100,10 @@ it('hides inactive categories from the marketplace filters', function () {
     $category = Category::where('slug', 'catering')->first();
 
     $this->actingAs($this->admin)
-        ->put(route('admin.categories.update', $category), ['name' => $category->name, 'icon' => $category->icon, 'is_active' => 0])
+        ->put(route('admin.categories.update', $category), ['name' => ['ms' => $category->name], 'icon' => $category->icon, 'is_active' => 0])
+        // Not just any redirect: a validation failure redirects too, and would
+        // leave the category untouched while the test still passed.
+        ->assertSessionHasNoErrors()
         ->assertRedirect();
 
     $this->get('/')->assertOk()->assertDontSee('Catering');

@@ -49,12 +49,12 @@ class StoreVendorReviewRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'rating' => 'bintang',
-            'comment' => 'ulasan',
-            'author_name' => 'nama',
-            'author_email' => 'emel',
-            'photos' => 'gambar',
-            'photos.*' => 'gambar',
+            'rating' => __('fields.bintang'),
+            'comment' => __('fields.ulasan'),
+            'author_name' => __('fields.nama'),
+            'author_email' => __('fields.emel'),
+            'photos' => __('fields.gambar'),
+            'photos.*' => __('fields.gambar'),
         ];
     }
 

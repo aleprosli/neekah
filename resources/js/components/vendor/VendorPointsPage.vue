@@ -54,22 +54,22 @@ defineProps({
 
         <div class="mt-4 grid gap-4 lg:grid-cols-3">
             <div class="rounded-2xl border border-line bg-surface-raised p-5">
-                <h3 class="text-sm font-semibold">Pendapatan mengikut bulan</h3>
+                <h3 class="text-sm font-semibold">{{ $t('points.pendapatan_mengikut_bulan') }}</h3>
                 <UiBarChart class="mt-4" :series="charts.revenue" />
             </div>
             <div class="rounded-2xl border border-line bg-surface-raised p-5">
-                <h3 class="text-sm font-semibold">Majlis selesai</h3>
+                <h3 class="text-sm font-semibold">{{ $t('points.majlis_selesai') }}</h3>
                 <UiBarChart class="mt-4" :series="charts.completed" />
             </div>
             <div class="rounded-2xl border border-line bg-surface-raised p-5">
-                <h3 class="text-sm font-semibold">Rating dari masa ke masa</h3>
-                <UiLineChart class="mt-4" :series="charts.rating" empty="Belum cukup review untuk menunjukkan aliran." />
+                <h3 class="text-sm font-semibold">{{ $t('points.rating_dari_masa_ke_masa') }}</h3>
+                <UiLineChart class="mt-4" :series="charts.rating" :empty="$t('points.belum_cukup_review_untuk_menunjukkan')" />
             </div>
         </div>
     </section>
 
     <section class="mt-8 flex flex-col gap-4">
-        <h2 class="font-display text-xl font-semibold">Tahap anda</h2>
+        <h2 class="font-display text-xl font-semibold">{{ $t('points.tahap_anda') }}</h2>
 
         <ol class="flex flex-col gap-2 sm:flex-row sm:gap-3">
             <li
@@ -87,9 +87,7 @@ defineProps({
             </li>
         </ol>
 
-        <p v-if="progress.locked" class="rounded-2xl border border-line bg-surface-muted p-4 text-sm text-ink-muted">
-            Tahap anda telah dikunci oleh admin. Hubungi kami jika anda rasa ia perlu disemak semula.
-        </p>
+        <p v-if="progress.locked" class="rounded-2xl border border-line bg-surface-muted p-4 text-sm text-ink-muted">{{ $t('points.tahap_anda_telah_dikunci_oleh') }}</p>
 
         <div v-else-if="progress.next" class="rounded-2xl border border-line bg-surface-raised p-5">
             <h3 class="text-sm font-semibold">Untuk naik ke {{ progress.next }} Vendor</h3>
@@ -112,7 +110,7 @@ defineProps({
 
     <div class="mt-8 grid gap-8 lg:grid-cols-2">
         <section class="flex flex-col gap-4">
-            <h2 class="font-display text-xl font-semibold">Cara point diberi</h2>
+            <h2 class="font-display text-xl font-semibold">{{ $t('points.cara_point_diberi') }}</h2>
             <DataTable :rows="earnable" :columns="POINT_COLUMNS">
                 <template #cell-earned="{ row }">
                     <template v-if="row.earned !== null">
@@ -123,14 +121,12 @@ defineProps({
                 </template>
             </DataTable>
 
-            <p class="text-xs text-ink-muted">Point tidak diberikan hanya kerana menerima enquiry. Booking sebenar, pembayaran dan perkhidmatan yang selesai menjadi faktor utama.</p>
+            <p class="text-xs text-ink-muted">{{ $t('points.point_tidak_diberikan_hanya_kerana') }}</p>
         </section>
 
         <section class="flex flex-col gap-4">
-            <h2 class="font-display text-xl font-semibold">Sejarah point</h2>
-            <p v-if="!history.length" class="rounded-2xl border border-dashed border-line p-6 text-sm text-ink-muted">
-                Belum ada point. Lengkapkan profil dan pakej untuk mula mengumpul.
-            </p>
+            <h2 class="font-display text-xl font-semibold">{{ $t('points.sejarah_point') }}</h2>
+            <p v-if="!history.length" class="rounded-2xl border border-dashed border-line p-6 text-sm text-ink-muted">{{ $t('points.belum_ada_point_lengkapkan_profil') }}</p>
             <ul v-else class="divide-y divide-line rounded-2xl border border-line">
                 <li v-for="entry in history" :key="entry.id" class="flex items-center gap-3 p-4 text-sm">
                     <div class="min-w-0 flex-1">

@@ -38,12 +38,12 @@ class StoreWeddingRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'title' => 'nama majlis',
-            'event_date' => 'tarikh majlis',
-            'city' => 'bandar',
-            'state' => 'negeri',
-            'budget' => 'bajet',
-            'notes' => 'nota',
+            'title' => __('fields.nama_majlis'),
+            'event_date' => __('fields.tarikh_majlis'),
+            'city' => __('fields.bandar'),
+            'state' => __('fields.negeri'),
+            'budget' => __('fields.bajet'),
+            'notes' => __('fields.nota'),
         ];
     }
 }

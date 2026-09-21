@@ -3,6 +3,7 @@
 namespace App\Notifications;
 
 use App\Models\Booking;
+use App\Support\NeekahMail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -29,22 +30,22 @@ class BookingCreatedForCustomer extends Notification implements ShouldQueue
     {
         return [
             'icon' => '🧾',
-            'title' => "Booking {$this->booking->reference} dibuat",
-            'body' => "Hubungi {$this->booking->vendor->name} untuk berbincang, kemudian rekodkan bayaran anda di sini.",
+            'title_key' => 'notifications.booking_created_customer.title',
+            'title_params' => ['reference' => $this->booking->reference],
+            'body_key' => 'notifications.booking_created_customer.body',
+            'body_params' => ['vendor' => $this->booking->vendor->name],
             'url' => route('bookings.show', $this->booking),
         ];
     }
 
     public function toMail(object $notifiable): MailMessage
     {
-        return (new MailMessage)
-            ->subject('Booking '.$this->booking->reference.' dengan '.$this->booking->vendor->name)
-            ->greeting('Hai '.$notifiable->name.',')
-            ->line('Booking anda dengan '.$this->booking->vendor->name.' telah direkod.')
+        return NeekahMail::to($notifiable)
+            ->subject(__('notifications.booking_created_customer.subject', ['reference' => $this->booking->reference, 'vendor' => $this->booking->vendor->name]))
+            ->line(__('notifications.booking_created_customer.intro', ['vendor' => $this->booking->vendor->name]))
             ->line($this->booking->package_name.' · '.$this->booking->event_date->translatedFormat('l, j F Y'))
-            ->line('Jumlah pakej RM'.number_format((float) $this->booking->total_amount, 2).'.')
-            ->line('Berbincang terus dengan vendor tentang bayaran. Setelah anda membayar, rekodkan bayaran itu di halaman booking dan vendor akan mengesahkannya.')
-            ->action('Lihat booking', route('bookings.show', $this->booking))
-            ->salutation('Terima kasih, Neekah');
+            ->line(__('notifications.package_total', ['amount' => 'RM'.number_format((float) $this->booking->total_amount, 2)]))
+            ->line(__('notifications.booking_created_customer.how_to_pay'))
+            ->action(__('notifications.actions.view_booking'), route('bookings.show', $this->booking));
     }
 }

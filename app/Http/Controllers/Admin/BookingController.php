@@ -16,20 +16,29 @@ use Illuminate\Http\Request;
 class BookingController extends Controller
 {
     /** Columns the DataTable draws, and the keys each row is expected to carry. */
-    private const COLUMNS = [
-        ['key' => 'reference', 'label' => 'Rujukan', 'sortable' => true],
-        ['key' => 'event_date', 'label' => 'Majlis', 'sortable' => true],
-        ['key' => 'vendor', 'label' => 'Vendor'],
-        ['key' => 'customer', 'label' => 'Pengantin'],
-        ['key' => 'total', 'label' => 'Jumlah', 'sort' => 'total_amount', 'sortable' => true, 'align' => 'right'],
-        ['key' => 'paid', 'label' => 'Dibayar', 'align' => 'right'],
-        ['key' => 'status', 'label' => 'Status', 'type' => 'html'],
-    ];
+    /**
+     * A constant cannot hold a function call, and these labels are
+     * translated now.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private static function columns(): array
+    {
+        return [
+            ['key' => 'reference', 'label' => __('props.admin.rujukan'), 'sortable' => true],
+            ['key' => 'event_date', 'label' => __('props.admin.majlis'), 'sortable' => true],
+            ['key' => 'vendor', 'label' => __('props.admin.vendor')],
+            ['key' => 'customer', 'label' => __('props.admin.pengantin')],
+            ['key' => 'total', 'label' => __('props.admin.jumlah'), 'sort' => 'total_amount', 'sortable' => true, 'align' => 'right'],
+            ['key' => 'paid', 'label' => __('props.admin.dibayar'), 'align' => 'right'],
+            ['key' => 'status', 'label' => __('props.admin.status_2'), 'type' => 'html'],
+        ];
+    }
 
     public function index(Request $request): View
     {
         return view('admin.bookings.index', [
-            'columns' => self::COLUMNS,
+            'columns' => self::columns(),
             'filters' => [TableFilter::fromEnum(
                 'status',
                 BookingStatus::cases(),
@@ -118,7 +127,7 @@ class BookingController extends Controller
                     'payments' => $booking->payments
                         ->sortBy('created_at')
                         ->map(fn (Payment $payment): array => [
-                            'label' => $payment->paid_on?->translatedFormat('j M Y') ?? 'Tarikh tidak direkod',
+                            'label' => $payment->paid_on?->translatedFormat('j M Y') ?? __('props.admin.tarikh_tidak_direkod'),
                             'reference' => $payment->reference,
                             'amount' => 'RM'.number_format((float) $payment->amount, 2),
                             'status' => $payment->status->label(),

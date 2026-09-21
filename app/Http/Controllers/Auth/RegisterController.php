@@ -97,12 +97,12 @@ class RegisterController extends Controller
         if ($invitation = $accept->fromSession($user)) {
             return redirect()
                 ->route('dashboard')
-                ->with('status', 'Selamat datang, '.$user->name.'! Anda kini menguruskan "'.$invitation->wedding->title.'" bersama '.$invitation->inviter->name.'.');
+                ->with('status', __('flash.account.welcome_partner', ['name' => $user->name, 'wedding' => $invitation->wedding->title, 'inviter' => $invitation->inviter->name]));
         }
 
         return redirect()
             ->intended($user->homeRoute())
-            ->with('status', 'Selamat datang ke Neekah, '.$user->name.'!');
+            ->with('status', __('flash.account.welcome', ['name' => $user->name]));
     }
 
     /**

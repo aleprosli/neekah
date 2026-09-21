@@ -86,6 +86,6 @@ class EnquiryController extends Controller
 
         $enquiry->user->notify(new EnquiryReplied($enquiry->fresh(['vendor'])));
 
-        return redirect()->route('vendor.enquiries.show', $enquiry)->with('status', 'Balasan dihantar kepada pelanggan.');
+        return redirect()->route('vendor.enquiries.show', $enquiry)->with('status', __('flash.vendor.enquiry_replied'));
     }
 }

@@ -83,6 +83,11 @@ return [
         'description' => env('NEEKAH_SEO_DESCRIPTION', 'Cari dan tempah vendor perkahwinan di Malaysia. Checklist, bajet, timeline dan kad jemputan digital dalam satu platform.'),
         'image' => env('NEEKAH_SEO_IMAGE', 'img/logo/neekah-og.png'),
         'twitter' => env('NEEKAH_SEO_TWITTER'),
+
+        // English is served under /en as its own pages, so it needs its own
+        // title tagline and meta description rather than the Malay ones.
+        'tagline_en' => env('NEEKAH_SEO_TAGLINE_EN', 'Every Wedding Errand, One Platform'),
+        'description_en' => env('NEEKAH_SEO_DESCRIPTION_EN', 'Find and book wedding vendors in Malaysia. Checklist, budget, timeline and digital invitation cards on one platform.'),
     ],
 
     'brand' => [

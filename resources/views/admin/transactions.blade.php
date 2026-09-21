@@ -1,4 +1,4 @@
-<x-layouts.admin title="Kewangan" heading="Kewangan" subheading="Nilai transaksi kasar, komisen platform dan payout vendor.">
+<x-layouts.admin :title="__('pages.dash.kewangan')" :heading="__('pages.dash.kewangan_2')" :subheading="__('pages.dash.nilai_transaksi_kasar_komisen_platform')">
     {{-- resources/js/components/admin/AdminStatRow.vue --}}
     <div data-vue="admin-stat-row" data-props="@vueProps(['stats' => $stats])"></div>
 
@@ -10,9 +10,9 @@
             'dataUrl' => route('admin.transactions.data'),
             'columns' => $columns,
             'filters' => $filters,
-            'searchPlaceholder' => 'Cari rujukan, booking atau vendor…',
-            'emptyTitle' => 'Tiada transaksi',
-            'emptyMessage' => 'Bayaran yang diterima akan muncul di sini.',
+            'searchPlaceholder' => __('pages.tables.cari_rujukan_booking_atau_vendor'),
+            'emptyTitle' => __('pages.tables.tiada_transaksi'),
+            'emptyMessage' => __('pages.tables.bayaran_yang_diterima_akan_muncul'),
             'csrf' => csrf_token(),
         ])"
     ></div>

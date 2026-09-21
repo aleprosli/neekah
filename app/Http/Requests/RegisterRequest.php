@@ -35,10 +35,10 @@ class RegisterRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'name' => 'nama',
-            'email' => 'emel',
-            'phone' => 'nombor telefon',
-            'password' => 'kata laluan',
+            'name' => __('fields.nama'),
+            'email' => __('fields.emel'),
+            'phone' => __('fields.nombor_telefon'),
+            'password' => __('fields.kata_laluan'),
         ];
     }
 }

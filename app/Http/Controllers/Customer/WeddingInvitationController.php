@@ -28,7 +28,7 @@ class WeddingInvitationController extends Controller
 
         Notification::route('mail', $invitation->email)->notify(new WeddingPartnerInvited($invitation));
 
-        return back()->with('status', 'Jemputan dihantar ke '.$invitation->email.'. Anda juga boleh kongsi pautan di bawah.');
+        return back()->with('status', __('flash.couple.invitation_sent', ['email' => $invitation->email]));
     }
 
     public function destroy(Request $request, Wedding $wedding, WeddingInvitation $invitation): RedirectResponse
@@ -38,6 +38,6 @@ class WeddingInvitationController extends Controller
 
         $invitation->delete();
 
-        return back()->with('status', 'Jemputan dibatalkan.');
+        return back()->with('status', __('flash.couple.invitation_cancelled'));
     }
 }

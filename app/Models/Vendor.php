@@ -380,7 +380,7 @@ class Vendor extends Model
      */
     public function responseRateLabel(): string
     {
-        return $this->response_rate === null ? 'Belum diukur' : $this->response_rate.'%';
+        return $this->response_rate === null ? __('props.vendor.not_measured') : $this->response_rate.'%';
     }
 
     /**

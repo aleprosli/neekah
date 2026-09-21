@@ -52,7 +52,7 @@ class TableFilter
             'value' => $value,
             // The count rides on the chip as a badge, kept up to date by the
             // table from what the endpoint counted.
-            'allLabel' => 'Semua',
+            'allLabel' => __('props.common.all'),
             'allCount' => $counts?->sum(),
             'options' => array_map(fn (\BackedEnum $case): array => [
                 'value' => $case->value,

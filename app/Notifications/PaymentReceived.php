@@ -3,6 +3,7 @@
 namespace App\Notifications;
 
 use App\Models\Payment;
+use App\Support\NeekahMail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -29,8 +30,10 @@ class PaymentReceived extends Notification implements ShouldQueue
     {
         return [
             'icon' => '💰',
-            'title' => 'Bayaran RM'.number_format((float) $this->payment->amount, 2).' disahkan',
-            'body' => "Vendor mengesahkan bayaran anda untuk booking {$this->payment->booking->reference}.",
+            'title_key' => 'notifications.payment_received.title',
+            'title_params' => ['amount' => 'RM'.number_format((float) $this->payment->amount, 2)],
+            'body_key' => 'notifications.payment_received.body',
+            'body_params' => ['reference' => $this->payment->booking->reference],
             'url' => route('bookings.show', $this->payment->booking),
         ];
     }
@@ -39,12 +42,10 @@ class PaymentReceived extends Notification implements ShouldQueue
     {
         $booking = $this->payment->booking;
 
-        return (new MailMessage)
-            ->subject('Bayaran '.$this->payment->reference.' disahkan')
-            ->greeting('Hai '.$notifiable->name.',')
-            ->line($booking->vendor->name.' mengesahkan bayaran RM'.number_format((float) $this->payment->amount, 2).' untuk booking '.$booking->reference.'.')
-            ->line('Majlis: '.$booking->event_date->translatedFormat('j F Y').' · Rujukan bayaran: '.$this->payment->reference)
-            ->action('Lihat booking', route('bookings.show', $booking))
-            ->salutation('Terima kasih, Neekah');
+        return NeekahMail::to($notifiable)
+            ->subject(__('notifications.payment_received.subject', ['reference' => $this->payment->reference]))
+            ->line(__('notifications.payment_received.intro', ['vendor' => $booking->vendor->name, 'amount' => 'RM'.number_format((float) $this->payment->amount, 2), 'reference' => $booking->reference]))
+            ->line(__('notifications.payment_received.detail', ['date' => $booking->event_date->translatedFormat('j F Y'), 'reference' => $this->payment->reference]))
+            ->action(__('notifications.actions.view_booking'), route('bookings.show', $booking));
     }
 }

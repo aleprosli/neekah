@@ -67,21 +67,21 @@ const pick = (iso) => {
         <section class="flex flex-col gap-4">
             <form :action="storeUrl" method="POST" class="flex flex-col gap-4 rounded-2xl border border-line bg-surface-raised p-6">
                 <input type="hidden" name="_token" :value="csrf">
-                <h2 class="font-semibold">Tutup tarikh</h2>
+                <h2 class="font-semibold">{{ $t('availability.tutup_tarikh') }}</h2>
 
                 <div class="grid gap-4 sm:grid-cols-2">
-                    <UiField v-model="form.from" label="Dari" name="from" type="date" :min="today" :error="errors.from" required />
-                    <UiField v-model="form.to" label="Hingga (pilihan)" name="to" type="date" :min="form.from" :error="errors.to" help="Kosongkan untuk satu hari sahaja." />
+                    <UiField v-model="form.from" :label="$t('availability.dari')" name="from" type="date" :min="today" :error="errors.from" required />
+                    <UiField v-model="form.to" :label="$t('availability.hingga_pilihan')" name="to" type="date" :min="form.from" :error="errors.to" :help="$t('availability.kosongkan_untuk_satu_hari_sahaja')" />
                 </div>
 
-                <UiField v-model="form.reason" label="Sebab (pilihan)" name="reason" placeholder="Cuti, majlis luar platform, dll." :error="errors.reason" />
+                <UiField v-model="form.reason" :label="$t('availability.sebab_pilihan')" name="reason" :placeholder="$t('availability.cuti_majlis_luar_platform_dll')" :error="errors.reason" />
 
-                <button type="submit" class="w-fit rounded-full bg-brand-600 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700">Tutup tarikh</button>
+                <button type="submit" class="w-fit rounded-full bg-brand-600 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700">{{ $t('availability.tutup_tarikh_2') }}</button>
             </form>
 
             <div class="rounded-2xl border border-line">
-                <h2 class="border-b border-line px-5 py-3 text-sm font-semibold">Tarikh ditutup</h2>
-                <p v-if="!closed.length" class="px-5 py-6 text-sm text-ink-muted">Tiada tarikh ditutup.</p>
+                <h2 class="border-b border-line px-5 py-3 text-sm font-semibold">{{ $t('availability.tarikh_ditutup') }}</h2>
+                <p v-if="!closed.length" class="px-5 py-6 text-sm text-ink-muted">{{ $t('availability.tiada_tarikh_ditutup') }}</p>
                 <ul v-else class="divide-y divide-line">
                     <li v-for="date in closed" :key="date.id" class="flex flex-wrap items-center gap-x-3 gap-y-1 px-5 py-3 text-sm">
                         <span class="font-medium">{{ date.label }}</span>
@@ -89,7 +89,7 @@ const pick = (iso) => {
                         <form :action="date.destroy_url" method="POST" class="ml-auto">
                             <input type="hidden" name="_token" :value="csrf">
                             <input type="hidden" name="_method" value="DELETE">
-                            <button type="submit" class="text-xs font-medium text-brand-600 hover:underline">Buka semula</button>
+                            <button type="submit" class="text-xs font-medium text-brand-600 hover:underline">{{ $t('availability.buka_semula') }}</button>
                         </form>
                     </li>
                 </ul>
@@ -99,9 +99,9 @@ const pick = (iso) => {
         <section class="flex flex-col gap-4">
             <div class="rounded-2xl border border-line bg-surface-raised p-5">
                 <div class="flex items-center justify-between gap-3">
-                    <button type="button" class="rounded-full px-3 py-1 text-lg leading-none text-ink-muted transition hover:bg-surface-muted disabled:opacity-30" :disabled="monthOffset <= 0" aria-label="Bulan sebelum" @click="monthOffset--">‹</button>
+                    <button type="button" class="rounded-full px-3 py-1 text-lg leading-none text-ink-muted transition hover:bg-surface-muted disabled:opacity-30" :disabled="monthOffset <= 0" :aria-label="$t('availability.bulan_sebelum')" @click="monthOffset--">‹</button>
                     <p class="font-display text-lg font-semibold">{{ month.label }}</p>
-                    <button type="button" class="rounded-full px-3 py-1 text-lg leading-none text-ink-muted transition hover:bg-surface-muted" aria-label="Bulan seterusnya" @click="monthOffset++">›</button>
+                    <button type="button" class="rounded-full px-3 py-1 text-lg leading-none text-ink-muted transition hover:bg-surface-muted" :aria-label="$t('availability.bulan_seterusnya')" @click="monthOffset++">›</button>
                 </div>
 
                 <div class="mt-4 grid grid-cols-7 gap-1 text-center text-[11px] text-ink-muted">
@@ -130,14 +130,14 @@ const pick = (iso) => {
                 </div>
 
                 <ul class="mt-4 flex flex-wrap gap-4 text-xs text-ink-muted">
-                    <li class="flex items-center gap-1.5"><span class="size-3 rounded bg-emerald-100"></span> Ada tempahan</li>
-                    <li class="flex items-center gap-1.5"><span class="size-3 rounded bg-surface-muted"></span> Ditutup</li>
+                    <li class="flex items-center gap-1.5"><span class="size-3 rounded bg-emerald-100"></span>{{ $t('availability.ada_tempahan') }}</li>
+                    <li class="flex items-center gap-1.5"><span class="size-3 rounded bg-surface-muted"></span>{{ $t('availability.ditutup') }}</li>
                 </ul>
             </div>
 
             <div class="rounded-2xl border border-line">
-                <h2 class="border-b border-line px-5 py-3 text-sm font-semibold">Tarikh dengan tempahan</h2>
-                <p v-if="!booked.length" class="px-5 py-6 text-sm text-ink-muted">Tiada tempahan akan datang.</p>
+                <h2 class="border-b border-line px-5 py-3 text-sm font-semibold">{{ $t('availability.tarikh_dengan_tempahan') }}</h2>
+                <p v-if="!booked.length" class="px-5 py-6 text-sm text-ink-muted">{{ $t('availability.tiada_tempahan_akan_datang') }}</p>
                 <ul v-else class="divide-y divide-line">
                     <li v-for="booking in booked" :key="booking.reference" class="flex flex-wrap items-center gap-x-3 gap-y-1 px-5 py-3 text-sm">
                         <span class="font-medium">{{ booking.label }}</span>

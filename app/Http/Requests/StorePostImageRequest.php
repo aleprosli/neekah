@@ -28,7 +28,7 @@ class StorePostImageRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'image' => 'gambar',
+            'image' => __('fields.gambar'),
         ];
     }
 }

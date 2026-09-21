@@ -3,6 +3,7 @@
 namespace App\Notifications;
 
 use App\Models\Enquiry;
+use App\Support\NeekahMail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -23,26 +24,25 @@ class EnquiryReplied extends Notification implements ShouldQueue
     }
 
     /**
-     * @return array<string, string>
+     * @return array<string, mixed>
      */
     public function toDatabase(object $notifiable): array
     {
         return [
             'icon' => '💬',
-            'title' => "{$this->enquiry->vendor->name} membalas enquiry anda",
-            'body' => 'Lihat balasan dan teruskan ke tempahan.',
+            'title_key' => 'notifications.enquiry_replied.title',
+            'title_params' => ['vendor' => $this->enquiry->vendor->name],
+            'body_key' => 'notifications.enquiry_replied.body',
             'url' => route('enquiries.show', $this->enquiry),
         ];
     }
 
     public function toMail(object $notifiable): MailMessage
     {
-        return (new MailMessage)
-            ->subject($this->enquiry->vendor->name.' telah membalas enquiry anda')
-            ->greeting('Hai '.$notifiable->name.',')
-            ->line($this->enquiry->vendor->name.' membalas:')
+        return NeekahMail::to($notifiable)
+            ->subject(__('notifications.enquiry_replied.subject', ['vendor' => $this->enquiry->vendor->name]))
+            ->line(__('notifications.enquiry_replied.intro', ['vendor' => $this->enquiry->vendor->name]))
             ->line('"'.$this->enquiry->reply.'"')
-            ->action('Lihat balasan', route('enquiries.show', $this->enquiry))
-            ->salutation('Terima kasih, Neekah');
+            ->action(__('notifications.actions.view_reply'), route('enquiries.show', $this->enquiry));
     }
 }

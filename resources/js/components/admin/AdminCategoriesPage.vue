@@ -14,6 +14,7 @@ import { useUploadForm } from '../../composables/useUploadForm.js';
 
 const props = defineProps({
     categories: { type: Array, required: true },
+    locales: { type: Array, required: true },
     stats: { type: Array, required: true },
     storeUrl: { type: String, required: true },
     orderUrl: { type: String, required: true },
@@ -37,8 +38,13 @@ const removeImage = ref(false);
 
 const action = computed(() => (editing.value?.id ? editing.value.update_url : props.storeUrl));
 
+/** An empty value for every language the site is served in. */
+function blankPerLocale() {
+    return Object.fromEntries(props.locales.map((locale) => [locale.code, '']));
+}
+
 function blankForm() {
-    return { name: '', icon: '', examples: '', is_active: true };
+    return { name: blankPerLocale(), icon: '', examples: blankPerLocale(), is_active: true };
 }
 
 const openAdd = () => {
@@ -50,7 +56,7 @@ const openAdd = () => {
 
 const openEdit = (row) => {
     editing.value = row;
-    form.value = { name: row.name, icon: row.icon, examples: row.examples ?? '', is_active: row.is_active };
+    form.value = { name: { ...row.names }, icon: row.icon, examples: { ...row.examples_all }, is_active: row.is_active };
     removeImage.value = false;
     panelOpen.value = true;
 };
@@ -102,7 +108,7 @@ const saveOrder = async () => {
         <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
             <div class="flex min-w-0 flex-col gap-3">
                 <div class="flex flex-wrap items-center justify-between gap-2">
-                    <p class="text-sm text-ink-muted">Seret dan lepas untuk susun paparan marketplace. Susunan disimpan sendiri.</p>
+                    <p class="text-sm text-ink-muted">{{ $t('admin_categories.seret_dan_lepas_untuk_susun') }}</p>
                     <button type="button" class="rounded-full bg-brand-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-700" @click="openAdd">+ Tambah kategori</button>
                 </div>
 
@@ -140,20 +146,20 @@ const saveOrder = async () => {
                         </span>
 
                         <div class="flex shrink-0 items-center gap-1">
-                            <button type="button" class="rounded-full px-2 py-1 text-xs text-ink-muted transition hover:bg-surface-muted disabled:opacity-30" :disabled="at === 0" aria-label="Alih ke atas" @click="move(at, at - 1)">↑</button>
-                            <button type="button" class="rounded-full px-2 py-1 text-xs text-ink-muted transition hover:bg-surface-muted disabled:opacity-30" :disabled="at === rows.length - 1" aria-label="Alih ke bawah" @click="move(at, at + 1)">↓</button>
-                            <button type="button" class="rounded-full border border-line px-3 py-1.5 text-xs font-medium transition hover:border-brand-400" @click="openEdit(row)">Edit</button>
+                            <button type="button" class="rounded-full px-2 py-1 text-xs text-ink-muted transition hover:bg-surface-muted disabled:opacity-30" :disabled="at === 0" :aria-label="$t('admin_categories.alih_ke_atas')" @click="move(at, at - 1)">↑</button>
+                            <button type="button" class="rounded-full px-2 py-1 text-xs text-ink-muted transition hover:bg-surface-muted disabled:opacity-30" :disabled="at === rows.length - 1" :aria-label="$t('admin_categories.alih_ke_bawah')" @click="move(at, at + 1)">↓</button>
+                            <button type="button" class="rounded-full border border-line px-3 py-1.5 text-xs font-medium transition hover:border-brand-400" @click="openEdit(row)">{{ $t('admin_categories.edit') }}</button>
                             <UiConfirm
                                 v-if="row.vendors_count === 0"
                                 :action="row.destroy_url"
                                 method="DELETE"
                                 tone="danger"
                                 :title="`Padam kategori ${row.name}?`"
-                                message="Kategori ini tiada vendor, jadi ia selamat dipadam. Tindakan ini tidak boleh dibatalkan."
-                                confirm-label="Padam kategori"
+                                :message="$t('admin_categories.kategori_ini_tiada_vendor_jadi')"
+                                confirm-:label="$t('admin_categories.padam_kategori')"
                                 trigger-class="rounded-full px-2 py-1.5 text-xs font-medium text-ink-muted transition hover:text-brand-700"
                                 :csrf="csrf"
-                            >Padam</UiConfirm>
+                            >{{ $t('admin_categories.padam') }}</UiConfirm>
                         </div>
                     </li>
                 </ul>
@@ -172,7 +178,7 @@ const saveOrder = async () => {
 
                 <div class="flex items-start justify-between gap-2">
                     <h2 class="font-semibold">{{ editing?.id ? 'Edit kategori' : 'Tambah kategori' }}</h2>
-                    <button type="button" class="text-sm text-ink-muted hover:text-ink" aria-label="Tutup" @click="panelOpen = false">✕</button>
+                    <button type="button" class="text-sm text-ink-muted hover:text-ink" :aria-label="$t('admin_categories.tutup')" @click="panelOpen = false">✕</button>
                 </div>
 
                 <div v-if="editing?.id" class="flex items-center gap-3">
@@ -180,17 +186,32 @@ const saveOrder = async () => {
                     <span v-else class="flex size-14 shrink-0 items-center justify-center rounded-xl bg-surface-muted text-2xl">{{ editing.icon }}</span>
                     <label v-if="editing.has_upload" class="flex items-center gap-2 text-xs text-ink-muted">
                         <input type="hidden" name="remove_image" value="0">
-                        <input v-model="removeImage" type="checkbox" name="remove_image" value="1" class="accent-brand-600">
-                        Buang gambar yang dimuat naik
-                    </label>
+                        <input v-model="removeImage" type="checkbox" name="remove_image" value="1" class="accent-brand-600">{{ $t('admin_categories.buang_gambar_yang_dimuat_naik') }}</label>
                 </div>
 
-                <UiField v-model="form.name" label="Nama kategori" name="name" placeholder="Kereta Pengantin" :error="errors.name" required />
-                <UiField v-model="form.icon" label="Ikon (emoji)" name="icon" placeholder="🚗" :error="errors.icon" help="Dipakai jika kategori ini tiada gambar." required />
-                <UiField v-model="form.examples" label="Contoh" name="examples" placeholder="Sewa kereta, deco kereta" :error="errors.examples" />
+                <UiField
+                    v-for="locale in locales"
+                    :key="`name-${locale.code}`"
+                    v-model="form.name[locale.code]"
+                    :label="`${$t('admin_categories.nama_kategori')} · ${locale.label}`"
+                    :name="`name[${locale.code}]`"
+                    :placeholder="$t('admin_categories.kereta_pengantin')"
+                    :error="errors[`name.${locale.code}`]"
+                    :required="locale.code === locales[0].code"
+                />
+                <UiField v-model="form.icon" :label="$t('admin_categories.ikon_emoji')" name="icon" placeholder="🚗" :error="errors.icon" :help="$t('admin_categories.dipakai_jika_kategori_ini_tiada')" required />
+                <UiField
+                    v-for="locale in locales"
+                    :key="`examples-${locale.code}`"
+                    v-model="form.examples[locale.code]"
+                    :label="`${$t('admin_categories.contoh')} · ${locale.label}`"
+                    :name="`examples[${locale.code}]`"
+                    :placeholder="$t('admin_categories.sewa_kereta_deco_kereta')"
+                    :error="errors[`examples.${locale.code}`]"
+                />
 
                 <label class="flex flex-col gap-1 text-sm">
-                    <span class="font-medium">Gambar kategori</span>
+                    <span class="font-medium">{{ $t('admin_categories.gambar_kategori') }}</span>
                     <input type="file" name="image" accept="image/*" class="rounded-xl border border-line bg-surface px-3 py-2 text-sm file:mr-3 file:rounded-full file:border-0 file:bg-surface-muted file:px-3 file:py-1.5 file:text-xs">
                     <span class="text-xs text-ink-muted">{{ imageHint }}</span>
                     <span v-if="errors.image" class="text-xs text-red-600">{{ errors.image }}</span>
@@ -198,9 +219,7 @@ const saveOrder = async () => {
 
                 <label class="flex items-center gap-2 text-sm">
                     <input type="hidden" name="is_active" value="0">
-                    <input v-model="form.is_active" type="checkbox" name="is_active" value="1" class="accent-brand-600">
-                    Aktif
-                </label>
+                    <input v-model="form.is_active" type="checkbox" name="is_active" value="1" class="accent-brand-600">{{ $t('admin_categories.aktif') }}</label>
 
                 <UiUploadProgress :uploading="uploading" :percent="percent" />
                 <p v-if="uploadError" class="text-sm text-red-600">{{ uploadError }}</p>

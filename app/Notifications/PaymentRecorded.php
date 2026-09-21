@@ -3,6 +3,7 @@
 namespace App\Notifications;
 
 use App\Models\Payment;
+use App\Support\NeekahMail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -33,8 +34,10 @@ class PaymentRecorded extends Notification implements ShouldQueue
     {
         return [
             'icon' => '💸',
-            'title' => 'Bayaran direkod: RM'.number_format((float) $this->payment->amount, 2),
-            'body' => $this->payment->booking->user->name.' merekodkan bayaran untuk '.$this->payment->booking->reference.'. Sahkan setelah anda semak akaun anda.',
+            'title_key' => 'notifications.payment_recorded.title',
+            'title_params' => ['amount' => 'RM'.number_format((float) $this->payment->amount, 2)],
+            'body_key' => 'notifications.payment_recorded.body',
+            'body_params' => ['name' => $this->payment->booking->user->name, 'reference' => $this->payment->booking->reference],
             'url' => route('vendor.bookings.show', $this->payment->booking),
         ];
     }
@@ -43,13 +46,11 @@ class PaymentRecorded extends Notification implements ShouldQueue
     {
         $booking = $this->payment->booking;
 
-        return (new MailMessage)
-            ->subject('Bayaran direkod untuk '.$booking->reference)
-            ->greeting('Hai '.$notifiable->name.',')
-            ->line($booking->user->name.' merekodkan bayaran sebanyak RM'.number_format((float) $this->payment->amount, 2).' untuk '.$booking->reference.'.')
-            ->line('Tarikh bayaran yang direkod: '.$this->payment->paid_on->translatedFormat('j F Y').'.')
-            ->line('Semak akaun anda, kemudian sahkan bayaran ini. Booking hanya menjadi Confirmed selepas anda mengesahkannya.')
-            ->action('Semak bayaran', route('vendor.bookings.show', $booking))
-            ->salutation('Terima kasih, Neekah');
+        return NeekahMail::to($notifiable)
+            ->subject(__('notifications.payment_recorded.subject', ['reference' => $booking->reference]))
+            ->line(__('notifications.payment_recorded.intro', ['name' => $booking->user->name, 'amount' => 'RM'.number_format((float) $this->payment->amount, 2), 'reference' => $booking->reference]))
+            ->line(__('notifications.payment_recorded.paid_on', ['date' => $this->payment->paid_on->translatedFormat('j F Y')]))
+            ->line(__('notifications.payment_recorded.verify'))
+            ->action(__('notifications.actions.check_payment'), route('vendor.bookings.show', $booking));
     }
 }

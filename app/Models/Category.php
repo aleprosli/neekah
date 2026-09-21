@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use App\Actions\StoreOptimizedImage;
+use App\Casts\Translatable;
+use App\Models\Concerns\HasTranslatedText;
 use Database\Factories\CategoryFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Scope;
@@ -14,6 +16,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 #[Fillable(['name', 'slug', 'icon', 'image', 'examples', 'sort_order', 'is_active'])]
 class Category extends Model
 {
+    use HasTranslatedText;
+
     /**
      * The drawing for each category slug. Pelamin and Decoration share the
      * floral-arch illustration; a slug that is not here falls back to its emoji.
@@ -60,6 +64,8 @@ class Category extends Model
     protected function casts(): array
     {
         return [
+            'name' => Translatable::class,
+            'examples' => Translatable::class,
             'is_active' => 'boolean',
         ];
     }
@@ -83,6 +89,8 @@ class Category extends Model
     #[Scope]
     protected function ordered(Builder $query): Builder
     {
-        return $query->orderBy('sort_order')->orderBy('name');
+        // sort_order is what actually orders these; the name was only a
+        // tiebreak, and sorting by it now would sort by JSON text.
+        return $query->orderBy('sort_order')->orderBy('id');
     }
 }

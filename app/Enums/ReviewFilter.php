@@ -19,10 +19,10 @@ enum ReviewFilter: string
     public function label(): string
     {
         return match ($this) {
-            self::Reported => 'Dilaporkan vendor',
-            self::Hidden => 'Disembunyikan',
-            self::Open => 'Review terbuka',
-            self::Verified => 'Dari tempahan',
+            self::Reported => __('enums.review_filter.reported'),
+            self::Hidden => __('enums.review_filter.hidden'),
+            self::Open => __('enums.review_filter.open'),
+            self::Verified => __('enums.review_filter.verified'),
         };
     }
 

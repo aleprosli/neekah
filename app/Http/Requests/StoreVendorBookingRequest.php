@@ -61,10 +61,10 @@ class StoreVendorBookingRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'customer_email' => 'emel pelanggan',
-            'package_id' => 'pakej',
-            'event_date' => 'tarikh majlis',
-            'notes' => 'nota',
+            'customer_email' => __('fields.emel_pelanggan'),
+            'package_id' => __('fields.pakej'),
+            'event_date' => __('fields.tarikh_majlis'),
+            'notes' => __('fields.nota'),
         ];
     }
 
@@ -74,7 +74,7 @@ class StoreVendorBookingRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'customer_email.exists' => 'Tiada akaun pengantin dengan emel ini. Minta pelanggan daftar di Neekah dahulu.',
+            'customer_email.exists' => __('validation.custom.no_customer_account'),
         ];
     }
 }

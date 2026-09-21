@@ -19,10 +19,10 @@ enum PaymentMethod: string
     public function label(): string
     {
         return match ($this) {
-            self::ManualTransfer => 'Rekod bayaran manual',
-            self::Billplz => 'Billplz',
-            self::Bayarcash => 'Bayarcash',
-            self::Stripe => 'Stripe',
+            self::ManualTransfer => __('enums.payment_method.manual_transfer'),
+            self::Billplz => __('enums.payment_method.billplz'),
+            self::Bayarcash => __('enums.payment_method.bayarcash'),
+            self::Stripe => __('enums.payment_method.stripe'),
         };
     }
 

@@ -31,7 +31,7 @@ const tier = ref(props.vendor.tier);
 
             <section class="rounded-2xl border border-line p-5">
                 <h2 class="font-semibold">Pakej ({{ packages.length }})</h2>
-                <p v-if="!packages.length" class="mt-2 text-sm text-ink-muted">Vendor belum menambah pakej.</p>
+                <p v-if="!packages.length" class="mt-2 text-sm text-ink-muted">{{ $t('admin_vendor.vendor_belum_menambah_pakej') }}</p>
                 <ul v-else class="mt-3 divide-y divide-line text-sm">
                     <li v-for="item in packages" :key="item.name" class="flex items-center justify-between gap-3 py-2">
                         <span class="min-w-0">{{ item.name }} <span class="text-ink-muted">· {{ item.duration }}</span></span>
@@ -42,7 +42,7 @@ const tier = ref(props.vendor.tier);
 
             <section class="rounded-2xl border border-line p-5">
                 <h2 class="font-semibold">Portfolio ({{ portfolio.length }})</h2>
-                <p v-if="!portfolio.length" class="mt-2 text-sm text-ink-muted">Belum ada gambar portfolio.</p>
+                <p v-if="!portfolio.length" class="mt-2 text-sm text-ink-muted">{{ $t('admin_vendor.belum_ada_gambar_portfolio') }}</p>
                 <ul v-else class="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-5">
                     <li v-for="photo in portfolio" :key="photo.url">
                         <img :src="photo.thumbnail || photo.url" alt="" loading="lazy" class="aspect-square w-full rounded-xl object-cover">
@@ -79,24 +79,22 @@ const tier = ref(props.vendor.tier);
                 <input type="hidden" name="_token" :value="csrf">
                 <input type="hidden" name="_method" value="PUT">
 
-                <h2 class="text-sm font-semibold">Ranking</h2>
+                <h2 class="text-sm font-semibold">{{ $t('admin_vendor.ranking') }}</h2>
 
-                <UiSelect v-model="tier" label="Tahap vendor" name="tier" :options="tiers" :error="errors.tier" required />
+                <UiSelect v-model="tier" :label="$t('admin_vendor.tahap_vendor')" name="tier" :options="tiers" :error="errors.tier" required />
 
-                <p class="text-xs text-ink-muted">Response rate dikira dari enquiry yang vendor ini balas, jadi ia tidak boleh ditetapkan secara manual.</p>
+                <p class="text-xs text-ink-muted">{{ $t('admin_vendor.response_rate_dikira_dari_enquiry') }}</p>
 
                 <label class="flex items-start gap-2 text-sm">
                     <input type="hidden" name="tier_locked" value="0">
                     <input type="checkbox" name="tier_locked" value="1" class="mt-0.5 accent-brand-600" :checked="vendor.tier_locked">
-                    <span>
-                        Kunci tahap ini
-                        <span class="block text-xs text-ink-muted">Pengiraan automatik tidak akan menaik atau menurunkan tahap vendor ini.</span>
+                    <span>{{ $t('admin_vendor.kunci_tahap_ini') }}<span class="block text-xs text-ink-muted">{{ $t('admin_vendor.pengiraan_automatik_tidak_akan_menaik') }}</span>
                     </span>
                 </label>
 
-                <button type="submit" class="rounded-full bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700">Simpan ranking</button>
+                <button type="submit" class="rounded-full bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700">{{ $t('admin_vendor.simpan_ranking') }}</button>
 
-                <p class="text-xs text-ink-muted">Vendor Score: rating 30%, booking selesai 20%, completion rate 15%, response rate 15%, transaksi platform 10%, kualiti profil 10%.</p>
+                <p class="text-xs text-ink-muted">{{ $t('admin_vendor.vendor_score_rating_30_booking') }}</p>
             </form>
         </aside>
     </div>

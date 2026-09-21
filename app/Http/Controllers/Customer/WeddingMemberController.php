@@ -18,11 +18,11 @@ class WeddingMemberController extends Controller
         Gate::authorize('manageMembers', $wedding);
 
         if ($wedding->isOwnedBy($member)) {
-            return back()->withErrors(['member' => 'Pemilik majlis tidak boleh dibuang.']);
+            return back()->withErrors(['member' => __('flash.couple.owner_cannot_be_removed')]);
         }
 
         $wedding->members()->detach($member->id);
 
-        return back()->with('status', $member->name.' telah dibuang daripada majlis ini.');
+        return back()->with('status', __('flash.couple.member_removed', ['name' => $member->name]));
     }
 }

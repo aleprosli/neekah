@@ -10,6 +10,7 @@
  *   <div data-vue="portfolio-gallery" data-props='@json($props)'></div>
  */
 import { createApp } from 'vue';
+import { refreshTranslations, t } from './i18n.js';
 
 const components = import.meta.glob('./components/**/*.vue', { eager: true });
 
@@ -27,6 +28,9 @@ const registry = Object.fromEntries(
 );
 
 export const mountIslands = (root = document) => {
+    // A swapped-in page may be in the other language.
+    refreshTranslations();
+
     root.querySelectorAll('[data-vue]:not([data-vue-mounted])').forEach((el) => {
         const component = registry[el.dataset.vue];
 
@@ -43,6 +47,9 @@ export const mountIslands = (root = document) => {
         }
 
         el.setAttribute('data-vue-mounted', '');
-        createApp(component, props).mount(el);
+
+        const app = createApp(component, props);
+        app.config.globalProperties.$t = t;
+        app.mount(el);
     });
 };

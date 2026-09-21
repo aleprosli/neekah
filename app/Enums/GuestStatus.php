@@ -13,11 +13,11 @@ enum GuestStatus: string
     public function label(): string
     {
         return match ($this) {
-            self::Attending => 'Hadir',
-            self::Declined => 'Tidak hadir',
-            self::Opened => 'Pautan peribadi dibuka',
-            self::Shared => 'Anda tanda hantar',
-            self::Pending => 'Belum ditanda hantar',
+            self::Attending => __('enums.guest_status.attending'),
+            self::Declined => __('enums.guest_status.declined'),
+            self::Opened => __('enums.guest_status.opened'),
+            self::Shared => __('enums.guest_status.shared'),
+            self::Pending => __('enums.guest_status.pending'),
         };
     }
 

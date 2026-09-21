@@ -18,13 +18,22 @@ use Illuminate\Support\Str;
 
 class VendorController extends Controller
 {
-    public const SORTS = [
-        'recommended' => 'Disyorkan',
-        'rating' => 'Rating tertinggi',
-        'price_asc' => 'Harga: rendah ke tinggi',
-        'price_desc' => 'Harga: tinggi ke rendah',
-        'reviews' => 'Paling banyak review',
-    ];
+    /**
+     * The orders the list can be put in. A method rather than a constant: the
+     * labels are translated, and a constant cannot hold a function call.
+     *
+     * @return array<string, string>
+     */
+    public static function sorts(): array
+    {
+        return [
+            'recommended' => __('marketplace.sorts.recommended'),
+            'rating' => __('marketplace.sorts.rating'),
+            'price_asc' => __('marketplace.sorts.price_asc'),
+            'price_desc' => __('marketplace.sorts.price_desc'),
+            'reviews' => __('marketplace.sorts.reviews'),
+        ];
+    }
 
     /**
      * List approved vendors with search, filters, sorting and pagination.
@@ -42,7 +51,7 @@ class VendorController extends Controller
             'max_price' => $request->filled('max_price') ? $request->integer('max_price') : null,
             'min_rating' => $request->filled('min_rating') ? (float) $request->input('min_rating') : null,
             'tier' => VendorTier::tryFrom($request->string('tier')->toString())?->value,
-            'sort' => array_key_exists($sort, self::SORTS) ? $sort : 'recommended',
+            'sort' => array_key_exists($sort, self::sorts()) ? $sort : 'recommended',
         ];
 
         $activeCategory = $filters['category'] ? $categories->firstWhere('slug', $filters['category']) : null;
@@ -78,7 +87,7 @@ class VendorController extends Controller
             'states' => States::names(),
             'stateOptions' => States::options(),
             'tiers' => VendorTier::cases(),
-            'sorts' => self::SORTS,
+            'sorts' => self::sorts(),
             'activeFilterCount' => count(array_filter([$filters['state'], $filters['min_price'], $filters['max_price'], $filters['min_rating'], $filters['tier']], fn ($value) => $value !== null)),
             'helpUrl' => $vendors->isEmpty() ? $this->helpUrl($activeCategory, $filters) : null,
         ]);
@@ -134,7 +143,7 @@ class VendorController extends Controller
 
         $description = $vendor->tagline ?: Str::of((string) $vendor->description)->squish()->value();
 
-        $seo->title($vendor->name.' — '.$vendor->category->name.' di '.$vendor->city)
+        $seo->title(__('seo.marketplace.vendor_title', ['name' => $vendor->name, 'category' => $vendor->category->name, 'city' => $vendor->city]))
             ->description($description)
             ->image($vendor->portfolioItems->first()?->url())
             ->type('profile')
@@ -238,12 +247,14 @@ class VendorController extends Controller
             'page' => $page > 1 ? $page : null,
         ]);
 
-        $where = $filters['state'] ? ' di '.$filters['state'] : ' di Malaysia';
+        $where = __('seo.marketplace.in', ['place' => $filters['state'] ?: __('seo.marketplace.malaysia')]);
 
-        $seo->title($category ? 'Vendor '.$category->name.$where : 'Cari vendor perkahwinan'.$where)
+        $seo->title($category
+                ? __('seo.marketplace.title_category', ['category' => $category->name, 'where' => $where])
+                : __('seo.marketplace.title', ['where' => $where]))
             ->description($category
-                ? 'Bandingkan dan tempah '.Str::lower($category->name).$where.'. Harga, pakej, rating dan review daripada pasangan yang benar-benar menempah.'
-                : 'Cari dan tempah vendor perkahwinan'.$where.': jurugambar, katering, pelamin, mak andam dan banyak lagi. Harga, pakej dan review sebenar.')
+                ? __('seo.marketplace.description_category', ['category' => Str::lower($category->name), 'where' => $where])
+                : __('seo.marketplace.description', ['where' => $where]))
             ->canonical(url()->current().($keep ? '?'.http_build_query($keep) : ''));
 
         if ($category) {

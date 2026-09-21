@@ -131,10 +131,10 @@ class Review extends Model
     public function sourceLabel(): string
     {
         return match (true) {
-            $this->isVerified() => '✓ Tempahan disahkan',
-            $this->isVendorAdded() => 'Ditambah oleh vendor',
-            $this->isPlatformAdded() => 'Ditambah oleh Neekah',
-            default => 'Review terbuka',
+            $this->isVerified() => __('enums.review_source.verified'),
+            $this->isVendorAdded() => __('enums.review_source.vendor_added'),
+            $this->isPlatformAdded() => __('enums.review_source.platform_added'),
+            default => __('enums.review_source.open'),
         };
     }
 

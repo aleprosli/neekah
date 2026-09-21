@@ -25,24 +25,24 @@ const messages = Object.values(props.errors);
     <form :action="action" method="POST" class="mt-6 flex flex-col gap-4 rounded-2xl border border-line bg-surface-raised p-6">
         <input type="hidden" name="_token" :value="csrf">
 
-        <UiSelect v-model="form.type" label="Jenis pelanggaran" name="type" :options="types" placeholder="Pilih jenis" :error="errors.type" required />
+        <UiSelect v-model="form.type" :label="$t('report.type')" name="type" :options="types" :placeholder="$t('report.type_placeholder')" :error="errors.type" required />
 
         <UiSelect
             v-if="bookings.length"
             v-model="form.booking_id"
-            label="Booking berkaitan (pilihan)"
+            :label="$t('report.booking')"
             name="booking_id"
             :options="bookings"
-            placeholder="Tiada booking khusus"
+            :placeholder="$t('report.booking_placeholder')"
             :error="errors.booking_id"
         />
 
         <UiTextarea
             v-model="form.description"
-            label="Apa yang berlaku?"
+            :label="$t('report.what_happened')"
             name="description"
             :rows="6"
-            placeholder="Terangkan kejadian dengan seberapa terperinci yang boleh, termasuk tarikh dan cara vendor menghubungi anda."
+            :placeholder="$t('report.what_happened_placeholder')"
             :error="errors.description"
             required
         />
@@ -52,8 +52,8 @@ const messages = Object.values(props.errors);
         </div>
 
         <div class="flex gap-2">
-            <button type="submit" class="rounded-full bg-brand-600 px-8 py-3 text-sm font-semibold text-white transition hover:bg-brand-700">Hantar laporan</button>
-            <a :href="cancelUrl" class="rounded-full px-6 py-3 text-sm font-medium text-ink-muted transition hover:bg-surface-muted">Batal</a>
+            <button type="submit" class="rounded-full bg-brand-600 px-8 py-3 text-sm font-semibold text-white transition hover:bg-brand-700">{{ $t('report.submit') }}</button>
+            <a :href="cancelUrl" class="rounded-full px-6 py-3 text-sm font-medium text-ink-muted transition hover:bg-surface-muted">{{ $t('common.cancel') }}</a>
         </div>
     </form>
 </template>

@@ -60,10 +60,10 @@ class StoreBookingRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'package_id' => 'pakej',
-            'event_date' => 'tarikh majlis',
-            'wedding_id' => 'majlis',
-            'notes' => 'nota',
+            'package_id' => __('fields.pakej'),
+            'event_date' => __('fields.tarikh_majlis'),
+            'wedding_id' => __('fields.majlis'),
+            'notes' => __('fields.nota'),
         ];
     }
 }

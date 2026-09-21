@@ -55,7 +55,7 @@ class ProfileController extends Controller
                     ->all(),
                 'tones' => UpdateVendorProfileRequest::TONES,
                 'priceUnits' => collect(PriceUnit::cases())
-                    ->map(fn (PriceUnit $unit): array => ['value' => $unit->value, 'label' => 'Setiap '.$unit->label()])
+                    ->map(fn (PriceUnit $unit): array => ['value' => $unit->value, 'label' => __('props.vendor.setiap').$unit->label()])
                     ->all(),
                 'imageHint' => $images->uploadHint('landskap 1920 × 1080px').'. Jika tiada gambar, warna latar digunakan.',
                 'logoHint' => $images->uploadHint('persegi 512 × 512px').'. Jika tiada logo, huruf pertama nama perniagaan digunakan.',

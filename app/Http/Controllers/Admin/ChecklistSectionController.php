@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Casts\Translatable;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreChecklistSectionRequest;
 use App\Models\Category;
 use App\Models\ChecklistItem;
 use App\Models\ChecklistSection;
 use App\Models\Wedding;
+use App\Support\Locales;
 use App\Support\VueProps;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
@@ -33,17 +35,20 @@ class ChecklistSectionController extends Controller
                 'itemStoreUrl' => route('admin.checklist.items.store'),
                 'orderUrl' => route('admin.checklist.order'),
                 'stats' => [
-                    ['label' => 'Fasa', 'value' => $sections->count()],
-                    ['label' => 'Jumlah tugasan', 'value' => $items->count()],
-                    ['label' => 'Tugasan aktif', 'value' => $items->where('is_active', true)->count()],
-                    ['label' => 'Majlis terlibat', 'value' => Wedding::count()],
+                    ['label' => __('props.admin.fasa'), 'value' => $sections->count()],
+                    ['label' => __('props.admin.jumlah_tugasan'), 'value' => $items->count()],
+                    ['label' => __('props.admin.tugasan_aktif'), 'value' => $items->where('is_active', true)->count()],
+                    ['label' => __('props.admin.majlis_terlibat'), 'value' => Wedding::count()],
                 ],
                 'categories' => Category::active()->ordered()->get(['id', 'name', 'icon']),
+                'locales' => collect(Locales::codes())->map(fn (string $c): array => ['code' => $c, 'label' => Locales::label($c)])->all(),
                 'sections' => $sections->map(fn (ChecklistSection $section): array => [
                     'id' => $section->id,
                     'title' => $section->title,
+                    'titles' => Translatable::all($section, 'title'),
                     'icon' => $section->icon,
                     'note' => $section->note,
+                    'notes_all' => Translatable::all($section, 'note'),
                     'is_active' => $section->is_active,
                     'update_url' => route('admin.checklist.sections.update', $section),
                     'destroy_url' => route('admin.checklist.sections.destroy', $section),
@@ -51,8 +56,11 @@ class ChecklistSectionController extends Controller
                         'id' => $item->id,
                         'checklist_section_id' => $item->checklist_section_id,
                         'title' => $item->title,
+                        'titles' => Translatable::all($item, 'title'),
                         'group' => $item->group,
+                        'groups' => Translatable::all($item, 'group'),
                         'notes' => $item->notes,
+                        'notes_all' => Translatable::all($item, 'notes'),
                         'months_before' => $item->months_before,
                         'is_active' => $item->is_active,
                         'category_id' => $item->category_id,
@@ -72,14 +80,14 @@ class ChecklistSectionController extends Controller
             'sort_order' => (int) ChecklistSection::max('sort_order') + 1,
         ]);
 
-        return back()->with('status', 'Fasa ditambah.');
+        return back()->with('status', __('flash.admin.section_added'));
     }
 
     public function update(StoreChecklistSectionRequest $request, ChecklistSection $section): RedirectResponse
     {
         $section->update($request->attributesForSection());
 
-        return back()->with('status', 'Fasa dikemas kini.');
+        return back()->with('status', __('flash.admin.section_updated'));
     }
 
     /**
@@ -91,6 +99,6 @@ class ChecklistSectionController extends Controller
     {
         $section->delete();
 
-        return back()->with('status', 'Fasa dipadam. Checklist pengantin sedia ada tidak berubah.');
+        return back()->with('status', __('flash.admin.section_deleted'));
     }
 }

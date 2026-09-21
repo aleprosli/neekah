@@ -9,9 +9,9 @@
                 <img src="{{ StoreOptimizedImage::thumbnailUrl($vendor->cover_image) }}" alt="{{ $vendor->category->name }} {{ $vendor->name }}" loading="lazy" decoding="async" class="absolute inset-0 size-full object-cover">
             @endif
             @if ($vendor->tier === VendorTier::Recommended)
-                <span class="absolute top-3 left-3 rounded-full bg-gold-300 px-2.5 py-1 text-xs font-semibold text-brand-900 shadow-sm">🏆 Recommended</span>
+                <span class="absolute top-3 left-3 rounded-full bg-gold-300 px-2.5 py-1 text-xs font-semibold text-brand-900 shadow-sm">🏆 {{ __('marketplace.card.recommended') }}</span>
             @elseif ($vendor->tier === VendorTier::Top)
-                <span class="absolute top-3 left-3 rounded-full bg-white/95 px-2.5 py-1 text-xs font-semibold text-ink shadow-sm">Top vendor</span>
+                <span class="absolute top-3 left-3 rounded-full bg-white/95 px-2.5 py-1 text-xs font-semibold text-ink shadow-sm">{{ __('marketplace.card.top') }}</span>
             @endif
             <span class="absolute inset-x-0 bottom-0 h-1/3 bg-linear-to-t from-black/35 to-transparent"></span>
             <span class="absolute bottom-3 left-3 flex size-10 items-center justify-center rounded-full bg-white text-xl shadow-sm" aria-hidden="true"><x-category-icon class="size-6" :category="$vendor->category" /></span>
@@ -26,21 +26,21 @@
                     {{ number_format($vendor->rating_avg, 1) }}
                     <span class="text-ink-muted">({{ $vendor->reviews_count }})</span>
                 @else
-                    <span class="text-ink-muted">Baru</span>
+                    <span class="text-ink-muted">{{ __('marketplace.card.new') }}</span>
                 @endif
             </span>
         </div>
         <p class="truncate text-sm text-ink-muted">{{ $vendor->tagline }}</p>
-        <p class="mt-1 text-sm text-ink-muted">Dari <span class="font-semibold text-ink">RM{{ number_format($vendor->price_from) }}</span> / {{ $vendor->price_unit->label() }}</p>
+        <p class="mt-1 text-sm text-ink-muted">{{ __('marketplace.card.from') }} <span class="font-semibold text-ink">RM{{ number_format($vendor->price_from) }}</span> / {{ $vendor->price_unit->label() }}</p>
     </a>
 
     @if ($comparable)
         {{-- One icon toggle in the corner, so it never crowds the tier badge. --}}
-        <label class="absolute top-2.5 right-2.5 cursor-pointer" title="Tambah ke senarai banding">
+        <label class="absolute top-2.5 right-2.5 cursor-pointer" title="{{ __('marketplace.card.compare_add') }}">
             <input type="checkbox" data-compare="{{ $vendor->slug }}" data-compare-name="{{ $vendor->name }}" class="peer sr-only">
             <span class="flex size-9 items-center justify-center rounded-full bg-white/90 text-ink shadow-sm backdrop-blur transition peer-checked:bg-brand-600 peer-checked:text-white peer-focus-visible:ring-2 peer-focus-visible:ring-brand-400 hover:bg-white">
                 <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h11M4 17h11"/><path d="m17 4 3 3-3 3M17 14l3 3-3 3"/></svg>
-                <span class="sr-only">Banding {{ $vendor->name }}</span>
+                <span class="sr-only">{{ __('marketplace.card.compare_one', ['name' => $vendor->name]) }}</span>
             </span>
         </label>
     @endif

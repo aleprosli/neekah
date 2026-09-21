@@ -1,7 +1,7 @@
-<x-layouts.customer title="Kad jemputan" heading="Kad jemputan digital" subheading="Isi maklumat majlis, pilih template dan siarkan pada alamat web anda sendiri.">
+<x-layouts.customer :title="__('pages.dash.kad_jemputan')" :heading="__('pages.dash.kad_jemputan_digital')" :subheading="__('pages.dash.isi_maklumat_majlis_pilih_template')">
     <x-slot:actions>
-        <a href="{{ route('sites.templates') }}" class="rounded-full border border-line px-4 py-2 text-sm font-medium transition hover:border-brand-400">Lihat semua template</a>
-        <a href="{{ route('site.preview') }}" target="_blank" class="rounded-full border border-line px-4 py-2 text-sm font-medium transition hover:border-brand-400">Pratonton</a>
+        <a href="{{ route('sites.templates') }}" class="rounded-full border border-line px-4 py-2 text-sm font-medium transition hover:border-brand-400">{{ __('pages.dash.lihat_semua_template') }}</a>
+        <a href="{{ route('site.preview') }}" target="_blank" class="rounded-full border border-line px-4 py-2 text-sm font-medium transition hover:border-brand-400">{{ __('pages.dash.pratonton') }}</a>
     </x-slot:actions>
 
     <x-invitation-setup :wedding="$wedding" compact class="mb-6" />

@@ -68,7 +68,7 @@ class UnavailableDateController extends Controller
             $added += $created->wasRecentlyCreated ? 1 : 0;
         }
 
-        return redirect()->route('vendor.availability.index')->with('status', $added.' hari ditutup.');
+        return redirect()->route('vendor.availability.index')->with('status', __('flash.vendor.dates_closed', ['count' => $added]));
     }
 
     public function destroy(Request $request, VendorUnavailableDate $date): RedirectResponse
@@ -77,6 +77,6 @@ class UnavailableDateController extends Controller
 
         $date->delete();
 
-        return redirect()->route('vendor.availability.index')->with('status', 'Tarikh dibuka semula.');
+        return redirect()->route('vendor.availability.index')->with('status', __('flash.vendor.date_reopened'));
     }
 }

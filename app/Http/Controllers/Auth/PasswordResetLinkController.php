@@ -37,6 +37,6 @@ class PasswordResetLinkController extends Controller
 
         Password::sendResetLink($request->only('email'));
 
-        return back()->with('status', 'Jika emel tersebut berdaftar, kami telah menghantar pautan set semula kata laluan.');
+        return back()->with('status', __('flash.account.reset_link_sent'));
     }
 }

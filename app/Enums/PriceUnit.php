@@ -10,8 +10,8 @@ enum PriceUnit: string
     public function label(): string
     {
         return match ($this) {
-            self::Package => 'pakej',
-            self::Pax => 'pax',
+            self::Package => __('enums.price_unit.package'),
+            self::Pax => __('enums.price_unit.pax'),
         };
     }
 }

@@ -50,12 +50,12 @@ class StoreTimelineItemRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'title' => 'aktiviti',
-            'starts_at' => 'masa mula',
-            'ends_at' => 'masa tamat',
-            'vendor_id' => 'vendor',
-            'location' => 'lokasi',
-            'notes' => 'nota',
+            'title' => __('fields.aktiviti'),
+            'starts_at' => __('fields.masa_mula'),
+            'ends_at' => __('fields.masa_tamat'),
+            'vendor_id' => __('fields.vendor'),
+            'location' => __('fields.lokasi'),
+            'notes' => __('fields.nota'),
         ];
     }
 
@@ -65,7 +65,7 @@ class StoreTimelineItemRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'vendor_id.in' => 'Anda hanya boleh menugaskan vendor yang telah ditempah untuk majlis ini.',
+            'vendor_id.in' => __('validation.custom.timeline_vendor_not_booked'),
         ];
     }
 }

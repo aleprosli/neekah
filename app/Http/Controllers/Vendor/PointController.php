@@ -50,10 +50,10 @@ class PointController extends Controller
         return view('vendor.points', [
             'props' => VueProps::for([
                 'stats' => [
-                    ['label' => 'Performance point', 'value' => number_format($vendor->points_total), 'hint' => $vendor->penalty_points ? '− '.$vendor->penalty_points.' penalti pelanggaran' : 'Tiada penalti'],
-                    ['label' => 'Vendor Score', 'value' => number_format((float) $vendor->score, 2), 'hint' => 'Maksimum 100'],
-                    ['label' => 'Completion rate', 'value' => $vendor->completion_rate.'%', 'hint' => $vendor->completed_bookings_count.' majlis selesai'],
-                    ['label' => 'Response rate', 'value' => $vendor->responseRateLabel(), 'hint' => $vendor->response_rate === null
+                    ['label' => __('props.vendor.performance_point'), 'value' => number_format($vendor->points_total), 'hint' => $vendor->penalty_points ? __('props.vendor.penalties', ['count' => $vendor->penalty_points]) : __('props.vendor.no_penalties')],
+                    ['label' => __('props.vendor.vendor_score'), 'value' => number_format((float) $vendor->score, 2), 'hint' => __('props.vendor.maksimum_100')],
+                    ['label' => __('props.vendor.completion_rate'), 'value' => $vendor->completion_rate.'%', 'hint' => $vendor->completed_bookings_count.' majlis selesai'],
+                    ['label' => __('props.vendor.response_rate'), 'value' => $vendor->responseRateLabel(), 'hint' => $vendor->response_rate === null
                         ? 'Perlu sekurang-kurangnya '.Vendor::MIN_ENQUIRIES_FOR_RESPONSE_RATE.' enquiry untuk diukur'
                         : 'Enquiry yang anda balas'],
                 ],
@@ -68,9 +68,9 @@ class PointController extends Controller
                         ])->values(),
                 ],
                 'periodStats' => [
-                    ['label' => 'Pendapatan', 'value' => 'RM'.number_format((float) $revenue->clone()->sum('amount')), 'hint' => 'Bayaran diterima dalam tempoh'],
-                    ['label' => 'Enquiry dibalas', 'value' => $enquiryCount > 0 ? $enquiries->clone()->whereNotNull('replied_at')->count().' / '.$enquiryCount : 'Tiada enquiry', 'hint' => 'Enquiry yang anda terima'],
-                    ['label' => 'Enquiry jadi tempahan', 'value' => $enquiryCount > 0 ? round($bookingsInPeriod / $enquiryCount * 100).'%' : 'Tiada data', 'hint' => $bookingsInPeriod.' tempahan dalam tempoh'],
+                    ['label' => __('props.vendor.pendapatan'), 'value' => 'RM'.number_format((float) $revenue->clone()->sum('amount')), 'hint' => __('props.vendor.bayaran_diterima_dalam_tempoh')],
+                    ['label' => __('props.vendor.enquiry_dibalas'), 'value' => $enquiryCount > 0 ? $enquiries->clone()->whereNotNull('replied_at')->count().' / '.$enquiryCount : __('props.vendor.tiada_enquiry'), 'hint' => __('props.vendor.enquiry_yang_anda_terima')],
+                    ['label' => __('props.vendor.enquiry_jadi_tempahan'), 'value' => $enquiryCount > 0 ? round($bookingsInPeriod / $enquiryCount * 100).'%' : 'Tiada data', 'hint' => $bookingsInPeriod.' tempahan dalam tempoh'],
                 ],
                 'charts' => [
                     'revenue' => $this->chart($period->series(MonthlyTotals::of($revenue->clone(), 'paid_at', 'sum', 'amount')), fn (float $value): string => 'RM'.number_format($value)),
@@ -158,11 +158,11 @@ class PointController extends Controller
         }
 
         $rows = [
-            ['label' => 'Booking selesai', 'value' => $vendor->completed_bookings_count, 'target' => $targets['completed'], 'suffix' => ''],
-            ['label' => 'Rating purata', 'value' => (float) $vendor->rating_avg, 'target' => $targets['rating'], 'suffix' => ''],
-            ['label' => 'Jumlah review', 'value' => $vendor->reviews_count, 'target' => $targets['reviews'], 'suffix' => ''],
-            ['label' => 'Response rate', 'value' => $vendor->response_rate ?? 0, 'target' => $targets['response'], 'suffix' => '%'],
-            ['label' => 'Completion rate', 'value' => $vendor->completion_rate, 'target' => $targets['completion'], 'suffix' => '%'],
+            ['label' => __('props.vendor.booking_selesai'), 'value' => $vendor->completed_bookings_count, 'target' => $targets['completed'], 'suffix' => ''],
+            ['label' => __('props.vendor.rating_purata'), 'value' => (float) $vendor->rating_avg, 'target' => $targets['rating'], 'suffix' => ''],
+            ['label' => __('props.vendor.jumlah_review'), 'value' => $vendor->reviews_count, 'target' => $targets['reviews'], 'suffix' => ''],
+            ['label' => __('props.vendor.response_rate_2'), 'value' => $vendor->response_rate ?? 0, 'target' => $targets['response'], 'suffix' => '%'],
+            ['label' => __('props.vendor.completion_rate_2'), 'value' => $vendor->completion_rate, 'target' => $targets['completion'], 'suffix' => '%'],
         ];
 
         return collect($rows)

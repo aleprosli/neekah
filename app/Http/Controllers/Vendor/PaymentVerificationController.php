@@ -26,7 +26,7 @@ class PaymentVerificationController extends Controller
 
         return redirect()
             ->route('vendor.bookings.show', $booking)
-            ->with('status', 'Bayaran RM'.number_format((float) $payment->amount, 2).' disahkan diterima.');
+            ->with('status', __('flash.vendor.payment_verified', ['amount' => number_format((float) $payment->amount, 2)]));
     }
 
     public function destroy(Request $request, Booking $booking, Payment $payment, VerifyManualPayment $verify): RedirectResponse
@@ -37,7 +37,7 @@ class PaymentVerificationController extends Controller
 
         return redirect()
             ->route('vendor.bookings.show', $booking)
-            ->with('status', 'Bayaran ditanda sebagai tidak diterima. Pelanggan dimaklumkan untuk menyemak semula.');
+            ->with('status', __('flash.vendor.payment_rejected'));
     }
 
     private function authorizePending(Request $request, Booking $booking, Payment $payment): void

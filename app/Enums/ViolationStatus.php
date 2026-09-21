@@ -11,9 +11,9 @@ enum ViolationStatus: string
     public function label(): string
     {
         return match ($this) {
-            self::Open => 'Menunggu semakan',
-            self::Upheld => 'Disahkan',
-            self::Dismissed => 'Ditolak',
+            self::Open => __('enums.violation_status.open'),
+            self::Upheld => __('enums.violation_status.upheld'),
+            self::Dismissed => __('enums.violation_status.dismissed'),
         };
     }
 }

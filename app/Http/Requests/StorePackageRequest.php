@@ -63,11 +63,11 @@ class StorePackageRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'name' => 'nama pakej',
-            'price' => 'harga',
-            'duration' => 'tempoh',
-            'features' => 'kandungan pakej',
-            'image' => 'gambar pakej',
+            'name' => __('fields.nama_pakej'),
+            'price' => __('fields.harga'),
+            'duration' => __('fields.tempoh'),
+            'features' => __('fields.kandungan_pakej'),
+            'image' => __('fields.gambar_pakej'),
         ];
     }
 }

@@ -10,17 +10,17 @@
 {{-- The guide from no card to guests holding it. Couples were signing up and
      never making one, so this walks them through it until the last step is done. --}}
 @unless ($setup->isFinished())
-    <section {{ $attributes->class(['overflow-hidden rounded-3xl border border-gold-400/60 bg-linear-to-br from-gold-300/15 via-surface-raised to-brand-50/60']) }} aria-label="Panduan kad digital">
+    <section {{ $attributes->class(['overflow-hidden rounded-3xl border border-gold-400/60 bg-linear-to-br from-gold-300/15 via-surface-raised to-brand-50/60']) }} aria-label="{{ __('pages.card_setup.aria') }}">
         <div @class(['flex flex-col gap-6 p-6 sm:p-7', 'lg:flex-row lg:items-start lg:gap-10' => ! $compact])>
             <div @class(['min-w-0', 'lg:w-72 lg:shrink-0' => ! $compact])>
                 <p class="flex items-center gap-2 text-xs font-semibold tracking-wide text-gold-600 uppercase">
                     <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
-                    Kad kahwin digital
+                    {{ __('pages.card_setup.eyebrow') }}
                 </p>
                 <h2 class="mt-2 font-display text-xl font-semibold">
-                    {{ $done === 0 ? 'Cipta kad dalam 4 langkah' : 'Teruskan kad anda' }}
+                    {{ $done === 0 ? __('pages.card_setup.heading_start') : __('pages.card_setup.heading_continue') }}
                 </h2>
-                <p class="mt-1 text-sm text-ink-muted">{{ $done }} daripada {{ count($steps) }} langkah selesai.</p>
+                <p class="mt-1 text-sm text-ink-muted">{{ __('pages.card_setup.progress', ['done' => $done, 'total' => count($steps)]) }}</p>
                 <x-progress-bar class="mt-4" :value="$done" :max="count($steps)" />
                 @if ($next && ! $compact)
                     <a href="{{ $next['url'] }}" class="mt-5 inline-flex items-center gap-2 rounded-full bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700">
@@ -46,7 +46,7 @@
                         ])>
                             @if ($step['done'])
                                 <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
-                                <span class="sr-only">Selesai:</span>
+                                <span class="sr-only">{{ __('pages.card_setup.done_label') }}</span>
                             @else
                                 {{ $loop->iteration }}
                             @endif

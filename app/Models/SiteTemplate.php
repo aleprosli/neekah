@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Casts\Translatable;
+use App\Models\Concerns\HasTranslatedText;
 use Database\Factories\SiteTemplateFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Scope;
@@ -14,6 +16,8 @@ class SiteTemplate extends Model
 {
     /** @use HasFactory<SiteTemplateFactory> */
     use HasFactory;
+
+    use HasTranslatedText;
 
     /**
      * Layout skeletons. Each one is a Blade partial under sites/layouts.
@@ -35,6 +39,8 @@ class SiteTemplate extends Model
     protected function casts(): array
     {
         return [
+            'name' => Translatable::class,
+            'description' => Translatable::class,
             'design' => 'array',
             'is_active' => 'boolean',
         ];
@@ -54,7 +60,9 @@ class SiteTemplate extends Model
     #[Scope]
     protected function ordered(Builder $query): Builder
     {
-        return $query->orderBy('sort_order')->orderBy('name');
+        // sort_order is what actually orders these; the name was only a
+        // tiebreak, and sorting by it now would sort by JSON text.
+        return $query->orderBy('sort_order')->orderBy('id');
     }
 
     public function layout(): string

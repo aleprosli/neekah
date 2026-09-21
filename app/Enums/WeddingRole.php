@@ -10,8 +10,8 @@ enum WeddingRole: string
     public function label(): string
     {
         return match ($this) {
-            self::Owner => 'Pemilik majlis',
-            self::Partner => 'Pasangan',
+            self::Owner => __('enums.wedding_role.owner'),
+            self::Partner => __('enums.wedding_role.partner'),
         };
     }
 }

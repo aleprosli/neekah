@@ -27,7 +27,7 @@ class ReplyEnquiryRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'reply' => 'balasan',
+            'reply' => __('fields.balasan'),
         ];
     }
 }

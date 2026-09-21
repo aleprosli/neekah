@@ -152,8 +152,8 @@ class WeddingSiteController extends Controller
         return redirect()
             ->route('site.edit')
             ->with('status', $site->is_published
-                ? 'Kad jemputan dikemas kini dan sudah tersiar di '.$site->url()
-                : 'Kad jemputan disimpan. Tekan "Siarkan" apabila anda sudah bersedia.');
+                ? __('flash.couple.site_updated_published', ['url' => $site->url()])
+                : __('flash.couple.site_saved_draft'));
     }
 
     /**
@@ -169,8 +169,8 @@ class WeddingSiteController extends Controller
         $site->update(['is_published' => $request->boolean('published')]);
 
         return back()->with('status', $site->is_published
-            ? 'Kad jemputan anda kini tersiar di '.$site->url()
-            : 'Kad jemputan ditarik daripada paparan awam.');
+            ? __('flash.couple.site_published', ['url' => $site->url()])
+            : __('flash.couple.site_unpublished'));
     }
 
     /**
@@ -246,10 +246,10 @@ class WeddingSiteController extends Controller
             'venue_address' => $wedding->city.', '.$wedding->state,
             'salutation' => 'Dengan penuh kesyukuran, kami menjemput Dato\' / Datin / Tuan / Puan / Encik / Cik ke majlis perkahwinan anakanda kami',
             'itinerary' => [
-                ['time' => '11:00 pagi', 'label' => 'Ketibaan tetamu'],
-                ['time' => '12:30 tengah hari', 'label' => 'Ketibaan pengantin'],
-                ['time' => '1:00 petang', 'label' => 'Makan beradab'],
-                ['time' => '4:00 petang', 'label' => 'Majlis bersurai'],
+                ['time' => '11:00 pagi', 'label' => __('props.couple.ketibaan_tetamu')],
+                ['time' => '12:30 tengah hari', 'label' => __('props.couple.ketibaan_pengantin')],
+                ['time' => '1:00 petang', 'label' => __('props.couple.makan_beradab')],
+                ['time' => '4:00 petang', 'label' => __('props.couple.majlis_bersurai')],
             ],
             'contacts' => [],
             'rsvp_enabled' => true,

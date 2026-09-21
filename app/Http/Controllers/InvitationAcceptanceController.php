@@ -58,15 +58,15 @@ class InvitationAcceptanceController extends Controller
         $wedding = $invitation->wedding;
 
         if ($wedding->hasMember($user)) {
-            return redirect()->route('dashboard')->with('status', 'Anda sudah menjadi ahli majlis ini.');
+            return redirect()->route('dashboard')->with('status', __('flash.account.already_member'));
         }
 
         if (! $accept->handle($invitation, $user)) {
             return redirect()->route('dashboard')->withErrors([
-                'invitation' => 'Jemputan ini tidak boleh digunakan lagi. Ia mungkin telah tamat tempoh, telah digunakan, atau majlis sudah ada dua ahli.',
+                'invitation' => __('flash.account.invitation_unusable'),
             ]);
         }
 
-        return redirect()->route('dashboard')->with('status', 'Anda kini menguruskan "'.$wedding->title.'" bersama '.$invitation->inviter->name.'.');
+        return redirect()->route('dashboard')->with('status', __('flash.account.now_planning', ['wedding' => $wedding->title, 'inviter' => $invitation->inviter->name]));
     }
 }

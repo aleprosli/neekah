@@ -6,25 +6,25 @@
     $wedding = $user->weddings()->latest('event_date')->first();
     $outstandingTasks = $wedding?->tasks()->outstanding()->whereNotNull('due_date')->whereDate('due_date', '<=', today())->count();
     $item = fn (string $label, string $icon, string $route, string|array $pattern, ?int $badge = null): array => [
-        'label' => $label, 'icon' => $icon, 'href' => route($route), 'active' => request()->routeIs($pattern), 'badge' => $badge ?: null,
+        'label' => $label, 'icon' => $icon, 'href' => route($route), 'active' => App\Support\Locales::routeIs($pattern), 'badge' => $badge ?: null,
     ];
     $nav = [
         ['label' => null, 'items' => [
-            $item('Majlis saya', 'rings', 'dashboard', ['dashboard', 'weddings.*']),
+            $item(__('pages.sidebar_couple.majlis_saya'), 'rings', 'dashboard', ['dashboard', 'weddings.*']),
         ]],
-        ['label' => 'Perancangan', 'items' => [
-            $item('Checklist', 'check', 'checklist.index', 'checklist.*', $outstandingTasks),
-            $item('Timeline', 'calendar', 'timeline.index', 'timeline.*'),
-            $item('Bajet', 'wallet', 'budget.index', 'budget.*'),
+        ['label' => __('pages.sidebar_couple.perancangan'), 'items' => [
+            $item(__('pages.sidebar_couple.checklist'), 'check', 'checklist.index', 'checklist.*', $outstandingTasks),
+            $item(__('pages.sidebar_couple.timeline'), 'calendar', 'timeline.index', 'timeline.*'),
+            $item(__('pages.sidebar_couple.bajet'), 'wallet', 'budget.index', 'budget.*'),
         ]],
-        ['label' => 'Tetamu', 'items' => [
-            $item('Senarai tetamu', 'users', 'guests.index', 'guests.*'),
-            $item('Kad jemputan', 'mail', 'site.edit', 'site.*'),
+        ['label' => __('pages.sidebar_couple.tetamu'), 'items' => [
+            $item(__('pages.sidebar_couple.senarai_tetamu'), 'users', 'guests.index', 'guests.*'),
+            $item(__('pages.sidebar_couple.kad_jemputan'), 'mail', 'site.edit', 'site.*'),
         ]],
-        ['label' => 'Vendor', 'items' => [
-            ['label' => 'Cari vendor', 'icon' => 'search', 'href' => route('vendors.index'), 'active' => false, 'badge' => null],
-            $item('Tempahan', 'receipt', 'bookings.index', 'bookings.*'),
-            $item('Enquiry', 'chat', 'enquiries.index', 'enquiries.*', $repliedEnquiries),
+        ['label' => __('pages.sidebar_couple.vendor'), 'items' => [
+            ['label' => __('pages.sidebar_couple.cari_vendor'), 'icon' => 'search', 'href' => route('vendors.index'), 'active' => false, 'badge' => null],
+            $item(__('pages.sidebar_couple.tempahan'), 'receipt', 'bookings.index', 'bookings.*'),
+            $item(__('pages.sidebar_couple.enquiry'), 'chat', 'enquiries.index', 'enquiries.*', $repliedEnquiries),
         ]],
     ];
 
@@ -34,13 +34,13 @@
         ? [
             'title' => $wedding->title,
             'detail' => $wedding->event_date->translatedFormat('j F Y').' · '.match (true) {
-                $daysLeft > 0 => $daysLeft.' hari lagi',
-                $daysLeft === 0 => 'Hari ini!',
-                default => 'Selamat pengantin baru',
+                $daysLeft > 0 => __('pages.sidebar_couple.hari_lagi', ['count' => $daysLeft]),
+                $daysLeft === 0 => __('pages.sidebar_couple.hari_ini'),
+                default => __('pages.sidebar_couple.selamat_pengantin_baru'),
             },
             'wedding' => true,
         ]
-        : ['title' => 'Perancang majlis', 'detail' => 'Cipta majlis anda untuk bermula', 'wedding' => true];
+        : ['title' => __('pages.sidebar_couple.perancang_majlis'), 'detail' => __('pages.sidebar_couple.cipta_majlis_anda_untuk'), 'wedding' => true];
 @endphp
 
 <x-layouts.dashboard :title="$title" :nav="$nav" :context="$context" :heading="$heading" :subheading="$subheading">

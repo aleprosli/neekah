@@ -120,7 +120,7 @@ class PackageController extends Controller
         $package->delete();
         $this->syncPriceFrom($request);
 
-        return redirect()->route('vendor.packages.index')->with('status', 'Pakej dipadam.');
+        return redirect()->route('vendor.packages.index')->with('status', __('flash.vendor.package_deleted'));
     }
 
     /**

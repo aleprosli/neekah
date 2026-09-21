@@ -47,13 +47,13 @@ class StoreAdminReviewRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'vendor_id' => 'vendor',
-            'author_name' => 'nama penulis',
-            'author_email' => 'emel penulis',
-            'rating' => 'bintang',
-            'comment' => 'ulasan',
-            'written_on' => 'tarikh review',
-            'photos.*' => 'gambar',
+            'vendor_id' => __('fields.vendor'),
+            'author_name' => __('fields.nama_penulis'),
+            'author_email' => __('fields.emel_penulis'),
+            'rating' => __('fields.bintang'),
+            'comment' => __('fields.ulasan'),
+            'written_on' => __('fields.tarikh_review'),
+            'photos.*' => __('fields.gambar'),
         ];
     }
 }

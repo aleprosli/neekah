@@ -15,14 +15,14 @@ defineProps({
 <template>
     <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
-            <h1 class="font-display text-3xl font-semibold tracking-tight">Notifikasi</h1>
+            <h1 class="font-display text-3xl font-semibold tracking-tight">{{ $t('notifications.title') }}</h1>
             <p class="mt-1 text-sm text-ink-muted">{{ unreadCount ? `${unreadCount} belum dibaca` : 'Semua telah dibaca' }}</p>
         </div>
 
         <form v-if="unreadCount" :action="readAllUrl" method="POST">
             <input type="hidden" name="_token" :value="csrf">
             <input type="hidden" name="_method" value="PUT">
-            <button type="submit" class="rounded-full border border-line px-4 py-2 text-sm font-medium transition hover:border-brand-400">Tandakan semua dibaca</button>
+            <button type="submit" class="rounded-full border border-line px-4 py-2 text-sm font-medium transition hover:border-brand-400">{{ $t('notifications.mark_all_read') }}</button>
         </form>
     </div>
 
@@ -32,8 +32,8 @@ defineProps({
         v-if="!notifications.length"
         class="mt-8"
         icon="🔔"
-        title="Belum ada notifikasi"
-        message="Tempahan, pembayaran dan balasan enquiry akan muncul di sini."
+        :title="$t('notifications.empty_title')"
+        :message="$t('notifications.empty_message')"
     />
 
     <template v-else>
@@ -48,7 +48,7 @@ defineProps({
                         <p class="mt-0.5 text-xs text-ink-muted">{{ notification.at }}</p>
                     </div>
 
-                    <span v-if="notification.unread" class="mt-1.5 size-2 shrink-0 rounded-full bg-brand-600" aria-label="Belum dibaca"></span>
+                    <span v-if="notification.unread" class="mt-1.5 size-2 shrink-0 rounded-full bg-brand-600" :aria-label="$t('notifications.unread')"></span>
                 </a>
             </li>
         </ul>

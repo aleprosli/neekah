@@ -208,7 +208,7 @@ it('skips a phase or a task an admin switched off', function () {
 });
 
 it('files a task the couple already had under its phase instead of adding it twice', function () {
-    $item = ChecklistItem::where('title', 'Tempah katering')->sole();
+    $item = ChecklistItem::whereTranslated('title', 'Tempah katering')->sole();
 
     $mine = $this->wedding->tasks()->create([
         'title' => 'Tempah katering',

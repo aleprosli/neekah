@@ -39,20 +39,20 @@ class AnalyticsController extends Controller
             'period' => $period,
             'props' => VueProps::for([
                 'stats' => [
-                    ['label' => 'Nilai transaksi', 'value' => $money((float) $gross->sum()), 'hint' => 'Bayaran diterima dalam tempoh'],
-                    ['label' => 'Komisen', 'value' => $money((float) $commission->sum()), 'hint' => 'Dari tempahan yang disahkan'],
-                    ['label' => 'Tempahan baharu', 'value' => number_format(Booking::query()->whereBetween('created_at', [$period->start, $period->end])->count()), 'hint' => 'Dicipta dalam tempoh'],
-                    ['label' => 'Enquiry dijawab', 'value' => $enquiryCount > 0
+                    ['label' => __('props.admin.nilai_transaksi'), 'value' => $money((float) $gross->sum()), 'hint' => __('props.admin.bayaran_diterima_dalam_tempoh')],
+                    ['label' => __('props.admin.komisen'), 'value' => $money((float) $commission->sum()), 'hint' => __('props.admin.dari_tempahan_yang_disahkan')],
+                    ['label' => __('props.admin.tempahan_baharu'), 'value' => number_format(Booking::query()->whereBetween('created_at', [$period->start, $period->end])->count()), 'hint' => __('props.admin.dicipta_dalam_tempoh')],
+                    ['label' => __('props.admin.enquiry_dijawab'), 'value' => $enquiryCount > 0
                         ? round($enquiries->clone()->whereIn('status', [EnquiryStatus::Replied, EnquiryStatus::Closed])->count() / $enquiryCount * 100).'%'
-                        : 'Tiada data', 'hint' => $enquiryCount.' enquiry diterima'],
+                        : 'Tiada data', 'hint' => __('props.units.enquiries_received', ['count' => $enquiryCount])],
                 ],
                 'charts' => [
-                    ['title' => 'Nilai transaksi mengikut bulan', 'type' => 'bars', 'series' => $this->formatted($period->series($gross), $money)],
-                    ['title' => 'Komisen mengikut bulan', 'type' => 'bars', 'series' => $this->formatted($period->series($commission), $money)],
-                    ['title' => 'Tempahan mengikut status', 'type' => 'donut', 'series' => $this->formatted($this->bookingsByStatus($period), $whole)],
-                    ['title' => 'Kategori mengikut nilai tempahan', 'type' => 'donut', 'series' => $this->formatted($this->categoryMix($period), $money)],
-                    ['title' => 'Pendaftaran pengantin', 'type' => 'line', 'series' => $this->formatted($period->series(MonthlyTotals::of(User::query()->where('role', UserRole::Customer)->whereBetween('created_at', [$period->start, $period->end]), 'created_at')), $whole)],
-                    ['title' => 'Pendaftaran vendor', 'type' => 'line', 'series' => $this->formatted($period->series(MonthlyTotals::of(Vendor::query()->whereBetween('created_at', [$period->start, $period->end]), 'created_at')), $whole)],
+                    ['title' => __('props.admin.nilai_transaksi_mengikut_bulan'), 'type' => 'bars', 'series' => $this->formatted($period->series($gross), $money)],
+                    ['title' => __('props.admin.komisen_mengikut_bulan'), 'type' => 'bars', 'series' => $this->formatted($period->series($commission), $money)],
+                    ['title' => __('props.admin.tempahan_mengikut_status'), 'type' => 'donut', 'series' => $this->formatted($this->bookingsByStatus($period), $whole)],
+                    ['title' => __('props.admin.kategori_mengikut_nilai_tempahan'), 'type' => 'donut', 'series' => $this->formatted($this->categoryMix($period), $money)],
+                    ['title' => __('props.admin.pendaftaran_pengantin'), 'type' => 'line', 'series' => $this->formatted($period->series(MonthlyTotals::of(User::query()->where('role', UserRole::Customer)->whereBetween('created_at', [$period->start, $period->end]), 'created_at')), $whole)],
+                    ['title' => __('props.admin.pendaftaran_vendor'), 'type' => 'line', 'series' => $this->formatted($period->series(MonthlyTotals::of(Vendor::query()->whereBetween('created_at', [$period->start, $period->end]), 'created_at')), $whole)],
                 ],
                 'topVendors' => Vendor::with('category')->approved()->orderByDesc('score')->limit(8)->get()
                     ->map(fn (Vendor $vendor): array => [

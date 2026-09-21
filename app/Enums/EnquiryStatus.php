@@ -11,9 +11,9 @@ enum EnquiryStatus: string
     public function label(): string
     {
         return match ($this) {
-            self::Open => 'Baru',
-            self::Replied => 'Dibalas',
-            self::Closed => 'Ditutup',
+            self::Open => __('enums.enquiry_status.open'),
+            self::Replied => __('enums.enquiry_status.replied'),
+            self::Closed => __('enums.enquiry_status.closed'),
         };
     }
 }

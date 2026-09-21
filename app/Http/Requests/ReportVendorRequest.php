@@ -36,9 +36,9 @@ class ReportVendorRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'type' => 'jenis pelanggaran',
-            'description' => 'penerangan',
-            'booking_id' => 'booking berkaitan',
+            'type' => __('fields.jenis_pelanggaran'),
+            'description' => __('fields.penerangan'),
+            'booking_id' => __('fields.booking_berkaitan'),
         ];
     }
 
@@ -48,7 +48,7 @@ class ReportVendorRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'description.min' => 'Sila terangkan apa yang berlaku sekurang-kurangnya 20 aksara supaya admin boleh menyiasat.',
+            'description.min' => __('validation.custom.report_too_short'),
         ];
     }
 }

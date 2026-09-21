@@ -20,10 +20,10 @@
                 </p>
                 <div class="flex gap-2">
                     @if ($sample)
-                        <a href="{{ route('sites.templates') }}" class="rounded-full border border-surface/30 px-4 py-1.5 text-xs font-medium transition hover:bg-surface/10">Semua template</a>
-                        <a href="{{ auth()->check() ? route('site.edit', ['template' => $template->slug]) : route('register') }}" class="rounded-full bg-surface px-4 py-1.5 text-xs font-semibold text-ink transition hover:opacity-90">Guna template ini</a>
+                        <a href="{{ route('sites.templates') }}" class="rounded-full border border-surface/30 px-4 py-1.5 text-xs font-medium transition hover:bg-surface/10">{{ __('pages.card_shell.semua_template') }}</a>
+                        <a href="{{ auth()->check() ? route('site.edit', ['template' => $template->slug]) : route('register') }}" class="rounded-full bg-surface px-4 py-1.5 text-xs font-semibold text-ink transition hover:opacity-90">{{ __('pages.card_shell.guna_template_ini') }}</a>
                     @else
-                        <a href="{{ route('site.edit') }}" class="rounded-full bg-surface px-4 py-1.5 text-xs font-semibold text-ink transition hover:opacity-90">Kembali ke editor</a>
+                        <a href="{{ route('site.edit') }}" class="rounded-full bg-surface px-4 py-1.5 text-xs font-semibold text-ink transition hover:opacity-90">{{ __('pages.card_shell.kembali_ke_editor') }}</a>
                     @endif
                 </div>
             </div>
@@ -33,8 +33,7 @@
     {{ $slot }}
 
     @unless ($preview)
-        <p class="bg-surface py-6 text-center text-xs text-ink-muted">
-            Kad jemputan digital oleh <a href="{{ route('landing') }}" class="font-medium underline underline-offset-4">Neekah</a>
+        <p class="bg-surface py-6 text-center text-xs text-ink-muted">{{ __('pages.card_shell.kad_jemputan_digital_oleh') }}<a href="{{ route('landing') }}" class="font-medium underline underline-offset-4">{{ __('pages.card_shell.neekah') }}</a>
         </p>
     @endunless
 </x-layouts.app>

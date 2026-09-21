@@ -3,6 +3,7 @@
 namespace App\Notifications;
 
 use App\Models\Payment;
+use App\Support\NeekahMail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -33,8 +34,9 @@ class PaymentRejected extends Notification implements ShouldQueue
     {
         return [
             'icon' => '⚠️',
-            'title' => 'Bayaran RM'.number_format((float) $this->payment->amount, 2).' tidak ditemui',
-            'body' => 'Vendor tidak menemui bayaran ini dalam akaun mereka. Sila semak dan rekod semula.',
+            'title_key' => 'notifications.payment_rejected.title',
+            'title_params' => ['amount' => 'RM'.number_format((float) $this->payment->amount, 2)],
+            'body_key' => 'notifications.payment_rejected.body',
             'url' => route('bookings.show', $this->payment->booking),
         ];
     }
@@ -43,12 +45,10 @@ class PaymentRejected extends Notification implements ShouldQueue
     {
         $booking = $this->payment->booking;
 
-        return (new MailMessage)
-            ->subject('Bayaran '.$this->payment->reference.' tidak dapat disahkan')
-            ->greeting('Hai '.$notifiable->name.',')
-            ->line($booking->vendor->name.' tidak menemui bayaran RM'.number_format((float) $this->payment->amount, 2).' yang anda rekodkan untuk booking '.$booking->reference.'.')
-            ->line('Semak resit dan tarikh bayaran anda, hubungi vendor jika perlu, kemudian rekodkan semula.')
-            ->action('Lihat booking', route('bookings.show', $booking))
-            ->salutation('Terima kasih, Neekah');
+        return NeekahMail::to($notifiable)
+            ->subject(__('notifications.payment_rejected.subject', ['reference' => $this->payment->reference]))
+            ->line(__('notifications.payment_rejected.intro', ['vendor' => $booking->vendor->name, 'amount' => 'RM'.number_format((float) $this->payment->amount, 2), 'reference' => $booking->reference]))
+            ->line(__('notifications.payment_rejected.what_to_do'))
+            ->action(__('notifications.actions.view_booking'), route('bookings.show', $booking));
     }
 }

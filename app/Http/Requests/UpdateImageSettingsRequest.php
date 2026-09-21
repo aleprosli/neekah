@@ -37,11 +37,11 @@ class UpdateImageSettingsRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'max_dimension' => 'saiz maksimum',
-            'thumbnail_width' => 'lebar thumbnail',
-            'quality' => 'kualiti',
-            'format' => 'format',
-            'max_upload_mb' => 'had saiz muat naik',
+            'max_dimension' => __('fields.saiz_maksimum'),
+            'thumbnail_width' => __('fields.lebar_thumbnail'),
+            'quality' => __('fields.kualiti'),
+            'format' => __('fields.format'),
+            'max_upload_mb' => __('fields.had_saiz_muat_naik'),
         ];
     }
 }

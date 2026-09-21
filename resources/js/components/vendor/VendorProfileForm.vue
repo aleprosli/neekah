@@ -82,23 +82,23 @@ const stateChoices = computed(() =>
         <input type="hidden" name="_method" value="PUT">
 
         <section class="flex flex-col gap-4 rounded-2xl border border-line bg-surface-raised p-6">
-            <h2 class="font-semibold">Maklumat asas</h2>
+            <h2 class="font-semibold">{{ $t('vendor_profile.maklumat_asas') }}</h2>
 
-            <UiField v-model="form.name" label="Nama perniagaan" name="name" :error="errors.name" required />
+            <UiField v-model="form.name" :label="$t('vendor_profile.nama_perniagaan')" name="name" :error="errors.name" required />
 
             <div class="grid gap-4 sm:grid-cols-2">
-                <UiSelect v-model="form.category_id" label="Kategori utama" name="category_id" :options="categoryOptions" :error="errors.category_id" required help="Kategori ini yang dipaparkan pada kad dan profil anda." />
-                <UiFlagSelect v-model="form.state" label="Negeri asal" name="state" :options="states" :error="errors.state" required />
+                <UiSelect v-model="form.category_id" :label="$t('vendor_profile.kategori_utama')" name="category_id" :options="categoryOptions" :error="errors.category_id" required :help="$t('vendor_profile.kategori_ini_yang_dipaparkan_pada')" />
+                <UiFlagSelect v-model="form.state" :label="$t('vendor_profile.negeri_asal')" name="state" :options="states" :error="errors.state" required />
             </div>
 
-            <UiField v-model="form.city" label="Bandar" name="city" :error="errors.city" required />
+            <UiField v-model="form.city" :label="$t('vendor_profile.bandar')" name="city" :error="errors.city" required />
 
             <div class="grid gap-4 sm:grid-cols-2">
                 <UiMultiSelect
                     v-model="form.category_ids"
-                    label="Kategori yang anda buat"
+                    :label="$t('vendor_profile.kategori_yang_anda_buat')"
                     name="category_ids[]"
-                    placeholder="Pilih kategori"
+                    :placeholder="$t('vendor_profile.pilih_kategori')"
                     :options="categoryChoices"
                     :max="maxCategories"
                     :error="errors.category_ids || errors['category_ids.0']"
@@ -107,36 +107,36 @@ const stateChoices = computed(() =>
 
                 <UiMultiSelect
                     v-model="form.service_states"
-                    label="Negeri yang anda cover"
+                    :label="$t('vendor_profile.negeri_yang_anda_cover')"
                     name="service_states[]"
-                    placeholder="Pilih negeri"
+                    :placeholder="$t('vendor_profile.pilih_negeri')"
                     :options="stateChoices"
                     :error="errors.service_states || errors['service_states.0']"
-                    help="Setiap negeri yang anda sanggup pergi. Anda akan muncul dalam carian untuk negeri itu."
+                    :help="$t('vendor_profile.setiap_negeri_yang_anda_sanggup')"
                 />
             </div>
-            <UiField v-model="form.tagline" label="Tagline" name="tagline" :error="errors.tagline" maxlength="160" help="Satu ayat pendek pada kad vendor, maksimum 160 aksara." />
-            <UiTextarea v-model="form.description" label="Penerangan" name="description" :rows="6" :error="errors.description" help="Ceritakan perkhidmatan, pengalaman dan apa yang membezakan anda." />
+            <UiField v-model="form.tagline" :label="$t('vendor_profile.tagline')" name="tagline" :error="errors.tagline" maxlength="160" :help="$t('vendor_profile.satu_ayat_pendek_pada_kad')" />
+            <UiTextarea v-model="form.description" :label="$t('vendor_profile.penerangan')" name="description" :rows="6" :error="errors.description" :help="$t('vendor_profile.ceritakan_perkhidmatan_pengalaman_dan_apa')" />
         </section>
 
         <section class="flex flex-col gap-4 rounded-2xl border border-line bg-surface-raised p-6">
-            <h2 class="font-semibold">Hubungi &amp; harga</h2>
+            <h2 class="font-semibold">{{ $t('vendor_profile.hubungi_harga') }}</h2>
 
             <div class="grid gap-4 sm:grid-cols-2">
-                <UiField v-model="form.phone" label="Telefon" name="phone" type="tel" :error="errors.phone" />
-                <UiField v-model="form.whatsapp" label="WhatsApp" name="whatsapp" type="tel" :error="errors.whatsapp" help="Nombor dengan kod negara, contoh 60123456789." />
+                <UiField v-model="form.phone" :label="$t('vendor_profile.telefon')" name="phone" type="tel" :error="errors.phone" />
+                <UiField v-model="form.whatsapp" :label="$t('vendor_profile.whatsapp')" name="whatsapp" type="tel" :error="errors.whatsapp" :help="$t('vendor_profile.nombor_dengan_kod_negara_contoh')" />
             </div>
 
             <div class="grid gap-4 sm:grid-cols-2">
-                <UiField v-model="form.price_from" label="Harga bermula (RM)" name="price_from" type="number" step="0.01" min="0" :error="errors.price_from" required help="Diselaraskan automatik dengan pakej termurah bila anda tambah pakej." />
-                <UiSelect v-model="form.price_unit" label="Unit harga" name="price_unit" :options="priceUnits" :error="errors.price_unit" required />
+                <UiField v-model="form.price_from" :label="$t('vendor_profile.harga_bermula_rm')" name="price_from" type="number" step="0.01" min="0" :error="errors.price_from" required :help="$t('vendor_profile.diselaraskan_automatik_dengan_pakej_termurah')" />
+                <UiSelect v-model="form.price_unit" :label="$t('vendor_profile.unit_harga')" name="price_unit" :options="priceUnits" :error="errors.price_unit" required />
             </div>
         </section>
 
         <section class="flex flex-col gap-4 rounded-2xl border border-line bg-surface-raised p-6">
             <div>
-                <h2 class="font-semibold">Media sosial</h2>
-                <p class="text-sm text-ink-muted">Dipaparkan pada halaman awam anda. Taip nama pengguna atau tampal pautan penuh; biarkan kosong jika tiada.</p>
+                <h2 class="font-semibold">{{ $t('vendor_profile.media_sosial') }}</h2>
+                <p class="text-sm text-ink-muted">{{ $t('vendor_profile.dipaparkan_pada_halaman_awam_anda') }}</p>
             </div>
 
             <div class="grid gap-4 sm:grid-cols-2">
@@ -154,10 +154,10 @@ const stateChoices = computed(() =>
         </section>
 
         <section class="flex flex-col gap-4 rounded-2xl border border-line bg-surface-raised p-6">
-            <h2 class="font-semibold">Rupa kad vendor</h2>
+            <h2 class="font-semibold">{{ $t('vendor_profile.rupa_kad_vendor') }}</h2>
 
             <div class="flex flex-col gap-2">
-                <span class="text-sm font-medium">Warna latar</span>
+                <span class="text-sm font-medium">{{ $t('vendor_profile.warna_latar') }}</span>
                 <div class="flex flex-wrap gap-2">
                     <label v-for="tone in tones" :key="tone" class="cursor-pointer">
                         <input v-model="form.cover_tone" type="radio" name="cover_tone" :value="tone" class="peer sr-only">
@@ -167,7 +167,7 @@ const stateChoices = computed(() =>
             </div>
 
             <div class="flex flex-col gap-2">
-                <span class="text-sm font-medium">Logo perniagaan</span>
+                <span class="text-sm font-medium">{{ $t('vendor_profile.logo_perniagaan') }}</span>
                 <div class="flex items-center gap-4">
                     <img v-if="logoPreview && !removeLogo" :src="logoPreview" alt="" class="size-16 shrink-0 rounded-full object-cover">
                     <span v-else :class="['flex size-16 shrink-0 items-center justify-center rounded-full bg-linear-to-br text-xl font-semibold text-white', form.cover_tone]">{{ vendor.initial }}</span>
@@ -176,9 +176,7 @@ const stateChoices = computed(() =>
                         <input type="file" name="logo" accept="image/jpeg,image/png,image/webp" class="text-sm file:mr-3 file:rounded-full file:border-0 file:bg-brand-50 file:px-4 file:py-2 file:text-sm file:font-medium file:text-brand-700" @change="onLogoChosen">
                         <label v-if="vendor.logo_url" class="flex items-center gap-2 text-xs text-ink-muted">
                             <input type="hidden" name="remove_logo" value="0">
-                            <input v-model="removeLogo" type="checkbox" name="remove_logo" value="1" class="accent-brand-600">
-                            Buang logo, guna huruf nama perniagaan
-                        </label>
+                            <input v-model="removeLogo" type="checkbox" name="remove_logo" value="1" class="accent-brand-600">{{ $t('vendor_profile.buang_logo_guna_huruf_nama') }}</label>
                     </div>
                 </div>
                 <span class="text-xs text-ink-muted">{{ logoHint }}</span>
@@ -186,7 +184,7 @@ const stateChoices = computed(() =>
             </div>
 
             <div class="flex flex-col gap-2">
-                <span class="text-sm font-medium">Gambar muka depan</span>
+                <span class="text-sm font-medium">{{ $t('vendor_profile.gambar_muka_depan') }}</span>
                 <img v-if="coverPreview" :src="coverPreview" alt="" class="h-40 w-full max-w-xs rounded-xl object-cover">
                 <input type="file" name="cover_image" accept="image/jpeg,image/png,image/webp" class="text-sm file:mr-3 file:rounded-full file:border-0 file:bg-brand-50 file:px-4 file:py-2 file:text-sm file:font-medium file:text-brand-700" @change="onCoverChosen">
                 <span class="text-xs text-ink-muted">{{ imageHint }}</span>

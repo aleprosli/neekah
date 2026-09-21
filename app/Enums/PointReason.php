@@ -38,16 +38,16 @@ enum PointReason: string
     public function label(): string
     {
         return match ($this) {
-            self::ProfileComplete => 'Profile lengkap',
-            self::CatalogueComplete => 'Catalogue lengkap',
-            self::PlatformBooking => 'Booking melalui platform',
-            self::DepositPaid => 'Bayaran disahkan',
-            self::BookingCompleted => 'Booking selesai',
-            self::FullPayment => 'Full payment',
-            self::PositiveReview => 'Positive review',
-            self::FastResponse => 'Fast response',
-            self::HighCompletionRate => 'Bonus completion rate tinggi',
-            self::ViolationPenalty => 'Potongan pelanggaran',
+            self::ProfileComplete => __('enums.point_reason.profile_complete'),
+            self::CatalogueComplete => __('enums.point_reason.catalogue_complete'),
+            self::PlatformBooking => __('enums.point_reason.platform_booking'),
+            self::DepositPaid => __('enums.point_reason.deposit_paid'),
+            self::BookingCompleted => __('enums.point_reason.booking_completed'),
+            self::FullPayment => __('enums.point_reason.full_payment'),
+            self::PositiveReview => __('enums.point_reason.positive_review'),
+            self::FastResponse => __('enums.point_reason.fast_response'),
+            self::HighCompletionRate => __('enums.point_reason.high_completion_rate'),
+            self::ViolationPenalty => __('enums.point_reason.violation_penalty'),
         };
     }
 

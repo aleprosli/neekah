@@ -11,9 +11,9 @@ enum AnnouncementStatus: string
     public function label(): string
     {
         return match ($this) {
-            self::Draft => 'Draf',
-            self::Sending => 'Sedang dihantar',
-            self::Sent => 'Dihantar',
+            self::Draft => __('enums.announcement_status.draft'),
+            self::Sending => __('enums.announcement_status.sending'),
+            self::Sent => __('enums.announcement_status.sent'),
         };
     }
 

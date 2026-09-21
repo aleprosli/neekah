@@ -16,16 +16,16 @@ enum AuthAudience: string
     public function label(): string
     {
         return match ($this) {
-            self::Couple => 'Pengantin',
-            self::Vendor => 'Vendor',
+            self::Couple => __('enums.auth_audience.couple'),
+            self::Vendor => __('enums.auth_audience.vendor'),
         };
     }
 
     public function description(): string
     {
         return match ($this) {
-            self::Couple => 'Rancang majlis dan cari vendor kahwin.',
-            self::Vendor => 'Urus perniagaan, tempahan dan enquiry.',
+            self::Couple => __('auth_pages.audience.couple_description'),
+            self::Vendor => __('auth_pages.audience.vendor_description'),
         };
     }
 

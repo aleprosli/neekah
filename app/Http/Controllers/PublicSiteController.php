@@ -35,7 +35,11 @@ class PublicSiteController extends Controller
         $site->increment('views');
 
         $seo->title($site->coupleNames())
-            ->description('Jemputan majlis perkahwinan '.$site->coupleNames().' pada '.$site->event_date->translatedFormat('j F Y').($site->venue_name ? ' di '.$site->venue_name : '').'.')
+            ->description(__('seo.card.description', [
+                'couple' => $site->coupleNames(),
+                'date' => $site->event_date->translatedFormat('j F Y'),
+                'venue' => $site->venue_name ? __('seo.card.at_venue', ['venue' => $site->venue_name]) : '',
+            ]))
             ->image(
                 route('sites.preview-image', ['subdomain' => $site->subdomain]),
                 RenderInvitationPreview::WIDTH,

@@ -1,0 +1,160 @@
+<?php
+
+return [
+
+    'greeting' => 'Hai :name,',
+    'greeting_plain' => 'Hai,',
+    'salutation' => 'Terima kasih, Neekah',
+    'congratulations' => 'Tahniah!',
+    'welcome' => 'Selamat datang, :name!',
+    'thanks_name' => 'Terima kasih, :name!',
+    'event_date' => 'Tarikh majlis: :date',
+    'package_total' => 'Jumlah pakej :amount.',
+    'total' => 'Jumlah: :amount',
+    'customer_is' => 'Pelanggan: :name',
+    'vendor_is' => 'Vendor: :name',
+    'actions' => [
+        'reply_enquiry' => 'Balas enquiry',
+        'write_review' => 'Beri review',
+        'open_dashboard' => 'Buka dashboard',
+        'complete_profile' => 'Lengkapkan profil',
+        'view_reply' => 'Lihat balasan',
+        'view_booking' => 'Lihat booking',
+        'view_public_profile' => 'Lihat profil awam',
+        'check_payment' => 'Semak bayaran',
+        'accept_invitation' => 'Terima jemputan',
+    ],
+
+    'enquiry_received' => [
+        'title' => 'Enquiry baharu daripada :name',
+        'body' => 'Balas dalam 24 jam untuk mengekalkan response rate anda.',
+        'subject' => 'Enquiry baharu daripada :name',
+        'intro' => ':name menghantar enquiry kepada anda:',
+        'reply_fast' => 'Balas dengan cepat untuk mengekalkan response rate yang tinggi.',
+    ],
+
+    'enquiry_replied' => [
+        'title' => ':vendor membalas enquiry anda',
+        'body' => 'Lihat balasan dan teruskan ke tempahan.',
+        'subject' => ':vendor telah membalas enquiry anda',
+        'intro' => ':vendor membalas:',
+    ],
+
+    'booking_cancelled' => [
+        'title' => 'Booking :reference dibatalkan',
+        'body' => ':name membatalkan tempahan :package.',
+        'subject' => 'Booking :reference dibatalkan',
+        'intro' => ':name telah membatalkan booking :reference.',
+        'reason' => 'Sebab: :reason',
+        'no_refund' => 'Tiada bayaran yang disahkan pada booking ini, jadi tiada apa yang perlu dipulangkan melalui Neekah.',
+    ],
+
+    'booking_completed' => [
+        'title' => 'Majlis dengan :vendor selesai',
+        'body' => 'Kongsi pengalaman anda dengan memberi review.',
+        'subject' => 'Bagaimana majlis anda dengan :vendor?',
+        'intro' => ':vendor telah menandakan booking :reference sebagai selesai.',
+        'ask_review' => 'Kongsi pengalaman anda. Review hanya boleh diberi oleh pengantin yang benar-benar menempah, jadi ulasan anda sangat bermakna kepada pengantin lain.',
+    ],
+
+    'booking_confirmed' => [
+        'title' => 'Booking :reference disahkan',
+        'body' => 'Tarikh majlis :date kini terjamin.',
+        'subject' => 'Booking :reference disahkan',
+        'intro' => 'Bayaran telah disahkan dan booking :reference kini Confirmed.',
+        'outstanding' => 'Baki :amount masih belum direkod.',
+    ],
+
+    'booking_created_customer' => [
+        'title' => 'Booking :reference dibuat',
+        'body' => 'Hubungi :vendor untuk berbincang, kemudian rekodkan bayaran anda di sini.',
+        'subject' => 'Booking :reference dengan :vendor',
+        'intro' => 'Booking anda dengan :vendor telah direkod.',
+        'how_to_pay' => 'Berbincang terus dengan vendor tentang bayaran. Setelah anda membayar, rekodkan bayaran itu di halaman booking dan vendor akan mengesahkannya.',
+    ],
+
+    'booking_created_vendor' => [
+        'title' => 'Booking baharu :reference',
+        'body' => ':name menempah :package untuk :date.',
+        'subject' => 'Booking baharu :reference daripada :name',
+        'intro' => ':name telah menempah :package untuk majlis pada :date.',
+        'awaiting_payment' => 'Booking akan disahkan sebaik sahaja pelanggan membayar deposit.',
+    ],
+
+    'payment_recorded' => [
+        'title' => 'Bayaran direkod: :amount',
+        'body' => ':name merekodkan bayaran untuk :reference. Sahkan setelah anda semak akaun anda.',
+        'subject' => 'Bayaran direkod untuk :reference',
+        'intro' => ':name merekodkan bayaran sebanyak :amount untuk :reference.',
+        'paid_on' => 'Tarikh bayaran yang direkod: :date.',
+        'verify' => 'Semak akaun anda, kemudian sahkan bayaran ini. Booking hanya menjadi Confirmed selepas anda mengesahkannya.',
+    ],
+
+    'payment_received' => [
+        'title' => 'Bayaran :amount disahkan',
+        'body' => 'Vendor mengesahkan bayaran anda untuk booking :reference.',
+        'subject' => 'Bayaran :reference disahkan',
+        'intro' => ':vendor mengesahkan bayaran :amount untuk booking :reference.',
+        'detail' => 'Majlis: :date · Rujukan bayaran: :reference',
+    ],
+
+    'payment_rejected' => [
+        'title' => 'Bayaran :amount tidak ditemui',
+        'body' => 'Vendor tidak menemui bayaran ini dalam akaun mereka. Sila semak dan rekod semula.',
+        'subject' => 'Bayaran :reference tidak dapat disahkan',
+        'intro' => ':vendor tidak menemui bayaran :amount yang anda rekodkan untuk booking :reference.',
+        'what_to_do' => 'Semak resit dan tarikh bayaran anda, hubungi vendor jika perlu, kemudian rekodkan semula.',
+    ],
+
+    'customer_registered' => [
+        'title' => 'Selamat datang ke Neekah',
+        'body' => 'Mulakan dengan menetapkan tarikh majlis anda, kemudian cari vendor.',
+        'subject' => 'Selamat datang ke Neekah',
+        'intro' => 'Akaun anda sudah sedia. Neekah mengumpulkan semua urusan majlis anda di satu tempat: cari dan tempah vendor yang disahkan, jejak bajet, checklist dan timeline, dan hantar kad jemputan digital.',
+        'next_step' => 'Mulakan dengan menetapkan tarikh majlis anda. Selepas itu kami boleh cadangkan vendor yang masih kosong pada tarikh tersebut.',
+    ],
+
+    'vendor_registered' => [
+        'title' => 'Selamat datang ke Neekah',
+        'body' => 'Lengkapkan profil, pakej dan portfolio anda sementara admin menyemak permohonan.',
+        'subject' => 'Terima kasih kerana mendaftar dengan Neekah',
+        'received' => 'Permohonan :vendor telah kami terima dan kini menunggu semakan admin.',
+        'meanwhile' => 'Sementara menunggu, lengkapkan profil, pakej dan portfolio anda. Profil yang lengkap disemak dengan lebih cepat dan muncul lebih tinggi dalam carian pengantin.',
+        'will_email' => 'Kami akan emel anda sebaik sahaja permohonan diluluskan.',
+    ],
+
+    'vendor_status' => [
+        'title' => 'Status vendor: :status',
+        'body' => ':vendor kini :status.',
+        'subject' => 'Status vendor anda: :status',
+        'approved' => 'Tahniah! :vendor telah diluluskan dan kini dipaparkan di marketplace Neekah.',
+        'tier' => 'Tahap anda: :tier Vendor.',
+        'suspended' => ':vendor telah digantung sementara dan tidak dipaparkan di marketplace.',
+        'contact_admin' => 'Sila hubungi pihak admin untuk maklumat lanjut.',
+        'rejected' => 'Maaf, permohonan :vendor tidak dapat diluluskan pada masa ini.',
+        'rejected_next' => 'Anda boleh melengkapkan profil dan menghubungi admin untuk semakan semula.',
+        'pending' => 'Profil :vendor kini menunggu semakan admin.',
+    ],
+
+    'violation' => [
+        'title' => 'Pelanggaran disahkan: :action',
+        'body' => ':type · pelanggaran ke-:number.',
+        'subject' => 'Pelanggaran direkod: :action',
+        'intro' => 'Satu laporan terhadap :vendor telah disahkan oleh admin.',
+        'type' => 'Jenis pelanggaran: :type',
+        'number' => 'Pelanggaran ke-:number · Tindakan: :action',
+        'admin_note' => 'Nota admin: :note',
+        'warning' => 'Ini adalah amaran pertama. Pastikan semua booking dan pembayaran direkod melalui platform.',
+        'point_deduction' => 'Point anda dipotong dan ranking diturunkan satu tahap.',
+        'suspension' => 'Akaun anda digantung sementara dan tidak dipaparkan di marketplace.',
+        'removal' => 'Akaun anda telah disingkirkan daripada marketplace kerana pelanggaran berulang.',
+    ],
+
+    'partner_invited' => [
+        'subject' => ':name menjemput anda menguruskan majlis ":wedding"',
+        'intro' => ':name menjemput anda menjadi pasangan dalam wedding project di Neekah.',
+        'shared' => 'Setelah menerima jemputan, anda berdua akan berkongsi checklist, bajet, tempahan dan pembayaran yang sama.',
+        'expires' => 'Pautan ini sah selama :days hari. Jika anda tidak mengenali jemputan ini, abaikan emel ini.',
+    ],
+
+];

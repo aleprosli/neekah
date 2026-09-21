@@ -17,8 +17,8 @@ class LandingController extends Controller
      */
     public function __invoke(Seo $seo, ContactSettings $contact): View
     {
-        $seo->title('Cari vendor kahwin dan hubungi mereka terus')
-            ->description('Cari vendor kahwin ikut kategori, lokasi dan bajet, dan berurusan terus dengan mereka. Checklist, bajet dan kad jemputan digital percuma.');
+        $seo->title(__('seo.landing.title'))
+            ->description(__('seo.landing.description'));
 
         $categories = Category::active()->ordered()->get();
 
@@ -28,7 +28,7 @@ class LandingController extends Controller
             'vendors' => Vendor::query()->approved()->with('category')->orderByDesc('score')->orderBy('id')->limit(6)->get(),
             'features' => $this->features(),
             'vendorBenefits' => $this->vendorBenefits(),
-            'helpUrl' => $contact->whatsappUrl('Salam Neekah, saya sedang mencari vendor untuk majlis saya. Boleh bantu?'),
+            'helpUrl' => $contact->whatsappUrl(__('pages.landing.whatsapp_message')),
         ]);
     }
 
@@ -38,12 +38,12 @@ class LandingController extends Controller
     private function flow(): array
     {
         return [
-            ['label' => 'Rancang', 'description' => 'Cipta majlis & ikut checklist'],
-            ['label' => 'Cari', 'description' => 'Vendor ikut kategori, lokasi & bajet'],
-            ['label' => 'Hubungi', 'description' => 'WhatsApp vendor terus dari profil'],
-            ['label' => 'Deal', 'description' => 'Bincang & bayar terus dengan vendor'],
-            ['label' => 'Jemput', 'description' => 'Kongsi kad digital dengan tetamu'],
-            ['label' => 'Raikan', 'description' => 'Nikmati hari bahagia anda'],
+            ['label' => __('pages.landing.flow.plan'), 'description' => __('pages.landing.flow.plan_detail')],
+            ['label' => __('pages.landing.flow.search'), 'description' => __('pages.landing.flow.search_detail')],
+            ['label' => __('pages.landing.flow.contact'), 'description' => __('pages.landing.flow.contact_detail')],
+            ['label' => __('pages.landing.flow.deal'), 'description' => __('pages.landing.flow.deal_detail')],
+            ['label' => __('pages.landing.flow.invite'), 'description' => __('pages.landing.flow.invite_detail')],
+            ['label' => __('pages.landing.flow.celebrate'), 'description' => __('pages.landing.flow.celebrate_detail')],
         ];
     }
 
@@ -53,12 +53,12 @@ class LandingController extends Controller
     private function features(): array
     {
         return [
-            ['icon' => '🔎', 'title' => 'Cari & hubungi vendor terus', 'description' => 'Senarai vendor ikut kategori dan lokasi. Lihat pakej dan portfolio, kemudian WhatsApp mereka terus. Tiada orang tengah.'],
-            ['icon' => '✉️', 'title' => 'Kad jemputan digital', 'description' => 'Pilih reka bentuk, isi butiran majlis dan kongsi dengan satu pautan. Tetamu boleh RSVP terus dari kad.'],
-            ['icon' => '📋', 'title' => 'Checklist persiapan', 'description' => 'Langkah demi langkah, termasuk borang nikah, kursus dan urusan wali. Tandakan bersama pasangan.'],
-            ['icon' => '💰', 'title' => 'Bajet majlis', 'description' => 'Pecahkan bajet ikut kategori dan tahu baki anda setiap masa.'],
-            ['icon' => '🗓️', 'title' => 'Timeline hari majlis', 'description' => 'Susun perjalanan hari majlis, dari makeup pagi hingga majlis tamat.'],
-            ['icon' => '👥', 'title' => 'Senarai tetamu', 'description' => 'Urus tetamu, kumpulan dan jawapan RSVP di satu tempat.'],
+            ['icon' => '🔎', 'title' => __('pages.landing.features.search'), 'description' => __('pages.landing.features.search_detail')],
+            ['icon' => '✉️', 'title' => __('pages.landing.features.card'), 'description' => __('pages.landing.features.card_detail')],
+            ['icon' => '📋', 'title' => __('pages.landing.features.checklist'), 'description' => __('pages.landing.features.checklist_detail')],
+            ['icon' => '💰', 'title' => __('pages.landing.features.budget'), 'description' => __('pages.landing.features.budget_detail')],
+            ['icon' => '🗓️', 'title' => __('pages.landing.features.timeline'), 'description' => __('pages.landing.features.timeline_detail')],
+            ['icon' => '👥', 'title' => __('pages.landing.features.guests'), 'description' => __('pages.landing.features.guests_detail')],
         ];
     }
 
@@ -72,11 +72,11 @@ class LandingController extends Controller
     private function vendorBenefits(): array
     {
         return [
-            'Senarai dan profil perniagaan, percuma',
-            'Pengantin WhatsApp anda terus',
-            'Pakej, harga dan portfolio dipaparkan',
-            'Kalendar tarikh yang sudah penuh',
-            'Enquiry pengantin dalam satu tempat',
+            __('pages.landing.benefits.listing'),
+            __('pages.landing.benefits.whatsapp'),
+            __('pages.landing.benefits.packages'),
+            __('pages.landing.benefits.calendar'),
+            __('pages.landing.benefits.enquiries'),
         ];
     }
 }

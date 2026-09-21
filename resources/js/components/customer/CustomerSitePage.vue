@@ -151,13 +151,13 @@ const previewFile = (event, target) => {
         <div class="min-w-0">
             <p class="flex items-center gap-2 text-sm font-semibold">
                 <span :class="['size-2 rounded-full', status.published ? 'bg-emerald-500' : 'bg-ink-muted']"></span>
-                {{ status.published ? 'Tersiar' : 'Draf, belum tersiar' }}
+                {{ status.published ? $t('card_editor.published') : $t('card_editor.draft') }}
             </p>
 
             <template v-if="status.published">
                 <a :href="status.url" target="_blank" rel="noopener" class="mt-1 block truncate text-sm text-brand-700 underline underline-offset-4">{{ status.url }}</a>
                 <p class="mt-1 text-xs text-ink-muted">
-                    {{ status.views }} tontonan · <a :href="status.guests_url" class="hover:text-ink">{{ status.rsvp_count }} tetamu mengesahkan kehadiran</a>
+                    {{ $t('card_editor.views', { count: status.views }) }} · <a :href="status.guests_url" class="hover:text-ink">{{ $t('card_editor.rsvp_count', { count: status.rsvp_count }) }}</a>
                 </p>
             </template>
 
@@ -174,7 +174,7 @@ const previewFile = (event, target) => {
                     'rounded-full px-5 py-2.5 text-sm font-semibold transition',
                     status.published ? 'border border-line hover:border-brand-400' : 'bg-brand-600 text-white hover:bg-brand-700',
                 ]"
-            >{{ status.published ? 'Tarik balik' : 'Siarkan kad' }}</button>
+            >{{ status.published ? $t('card_editor.unpublish') : $t('card_editor.publish') }}</button>
         </form>
     </div>
 
@@ -185,13 +185,13 @@ const previewFile = (event, target) => {
         <section id="template" class="flex scroll-mt-24 flex-col gap-5 rounded-2xl border border-line bg-surface-raised p-6">
             <div class="flex flex-wrap items-end justify-between gap-3">
                 <div>
-                    <h2 class="font-semibold">Template</h2>
-                    <p class="text-sm text-ink-muted">{{ limits.templates }} reka bentuk dalam {{ templateGroups.length }} gaya. Tekan "Lihat contoh" untuk membuka kad penuh.</p>
+                    <h2 class="font-semibold">{{ $t('card_editor.template') }}</h2>
+                    <p class="text-sm text-ink-muted">{{ $t('card_editor.template_count', { designs: limits.templates, styles: templateGroups.length }) }}</p>
                 </div>
-                <a :href="limits.gallery_url" target="_blank" rel="noopener" class="text-sm font-medium text-brand-600 underline underline-offset-4">Layari galeri</a>
+                <a :href="limits.gallery_url" target="_blank" rel="noopener" class="text-sm font-medium text-brand-600 underline underline-offset-4">{{ $t('card_editor.layari_galeri') }}</a>
             </div>
 
-            <div class="no-scrollbar -mx-6 flex gap-2 overflow-x-auto px-6" role="tablist" aria-label="Gaya template">
+            <div class="no-scrollbar -mx-6 flex gap-2 overflow-x-auto px-6" role="tablist" :aria-label="$t('card_editor.gaya_template')">
                 <button
                     v-for="group in templateGroups"
                     :key="group.style"
@@ -219,22 +219,22 @@ const previewFile = (event, target) => {
                             <span class="truncate text-xs font-semibold">{{ template.name }}</span>
                             <svg v-if="form.template === template.slug" class="size-4 shrink-0 text-brand-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
                         </span>
-                        <a :href="template.url" target="_blank" rel="noopener" class="px-0.5 text-[11px] text-brand-600 underline underline-offset-2">Lihat contoh</a>
+                        <a :href="template.url" target="_blank" rel="noopener" class="px-0.5 text-[11px] text-brand-600 underline underline-offset-2">{{ $t('card_editor.lihat_contoh') }}</a>
                     </span>
                 </label>
             </div>
 
-            <p class="text-sm text-ink-muted">Dipilih: <span class="font-semibold text-ink">{{ chosenTemplateName }}</span> &middot; boleh ditukar bila-bila masa, maklumat anda kekal.</p>
+            <p class="text-sm text-ink-muted">{{ $t('card_editor.dipilih') }}<span class="font-semibold text-ink">{{ chosenTemplateName }}</span> &middot; {{ $t('card_editor.change_anytime') }}</p>
         </section>
 
         <section id="alamat" class="flex scroll-mt-24 flex-col gap-4 rounded-2xl border border-line bg-surface-raised p-6">
             <div>
-                <h2 class="font-semibold">Alamat web kad</h2>
-                <p class="text-sm text-ink-muted">Pilih sendiri pautan yang anda kongsi dengan tetamu. Kami semak sama ada ia masih kosong semasa anda menaip.</p>
+                <h2 class="font-semibold">{{ $t('card_editor.alamat_web_kad') }}</h2>
+                <p class="text-sm text-ink-muted">{{ $t('card_editor.pilih_sendiri_pautan_yang_anda') }}</p>
             </div>
 
             <label class="flex flex-col gap-2">
-                <span class="sr-only">Alamat web</span>
+                <span class="sr-only">{{ $t('card_editor.alamat_web') }}</span>
                 <span
                     :class="[
                         'flex items-center overflow-hidden rounded-xl border bg-surface transition',
@@ -248,9 +248,7 @@ const previewFile = (event, target) => {
 
                 <span v-if="errors.subdomain && addressCheck.state === 'idle'" class="text-xs text-brand-700">{{ errors.subdomain }}</span>
                 <span v-else-if="addressCheck.state === 'checking'" class="flex items-center gap-1.5 text-xs text-ink-muted">
-                    <span class="size-3 animate-spin rounded-full border-2 border-line border-t-brand-500"></span>
-                    Menyemak…
-                </span>
+                    <span class="size-3 animate-spin rounded-full border-2 border-line border-t-brand-500"></span>{{ $t('card_editor.menyemak') }}</span>
                 <span v-else-if="addressCheck.state === 'available'" class="flex items-center gap-1.5 text-xs font-medium text-emerald-700">
                     <svg class="size-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
                     <span class="break-all">{{ addressCheck.message }}</span>
@@ -259,11 +257,11 @@ const previewFile = (event, target) => {
                     <svg class="size-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
                     {{ addressCheck.message }}
                 </span>
-                <span v-else class="text-xs text-ink-muted">Huruf kecil, nombor dan sengkang sahaja. Contoh: aina-hakim</span>
+                <span v-else class="text-xs text-ink-muted">{{ $t('card_editor.huruf_kecil_nombor_dan_sengkang') }}</span>
             </label>
 
             <div v-if="addressCheck.state === 'taken' && addressCheck.suggestions.length" class="flex flex-wrap items-center gap-2">
-                <span class="text-xs text-ink-muted">Masih kosong:</span>
+                <span class="text-xs text-ink-muted">{{ $t('card_editor.masih_kosong') }}</span>
                 <button
                     v-for="suggestion in addressCheck.suggestions"
                     :key="suggestion"
@@ -275,34 +273,34 @@ const previewFile = (event, target) => {
         </section>
 
         <section class="flex flex-col gap-4 rounded-2xl border border-line bg-surface-raised p-6">
-            <h2 class="font-semibold">Pengantin</h2>
+            <h2 class="font-semibold">{{ $t('card_editor.pengantin') }}</h2>
 
             <div class="grid gap-4 sm:grid-cols-2">
-                <UiField v-model="form.bride_name" label="Nama pengantin perempuan" name="bride_name" :error="errors.bride_name" required />
-                <UiField v-model="form.groom_name" label="Nama pengantin lelaki" name="groom_name" :error="errors.groom_name" required />
-                <UiField v-model="form.bride_parents" label="Ibu bapa pengantin perempuan" name="bride_parents" placeholder="Zulkifli bin Hassan & Rohana binti Ahmad" :error="errors.bride_parents" />
-                <UiField v-model="form.groom_parents" label="Ibu bapa pengantin lelaki" name="groom_parents" placeholder="Ismail bin Yusof & Salmah binti Osman" :error="errors.groom_parents" />
+                <UiField v-model="form.bride_name" :label="$t('card_editor.nama_pengantin_perempuan')" name="bride_name" :error="errors.bride_name" required />
+                <UiField v-model="form.groom_name" :label="$t('card_editor.nama_pengantin_lelaki')" name="groom_name" :error="errors.groom_name" required />
+                <UiField v-model="form.bride_parents" :label="$t('card_editor.ibu_bapa_pengantin_perempuan')" name="bride_parents" :placeholder="$t('card_editor.zulkifli_bin_hassan_rohana_binti')" :error="errors.bride_parents" />
+                <UiField v-model="form.groom_parents" :label="$t('card_editor.ibu_bapa_pengantin_lelaki')" name="groom_parents" :placeholder="$t('card_editor.ismail_bin_yusof_salmah_binti')" :error="errors.groom_parents" />
             </div>
 
-            <UiTextarea v-model="form.salutation" label="Kata aluan" name="salutation" :rows="3" :error="errors.salutation" />
-            <UiTextarea v-model="form.invitation_note" label="Nota jemputan (pilihan)" name="invitation_note" :rows="3" placeholder="Doa dan restu daripada tuan/puan amat bermakna." :error="errors.invitation_note" />
+            <UiTextarea v-model="form.salutation" :label="$t('card_editor.kata_aluan')" name="salutation" :rows="3" :error="errors.salutation" />
+            <UiTextarea v-model="form.invitation_note" :label="$t('card_editor.nota_jemputan_pilihan')" name="invitation_note" :rows="3" :placeholder="$t('card_editor.doa_dan_restu_daripada_tuan')" :error="errors.invitation_note" />
         </section>
 
         <section id="majlis" class="flex scroll-mt-24 flex-col gap-4 rounded-2xl border border-line bg-surface-raised p-6">
-            <h2 class="font-semibold">Majlis</h2>
+            <h2 class="font-semibold">{{ $t('card_editor.majlis') }}</h2>
 
             <div class="grid gap-4 sm:grid-cols-3">
-                <UiField v-model="form.event_date" label="Tarikh" name="event_date" type="date" :error="errors.event_date" required />
-                <UiField v-model="form.starts_at" label="Mula" name="starts_at" type="time" :error="errors.starts_at" />
-                <UiField v-model="form.ends_at" label="Tamat" name="ends_at" type="time" :error="errors.ends_at" />
+                <UiField v-model="form.event_date" :label="$t('card_editor.tarikh')" name="event_date" type="date" :error="errors.event_date" required />
+                <UiField v-model="form.starts_at" :label="$t('card_editor.mula')" name="starts_at" type="time" :error="errors.starts_at" />
+                <UiField v-model="form.ends_at" :label="$t('card_editor.tamat')" name="ends_at" type="time" :error="errors.ends_at" />
             </div>
 
-            <UiField v-model="form.venue_name" label="Nama tempat" name="venue_name" placeholder="Dewan Seri Melati" :error="errors.venue_name" />
-            <UiTextarea v-model="form.venue_address" label="Alamat penuh" name="venue_address" :rows="2" :error="errors.venue_address" />
-            <UiField v-model="form.map_url" label="Pautan peta" name="map_url" type="url" placeholder="https://maps.google.com/..." :error="errors.map_url" />
+            <UiField v-model="form.venue_name" :label="$t('card_editor.nama_tempat')" name="venue_name" :placeholder="$t('card_editor.dewan_seri_melati')" :error="errors.venue_name" />
+            <UiTextarea v-model="form.venue_address" :label="$t('card_editor.alamat_penuh')" name="venue_address" :rows="2" :error="errors.venue_address" />
+            <UiField v-model="form.map_url" :label="$t('card_editor.pautan_peta')" name="map_url" type="url" placeholder="https://maps.google.com/..." :error="errors.map_url" />
 
             <div class="flex flex-col gap-2">
-                <span class="text-sm font-medium">Gambar utama (pilihan)</span>
+                <span class="text-sm font-medium">{{ $t('card_editor.gambar_utama_pilihan') }}</span>
                 <img v-if="coverPreview" :src="coverPreview" alt="" class="h-32 w-full max-w-xs rounded-xl object-cover">
                 <input type="file" name="cover_image" accept="image/jpeg,image/png,image/webp" class="text-sm file:mr-3 file:rounded-full file:border-0 file:bg-brand-50 file:px-4 file:py-2 file:text-sm file:font-medium file:text-brand-700" @change="previewFile($event, coverPreview)">
                 <span class="text-xs text-ink-muted">{{ imageHint }}</span>
@@ -312,94 +310,88 @@ const previewFile = (event, target) => {
 
         <section class="flex flex-col gap-4 rounded-2xl border border-line bg-surface-raised p-6">
             <div>
-                <h2 class="font-semibold">Atur cara</h2>
-                <p class="text-sm text-ink-muted">Susunan acara pada hari majlis, seperti yang tetamu akan baca.</p>
+                <h2 class="font-semibold">{{ $t('card_editor.atur_cara') }}</h2>
+                <p class="text-sm text-ink-muted">{{ $t('card_editor.susunan_acara_pada_hari_majlis') }}</p>
             </div>
 
             <div v-for="(row, at) in itinerary" :key="`itinerary-${at}`" class="grid gap-3 sm:grid-cols-[10rem_1fr_auto]">
                 <input v-model="row.time" type="text" :name="`itinerary[${at}][time]`" placeholder="11:00 pagi" class="rounded-xl border border-line bg-surface px-4 py-2.5 text-sm focus:border-brand-400 focus:outline-none">
-                <input v-model="row.label" type="text" :name="`itinerary[${at}][label]`" placeholder="Ketibaan tetamu" class="rounded-xl border border-line bg-surface px-4 py-2.5 text-sm focus:border-brand-400 focus:outline-none">
-                <button type="button" class="rounded-full px-3 text-ink-muted transition hover:bg-surface-muted hover:text-ink" aria-label="Buang baris" @click="remove(itinerary, at)">&times;</button>
+                <input v-model="row.label" type="text" :name="`itinerary[${at}][label]`" :placeholder="$t('card_editor.ketibaan_tetamu')" class="rounded-xl border border-line bg-surface px-4 py-2.5 text-sm focus:border-brand-400 focus:outline-none">
+                <button type="button" class="rounded-full px-3 text-ink-muted transition hover:bg-surface-muted hover:text-ink" :aria-label="$t('card_editor.buang_baris')" @click="remove(itinerary, at)">&times;</button>
             </div>
 
             <button v-if="itinerary.length < limits.itinerary" type="button" class="w-fit rounded-full border border-line px-4 py-2 text-sm font-medium transition hover:border-brand-400" @click="add(itinerary, { time: '', label: '' }, limits.itinerary)">+ Tambah baris</button>
         </section>
 
         <section class="flex flex-col gap-4 rounded-2xl border border-line bg-surface-raised p-6">
-            <h2 class="font-semibold">Hubungi &amp; RSVP</h2>
+            <h2 class="font-semibold">{{ $t('card_editor.hubungi_rsvp') }}</h2>
 
             <div v-for="(row, at) in contacts" :key="`contact-${at}`" class="grid gap-3 sm:grid-cols-[1fr_1fr_auto]">
-                <input v-model="row.name" type="text" :name="`contacts[${at}][name]`" placeholder="Puan Rohana" class="rounded-xl border border-line bg-surface px-4 py-2.5 text-sm focus:border-brand-400 focus:outline-none">
+                <input v-model="row.name" type="text" :name="`contacts[${at}][name]`" :placeholder="$t('card_editor.puan_rohana')" class="rounded-xl border border-line bg-surface px-4 py-2.5 text-sm focus:border-brand-400 focus:outline-none">
                 <input v-model="row.phone" type="tel" :name="`contacts[${at}][phone]`" placeholder="012-345 6789" class="rounded-xl border border-line bg-surface px-4 py-2.5 text-sm focus:border-brand-400 focus:outline-none">
-                <button type="button" class="rounded-full px-3 text-ink-muted transition hover:bg-surface-muted hover:text-ink" aria-label="Buang baris" @click="remove(contacts, at)">&times;</button>
+                <button type="button" class="rounded-full px-3 text-ink-muted transition hover:bg-surface-muted hover:text-ink" :aria-label="$t('card_editor.buang_baris_2')" @click="remove(contacts, at)">&times;</button>
             </div>
 
             <button v-if="contacts.length < limits.contacts" type="button" class="w-fit rounded-full border border-line px-4 py-2 text-sm font-medium transition hover:border-brand-400" @click="add(contacts, { name: '', phone: '' }, limits.contacts)">+ Tambah nombor</button>
 
             <label class="flex items-center gap-2 border-t border-line pt-4 text-sm">
                 <input type="hidden" name="rsvp_enabled" value="0">
-                <input v-model="form.rsvp_enabled" type="checkbox" name="rsvp_enabled" value="1" class="accent-brand-600">
-                Benarkan tetamu mengesahkan kehadiran (RSVP)
-            </label>
+                <input v-model="form.rsvp_enabled" type="checkbox" name="rsvp_enabled" value="1" class="accent-brand-600">{{ $t('card_editor.benarkan_tetamu_mengesahkan_kehadiran_rsvp') }}</label>
 
-            <UiField v-model="form.rsvp_deadline" class="sm:w-56" label="Tarikh akhir RSVP (pilihan)" name="rsvp_deadline" type="date" :error="errors.rsvp_deadline" />
-            <UiTextarea v-model="form.closing_note" label="Nota penutup" name="closing_note" :rows="2" :error="errors.closing_note" />
+            <UiField v-model="form.rsvp_deadline" class="sm:w-56" :label="$t('card_editor.tarikh_akhir_rsvp_pilihan')" name="rsvp_deadline" type="date" :error="errors.rsvp_deadline" />
+            <UiTextarea v-model="form.closing_note" :label="$t('card_editor.nota_penutup')" name="closing_note" :rows="2" :error="errors.closing_note" />
         </section>
 
         <section class="flex flex-col gap-4 rounded-2xl border border-line bg-surface-raised p-6">
             <div>
-                <h2 class="font-semibold">Salam kaut</h2>
-                <p class="text-sm text-ink-muted">Kod QR DuitNow dan nombor akaun untuk tetamu yang ingin memberi hadiah.</p>
+                <h2 class="font-semibold">{{ $t('card_editor.salam_kaut') }}</h2>
+                <p class="text-sm text-ink-muted">{{ $t('card_editor.kod_qr_duitnow_dan_nombor') }}</p>
             </div>
 
             <label class="flex items-center gap-2 text-sm">
                 <input type="hidden" name="gift_enabled" value="0">
-                <input v-model="form.gift_enabled" type="checkbox" name="gift_enabled" value="1" class="accent-brand-600">
-                Papar bahagian hadiah pada kad
-            </label>
+                <input v-model="form.gift_enabled" type="checkbox" name="gift_enabled" value="1" class="accent-brand-600">{{ $t('card_editor.papar_bahagian_hadiah_pada_kad') }}</label>
 
-            <UiTextarea v-model="form.gift_note" label="Nota hadiah (pilihan)" name="gift_note" :rows="2" :error="errors.gift_note" />
+            <UiTextarea v-model="form.gift_note" :label="$t('card_editor.nota_hadiah_pilihan')" name="gift_note" :rows="2" :error="errors.gift_note" />
 
             <label class="flex flex-col gap-1.5">
-                <span class="text-sm font-medium">Kod QR DuitNow</span>
+                <span class="text-sm font-medium">{{ $t('card_editor.kod_qr_duitnow') }}</span>
                 <input type="file" name="gift_qr_image" accept="image/jpeg,image/png,image/webp" class="text-sm" @change="previewFile($event, qrPreview)">
                 <img v-if="qrPreview" :src="qrPreview" alt="Kod QR DuitNow" class="mt-2 w-32 rounded-xl border border-line">
                 <span v-if="errors.gift_qr_image" class="text-xs text-brand-700">{{ errors.gift_qr_image }}</span>
             </label>
 
             <div v-for="(row, at) in giftAccounts" :key="`gift-${at}`" class="grid gap-3 sm:grid-cols-[1fr_1fr_1fr_auto]">
-                <input v-model="row.bank" type="text" :name="`gift_accounts[${at}][bank]`" placeholder="Maybank" class="rounded-xl border border-line bg-surface px-4 py-2.5 text-sm focus:border-brand-400 focus:outline-none">
-                <input v-model="row.holder" type="text" :name="`gift_accounts[${at}][holder]`" placeholder="Nama pemegang akaun" class="rounded-xl border border-line bg-surface px-4 py-2.5 text-sm focus:border-brand-400 focus:outline-none">
+                <input v-model="row.bank" type="text" :name="`gift_accounts[${at}][bank]`" :placeholder="$t('card_editor.maybank')" class="rounded-xl border border-line bg-surface px-4 py-2.5 text-sm focus:border-brand-400 focus:outline-none">
+                <input v-model="row.holder" type="text" :name="`gift_accounts[${at}][holder]`" :placeholder="$t('card_editor.nama_pemegang_akaun')" class="rounded-xl border border-line bg-surface px-4 py-2.5 text-sm focus:border-brand-400 focus:outline-none">
                 <input v-model="row.number" type="text" :name="`gift_accounts[${at}][number]`" placeholder="1234 5678 9012" class="rounded-xl border border-line bg-surface px-4 py-2.5 text-sm focus:border-brand-400 focus:outline-none">
-                <button type="button" class="rounded-full px-3 text-ink-muted transition hover:bg-surface-muted hover:text-ink" aria-label="Buang baris" @click="remove(giftAccounts, at)">&times;</button>
+                <button type="button" class="rounded-full px-3 text-ink-muted transition hover:bg-surface-muted hover:text-ink" :aria-label="$t('card_editor.buang_baris_3')" @click="remove(giftAccounts, at)">&times;</button>
             </div>
 
             <button v-if="giftAccounts.length < limits.gift_accounts" type="button" class="w-fit rounded-full border border-line px-4 py-2 text-sm font-medium transition hover:border-brand-400" @click="add(giftAccounts, { bank: '', holder: '', number: '' }, limits.gift_accounts)">+ Tambah akaun</button>
 
             <label class="flex items-center gap-2 border-t border-line pt-4 text-sm">
                 <input type="hidden" name="wishes_enabled" value="0">
-                <input v-model="form.wishes_enabled" type="checkbox" name="wishes_enabled" value="1" class="accent-brand-600">
-                Papar ucapan tetamu yang anda luluskan pada kad
-            </label>
+                <input v-model="form.wishes_enabled" type="checkbox" name="wishes_enabled" value="1" class="accent-brand-600">{{ $t('card_editor.papar_ucapan_tetamu_yang_anda') }}</label>
         </section>
 
-        <UiUploadProgress :uploading="uploading" :percent="uploadPercent" :error="uploadError" label="Menyimpan kad" />
+        <UiUploadProgress :uploading="uploading" :percent="uploadPercent" :error="uploadError" :label="$t('card_editor.menyimpan_kad')" />
 
         <div class="flex flex-wrap gap-3">
             <button type="submit" class="rounded-full bg-brand-600 px-8 py-3 text-sm font-semibold text-white transition hover:bg-brand-700 disabled:opacity-50" :disabled="uploading">
-                {{ uploading ? 'Menyimpan…' : exists ? 'Simpan kad' : 'Cipta kad jemputan' }}
+                {{ uploading ? $t('card_editor.saving') : exists ? $t('card_editor.save') : $t('card_editor.create') }}
             </button>
-            <a :href="limits.preview_url" target="_blank" rel="noopener" class="rounded-full border border-line px-6 py-3 text-sm font-medium transition hover:border-brand-400">Pratonton</a>
+            <a :href="limits.preview_url" target="_blank" rel="noopener" class="rounded-full border border-line px-6 py-3 text-sm font-medium transition hover:border-brand-400">{{ $t('card_editor.pratonton') }}</a>
         </div>
     </form>
 
     <section v-if="gallery" class="mt-10 flex flex-col gap-4">
-        <h2 class="font-display text-xl font-semibold">Galeri gambar</h2>
+        <h2 class="font-display text-xl font-semibold">{{ $t('card_editor.galeri_gambar') }}</h2>
 
         <form :action="gallery.store_url" method="POST" enctype="multipart/form-data" class="flex flex-col gap-3 rounded-2xl border border-line bg-surface-raised p-5" @submit="submitUpload">
             <input type="hidden" name="_token" :value="csrf">
             <input type="file" name="images[]" accept="image/jpeg,image/png,image/webp" multiple required class="text-sm">
-            <input type="text" name="caption" placeholder="Kapsyen (pilihan)" class="rounded-xl border border-line bg-surface px-4 py-2.5 text-sm focus:border-brand-400 focus:outline-none">
+            <input type="text" name="caption" :placeholder="$t('card_editor.kapsyen_pilihan')" class="rounded-xl border border-line bg-surface px-4 py-2.5 text-sm focus:border-brand-400 focus:outline-none">
             <span class="text-xs text-ink-muted">{{ imageHint }}</span>
 
             <UiUploadProgress :uploading="uploading" :percent="uploadPercent" :error="uploadError" />
@@ -416,19 +408,19 @@ const previewFile = (event, target) => {
                     :action="photo.destroy_url"
                     method="DELETE"
                     tone="danger"
-                    title="Padam gambar ini?"
-                    message="Gambar akan dibuang dari galeri kad jemputan."
-                    confirm-label="Padam"
+                    :title="$t('card_editor.padam_gambar_ini')"
+                    :message="$t('card_editor.gambar_akan_dibuang_dari_galeri')"
+                    confirm-:label="$t('card_editor.padam')"
                     trigger-class="text-xs font-medium text-ink-muted hover:text-brand-700"
                     :csrf="csrf"
-                >Padam</UiConfirm>
+                >{{ $t('card_editor.padam_2') }}</UiConfirm>
             </li>
         </ul>
     </section>
 
     <section v-if="wishes.length" class="mt-10 flex flex-col gap-4">
-        <h2 class="font-display text-xl font-semibold">Ucapan tetamu</h2>
-        <p class="text-sm text-ink-muted">Hanya ucapan yang anda luluskan akan dipaparkan pada kad jemputan.</p>
+        <h2 class="font-display text-xl font-semibold">{{ $t('card_editor.ucapan_tetamu') }}</h2>
+        <p class="text-sm text-ink-muted">{{ $t('card_editor.hanya_ucapan_yang_anda_luluskan') }}</p>
 
         <ul class="flex flex-col gap-3">
             <li v-for="wish in wishes" :key="wish.id" class="flex flex-col gap-2 rounded-2xl border border-line bg-surface-raised p-4 sm:flex-row sm:items-center">
@@ -455,7 +447,7 @@ const previewFile = (event, target) => {
 
     <section v-if="rsvpSummary" class="mt-10 flex flex-col items-start gap-3 rounded-2xl border border-line bg-surface-raised p-5">
         <h2 class="font-display text-xl font-semibold">{{ rsvpSummary.count }} jawapan RSVP diterima</h2>
-        <p class="text-sm text-ink-muted">Lihat siapa yang menjawab, siapa yang belum, dan jumlah kehadiran yang disahkan di halaman tetamu.</p>
-        <a :href="rsvpSummary.url" class="rounded-full bg-brand-600 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700">Buka senarai tetamu</a>
+        <p class="text-sm text-ink-muted">{{ $t('card_editor.lihat_siapa_yang_menjawab_siapa') }}</p>
+        <a :href="rsvpSummary.url" class="rounded-full bg-brand-600 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700">{{ $t('card_editor.buka_senarai_tetamu') }}</a>
     </section>
 </template>

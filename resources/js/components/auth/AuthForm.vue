@@ -75,9 +75,9 @@ const values = ref(Object.fromEntries(props.fields.map((field) => [field.name, f
         <div v-if="remember || forgotUrl" class="flex items-center justify-between gap-3 text-sm">
             <label v-if="remember" class="flex items-center gap-2">
                 <input type="checkbox" name="remember" class="accent-brand-600">
-                Ingat saya
+                {{ $t('auth.remember_me') }}
             </label>
-            <a v-if="forgotUrl" :href="forgotUrl" class="ml-auto font-medium text-brand-600 underline underline-offset-4">Lupa kata laluan?</a>
+            <a v-if="forgotUrl" :href="forgotUrl" class="ml-auto font-medium text-brand-600 underline underline-offset-4">{{ $t('auth.forgot_password') }}</a>
         </div>
 
         <UiTurnstile v-if="turnstileSiteKey" :site-key="turnstileSiteKey" />
@@ -88,7 +88,7 @@ const values = ref(Object.fromEntries(props.fields.map((field) => [field.name, f
     <div v-if="googleUrl" class="mt-6 flex flex-col gap-4">
         <div class="flex items-center gap-3 text-xs text-ink-muted">
             <span class="h-px flex-1 bg-line"></span>
-            atau
+            {{ $t('auth.or') }}
             <span class="h-px flex-1 bg-line"></span>
         </div>
 
@@ -99,7 +99,7 @@ const values = ref(Object.fromEntries(props.fields.map((field) => [field.name, f
                 <path fill="#FBBC05" d="M5.4 14.4a7.2 7.2 0 0 1 0-4.6V6.7H1.4a12 12 0 0 0 0 10.8l4-3.1Z" />
                 <path fill="#EA4335" d="M12 4.8c1.8 0 3.3.6 4.6 1.8l3.4-3.4A12 12 0 0 0 1.4 6.7l4 3.1C6.3 6.9 8.9 4.8 12 4.8Z" />
             </svg>
-            Teruskan dengan Google
+            {{ $t('auth.continue_google') }}
         </a>
     </div>
 

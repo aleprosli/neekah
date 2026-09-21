@@ -11,9 +11,9 @@ enum GuestSide: string
     public function label(): string
     {
         return match ($this) {
-            self::Bride => 'Pihak perempuan',
-            self::Groom => 'Pihak lelaki',
-            self::Both => 'Kedua-dua pihak',
+            self::Bride => __('enums.guest_side.bride'),
+            self::Groom => __('enums.guest_side.groom'),
+            self::Both => __('enums.guest_side.both'),
         };
     }
 }

@@ -7,11 +7,11 @@
 <footer class="border-t border-line pb-16 md:pb-0">
     <div class="mx-auto flex max-w-[1760px] min-w-0 flex-col gap-6 px-4 py-8 text-sm text-ink-muted sm:px-6 lg:px-10">
         <div class="flex flex-col gap-6 sm:flex-row sm:justify-between">
-            <nav class="flex flex-wrap gap-x-6 gap-y-2" aria-label="Footer">
-                <a href="{{ route('landing') }}" class="transition hover:text-ink">Tentang</a>
-                <a href="{{ route('vendors.index') }}" class="transition hover:text-ink">Cari Vendor</a>
-                <a href="{{ route('vendor.register') }}" class="transition hover:text-ink">Jadi Vendor</a>
-                <a href="{{ route('blog.index') }}" class="transition hover:text-ink">Blog</a>
+            <nav class="flex flex-wrap gap-x-6 gap-y-2" :aria-label="__('pages.footer.footer')">
+                <a href="{{ route('landing') }}" class="transition hover:text-ink">{{ __('pages.footer.tentang') }}</a>
+                <a href="{{ route('vendors.index') }}" class="transition hover:text-ink">{{ __('pages.footer.cari_vendor') }}</a>
+                <a href="{{ route('vendor.register') }}" class="transition hover:text-ink">{{ __('pages.footer.jadi_vendor') }}</a>
+                <a href="{{ route('blog.index') }}" class="transition hover:text-ink">{{ __('pages.footer.blog') }}</a>
             </nav>
 
             @if ($contact->phone() || $contact->email() || $contact->whatsappUrl())
@@ -20,7 +20,7 @@
                         <a href="{{ $contact->telUrl() }}" class="transition hover:text-ink">{{ $contact->phone() }}</a>
                     @endif
                     @if ($contact->whatsappUrl())
-                        <a href="{{ $contact->whatsappUrl() }}" target="_blank" rel="noopener" class="transition hover:text-ink">WhatsApp</a>
+                        <a href="{{ $contact->whatsappUrl() }}" target="_blank" rel="noopener" class="transition hover:text-ink">{{ __('pages.footer.whatsapp') }}</a>
                     @endif
                     @if ($contact->email())
                         <a href="mailto:{{ $contact->email() }}" class="break-all transition hover:text-ink">{{ $contact->email() }}</a>

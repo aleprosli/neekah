@@ -56,11 +56,11 @@ const tones = {
     <div class="grid gap-8 break-words lg:grid-cols-[minmax(0,1fr)_340px]">
         <div class="flex min-w-0 flex-col gap-6">
             <dl class="grid gap-3 rounded-2xl border border-line p-5 text-sm sm:grid-cols-2 [&>div]:min-w-0">
-                <div><dt class="text-ink-muted">Rujukan</dt><dd class="font-semibold">{{ booking.reference }}</dd></div>
-                <div><dt class="text-ink-muted">Tarikh majlis</dt><dd class="font-semibold">{{ booking.event_date }}</dd></div>
-                <div><dt class="text-ink-muted">Pakej</dt><dd class="font-semibold">{{ booking.package_name }}</dd></div>
-                <div><dt class="text-ink-muted">Dibuat pada</dt><dd class="font-semibold">{{ booking.created_at }}</dd></div>
-                <div v-if="booking.notes" class="sm:col-span-2"><dt class="text-ink-muted">Nota</dt><dd class="whitespace-pre-line">{{ booking.notes }}</dd></div>
+                <div><dt class="text-ink-muted">{{ $t('booking.rujukan') }}</dt><dd class="font-semibold">{{ booking.reference }}</dd></div>
+                <div><dt class="text-ink-muted">{{ $t('booking.tarikh_majlis') }}</dt><dd class="font-semibold">{{ booking.event_date }}</dd></div>
+                <div><dt class="text-ink-muted">{{ $t('booking.pakej') }}</dt><dd class="font-semibold">{{ booking.package_name }}</dd></div>
+                <div><dt class="text-ink-muted">{{ $t('booking.dibuat_pada') }}</dt><dd class="font-semibold">{{ booking.created_at }}</dd></div>
+                <div v-if="booking.notes" class="sm:col-span-2"><dt class="text-ink-muted">{{ $t('booking.nota') }}</dt><dd class="whitespace-pre-line">{{ booking.notes }}</dd></div>
             </dl>
 
             <ol class="flex flex-col gap-3 rounded-2xl border border-line p-5 text-sm">
@@ -75,7 +75,7 @@ const tones = {
 
             <section v-if="paymentForm" class="flex flex-col gap-4 rounded-2xl border border-line p-5">
                 <div>
-                    <h2 class="font-display text-lg font-semibold">Rekod bayaran</h2>
+                    <h2 class="font-display text-lg font-semibold">{{ $t('booking.rekod_bayaran') }}</h2>
                     <p class="mt-1 text-sm text-ink-muted">{{ paymentForm.instructions }}</p>
                 </div>
 
@@ -84,7 +84,7 @@ const tones = {
 
                     <div class="grid gap-4 sm:grid-cols-2">
                         <label class="flex flex-col gap-1.5 text-sm">
-                            <span class="font-medium">Jumlah dibayar (RM)</span>
+                            <span class="font-medium">{{ $t('booking.jumlah_dibayar_rm') }}</span>
                             <input
                                 v-model="amount"
                                 type="number"
@@ -100,7 +100,7 @@ const tones = {
                         </label>
 
                         <label class="flex flex-col gap-1.5 text-sm">
-                            <span class="font-medium">Tarikh bayaran</span>
+                            <span class="font-medium">{{ $t('booking.tarikh_bayaran') }}</span>
                             <input
                                 type="date"
                                 name="paid_on"
@@ -114,20 +114,20 @@ const tones = {
                     </div>
 
                     <label class="flex flex-col gap-1.5 text-sm">
-                        <span class="font-medium">Nota <span class="font-normal text-ink-muted">(pilihan)</span></span>
+                        <span class="font-medium">{{ $t('booking.nota_2') }}<span class="font-normal text-ink-muted">(pilihan)</span></span>
                         <input
                             type="text"
                             name="note"
                             maxlength="160"
                             :value="paymentForm.old.note"
-                            placeholder="Contoh: bayaran pendahuluan, transfer Maybank2u"
+                            :placeholder="$t('booking.contoh_bayaran_pendahuluan_transfer_maybank2u')"
                             class="rounded-xl border border-line bg-surface px-4 py-2.5 focus:border-brand-400 focus:outline-none"
                         >
                         <span v-if="errors.note" class="text-xs text-brand-700">{{ errors.note }}</span>
                     </label>
 
                     <label class="flex flex-col gap-1.5 text-sm">
-                        <span class="font-medium">Gambar resit <span class="font-normal text-ink-muted">(pilihan)</span></span>
+                        <span class="font-medium">{{ $t('booking.gambar_resit') }}<span class="font-normal text-ink-muted">(pilihan)</span></span>
                         <input
                             type="file"
                             name="receipt"
@@ -139,28 +139,28 @@ const tones = {
                         <span v-if="errors.receipt" class="text-xs text-brand-700">{{ errors.receipt }}</span>
                     </label>
 
-                    <UiUploadProgress :uploading="uploading" :percent="percent" :error="uploadError" label="Memuat naik resit" />
+                    <UiUploadProgress :uploading="uploading" :percent="percent" :error="uploadError" :label="$t('booking.memuat_naik_resit')" />
 
                     <UiConfirmSubmit
-                        title="Rekod bayaran ini?"
+                        :title="$t('booking.rekod_bayaran_ini')"
                         :message="`${money(amount)} akan dihantar kepada vendor untuk disahkan${receiptName ? ` bersama resit ${receiptName}` : ''}. Vendor akan menyemak akaun mereka sebelum booking disahkan.`"
-                        confirm-label="Ya, rekodkan"
+                        confirm-:label="$t('booking.ya_rekodkan')"
                         button-class="w-fit rounded-full bg-brand-600 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700 disabled:opacity-60"
                         :disabled="uploading"
-                    >Rekod bayaran</UiConfirmSubmit>
+                    >{{ $t('booking.rekod_bayaran_2') }}</UiConfirmSubmit>
                 </form>
             </section>
 
             <section v-if="review" class="rounded-2xl border border-line p-5">
-                <h2 class="font-display text-lg font-semibold">Review anda</h2>
+                <h2 class="font-display text-lg font-semibold">{{ $t('booking.review_anda') }}</h2>
                 <p class="mt-2 text-gold-500">{{ stars(review.rating) }}<span class="text-line">{{ stars(5 - review.rating) }}</span></p>
                 <p class="mt-2 text-sm leading-relaxed">{{ review.comment }}</p>
             </section>
 
             <section v-else-if="reviewForm" class="flex flex-col gap-4 rounded-2xl border border-brand-200 bg-brand-50/50 p-5">
                 <div>
-                    <h2 class="font-display text-lg font-semibold">Beri review</h2>
-                    <p class="text-sm text-ink-muted">Majlis anda telah selesai. Kongsi pengalaman anda dengan pengantin lain.</p>
+                    <h2 class="font-display text-lg font-semibold">{{ $t('booking.beri_review') }}</h2>
+                    <p class="text-sm text-ink-muted">{{ $t('booking.majlis_anda_telah_selesai_kongsi') }}</p>
                 </div>
 
                 <form :action="reviewForm.action" method="POST" class="flex flex-col gap-4">
@@ -182,24 +182,24 @@ const tones = {
                         name="comment"
                         rows="4"
                         required
-                        placeholder="Ceritakan pengalaman anda dengan vendor ini…"
+                        :placeholder="$t('booking.ceritakan_pengalaman_anda_dengan_vendor')"
                         class="rounded-xl border border-line bg-surface px-4 py-2.5 text-sm focus:border-brand-400 focus:outline-none"
                     ></textarea>
                     <span v-if="errors.comment" class="text-xs text-brand-700">{{ errors.comment }}</span>
 
                     <UiConfirmSubmit
-                        title="Hantar review ini?"
-                        message="Review dipaparkan di halaman awam vendor dan tidak boleh diubah selepas dihantar."
-                        confirm-label="Ya, hantar"
+                        :title="$t('booking.hantar_review_ini')"
+                        :message="$t('booking.review_dipaparkan_di_halaman_awam')"
+                        confirm-:label="$t('booking.ya_hantar')"
                         button-class="w-fit rounded-full bg-brand-600 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700"
-                    >Hantar review</UiConfirmSubmit>
+                    >{{ $t('booking.hantar_review') }}</UiConfirmSubmit>
                 </form>
             </section>
         </div>
 
         <aside class="flex min-w-0 flex-col gap-4 rounded-2xl border border-line bg-surface-raised p-5 shadow-xl shadow-brand-900/5 lg:sticky lg:top-28 lg:self-start">
             <div>
-                <p class="text-xs font-semibold tracking-wide text-ink-muted uppercase">Jumlah pakej</p>
+                <p class="text-xs font-semibold tracking-wide text-ink-muted uppercase">{{ $t('booking.jumlah_pakej') }}</p>
                 <p class="font-display text-3xl font-semibold">{{ booking.total }}</p>
                 <p class="text-sm text-ink-muted">Disahkan dibayar {{ booking.paid }}</p>
             </div>
@@ -214,36 +214,36 @@ const tones = {
                     <p class="text-xs text-ink-muted">{{ payment.paid_on }} · {{ payment.reference }}</p>
                     <p v-if="payment.note" class="text-xs break-words text-ink-muted">{{ payment.note }}</p>
 
-                    <a v-if="payment.receipt_url" :href="payment.receipt_url" target="_blank" rel="noopener" class="text-xs font-medium text-brand-700 underline underline-offset-4">Lihat resit</a>
+                    <a v-if="payment.receipt_url" :href="payment.receipt_url" target="_blank" rel="noopener" class="text-xs font-medium text-brand-700 underline underline-offset-4">{{ $t('booking.lihat_resit') }}</a>
 
                     <UiConfirm
                         v-if="payment.destroy_url"
                         :action="payment.destroy_url"
                         method="DELETE"
-                        title="Buang rekod bayaran ini?"
-                        message="Rekod ini belum disahkan vendor. Anda boleh merekodkannya semula selepas ini."
-                        confirm-label="Ya, buang"
+                        :title="$t('booking.buang_rekod_bayaran_ini')"
+                        :message="$t('booking.rekod_ini_belum_disahkan_vendor')"
+                        confirm-:label="$t('booking.ya_buang')"
                         tone="danger"
                         :csrf="csrf"
-                    >Buang rekod</UiConfirm>
+                    >{{ $t('booking.buang_rekod') }}</UiConfirm>
                 </li>
             </ul>
 
-            <p v-else class="rounded-xl bg-surface-muted p-4 text-xs text-ink-muted">Belum ada bayaran direkod. Berbincang dengan vendor tentang jumlah dan cara bayaran, kemudian rekodkannya di sini.</p>
+            <p v-else class="rounded-xl bg-surface-muted p-4 text-xs text-ink-muted">{{ $t('booking.belum_ada_bayaran_direkod_berbincang') }}</p>
 
             <p v-if="booking.has_commission" class="text-xs text-ink-muted">Komisen platform {{ booking.commission_rate }}% dikira daripada nilai booking ini.</p>
 
             <UiConfirm
                 v-if="cancelForm"
                 :action="cancelForm.action"
-                title="Batalkan booking ini?"
-                message="Vendor akan dimaklumkan. Tindakan ini tidak boleh dibatalkan — anda perlu menempah semula jika berubah fikiran."
-                confirm-label="Ya, batalkan booking"
-                cancel-label="Jangan batalkan"
+                :title="$t('booking.batalkan_booking_ini')"
+                :message="$t('booking.vendor_akan_dimaklumkan_tindakan_ini')"
+                confirm-:label="$t('booking.ya_batalkan_booking')"
+                cancel-:label="$t('booking.jangan_batalkan')"
                 tone="danger"
                 trigger-class="w-full rounded-full border border-line px-4 py-2.5 text-sm font-medium text-ink-muted transition hover:border-red-300 hover:text-red-700"
                 :csrf="csrf"
-            >Batalkan booking</UiConfirm>
+            >{{ $t('booking.batalkan_booking') }}</UiConfirm>
         </aside>
     </div>
 </template>

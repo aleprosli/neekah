@@ -35,9 +35,9 @@ class WeddingGuestController extends Controller
                 'importErrors' => session('importErrors', []),
                 'cardNotice' => $site?->is_published ? null : ['url' => route('site.edit')],
                 'stats' => [
-                    ['label' => 'Sah hadir', 'value' => ($site?->confirmedPax() ?? 0).' orang', 'hint' => 'Dijumlahkan dari jawapan RSVP sahaja'],
-                    ['label' => 'Belum jawab', 'value' => 'sehingga '.($site?->awaitingPax() ?? 0).' orang', 'hint' => 'Had atas jemputan yang belum dijawab'],
-                    ['label' => 'Tidak hadir', 'value' => ($site?->declinedCount() ?? 0).' jawapan', 'hint' => $guests->count().' tetamu dalam senarai'],
+                    ['label' => __('props.couple.sah_hadir'), 'value' => __('props.units.people', ['count' => $site?->confirmedPax() ?? 0]), 'hint' => __('props.couple.dijumlahkan_dari_jawapan_rsvp_sahaja')],
+                    ['label' => __('props.couple.belum_jawab'), 'value' => __('props.units.up_to_people', ['count' => $site?->awaitingPax() ?? 0]), 'hint' => __('props.couple.had_atas_jemputan_yang_belum')],
+                    ['label' => __('props.couple.tidak_hadir'), 'value' => __('props.units.replies', ['count' => $site?->declinedCount() ?? 0]), 'hint' => __('props.units.guests_on_list', ['count' => $guests->count()])],
                 ],
                 'sides' => collect(GuestSide::cases())->map(fn (GuestSide $case): array => ['value' => $case->value, 'label' => $case->label()])->all(),
                 'groups' => collect(GuestGroup::cases())->map(fn (GuestGroup $case): array => ['value' => $case->value, 'label' => $case->label()])->all(),
@@ -81,7 +81,7 @@ class WeddingGuestController extends Controller
     {
         $wedding->guests()->create($request->validated());
 
-        return back()->with('status', 'Tetamu ditambah ke senarai.');
+        return back()->with('status', __('flash.couple.guest_added'));
     }
 
     public function update(StoreWeddingGuestRequest $request, Wedding $wedding, WeddingGuest $guest): RedirectResponse
@@ -90,7 +90,7 @@ class WeddingGuestController extends Controller
 
         $guest->update($request->validated());
 
-        return back()->with('status', 'Maklumat tetamu dikemas kini.');
+        return back()->with('status', __('flash.couple.guest_updated'));
     }
 
     public function destroy(Wedding $wedding, WeddingGuest $guest): RedirectResponse
@@ -100,7 +100,7 @@ class WeddingGuestController extends Controller
 
         $guest->delete();
 
-        return back()->with('status', 'Tetamu dipadam dari senarai.');
+        return back()->with('status', __('flash.couple.guest_deleted'));
     }
 
     /**

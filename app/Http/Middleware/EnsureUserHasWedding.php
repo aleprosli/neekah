@@ -24,7 +24,7 @@ class EnsureUserHasWedding
         if (! $user->weddings()->exists()) {
             return redirect()
                 ->route('weddings.create')
-                ->with('status', 'Cipta majlis anda dahulu sebelum menggunakan alat perancangan.');
+                ->with('status', __('pages.dash.cipta_majlis_dahulu'));
         }
 
         return $next($request);

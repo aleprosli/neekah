@@ -12,6 +12,7 @@ use App\Http\Requests\UpdateTelegramSettingsRequest;
 use App\Http\Requests\UpdateTurnstileSettingsRequest;
 use App\Support\ContactSettings;
 use App\Support\ImageSettings;
+use App\Support\Locales;
 use App\Support\PaymentSettings;
 use App\Support\Seo;
 use App\Support\SeoSettings;
@@ -48,21 +49,21 @@ class SettingController extends Controller
         return [
             'id' => 'perhubungan',
             'icon' => '📞',
-            'label' => 'Perhubungan',
-            'title' => 'Maklumat perhubungan',
-            'description' => 'Dipaparkan di footer setiap halaman awam. Biarkan kosong untuk menyembunyikan satu-satu maklumat.',
+            'label' => __('props.admin.perhubungan'),
+            'title' => __('props.admin.maklumat_perhubungan'),
+            'description' => __('props.admin.dipaparkan_di_footer_setiap_halaman'),
             'action' => route('admin.settings.contact'),
-            'submit' => 'Simpan maklumat perhubungan',
+            'submit' => __('props.admin.simpan_maklumat_perhubungan'),
             'columns' => true,
             'fields' => [
-                ['name' => 'phone', 'label' => 'Nombor telefon', 'type' => 'tel', 'value' => $values['phone'], 'placeholder' => '03-1234 5678', 'help' => 'Dipaparkan sebagai pautan panggilan.'],
-                ['name' => 'whatsapp', 'label' => 'Nombor WhatsApp', 'type' => 'tel', 'value' => $values['whatsapp'], 'placeholder' => '60123456789', 'help' => 'Dengan kod negara. Kosong bermakna nombor telefon digunakan.'],
-                ['name' => 'email', 'label' => 'Emel', 'type' => 'email', 'value' => $values['email'], 'placeholder' => 'hello@neekah.my'],
-                ['name' => 'hours', 'label' => 'Waktu operasi', 'value' => $values['hours'], 'placeholder' => 'Isnin – Jumaat, 9 pagi – 6 petang'],
-                ['name' => 'address', 'label' => 'Alamat', 'type' => 'textarea', 'rows' => 2, 'wide' => true, 'value' => $values['address'], 'placeholder' => 'No. 1, Jalan Contoh, 50000 Kuala Lumpur'],
-                ['name' => 'facebook', 'label' => 'Facebook', 'type' => 'url', 'value' => $values['facebook'], 'placeholder' => 'https://facebook.com/neekahmy'],
-                ['name' => 'instagram', 'label' => 'Instagram', 'type' => 'url', 'value' => $values['instagram'], 'placeholder' => 'https://instagram.com/neekahmy'],
-                ['name' => 'tiktok', 'label' => 'TikTok', 'type' => 'url', 'value' => $values['tiktok'], 'placeholder' => 'https://tiktok.com/@neekahmy'],
+                ['name' => 'phone', 'label' => __('props.admin.nombor_telefon'), 'type' => 'tel', 'value' => $values['phone'], 'placeholder' => '03-1234 5678', 'help' => __('props.admin.dipaparkan_sebagai_pautan_panggilan')],
+                ['name' => 'whatsapp', 'label' => __('props.admin.nombor_whatsapp'), 'type' => 'tel', 'value' => $values['whatsapp'], 'placeholder' => '60123456789', 'help' => __('props.admin.dengan_kod_negara_kosong_bermakna')],
+                ['name' => 'email', 'label' => __('props.admin.emel'), 'type' => 'email', 'value' => $values['email'], 'placeholder' => 'hello@neekah.my'],
+                ['name' => 'hours', 'label' => __('props.admin.waktu_operasi'), 'value' => $values['hours'], 'placeholder' => __('props.admin.isnin_jumaat_9_pagi_6')],
+                ['name' => 'address', 'label' => __('props.admin.alamat'), 'type' => 'textarea', 'rows' => 2, 'wide' => true, 'value' => $values['address'], 'placeholder' => __('props.admin.no_1_jalan_contoh_50000')],
+                ['name' => 'facebook', 'label' => __('props.admin.facebook'), 'type' => 'url', 'value' => $values['facebook'], 'placeholder' => 'https://facebook.com/neekahmy'],
+                ['name' => 'instagram', 'label' => __('props.admin.instagram'), 'type' => 'url', 'value' => $values['instagram'], 'placeholder' => 'https://instagram.com/neekahmy'],
+                ['name' => 'tiktok', 'label' => __('props.admin.tiktok'), 'type' => 'url', 'value' => $values['tiktok'], 'placeholder' => 'https://tiktok.com/@neekahmy'],
             ],
         ];
     }
@@ -76,18 +77,58 @@ class SettingController extends Controller
         return [
             'id' => 'seo',
             'icon' => '🔍',
-            'label' => 'SEO',
-            'title' => 'SEO dan pratonton pautan',
-            'description' => 'Digunakan pada halaman yang tidak menulis meta tag sendiri, dan sebagai pratonton apabila pautan dikongsi.',
+            'label' => __('props.admin.seo'),
+            'title' => __('props.admin.seo_dan_pratonton_pautan'),
+            'description' => __('props.admin.digunakan_pada_halaman_yang_tidak'),
             'action' => route('admin.settings.seo'),
-            'submit' => 'Simpan tetapan SEO',
+            'submit' => __('props.admin.simpan_tetapan_seo'),
             'preview' => ['site' => config('app.name')],
             'fields' => [
-                ['name' => 'tagline', 'label' => 'Tagline', 'value' => $values['tagline'], 'required' => true, 'maxlength' => SeoSettings::TAGLINE_LIMIT, 'help' => 'Muncul selepas nama laman pada tajuk halaman utama.'],
-                ['name' => 'description', 'label' => 'Penerangan lalai', 'type' => 'textarea', 'rows' => 3, 'value' => $values['description'], 'required' => true, 'maxlength' => Seo::DESCRIPTION_LIMIT, 'help' => 'Google memotong sekitar '.Seo::DESCRIPTION_LIMIT.' aksara.'],
-                ['name' => 'twitter', 'label' => 'Akaun X (pilihan)', 'value' => $values['twitter'], 'placeholder' => '@neekahmy', 'help' => 'Dikreditkan pada kad pratonton X.'],
+                ...$this->seoTextFields($values),
+                ['name' => 'twitter', 'label' => __('props.admin.akaun_x_pilihan'), 'value' => $values['twitter'], 'placeholder' => '@neekahmy', 'help' => __('props.admin.dikreditkan_pada_kad_pratonton_x')],
             ],
         ];
+    }
+
+    /**
+     * The title tagline and meta description, one field per language. English
+     * pages are indexed separately, so they get their own words; leaving the
+     * English field empty falls back to the Malay one.
+     *
+     * @param  array<string, mixed>  $values
+     * @return array<int, array<string, mixed>>
+     */
+    private function seoTextFields(array $values): array
+    {
+        $fields = [];
+
+        foreach (Locales::ALL as $code => $locale) {
+            $suffix = $code === Locales::DEFAULT ? '' : '_'.$code;
+            $isDefault = $suffix === '';
+
+            $fields[] = [
+                'name' => 'tagline'.$suffix,
+                'label' => __('props.admin.tagline_bahasa', ['language' => $locale['label']]),
+                'value' => $values['tagline'.$suffix],
+                'required' => $isDefault,
+                'maxlength' => SeoSettings::TAGLINE_LIMIT,
+                'help' => $isDefault ? __('props.admin.muncul_selepas_nama_laman_pada') : __('props.admin.bahasa_kedua_pilihan'),
+            ];
+            $fields[] = [
+                'name' => 'description'.$suffix,
+                'label' => __('props.admin.penerangan_lalai_bahasa', ['language' => $locale['label']]),
+                'type' => 'textarea',
+                'rows' => 3,
+                'value' => $values['description'.$suffix],
+                'required' => $isDefault,
+                'maxlength' => Seo::DESCRIPTION_LIMIT,
+                'help' => $isDefault
+                    ? __('props.admin.google_memotong_sekitar').__('props.admin.aksara', ['count' => Seo::DESCRIPTION_LIMIT])
+                    : __('props.admin.bahasa_kedua_pilihan'),
+            ];
+        }
+
+        return $fields;
     }
 
     /**
@@ -99,16 +140,16 @@ class SettingController extends Controller
         return [
             'id' => 'keselamatan',
             'icon' => '🛡️',
-            'label' => 'Keselamatan',
-            'title' => 'Cloudflare Turnstile',
-            'description' => 'Semakan tanpa teka-teki pada borang log masuk, pendaftaran pengantin dan vendor, serta borang tempahan. Dapatkan kunci di dash.cloudflare.com → Turnstile.',
+            'label' => __('props.admin.keselamatan'),
+            'title' => __('props.admin.cloudflare_turnstile'),
+            'description' => __('props.admin.semakan_tanpa_teka_teki_pada'),
             'action' => route('admin.settings.turnstile'),
-            'submit' => 'Simpan tetapan Turnstile',
+            'submit' => __('props.admin.simpan_tetapan_turnstile'),
             'badge' => ['active' => $active, 'label' => $active ? 'Aktif' : 'Tidak aktif'],
             'fields' => [
-                ['name' => 'enabled', 'label' => 'Hidupkan Turnstile', 'type' => 'checkbox', 'value' => $values['enabled'], 'help' => 'Hanya berjalan apabila kedua-dua kunci diisi, supaya pendaftaran tidak pernah tersekat.'],
-                ['name' => 'site_key', 'label' => 'Site key', 'value' => $values['site_key'], 'placeholder' => '0x4AAAAAAA...', 'help' => 'Kunci awam, dipaparkan dalam halaman.'],
-                ['name' => 'secret_key', 'label' => 'Secret key', 'type' => 'password', 'value' => '', 'placeholder' => $values['secret_key'] ? 'Tersimpan — biarkan kosong untuk kekalkan' : 'Belum ditetapkan', 'help' => 'Tidak pernah dipaparkan semula selepas disimpan.'],
+                ['name' => 'enabled', 'label' => __('props.admin.hidupkan_turnstile'), 'type' => 'checkbox', 'value' => $values['enabled'], 'help' => __('props.admin.hanya_berjalan_apabila_kedua_dua')],
+                ['name' => 'site_key', 'label' => __('props.admin.site_key'), 'value' => $values['site_key'], 'placeholder' => '0x4AAAAAAA...', 'help' => __('props.admin.kunci_awam_dipaparkan_dalam_halaman')],
+                ['name' => 'secret_key', 'label' => __('props.admin.secret_key'), 'type' => 'password', 'value' => '', 'placeholder' => $values['secret_key'] ? __('props.common.saved_leave_blank') : __('props.common.not_set'), 'help' => __('props.admin.tidak_pernah_dipaparkan_semula_selepas')],
             ],
         ];
     }
@@ -122,16 +163,16 @@ class SettingController extends Controller
         return [
             'id' => 'telegram',
             'icon' => '📣',
-            'label' => 'Telegram',
-            'title' => 'Makluman Telegram',
-            'description' => 'Setiap pendaftaran vendor dan pengantin dihantar ke chat admin, lengkap dengan emel dan pautan WhatsApp lead itu. Cipta bot dengan @BotFather, kemudian ambil chat id chat atau kumpulan admin.',
+            'label' => __('props.admin.telegram'),
+            'title' => __('props.admin.makluman_telegram'),
+            'description' => __('props.admin.setiap_pendaftaran_vendor_dan_pengantin'),
             'action' => route('admin.settings.telegram'),
-            'submit' => 'Simpan tetapan Telegram',
+            'submit' => __('props.admin.simpan_tetapan_telegram'),
             'badge' => ['active' => $active, 'label' => $active ? 'Aktif' : 'Tidak aktif'],
             'fields' => [
-                ['name' => 'enabled', 'label' => 'Hantar makluman ke Telegram', 'type' => 'checkbox', 'value' => $values['enabled'], 'help' => 'Dihantar melalui queue, jadi pendaftaran tidak pernah menunggu Telegram.'],
-                ['name' => 'bot_token', 'label' => 'Bot token', 'type' => 'password', 'value' => '', 'placeholder' => $values['bot_token'] ? 'Tersimpan — biarkan kosong untuk kekalkan' : '123456:ABC-DEF...', 'help' => 'Tidak pernah dipaparkan semula selepas disimpan.'],
-                ['name' => 'chat_id', 'label' => 'Chat id', 'value' => $values['chat_id'], 'placeholder' => '-1001234567890', 'help' => 'Chat peribadi admin atau kumpulan. Kumpulan bermula dengan tanda tolak.'],
+                ['name' => 'enabled', 'label' => __('props.admin.hantar_makluman_ke_telegram'), 'type' => 'checkbox', 'value' => $values['enabled'], 'help' => __('props.admin.dihantar_melalui_queue_jadi_pendaftaran')],
+                ['name' => 'bot_token', 'label' => __('props.admin.bot_token'), 'type' => 'password', 'value' => '', 'placeholder' => $values['bot_token'] ? 'Tersimpan — biarkan kosong untuk kekalkan' : '123456:ABC-DEF...', 'help' => __('props.admin.tidak_pernah_dipaparkan_semula_selepas_2')],
+                ['name' => 'chat_id', 'label' => __('props.admin.chat_id'), 'value' => $values['chat_id'], 'placeholder' => '-1001234567890', 'help' => __('props.admin.chat_peribadi_admin_atau_kumpulan')],
             ],
         ];
     }
@@ -147,14 +188,14 @@ class SettingController extends Controller
         return [
             'id' => 'bayaran',
             'icon' => '💳',
-            'label' => 'Bayaran',
-            'title' => 'Kaedah bayaran',
-            'description' => 'Hidupkan kaedah yang boleh digunakan oleh pengantin. Neekah tidak menyimpan akaun bank sendiri: untuk bayaran manual, pengantin membayar terus kepada vendor dan vendor mengesahkannya.',
+            'label' => __('props.admin.bayaran'),
+            'title' => __('props.admin.kaedah_bayaran'),
+            'description' => __('props.admin.hidupkan_kaedah_yang_boleh_digunakan'),
             'action' => route('admin.settings.payments'),
-            'submit' => 'Simpan tetapan bayaran',
+            'submit' => __('props.admin.simpan_tetapan_bayaran'),
             'badge' => [
                 'active' => $offered !== [],
-                'label' => $offered === [] ? 'Tiada kaedah bayaran' : collect($offered)->map->label()->join(', ').' aktif',
+                'label' => $offered === [] ? 'Tiada kaedah bayaran' : __('props.units.active_list', ['list' => collect($offered)->map->label()->join(', ')]),
             ],
             'fields' => [
                 ...collect(PaymentMethod::cases())->map(fn (PaymentMethod $method): array => [
@@ -166,7 +207,7 @@ class SettingController extends Controller
                         ? $method->description()
                         : $method->description().' Integrasi belum dibina, jadi ia belum dipaparkan kepada pengantin walaupun dihidupkan.',
                 ])->all(),
-                ['name' => 'instructions', 'label' => 'Arahan bayaran manual', 'type' => 'textarea', 'rows' => 3, 'value' => $values['instructions'], 'help' => 'Dipaparkan kepada pengantin di borang rekod bayaran.'],
+                ['name' => 'instructions', 'label' => __('props.admin.arahan_bayaran_manual'), 'type' => 'textarea', 'rows' => 3, 'value' => $values['instructions'], 'help' => __('props.admin.dipaparkan_kepada_pengantin_di_borang')],
             ],
         ];
     }
@@ -181,22 +222,22 @@ class SettingController extends Controller
         return [
             'id' => 'gambar',
             'icon' => '🖼️',
-            'label' => 'Gambar',
-            'title' => 'Gambar',
-            'description' => 'Setiap gambar yang dimuat naik oleh vendor, pasangan dan admin diubah saiz, dimampatkan dan dibuang data EXIF (termasuk lokasi GPS) sebelum disimpan. Satu salinan thumbnail turut dijana untuk senarai vendor, grid portfolio dan galeri.',
+            'label' => __('props.admin.gambar'),
+            'title' => __('props.admin.gambar_2'),
+            'description' => __('props.admin.setiap_gambar_yang_dimuat_naik'),
             'action' => route('admin.settings.update'),
-            'submit' => 'Simpan tetapan gambar',
+            'submit' => __('props.admin.simpan_tetapan_gambar'),
             'columns' => true,
             'warning' => $images->isLimitedByServer()
                 ? 'Server ini hanya menerima <strong>'.$images->serverUploadMegabytes().'MB</strong> setiap muat naik, jadi had di bawah tidak digunakan sepenuhnya. Naikkan <code class="font-mono">upload_max_filesize</code> dan <code class="font-mono">post_max_size</code> dalam php.ini (serta <code class="font-mono">client_max_body_size</code> pada nginx), kemudian mulakan semula PHP.'
                 : null,
-            'note' => 'Tetapan ini digunakan untuk gambar yang dimuat naik selepas ini. Gambar lama diproses dengan menjalankan <code class="font-mono">php artisan neekah:optimize-images</code> pada server.',
+            'note' => __('props.admin.tetapan_ini_digunakan_untuk_gambar'),
             'fields' => [
-                ['name' => 'max_dimension', 'label' => 'Saiz maksimum (piksel, sisi terpanjang)', 'type' => 'number', 'value' => $values['max_dimension'], 'min' => 800, 'max' => 4000, 'step' => 10, 'required' => true, 'help' => '1920 sudah tajam untuk skrin penuh. Lebih besar bermakna fail lebih berat.'],
-                ['name' => 'thumbnail_width', 'label' => 'Lebar thumbnail (piksel)', 'type' => 'number', 'value' => $values['thumbnail_width'], 'min' => 200, 'max' => 1200, 'step' => 10, 'required' => true, 'help' => 'Saiz yang dipaparkan dalam senarai dan grid.'],
-                ['name' => 'quality', 'label' => 'Kualiti (40 hingga 95)', 'type' => 'number', 'value' => $values['quality'], 'min' => 40, 'max' => 95, 'required' => true, 'help' => '80 ialah titik terbaik: sukar dibezakan daripada asal, tetapi fail jauh lebih kecil.'],
-                ['name' => 'format', 'label' => 'Format', 'type' => 'select', 'value' => $values['format'], 'required' => true, 'help' => 'WebP biasanya 25 hingga 35% lebih kecil daripada JPEG pada kualiti yang sama.', 'options' => collect(ImageSettings::FORMATS)->map(fn (string $label, string $value): array => ['value' => $value, 'label' => $label])->values()->all()],
-                ['name' => 'max_upload_mb', 'label' => 'Had saiz muat naik (MB)', 'type' => 'number', 'value' => $values['max_upload_mb'], 'min' => 1, 'max' => 15, 'required' => true, 'help' => 'Saiz fail asal yang dibenarkan sebelum diproses. Maksimum 15 MB.'],
+                ['name' => 'max_dimension', 'label' => __('props.admin.saiz_maksimum_piksel_sisi_terpanjang'), 'type' => 'number', 'value' => $values['max_dimension'], 'min' => 800, 'max' => 4000, 'step' => 10, 'required' => true, 'help' => '1920 sudah tajam untuk skrin penuh. Lebih besar bermakna fail lebih berat.'],
+                ['name' => 'thumbnail_width', 'label' => __('props.admin.lebar_thumbnail_piksel'), 'type' => 'number', 'value' => $values['thumbnail_width'], 'min' => 200, 'max' => 1200, 'step' => 10, 'required' => true, 'help' => __('props.admin.saiz_yang_dipaparkan_dalam_senarai')],
+                ['name' => 'quality', 'label' => __('props.admin.kualiti_40_hingga_95'), 'type' => 'number', 'value' => $values['quality'], 'min' => 40, 'max' => 95, 'required' => true, 'help' => '80 ialah titik terbaik: sukar dibezakan daripada asal, tetapi fail jauh lebih kecil.'],
+                ['name' => 'format', 'label' => __('props.admin.format'), 'type' => 'select', 'value' => $values['format'], 'required' => true, 'help' => __('props.admin.webp_biasanya_25_hingga_35'), 'options' => collect(ImageSettings::FORMATS)->map(fn (string $label, string $value): array => ['value' => $value, 'label' => $label])->values()->all()],
+                ['name' => 'max_upload_mb', 'label' => __('props.admin.had_saiz_muat_naik_mb'), 'type' => 'number', 'value' => $values['max_upload_mb'], 'min' => 1, 'max' => 15, 'required' => true, 'help' => __('props.admin.saiz_fail_asal_yang_dibenarkan')],
             ],
         ];
     }

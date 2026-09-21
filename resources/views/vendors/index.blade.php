@@ -19,7 +19,7 @@
                             <span @class(['flex size-14 items-center justify-center overflow-hidden rounded-full bg-white text-2xl transition', 'shadow-md shadow-brand-600/30 ring-2 ring-brand-600' => ! $filters['category'], 'ring-1 ring-line group-hover:ring-brand-300' => $filters['category']])>
                                 <x-category-icon class="size-9" fallback="🎉" />
                             </span>
-                            Semua
+                            {{ __('marketplace.filters.all') }}
                         </a>
                     </li>
                     @foreach ($categories as $category)
@@ -44,8 +44,8 @@
         @php
             $priceLabel = match (true) {
                 $filters['min_price'] !== null && $filters['max_price'] !== null => 'RM'.number_format($filters['min_price']).' – RM'.number_format($filters['max_price']),
-                $filters['max_price'] !== null => 'Bawah RM'.number_format($filters['max_price']),
-                $filters['min_price'] !== null => 'Dari RM'.number_format($filters['min_price']),
+                $filters['max_price'] !== null => __('marketplace.filters.under', ['amount' => 'RM'.number_format($filters['max_price'])]),
+                $filters['min_price'] !== null => __('marketplace.filters.from', ['amount' => 'RM'.number_format($filters['min_price'])]),
                 default => null,
             };
             $fieldClasses = 'w-full rounded-xl border border-line bg-surface px-3 py-2 text-sm focus:border-brand-400 focus:outline-none';
@@ -53,7 +53,7 @@
         @endphp
         <div class="flex flex-col gap-4 py-5 md:flex-row md:items-center md:justify-between">
             <div class="hidden flex-wrap items-center gap-2 md:flex">
-                <x-filter-popover label="Negeri" :active="$filters['state']">
+                <x-filter-popover :label="__('marketplace.search.state')" :active="$filters['state']">
                     <form method="GET" action="{{ route('vendors.index') }}" class="flex flex-col gap-3">
                         <x-filter-hidden :filters="$filters" except="state" />
                         <div
@@ -62,12 +62,12 @@
                                 'name' => 'state',
                                 'options' => $stateOptions,
                                 'modelValue' => $filters['state'] ?? '',
-                                'placeholder' => 'Mana-mana negeri',
+                                'placeholder' => __('pages.dash.mana_mana_negeri'),
                                 'submitOnChange' => true,
                             ])"
                         >
                             <select name="state" class="nk-select pr-9 {{ $fieldClasses }}" onchange="this.form.requestSubmit()">
-                                <option value="">Mana-mana negeri</option>
+                                <option value="">{{ __('pages.dash.mana_mana_negeri') }}</option>
                                 @foreach ($states as $state)
                                     <option value="{{ $state }}" @selected($filters['state'] === $state)>{{ $state }}</option>
                                 @endforeach
@@ -76,35 +76,35 @@
                     </form>
                 </x-filter-popover>
 
-                <x-filter-popover label="Harga" :active="$priceLabel" width="w-80">
+                <x-filter-popover :label="__('marketplace.filters.price')" :active="$priceLabel" width="w-80">
                     <form method="GET" action="{{ route('vendors.index') }}" class="flex flex-col gap-3">
                         <x-filter-hidden :filters="$filters" :except="['min_price', 'max_price']" />
-                        <p class="text-xs text-ink-muted">Harga pakej terendah vendor, dalam RM.</p>
+                        <p class="text-xs text-ink-muted">{{ __('marketplace.filters.price_hint') }}</p>
                         <div class="grid grid-cols-2 gap-2">
                             <label class="flex flex-col gap-1 rounded-xl border border-line px-3 py-2 focus-within:border-brand-400">
-                                <span class="text-[11px] text-ink-muted">Minimum</span>
+                                <span class="text-[11px] text-ink-muted">{{ __('marketplace.filters.minimum') }}</span>
                                 <input type="number" name="min_price" min="0" step="50" value="{{ $filters['min_price'] }}" placeholder="0" class="bg-transparent text-sm focus:outline-none">
                             </label>
                             <label class="flex flex-col gap-1 rounded-xl border border-line px-3 py-2 focus-within:border-brand-400">
-                                <span class="text-[11px] text-ink-muted">Maksimum</span>
-                                <input type="number" name="max_price" min="0" step="50" value="{{ $filters['max_price'] }}" placeholder="Tiada had" class="bg-transparent text-sm focus:outline-none">
+                                <span class="text-[11px] text-ink-muted">{{ __('marketplace.filters.maximum') }}</span>
+                                <input type="number" name="max_price" min="0" step="50" value="{{ $filters['max_price'] }}" placeholder="{{ __('marketplace.filters.no_limit') }}" class="bg-transparent text-sm focus:outline-none">
                             </label>
                         </div>
                         <div class="flex items-center justify-between">
                             @if ($priceLabel)
-                                <a href="{{ route('vendors.index', array_filter(array_merge($filters, ['min_price' => null, 'max_price' => null, 'sort' => $filters['sort'] === 'recommended' ? null : $filters['sort']]), fn ($value) => $value !== null)) }}" class="text-xs font-medium underline underline-offset-4">Buang</a>
+                                <a href="{{ route('vendors.index', array_filter(array_merge($filters, ['min_price' => null, 'max_price' => null, 'sort' => $filters['sort'] === 'recommended' ? null : $filters['sort']]), fn ($value) => $value !== null)) }}" class="text-xs font-medium underline underline-offset-4">{{ __('marketplace.filters.remove') }}</a>
                             @else
                                 <span></span>
                             @endif
-                            <button type="submit" class="rounded-full bg-brand-600 px-4 py-2 text-xs font-semibold text-white transition hover:bg-brand-700">Guna</button>
+                            <button type="submit" class="rounded-full bg-brand-600 px-4 py-2 text-xs font-semibold text-white transition hover:bg-brand-700">{{ __('marketplace.filters.apply') }}</button>
                         </div>
                     </form>
                 </x-filter-popover>
 
-                <x-filter-popover label="Rating" :active="$filters['min_rating'] !== null ? number_format($filters['min_rating'], 1).'+' : null" width="w-64">
+                <x-filter-popover :label="__('marketplace.filters.rating')" :active="$filters['min_rating'] !== null ? number_format($filters['min_rating'], 1).'+' : null" width="w-64">
                     <form method="GET" action="{{ route('vendors.index') }}" class="flex flex-wrap gap-2">
                         <x-filter-hidden :filters="$filters" except="min_rating" />
-                        @foreach (['' => 'Semua', '4' => '4.0+', '4.5' => '4.5+', '4.8' => '4.8+'] as $value => $label)
+                        @foreach (['' => __('marketplace.filters.all'), '4' => '4.0+', '4.5' => '4.5+', '4.8' => '4.8+'] as $value => $label)
                             <label class="{{ $chipOption }}">
                                 <input type="radio" name="min_rating" value="{{ $value }}" class="sr-only" onchange="this.form.requestSubmit()" @checked((string) $filters['min_rating'] === (string) $value)>
                                 {{ $label }}
@@ -113,12 +113,12 @@
                     </form>
                 </x-filter-popover>
 
-                <x-filter-popover label="Tahap vendor" :active="$filters['tier'] ? \App\Enums\VendorTier::from($filters['tier'])->label() : null" width="w-80">
+                <x-filter-popover :label="__('marketplace.filters.tier')" :active="$filters['tier'] ? \App\Enums\VendorTier::from($filters['tier'])->label() : null" width="w-80">
                     <form method="GET" action="{{ route('vendors.index') }}" class="flex flex-wrap gap-2">
                         <x-filter-hidden :filters="$filters" except="tier" />
                         <label class="{{ $chipOption }}">
                             <input type="radio" name="tier" value="" class="sr-only" onchange="this.form.requestSubmit()" @checked(! $filters['tier'])>
-                            Semua
+                            {{ __('marketplace.filters.all') }}
                         </label>
                         @foreach ($tiers as $tier)
                             <label class="{{ $chipOption }}">
@@ -131,28 +131,28 @@
 
                 <button type="button" data-dialog-open="filters" class="flex items-center gap-2 rounded-full border border-dashed border-line px-4 py-2 text-sm font-medium transition hover:border-brand-400 hover:text-brand-700">
                     <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M7 12h10M10 18h4"/></svg>
-                    Semua filter
+                    {{ __('marketplace.filters.all_filters') }}
                     @if ($activeFilterCount)
                         <span class="rounded-full bg-brand-600 px-1.5 text-xs font-semibold text-white">{{ $activeFilterCount }}</span>
                     @endif
                 </button>
 
                 @if ($activeFilterCount || $filters['q'] || $filters['category'])
-                    <a href="{{ route('vendors.index') }}" class="px-2 text-sm font-medium underline underline-offset-4">Buang semua</a>
+                    <a href="{{ route('vendors.index') }}" class="px-2 text-sm font-medium underline underline-offset-4">{{ __('marketplace.filters.clear') }}</a>
                 @endif
             </div>
 
             <div class="flex items-center justify-between gap-3 text-sm md:justify-end">
                 <p class="text-ink-muted">
-                    <span class="font-display text-lg font-semibold text-ink">{{ $vendors->total() }} vendor</span>
+                    <span class="font-display text-lg font-semibold text-ink">{{ trans_choice('marketplace.count', $vendors->total(), ['count' => $vendors->total()]) }}</span>
                     @if ($activeCategory) · {{ $activeCategory->name }} @endif
                     @if ($filters['q']) · "{{ $filters['q'] }}" @endif
                     @unless (app()->isProduction())
-                        <span class="ml-1 rounded-full bg-gold-300/50 px-2 py-0.5 text-[11px] font-medium text-brand-900">Data demo</span>
+                        <span class="ml-1 rounded-full bg-gold-300/50 px-2 py-0.5 text-[11px] font-medium text-brand-900">{{ __('marketplace.demo') }}</span>
                     @endunless
                 </p>
 
-                <x-filter-popover :label="'Susun: '.$sorts[$filters['sort']]" align="right" width="w-60">
+                <x-filter-popover :label="__('marketplace.filters.sort').': '.$sorts[$filters['sort']]" align="right" width="w-60">
                     <form method="GET" action="{{ route('vendors.index') }}" class="flex flex-col gap-1">
                         <x-filter-hidden :filters="$filters" except="sort" />
                         @foreach ($sorts as $value => $label)
@@ -171,7 +171,7 @@
                  can still pass the request on to vendors who are not listed. --}}
             <div class="flex flex-col items-center gap-3 py-24 text-center">
                 <span class="text-4xl">🔍</span>
-                <h1 class="text-lg font-semibold">Maaf, belum ada vendor yang sepadan</h1>
+                <h1 class="text-lg font-semibold">{{ __('marketplace.empty.title') }}</h1>
                 <p class="max-w-md text-sm text-ink-muted">
                     Cuba longgarkan penapis, atau beritahu kami apa yang anda cari: kategori, lokasi dan tarikh majlis.
                     Kami akan kongsikan kepada rangkaian vendor kami dan bantu hubungkan anda.
@@ -180,14 +180,14 @@
                     @if ($helpUrl)
                         <a href="{{ $helpUrl }}" target="_blank" rel="noopener" class="inline-flex items-center justify-center gap-2 rounded-full bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700">
                             <svg class="size-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .1-3.3-.8-2.8-1.1-4.5-3.9-4.7-4.1-.1-.2-1.1-1.5-1.1-2.8s.7-2 1-2.3c.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.4 0 .5l-.4.6-.4.4c-.1.1-.3.3-.1.6.2.3.8 1.3 1.6 2 1.1 1 2 1.3 2.3 1.4.3.1.5.1.6-.1l.9-1.1c.2-.3.4-.2.7-.1l1.9.9c.3.1.5.2.5.3.1.2.1.7-.1 1.3Z"/></svg>
-                            WhatsApp kami
+                            {{ __('marketplace.empty.whatsapp') }}
                         </a>
                     @endif
-                    <a href="{{ route('vendors.index') }}" class="inline-flex items-center justify-center rounded-full border border-line px-5 py-2.5 text-sm font-semibold transition hover:border-brand-400">Buang semua filter</a>
+                    <a href="{{ route('vendors.index') }}" class="inline-flex items-center justify-center rounded-full border border-line px-5 py-2.5 text-sm font-semibold transition hover:border-brand-400">{{ __('marketplace.empty.clear') }}</a>
                 </div>
             </div>
         @else
-            <h1 class="sr-only">{{ $activeCategory?->name ?? 'Semua vendor' }}</h1>
+            <h1 class="sr-only">{{ $activeCategory?->name ?? __('pages.dash.semua_vendor') }}</h1>
             <ul class="grid grid-cols-2 gap-x-3 gap-y-8 sm:gap-x-6 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
                 @foreach ($vendors as $vendor)
                     <li><x-vendor-card :vendor="$vendor" comparable /></li>
@@ -203,12 +203,12 @@
         <div class="mx-auto flex max-w-3xl items-center gap-3 rounded-2xl border border-line bg-surface-raised px-4 py-3 shadow-2xl shadow-brand-900/20">
             <span class="flex size-8 shrink-0 items-center justify-center rounded-full bg-brand-600 text-sm font-semibold text-white" data-compare-count>0</span>
             <div class="min-w-0 flex-1">
-                <p class="text-sm font-medium">Vendor untuk dibanding</p>
+                <p class="text-sm font-medium">{{ __('marketplace.compare.heading') }}</p>
                 <p class="truncate text-xs text-ink-muted" data-compare-names></p>
-                <p class="text-xs font-medium text-brand-700" data-compare-limit hidden>Maksimum 4 vendor sahaja.</p>
+                <p class="text-xs font-medium text-brand-700" data-compare-limit hidden>{{ __('marketplace.compare.limit') }}</p>
             </div>
-            <button type="button" data-compare-clear class="shrink-0 text-xs font-medium text-ink-muted hover:text-ink">Kosongkan</button>
-            <a data-compare-link href="{{ route('vendors.compare') }}" class="shrink-0 rounded-full bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700">Banding</a>
+            <button type="button" data-compare-clear class="shrink-0 text-xs font-medium text-ink-muted hover:text-ink">{{ __('marketplace.compare.clear') }}</button>
+            <a data-compare-link href="{{ route('vendors.compare') }}" class="shrink-0 rounded-full bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700">{{ __('marketplace.compare.open') }}</a>
         </div>
     </div>
 
@@ -221,12 +221,12 @@
 
             <div class="grid grid-cols-[2.5rem_1fr_2.5rem] items-center border-b border-line px-4 py-4">
                 <button type="button" data-dialog-close class="flex size-8 items-center justify-center rounded-full hover:bg-surface-muted" aria-label="Tutup">✕</button>
-                <h2 class="text-center font-display text-lg font-semibold">Filter</h2>
+                <h2 class="text-center font-display text-lg font-semibold">{{ __('marketplace.search.filters') }}</h2>
             </div>
 
             <div class="flex flex-col gap-7 overflow-y-auto px-6 py-6">
                 <div class="flex flex-col gap-2">
-                    <label for="q" class="font-semibold">Cari</label>
+                    <label for="q" class="font-semibold">{{ __('marketplace.search.label') }}</label>
                     <input id="q" type="search" name="q" value="{{ $filters['q'] }}" placeholder="Nama vendor, pakej, bandar…" class="rounded-xl border border-line bg-surface px-4 py-3 text-sm focus:border-brand-400 focus:outline-none">
                 </div>
 
@@ -238,12 +238,12 @@
                         'label' => 'Negeri',
                         'options' => $stateOptions,
                         'modelValue' => $filters['state'] ?? '',
-                        'placeholder' => 'Mana-mana negeri',
+                        'placeholder' => __('pages.dash.mana_mana_negeri'),
                     ])"
                 >
-                    <label for="state" class="font-semibold">Negeri</label>
+                    <label for="state" class="font-semibold">{{ __('marketplace.search.state') }}</label>
                     <select id="state" name="state" class="nk-select rounded-xl border border-line bg-surface px-4 py-3 pr-10 text-sm focus:border-brand-400 focus:outline-none">
-                        <option value="">Mana-mana negeri</option>
+                        <option value="">{{ __('pages.dash.mana_mana_negeri') }}</option>
                         @foreach ($states as $state)
                             <option value="{{ $state }}" @selected($filters['state'] === $state)>{{ $state }}</option>
                         @endforeach
@@ -251,24 +251,24 @@
                 </div>
 
                 <fieldset class="flex flex-col gap-3">
-                    <legend class="font-semibold">Harga bermula</legend>
-                    <p class="text-sm text-ink-muted">Harga pakej terendah vendor, dalam RM.</p>
+                    <legend class="font-semibold">{{ __('marketplace.filters.price') }}</legend>
+                    <p class="text-sm text-ink-muted">{{ __('marketplace.filters.price_hint') }}</p>
                     <div class="grid grid-cols-2 gap-3">
                         <label class="flex flex-col gap-1 rounded-xl border border-line px-4 py-2 focus-within:border-brand-400">
-                            <span class="text-xs text-ink-muted">Minimum</span>
+                            <span class="text-xs text-ink-muted">{{ __('marketplace.filters.minimum') }}</span>
                             <input type="number" name="min_price" min="0" step="50" value="{{ $filters['min_price'] }}" placeholder="0" class="bg-transparent text-sm focus:outline-none">
                         </label>
                         <label class="flex flex-col gap-1 rounded-xl border border-line px-4 py-2 focus-within:border-brand-400">
-                            <span class="text-xs text-ink-muted">Maksimum</span>
-                            <input type="number" name="max_price" min="0" step="50" value="{{ $filters['max_price'] }}" placeholder="Tiada had" class="bg-transparent text-sm focus:outline-none">
+                            <span class="text-xs text-ink-muted">{{ __('marketplace.filters.maximum') }}</span>
+                            <input type="number" name="max_price" min="0" step="50" value="{{ $filters['max_price'] }}" placeholder="{{ __('marketplace.filters.no_limit') }}" class="bg-transparent text-sm focus:outline-none">
                         </label>
                     </div>
                 </fieldset>
 
                 <fieldset class="flex flex-col gap-3">
-                    <legend class="font-semibold">Rating minimum</legend>
+                    <legend class="font-semibold">{{ __('marketplace.filters.min_rating') }}</legend>
                     <div class="flex flex-wrap gap-2">
-                        @foreach (['' => 'Semua', '4' => '4.0+', '4.5' => '4.5+', '4.8' => '4.8+'] as $value => $label)
+                        @foreach (['' => __('marketplace.filters.all'), '4' => '4.0+', '4.5' => '4.5+', '4.8' => '4.8+'] as $value => $label)
                             <label class="cursor-pointer rounded-full border border-line px-4 py-2 text-sm transition has-checked:border-brand-600 has-checked:bg-brand-600 has-checked:text-white hover:border-brand-400">
                                 <input type="radio" name="min_rating" value="{{ $value }}" class="sr-only" @checked((string) $filters['min_rating'] === (string) $value)>
                                 {{ $label }}
@@ -278,11 +278,11 @@
                 </fieldset>
 
                 <fieldset class="flex flex-col gap-3">
-                    <legend class="font-semibold">Tahap vendor</legend>
+                    <legend class="font-semibold">{{ __('marketplace.filters.tier') }}</legend>
                     <div class="flex flex-wrap gap-2">
                         <label class="cursor-pointer rounded-full border border-line px-4 py-2 text-sm transition has-checked:border-brand-600 has-checked:bg-brand-600 has-checked:text-white hover:border-brand-400">
                             <input type="radio" name="tier" value="" class="sr-only" @checked(! $filters['tier'])>
-                            Semua
+                            {{ __('marketplace.filters.all') }}
                         </label>
                         @foreach ($tiers as $tier)
                             <label class="cursor-pointer rounded-full border border-line px-4 py-2 text-sm transition has-checked:border-brand-600 has-checked:bg-brand-600 has-checked:text-white hover:border-brand-400">
@@ -294,7 +294,7 @@
                 </fieldset>
 
                 <div class="flex flex-col gap-2">
-                    <label for="sort" class="font-semibold">Susunan</label>
+                    <label for="sort" class="font-semibold">{{ __('marketplace.filters.order') }}</label>
                     <select id="sort" name="sort" class="nk-select rounded-xl border border-line bg-surface px-4 py-3 pr-10 text-sm focus:border-brand-400 focus:outline-none">
                         @foreach ($sorts as $value => $label)
                             <option value="{{ $value }}" @selected($filters['sort'] === $value)>{{ $label }}</option>
@@ -304,8 +304,8 @@
             </div>
 
             <div class="flex items-center justify-between border-t border-line px-6 py-4">
-                <a href="{{ route('vendors.index') }}" class="text-sm font-medium underline underline-offset-4">Buang semua</a>
-                <button type="submit" class="rounded-full bg-brand-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-brand-700">Tunjuk vendor</button>
+                <a href="{{ route('vendors.index') }}" class="text-sm font-medium underline underline-offset-4">{{ __('marketplace.filters.clear') }}</a>
+                <button type="submit" class="rounded-full bg-brand-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-brand-700">{{ __('marketplace.filters.show') }}</button>
             </div>
         </form>
     </dialog>

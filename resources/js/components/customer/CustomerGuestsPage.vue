@@ -49,9 +49,7 @@ const tones = {
         <UiStatCard v-for="stat in stats" :key="stat.label" v-bind="stat" />
     </div>
 
-    <p v-if="cardNotice" class="mt-4 rounded-2xl border border-line bg-surface-muted p-4 text-sm text-ink-muted">
-        Kad jemputan belum diterbitkan, jadi pautan peribadi belum boleh dikongsi.
-        <a :href="cardNotice.url" class="font-medium text-brand-700 hover:underline">Sediakan kad jemputan</a>.
+    <p v-if="cardNotice" class="mt-4 rounded-2xl border border-line bg-surface-muted p-4 text-sm text-ink-muted">{{ $t('guests.kad_jemputan_belum_diterbitkan_jadi') }}<a :href="cardNotice.url" class="font-medium text-brand-700 hover:underline">{{ $t('guests.sediakan_kad_jemputan') }}</a>.
     </p>
 
     <ul v-if="importErrors.length" class="mt-4 flex flex-col gap-1 rounded-2xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900">
@@ -61,64 +59,64 @@ const tones = {
     <div class="mt-6 grid gap-4 lg:grid-cols-2">
         <form :action="storeUrl" method="POST" class="flex flex-col gap-3 rounded-2xl border border-line bg-surface-raised p-5">
             <input type="hidden" name="_token" :value="csrf">
-            <h2 class="font-display text-lg font-semibold">Tambah tetamu</h2>
+            <h2 class="font-display text-lg font-semibold">{{ $t('guests.tambah_tetamu') }}</h2>
 
             <div class="grid gap-3 sm:grid-cols-2">
                 <label class="flex min-w-0 flex-col gap-1.5">
-                    <span class="text-sm font-medium">Nama</span>
+                    <span class="text-sm font-medium">{{ $t('guests.nama') }}</span>
                     <input type="text" name="name" required class="rounded-xl border border-line bg-surface px-4 py-2.5 text-sm focus:border-brand-400 focus:outline-none">
                 </label>
                 <label class="flex min-w-0 flex-col gap-1.5">
-                    <span class="text-sm font-medium">Nombor telefon</span>
+                    <span class="text-sm font-medium">{{ $t('guests.nombor_telefon') }}</span>
                     <input type="tel" name="phone" placeholder="012-345 6789" class="rounded-xl border border-line bg-surface px-4 py-2.5 text-sm focus:border-brand-400 focus:outline-none">
                 </label>
             </div>
 
             <div class="grid gap-3 sm:grid-cols-3">
                 <label class="flex min-w-0 flex-col gap-1.5">
-                    <span class="text-sm font-medium">Pihak</span>
+                    <span class="text-sm font-medium">{{ $t('guests.pihak') }}</span>
                     <select name="side" class="nk-select rounded-xl border border-line bg-surface px-3 py-2.5 pr-9 text-sm focus:border-brand-400 focus:outline-none">
                         <option v-for="side in sides" :key="side.value" :value="side.value">{{ side.label }}</option>
                     </select>
                 </label>
                 <label class="flex min-w-0 flex-col gap-1.5">
-                    <span class="text-sm font-medium">Kumpulan</span>
+                    <span class="text-sm font-medium">{{ $t('guests.kumpulan') }}</span>
                     <select name="group" class="nk-select rounded-xl border border-line bg-surface px-3 py-2.5 pr-9 text-sm focus:border-brand-400 focus:outline-none">
                         <option v-for="group in groups" :key="group.value" :value="group.value">{{ group.label }}</option>
                     </select>
                 </label>
                 <label class="flex min-w-0 flex-col gap-1.5">
-                    <span class="text-sm font-medium">Jemputan (pax)</span>
+                    <span class="text-sm font-medium">{{ $t('guests.jemputan_pax') }}</span>
                     <input type="number" name="pax_invited" value="1" min="1" max="20" class="rounded-xl border border-line bg-surface px-3 py-2.5 text-sm focus:border-brand-400 focus:outline-none">
                 </label>
             </div>
 
             <p v-if="errors.name" class="text-xs text-brand-700">{{ errors.name }}</p>
 
-            <button type="submit" class="w-fit rounded-full bg-brand-600 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700">Tambah tetamu</button>
+            <button type="submit" class="w-fit rounded-full bg-brand-600 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700">{{ $t('guests.tambah_tetamu_2') }}</button>
         </form>
 
         <form :action="importUrl" method="POST" class="flex flex-col gap-3 rounded-2xl border border-line bg-surface-raised p-5">
             <input type="hidden" name="_token" :value="csrf">
-            <h2 class="font-display text-lg font-semibold">Tampal senarai sedia ada</h2>
-            <p class="text-sm text-ink-muted">Satu tetamu satu baris: <code class="text-xs">nama, telefon, pihak, kumpulan, pax</code>. Medan selepas nama boleh dikosongkan.</p>
+            <h2 class="font-display text-lg font-semibold">{{ $t('guests.tampal_senarai_sedia_ada') }}</h2>
+            <p class="text-sm text-ink-muted">{{ $t('guests.satu_tetamu_satu_baris') }}<code class="text-xs">nama, telefon, pihak, kumpulan, pax</code>. Medan selepas nama boleh dikosongkan.</p>
 
             <textarea
                 name="rows"
                 rows="6"
-                placeholder="Aina Sofea, 0123456789, bride, family, 2&#10;Pak Long Rahim, , groom, family, 4"
+                :placeholder="$t('guests.aina_sofea_0123456789_bride_family')"
                 class="rounded-xl border border-line bg-surface px-4 py-2.5 font-mono text-xs focus:border-brand-400 focus:outline-none"
             ></textarea>
 
             <div class="grid gap-3 sm:grid-cols-2">
                 <label class="flex min-w-0 flex-col gap-1.5">
-                    <span class="text-sm font-medium">Pihak (jika kosong)</span>
+                    <span class="text-sm font-medium">{{ $t('guests.pihak_jika_kosong') }}</span>
                     <select name="side" class="nk-select rounded-xl border border-line bg-surface px-3 py-2.5 pr-9 text-sm focus:border-brand-400 focus:outline-none">
                         <option v-for="side in sides" :key="side.value" :value="side.value">{{ side.label }}</option>
                     </select>
                 </label>
                 <label class="flex min-w-0 flex-col gap-1.5">
-                    <span class="text-sm font-medium">Kumpulan (jika kosong)</span>
+                    <span class="text-sm font-medium">{{ $t('guests.kumpulan_jika_kosong') }}</span>
                     <select name="group" class="nk-select rounded-xl border border-line bg-surface px-3 py-2.5 pr-9 text-sm focus:border-brand-400 focus:outline-none">
                         <option v-for="group in groups" :key="group.value" :value="group.value" :selected="group.value === 'other'">{{ group.label }}</option>
                     </select>
@@ -127,7 +125,7 @@ const tones = {
 
             <p v-if="errors.rows" class="text-xs text-brand-700">{{ errors.rows }}</p>
 
-            <button type="submit" class="w-fit rounded-full border border-line px-6 py-2.5 text-sm font-semibold transition hover:border-brand-400">Import senarai</button>
+            <button type="submit" class="w-fit rounded-full border border-line px-6 py-2.5 text-sm font-semibold transition hover:border-brand-400">{{ $t('guests.import_senarai') }}</button>
         </form>
     </div>
 
@@ -135,8 +133,8 @@ const tones = {
         <UiEmptyState
             v-if="!guests.length"
             icon="🧑‍🤝‍🧑"
-            title="Senarai tetamu masih kosong"
-            message="Tambah tetamu satu per satu, atau tampal senarai dari Excel atau WhatsApp. Setiap tetamu dapat pautan kad peribadi mereka sendiri."
+            :title="$t('guests.senarai_tetamu_masih_kosong')"
+            :message="$t('guests.tambah_tetamu_satu_per_satu')"
         />
 
         <ul v-else class="flex flex-col gap-3">
@@ -145,7 +143,7 @@ const tones = {
                     <p class="flex flex-wrap items-center gap-2 font-medium">
                         {{ guest.name }}
                         <span :class="['rounded-full px-2 py-0.5 text-xs font-semibold', tones[guest.status_tone]]">{{ guest.status }}</span>
-                        <span v-if="guest.duplicate" class="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-900">Kemungkinan duplikasi</span>
+                        <span v-if="guest.duplicate" class="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-900">{{ $t('guests.kemungkinan_duplikasi') }}</span>
                     </p>
 
                     <p class="flex flex-wrap items-center gap-x-3 text-sm text-ink-muted">
@@ -164,7 +162,7 @@ const tones = {
                             <input type="hidden" name="_token" :value="csrf">
                             <input type="hidden" name="_method" value="PUT">
                             <input type="hidden" name="detach" value="1">
-                            <button type="submit" class="text-xs font-medium text-ink-muted underline hover:text-brand-700">Bukan orang ini? Buang padanan</button>
+                            <button type="submit" class="text-xs font-medium text-ink-muted underline hover:text-brand-700">{{ $t('guests.bukan_orang_ini_buang_padanan') }}</button>
                         </form>
 
                         <p v-if="guest.rsvp.message" class="mt-1 text-sm text-ink-muted italic">“{{ guest.rsvp.message }}”</p>
@@ -183,41 +181,41 @@ const tones = {
 
                         <form :action="guest.share_url" method="POST">
                             <input type="hidden" name="_token" :value="csrf">
-                            <button type="submit" class="rounded-full bg-brand-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-brand-700">WhatsApp</button>
+                            <button type="submit" class="rounded-full bg-brand-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-brand-700">{{ $t('guests.whatsapp') }}</button>
                         </form>
                     </template>
 
                     <form v-if="guest.shared_at" :action="guest.unshare_url" method="POST">
                         <input type="hidden" name="_token" :value="csrf">
                         <input type="hidden" name="_method" value="DELETE">
-                        <button type="submit" class="text-xs font-medium text-ink-muted hover:text-brand-700">Buang tanda hantar</button>
+                        <button type="submit" class="text-xs font-medium text-ink-muted hover:text-brand-700">{{ $t('guests.buang_tanda_hantar') }}</button>
                     </form>
 
                     <UiConfirm
                         :action="guest.destroy_url"
                         method="DELETE"
                         tone="danger"
-                        title="Padam tetamu ini?"
+                        :title="$t('guests.padam_tetamu_ini')"
                         :message="`${guest.name} akan dibuang dari senarai. Jawapan RSVP mereka kekal.`"
-                        confirm-label="Padam"
+                        confirm-:label="$t('guests.padam')"
                         trigger-class="text-xs font-medium text-ink-muted hover:text-brand-700"
                         :csrf="csrf"
-                    >Padam</UiConfirm>
+                    >{{ $t('guests.padam_2') }}</UiConfirm>
                 </div>
             </li>
         </ul>
     </section>
 
     <section v-if="walkIns.length" class="mt-8">
-        <h2 class="font-display text-lg font-semibold">Jawapan tanpa nama dalam senarai</h2>
-        <p class="mt-1 text-sm text-ink-muted">Jawapan ini datang tanpa pautan peribadi dan kami tidak dapat memadankannya dengan sesiapa. Ia tetap dikira melainkan anda keluarkan.</p>
+        <h2 class="font-display text-lg font-semibold">{{ $t('guests.jawapan_tanpa_nama_dalam_senarai') }}</h2>
+        <p class="mt-1 text-sm text-ink-muted">{{ $t('guests.jawapan_ini_datang_tanpa_pautan') }}</p>
 
         <ul class="mt-3 flex flex-col gap-3">
             <li v-for="rsvp in walkIns" :key="rsvp.id" class="flex flex-col gap-2 rounded-2xl border border-line bg-surface-raised p-4 sm:flex-row sm:items-center">
                 <div class="min-w-0 flex-1">
                     <p class="font-medium">
                         {{ rsvp.name }}
-                        <span v-if="!rsvp.counted" class="rounded-full bg-surface-muted px-2 py-0.5 text-xs text-ink-muted">Tidak dikira</span>
+                        <span v-if="!rsvp.counted" class="rounded-full bg-surface-muted px-2 py-0.5 text-xs text-ink-muted">{{ $t('guests.tidak_dikira') }}</span>
                     </p>
                     <p class="text-sm text-ink-muted">{{ rsvp.summary }}</p>
                     <p v-if="rsvp.message" class="mt-1 text-sm text-ink-muted italic">“{{ rsvp.message }}”</p>

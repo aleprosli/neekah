@@ -121,14 +121,14 @@ onBeforeUnmount(() => {
             >
                 <div class="flex items-center justify-between px-4 py-3 text-white sm:px-6">
                     <p class="text-sm font-medium">{{ index + 1 }} / {{ photos.length }}</p>
-                    <button type="button" class="rounded-full px-3 py-1.5 text-2xl leading-none transition hover:bg-white/10" aria-label="Tutup" @click="close">&times;</button>
+                    <button type="button" class="rounded-full px-3 py-1.5 text-2xl leading-none transition hover:bg-white/10" :aria-label="$t('common.close')" @click="close">&times;</button>
                 </div>
 
                 <div class="relative flex min-h-0 flex-1 items-center justify-center px-2 sm:px-6">
                     <button
                         type="button"
                         class="absolute left-2 hidden size-11 items-center justify-center rounded-full bg-white/10 text-2xl text-white transition hover:bg-white/20 sm:flex"
-                        aria-label="Gambar sebelum"
+                        :aria-label="$t('gallery.previous_photo')"
                         @click="previous"
                     >‹</button>
 
@@ -137,14 +137,14 @@ onBeforeUnmount(() => {
                     <button
                         type="button"
                         class="absolute right-2 hidden size-11 items-center justify-center rounded-full bg-white/10 text-2xl text-white transition hover:bg-white/20 sm:flex"
-                        aria-label="Gambar seterusnya"
+                        :aria-label="$t('gallery.next_photo')"
                         @click="next"
                     >›</button>
                 </div>
 
                 <div class="shrink-0 px-4 pt-3 pb-5 sm:px-6">
                     <p v-if="current.caption" class="mb-3 text-center text-sm text-white/80">{{ current.caption }}</p>
-                    <p class="mb-3 text-center text-xs text-white/50 sm:hidden">Leret ke kiri atau kanan untuk gambar seterusnya</p>
+                    <p class="mb-3 text-center text-xs text-white/50 sm:hidden">{{ $t('gallery.swipe_hint') }}</p>
 
                     <div class="no-scrollbar flex gap-2 overflow-x-auto">
                         <button

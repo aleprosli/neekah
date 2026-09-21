@@ -30,7 +30,7 @@
             </div>
             <input type="number" name="pax" value="{{ old('pax', $guest['pax_invited'] ?? 1) }}" min="1" max="{{ $guest['pax_invited'] ?? 20 }}" placeholder="Bilangan orang" class="nk-field w-full rounded-xl px-4 py-2.5 text-sm">
             <textarea name="message" rows="2" placeholder="Ucapan untuk pengantin" class="nk-field w-full rounded-xl px-4 py-2.5 text-sm">{{ old('message') }}</textarea>
-            <button type="submit" class="nk-button w-full rounded-full py-3 text-sm font-semibold">Hantar RSVP</button>
+            <button type="submit" class="nk-button w-full rounded-full py-3 text-sm font-semibold">{{ __('pages.card.send_rsvp') }}</button>
         </form>
 
         @if ($site->rsvp_deadline)

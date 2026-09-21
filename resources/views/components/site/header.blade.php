@@ -6,22 +6,24 @@
             <x-brand.lockup class="h-7 max-w-[42vw] object-contain sm:h-8" />
         </a>
 
-        <nav data-nav-region class="hidden items-center gap-1 text-sm font-medium md:flex" aria-label="Utama">
-            <a href="{{ route('vendors.index') }}" @class(['rounded-full px-4 py-2 transition hover:bg-surface-muted', 'bg-surface-muted text-brand-700' => request()->routeIs('vendors.*')])>Cari Vendor</a>
-            <a href="{{ route('landing') }}#cara" class="rounded-full px-4 py-2 transition hover:bg-surface-muted">Cara Ia Berfungsi</a>
-            <a href="{{ route('vendor.register') }}" class="rounded-full px-4 py-2 transition hover:bg-surface-muted">Untuk Vendor</a>
-            <a href="{{ route('blog.index') }}" @class(['rounded-full px-4 py-2 transition hover:bg-surface-muted', 'bg-surface-muted text-brand-700' => request()->routeIs('blog.*')])>Blog</a>
+        <nav data-nav-region class="hidden items-center gap-1 text-sm font-medium md:flex" aria-label="{{ __('nav.main') }}">
+            <a href="{{ route('vendors.index') }}" @class(['rounded-full px-4 py-2 transition hover:bg-surface-muted', 'bg-surface-muted text-brand-700' => App\Support\Locales::routeIs('vendors.*')])>{{ __('nav.find_vendors') }}</a>
+            <a href="{{ route('landing') }}#cara" class="rounded-full px-4 py-2 transition hover:bg-surface-muted">{{ __('nav.how_it_works') }}</a>
+            <a href="{{ route('vendor.register') }}" class="rounded-full px-4 py-2 transition hover:bg-surface-muted">{{ __('nav.for_vendors') }}</a>
+            <a href="{{ route('blog.index') }}" @class(['rounded-full px-4 py-2 transition hover:bg-surface-muted', 'bg-surface-muted text-brand-700' => App\Support\Locales::routeIs('blog.*')])>{{ __('nav.blog') }}</a>
         </nav>
 
         <div class="flex shrink-0 items-center gap-1">
+            <x-site.language-switcher class="mr-1" />
+
             @auth
                 <x-notification-bell />
                 @if (auth()->user()->isAdmin())
-                    <a href="{{ route('admin.dashboard') }}" @class(['hidden rounded-full px-4 py-2 text-sm font-medium transition hover:bg-surface-muted sm:inline', 'bg-surface-muted text-brand-700' => request()->routeIs('admin.*')])>Admin</a>
+                    <a href="{{ route('admin.dashboard') }}" @class(['hidden rounded-full px-4 py-2 text-sm font-medium transition hover:bg-surface-muted sm:inline', 'bg-surface-muted text-brand-700' => App\Support\Locales::routeIs('admin.*')])>{{ __('nav.admin') }}</a>
                 @elseif (auth()->user()->isVendor())
-                    <a href="{{ route('vendor.dashboard') }}" @class(['hidden rounded-full px-4 py-2 text-sm font-medium transition hover:bg-surface-muted sm:inline', 'bg-surface-muted text-brand-700' => request()->routeIs('vendor.*')])>Dashboard</a>
+                    <a href="{{ route('vendor.dashboard') }}" @class(['hidden rounded-full px-4 py-2 text-sm font-medium transition hover:bg-surface-muted sm:inline', 'bg-surface-muted text-brand-700' => App\Support\Locales::routeIs('vendor.*')])>{{ __('nav.dashboard') }}</a>
                 @else
-                    <a href="{{ route('dashboard') }}" @class(['hidden rounded-full px-4 py-2 text-sm font-medium transition hover:bg-surface-muted sm:inline', 'bg-surface-muted text-brand-700' => request()->routeIs('dashboard', 'weddings.*', 'bookings.*', 'enquiries.*')])>Majlis saya</a>
+                    <a href="{{ route('dashboard') }}" @class(['hidden rounded-full px-4 py-2 text-sm font-medium transition hover:bg-surface-muted sm:inline', 'bg-surface-muted text-brand-700' => App\Support\Locales::routeIs('dashboard', 'weddings.*', 'bookings.*', 'enquiries.*')])>{{ __('nav.my_wedding') }}</a>
                 @endif
                 <details data-popover class="relative">
                     <summary class="flex cursor-pointer list-none items-center gap-2 rounded-full border border-line py-1 pr-1 pl-3 text-sm font-medium select-none hover:shadow-md [&::-webkit-details-marker]:hidden">
@@ -31,25 +33,26 @@
                     <div class="absolute top-full right-0 z-20 mt-2 w-56 rounded-2xl border border-line bg-surface-raised p-2 text-sm shadow-xl shadow-brand-900/10">
                         <p class="truncate px-3 py-2 text-xs text-ink-muted">{{ auth()->user()->email }}</p>
                         @if (auth()->user()->isAdmin())
-                            <a href="{{ route('admin.dashboard') }}" class="block rounded-xl px-3 py-2 hover:bg-surface-muted">Admin panel</a>
+                            <a href="{{ route('admin.dashboard') }}" class="block rounded-xl px-3 py-2 hover:bg-surface-muted">{{ __('nav.admin_panel') }}</a>
                         @elseif (auth()->user()->isVendor())
-                            <a href="{{ route('vendor.dashboard') }}" class="block rounded-xl px-3 py-2 hover:bg-surface-muted">Dashboard vendor</a>
+                            <a href="{{ route('vendor.dashboard') }}" class="block rounded-xl px-3 py-2 hover:bg-surface-muted">{{ __('nav.vendor_dashboard') }}</a>
                         @else
-                            <a href="{{ route('dashboard') }}" class="block rounded-xl px-3 py-2 hover:bg-surface-muted">Majlis saya</a>
-                            <a href="{{ route('bookings.index') }}" class="block rounded-xl px-3 py-2 hover:bg-surface-muted">Tempahan saya</a>
-                            <a href="{{ route('enquiries.index') }}" class="block rounded-xl px-3 py-2 hover:bg-surface-muted">Enquiry</a>
+                            <a href="{{ route('dashboard') }}" class="block rounded-xl px-3 py-2 hover:bg-surface-muted">{{ __('nav.my_wedding') }}</a>
+                            <a href="{{ route('bookings.index') }}" class="block rounded-xl px-3 py-2 hover:bg-surface-muted">{{ __('nav.my_bookings') }}</a>
+                            <a href="{{ route('enquiries.index') }}" class="block rounded-xl px-3 py-2 hover:bg-surface-muted">{{ __('nav.enquiries') }}</a>
                         @endif
-                        <a href="{{ route('account.edit') }}" class="block rounded-xl px-3 py-2 hover:bg-surface-muted">Akaun saya</a>
+                        <a href="{{ route('account.edit') }}" class="block rounded-xl px-3 py-2 hover:bg-surface-muted">{{ __('nav.account') }}</a>
+
 
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
-                            <button type="submit" class="w-full rounded-xl px-3 py-2 text-left hover:bg-surface-muted">Log keluar</button>
+                            <button type="submit" class="w-full rounded-xl px-3 py-2 text-left hover:bg-surface-muted">{{ __('nav.logout') }}</button>
                         </form>
                     </div>
                 </details>
             @else
-                <a href="{{ route('login') }}" class="rounded-full px-3 py-2 text-sm font-medium whitespace-nowrap transition hover:bg-surface-muted sm:px-4">Log masuk</a>
-                <a href="{{ route('register') }}" class="rounded-full bg-brand-600 px-3 py-2 text-sm font-semibold whitespace-nowrap text-white transition hover:bg-brand-700 sm:px-4">Daftar</a>
+                <a href="{{ route('login') }}" class="rounded-full px-3 py-2 text-sm font-medium whitespace-nowrap transition hover:bg-surface-muted sm:px-4">{{ __('nav.login') }}</a>
+                <a href="{{ route('register') }}" class="rounded-full bg-brand-600 px-3 py-2 text-sm font-semibold whitespace-nowrap text-white transition hover:bg-brand-700 sm:px-4">{{ __('nav.register') }}</a>
             @endauth
         </div>
     </header>

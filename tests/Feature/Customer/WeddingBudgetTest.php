@@ -113,7 +113,10 @@ it('shows an empty chart message rather than a blank box before any booking', fu
     expect(collect($charts['committed'])->sum('value'))->toBe(0.0)
         ->and($charts['categories'])->toBe([]);
 
+    // The words are translated now, so the keys are what pin them being there.
     expect(file_get_contents(resource_path('js/components/customer/CustomerBudgetPage.vue')))
-        ->toContain('Belum ada tempahan untuk dipaparkan.')
-        ->toContain('Tempah vendor untuk melihat agihan perbelanjaan anda.');
+        ->toContain('budget.belum_ada_tempahan_untuk_dipaparkan')
+        ->toContain('budget.tempah_vendor_untuk_melihat_agihan');
+
+    expect(trans('ui.budget.belum_ada_tempahan_untuk_dipaparkan'))->toBe('Belum ada tempahan untuk dipaparkan.');
 });

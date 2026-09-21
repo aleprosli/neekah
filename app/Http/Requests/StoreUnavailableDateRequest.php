@@ -29,9 +29,9 @@ class StoreUnavailableDateRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'from' => 'tarikh mula',
-            'to' => 'tarikh akhir',
-            'reason' => 'sebab',
+            'from' => __('fields.tarikh_mula'),
+            'to' => __('fields.tarikh_akhir'),
+            'reason' => __('fields.sebab'),
         ];
     }
 }

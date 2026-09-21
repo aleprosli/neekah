@@ -15,11 +15,9 @@ defineProps({
     </div>
 
     <section class="mt-8 flex flex-col gap-4">
-        <h2 class="font-display text-xl font-semibold">Tempahan terdekat</h2>
+        <h2 class="font-display text-xl font-semibold">{{ $t('vendor_dashboard.tempahan_terdekat') }}</h2>
 
-        <p v-if="!upcoming.length" class="rounded-2xl border border-dashed border-line p-6 text-sm text-ink-muted">
-            Tiada tempahan akan datang. Booking yang dibuat pelanggan atau yang anda rekod akan muncul di sini.
-        </p>
+        <p v-if="!upcoming.length" class="rounded-2xl border border-dashed border-line p-6 text-sm text-ink-muted">{{ $t('vendor_dashboard.tiada_tempahan_akan_datang_booking') }}</p>
 
         <ul v-else class="divide-y divide-line rounded-2xl border border-line">
             <li v-for="booking in upcoming" :key="booking.reference">

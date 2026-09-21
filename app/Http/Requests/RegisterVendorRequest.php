@@ -66,15 +66,15 @@ class RegisterVendorRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'name' => 'nama',
-            'email' => 'emel',
-            'phone' => 'nombor telefon',
-            'password' => 'kata laluan',
-            'business_name' => 'nama perniagaan',
-            'category_id' => 'kategori',
-            'city' => 'bandar',
-            'state' => 'negeri',
-            'tagline' => 'tagline',
+            'name' => __('fields.nama'),
+            'email' => __('fields.emel'),
+            'phone' => __('fields.nombor_telefon'),
+            'password' => __('fields.kata_laluan'),
+            'business_name' => __('fields.nama_perniagaan'),
+            'category_id' => __('fields.kategori'),
+            'city' => __('fields.bandar'),
+            'state' => __('fields.negeri'),
+            'tagline' => __('fields.tagline'),
         ];
     }
 }

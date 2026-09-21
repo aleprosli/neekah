@@ -22,21 +22,30 @@ use Illuminate\Support\Facades\Gate;
 class BookingController extends Controller
 {
     /** Columns for components/ui/DataTable.vue, matching the keys data() returns. */
-    private const COLUMNS = [
-        ['key' => 'event_date', 'label' => 'Tarikh', 'sortable' => true],
-        ['key' => 'customer', 'label' => 'Pelanggan'],
-        ['key' => 'package_name', 'label' => 'Pakej'],
-        ['key' => 'total', 'label' => 'Jumlah', 'sort' => 'total_amount', 'sortable' => true, 'align' => 'right'],
-        ['key' => 'paid', 'label' => 'Dibayar', 'align' => 'right'],
-        ['key' => 'status', 'label' => 'Status', 'type' => 'html'],
-    ];
+    /**
+     * A constant cannot hold a function call, and these labels are
+     * translated now.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private static function columns(): array
+    {
+        return [
+            ['key' => 'event_date', 'label' => __('props.vendor.tarikh'), 'sortable' => true],
+            ['key' => 'customer', 'label' => __('props.vendor.pelanggan')],
+            ['key' => 'package_name', 'label' => __('props.vendor.pakej')],
+            ['key' => 'total', 'label' => __('props.vendor.jumlah'), 'sort' => 'total_amount', 'sortable' => true, 'align' => 'right'],
+            ['key' => 'paid', 'label' => __('props.vendor.dibayar'), 'align' => 'right'],
+            ['key' => 'status', 'label' => __('props.vendor.status'), 'type' => 'html'],
+        ];
+    }
 
     public function index(Request $request): View
     {
         $vendor = $request->user()->vendor;
 
         return view('vendor.bookings.index', [
-            'columns' => self::COLUMNS,
+            'columns' => self::columns(),
             'filters' => [TableFilter::fromEnum(
                 'status',
                 BookingStatus::cases(),
@@ -126,7 +135,7 @@ class BookingController extends Controller
 
         return redirect()
             ->route('vendor.bookings.show', $booking)
-            ->with('status', 'Booking '.$booking->reference.' direkod. Pelanggan boleh merekodkan bayaran mereka dari akaun mereka.');
+            ->with('status', __('flash.vendor.booking_recorded', ['reference' => $booking->reference]));
     }
 
     public function show(Booking $booking): View

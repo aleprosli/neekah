@@ -33,7 +33,7 @@ const points = computed(() => {
         </div>
 
         <details class="mt-2 text-xs text-ink-muted">
-            <summary class="cursor-pointer">Lihat nombor</summary>
+            <summary class="cursor-pointer">{{ $t('chart.lihat_nombor') }}</summary>
             <ul class="mt-2 flex flex-col gap-1">
                 <li v-for="row in series" :key="row.label" class="flex justify-between gap-4"><span>{{ row.label }}</span><span>{{ row.display }}</span></li>
             </ul>

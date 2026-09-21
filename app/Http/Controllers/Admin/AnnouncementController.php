@@ -48,7 +48,7 @@ class AnnouncementController extends Controller
                     'subject' => $announcement->subject,
                     'audience' => $announcement->audience->label(),
                     'recipients' => $announcement->status === AnnouncementStatus::Sent
-                        ? $announcement->recipients_count.' penerima'
+                        ? __('props.units.recipients', ['count' => $announcement->recipients_count])
                         : '—',
                     'sent_at' => $announcement->sent_at?->translatedFormat('j M Y, g:i A') ?? '—',
                     'author' => $announcement->author?->name ?? 'Admin',
@@ -115,7 +115,7 @@ class AnnouncementController extends Controller
 
         return redirect()
             ->route('admin.announcements.index')
-            ->with('status', 'Pengumuman dihantar kepada '.$this->audienceSummary($announcement).'. Emel dihantar melalui queue.');
+            ->with('status', __('flash.admin.announcement_sent', ['audience' => $this->audienceSummary($announcement)]));
     }
 
     public function show(Announcement $announcement): View
@@ -133,11 +133,11 @@ class AnnouncementController extends Controller
                     'action_url' => $announcement->hasAction() ? $announcement->action_url : null,
                 ],
                 'facts' => [
-                    ['label' => 'Penerima', 'value' => $announcement->audience->label()],
-                    ['label' => 'Dihantar kepada', 'value' => $sent ? $announcement->recipients_count.' penerima' : '—'],
-                    ['label' => 'Status', 'value' => $announcement->status->label(), 'tone' => $announcement->status->tone()],
-                    ['label' => 'Tarikh hantar', 'value' => $announcement->sent_at?->translatedFormat('j M Y, g:i A') ?? '—'],
-                    ['label' => 'Ditulis oleh', 'value' => $announcement->author?->name ?? 'Admin'],
+                    ['label' => __('props.admin.penerima'), 'value' => $announcement->audience->label()],
+                    ['label' => __('props.admin.dihantar_kepada'), 'value' => $sent ? __('props.units.recipients', ['count' => $announcement->recipients_count]) : '—'],
+                    ['label' => __('props.admin.status'), 'value' => $announcement->status->label(), 'tone' => $announcement->status->tone()],
+                    ['label' => __('props.admin.tarikh_hantar'), 'value' => $announcement->sent_at?->translatedFormat('j M Y, g:i A') ?? '—'],
+                    ['label' => __('props.admin.ditulis_oleh'), 'value' => $announcement->author?->name ?? 'Admin'],
                 ],
                 // Accounts first, then the addresses that belong to nobody.
                 'recipients' => $announcement->audience->isCustom()
@@ -166,7 +166,7 @@ class AnnouncementController extends Controller
         // only carry a model it can load back from the database.
         $request->user()->notifyNow(new AnnouncementPublished($draft, mailOnly: true));
 
-        return back()->with('status', 'Ujian dihantar ke '.$request->user()->email.'.');
+        return back()->with('status', __('flash.admin.test_sent', ['email' => $request->user()->email]));
     }
 
     private function audienceSummary(Announcement $announcement): string

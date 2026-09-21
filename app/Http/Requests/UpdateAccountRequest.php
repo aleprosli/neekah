@@ -41,10 +41,10 @@ class UpdateAccountRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'name' => 'nama',
-            'phone' => 'nombor telefon',
-            'email' => 'emel',
-            'current_password' => 'kata laluan semasa',
+            'name' => __('fields.nama'),
+            'phone' => __('fields.nombor_telefon'),
+            'email' => __('fields.emel'),
+            'current_password' => __('fields.kata_laluan_semasa'),
         ];
     }
 
@@ -54,7 +54,7 @@ class UpdateAccountRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'current_password.required' => 'Masukkan kata laluan semasa anda untuk menukar emel.',
+            'current_password.required' => __('validation.custom.current_password_to_change_email'),
         ];
     }
 }

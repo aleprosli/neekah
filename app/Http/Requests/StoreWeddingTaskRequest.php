@@ -32,10 +32,10 @@ class StoreWeddingTaskRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'title' => 'tugasan',
-            'category_id' => 'kategori',
-            'due_date' => 'tarikh akhir',
-            'notes' => 'nota',
+            'title' => __('fields.tugasan'),
+            'category_id' => __('fields.kategori'),
+            'due_date' => __('fields.tarikh_akhir'),
+            'notes' => __('fields.nota'),
         ];
     }
 }

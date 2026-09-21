@@ -67,3 +67,35 @@ function lastmodFor($test, Vendor $vendor): ?string
 
     return null;
 }
+
+it('offers every page in both languages, each naming the other', function () {
+    $this->seed(CategorySeeder::class);
+    $vendor = Vendor::factory()->create();
+
+    $xml = $this->get(route('sitemap.pages'))->assertOk()->getContent();
+
+    // The English pages are linked from nowhere outside the site, so if the
+    // sitemap leaves them out they are never found at all.
+    expect($xml)
+        ->toContain('<loc>'.route('landing').'</loc>')
+        ->toContain('<loc>'.url()->routeIn('en', 'landing').'</loc>')
+        ->toContain('hreflang="en-MY"')
+        ->toContain('hreflang="x-default"');
+
+    expect(simplexml_load_string($xml))->not->toBeFalse();
+});
+
+it('lists the Malay addresses even when an English page was served first', function () {
+    $this->seed(CategorySeeder::class);
+
+    // The sitemap routes carry no locale middleware, so they used to inherit
+    // whatever language the last request left behind — and a worker that had
+    // just served /en would publish a sitemap of nothing but /en addresses.
+    $this->get('/en')->assertOk();
+
+    // Written out rather than built with route(), which would itself come back
+    // in whatever language the request left behind and assert nothing.
+    expect($this->get('/sitemap-pages.xml')->assertOk()->getContent())
+        ->toContain('<loc>'.config('app.url').'</loc>')
+        ->toContain('<loc>'.config('app.url').'/blog</loc>');
+});

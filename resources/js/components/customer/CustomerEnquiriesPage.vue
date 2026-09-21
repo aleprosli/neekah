@@ -14,9 +14,9 @@ defineProps({
     <UiEmptyState
         v-if="!enquiries.length"
         icon="💬"
-        title="Belum ada enquiry"
-        message="Tanya vendor tentang pakej, tarikh atau harga sebelum menempah."
-        action-label="Cari vendor"
+        :title="$t('customer.no_enquiries_title')"
+        :message="$t('customer.tanya_vendor_tentang_pakej_tarikh')"
+        :action-label="$t('common.find_vendors')"
         :action-url="findVendorsUrl"
     />
 
@@ -29,7 +29,7 @@ defineProps({
                     <div class="min-w-0 flex-1">
                         <div class="flex items-center gap-2">
                             <p class="truncate font-medium">{{ enquiry.vendor }}</p>
-                            <span v-if="enquiry.replied" class="rounded-full bg-emerald-100 px-2 py-0.5 text-[11px] font-semibold text-emerald-800">Dibalas</span>
+                            <span v-if="enquiry.replied" class="rounded-full bg-emerald-100 px-2 py-0.5 text-[11px] font-semibold text-emerald-800">{{ $t('customer.replied') }}</span>
                         </div>
                         <p class="truncate text-sm text-ink-muted">{{ enquiry.message }}</p>
                     </div>

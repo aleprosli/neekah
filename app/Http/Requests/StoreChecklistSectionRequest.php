@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Support\Locales;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreChecklistSectionRequest extends FormRequest
@@ -17,9 +18,12 @@ class StoreChecklistSectionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => ['required', 'string', 'max:80'],
+            'title' => ['required', 'array'],
+            'title.'.Locales::DEFAULT => ['required', 'string', 'max:80'],
+            'title.*' => ['nullable', 'string', 'max:80'],
             'icon' => ['nullable', 'string', 'max:8'],
-            'note' => ['nullable', 'string', 'max:500'],
+            'note' => ['nullable', 'array'],
+            'note.*' => ['nullable', 'string', 'max:500'],
             'is_active' => ['nullable', 'boolean'],
         ];
     }
@@ -41,9 +45,9 @@ class StoreChecklistSectionRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'title' => 'nama fasa',
-            'icon' => 'ikon',
-            'note' => 'nota',
+            'title.'.Locales::DEFAULT => __('fields.nama_fasa'),
+            'icon' => __('fields.ikon'),
+            'note' => __('fields.nota'),
         ];
     }
 }

@@ -4,6 +4,7 @@ namespace App\Notifications;
 
 use App\Enums\ViolationAction;
 use App\Models\VendorViolation;
+use App\Support\NeekahMail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -30,8 +31,10 @@ class VendorViolationRecorded extends Notification implements ShouldQueue
     {
         return [
             'icon' => '⚠️',
-            'title' => "Pelanggaran disahkan: {$this->violation->action->label()}",
-            'body' => "{$this->violation->type->label()} · pelanggaran ke-{$this->violation->offence_number}.",
+            'title_key' => 'notifications.violation.title',
+            'title_params' => ['action' => $this->violation->action->label()],
+            'body_key' => 'notifications.violation.body',
+            'body_params' => ['type' => $this->violation->type->label(), 'number' => $this->violation->offence_number],
             'url' => route('vendor.dashboard'),
         ];
     }
@@ -40,26 +43,24 @@ class VendorViolationRecorded extends Notification implements ShouldQueue
     {
         $action = $this->violation->action;
 
-        $message = (new MailMessage)
-            ->subject('Pelanggaran direkod: '.$action->label())
-            ->greeting('Hai '.$notifiable->name.',')
-            ->line('Satu laporan terhadap '.$this->violation->vendor->name.' telah disahkan oleh admin.')
-            ->line('Jenis pelanggaran: '.$this->violation->type->label())
-            ->line('Pelanggaran ke-'.$this->violation->offence_number.' · Tindakan: '.$action->label());
+        $message = NeekahMail::to($notifiable)
+            ->subject(__('notifications.violation.subject', ['action' => $action->label()]))
+            ->line(__('notifications.violation.intro', ['vendor' => $this->violation->vendor->name]))
+            ->line(__('notifications.violation.type', ['type' => $this->violation->type->label()]))
+            ->line(__('notifications.violation.number', ['number' => $this->violation->offence_number, 'action' => $action->label()]));
 
         if ($this->violation->admin_note) {
-            $message->line('Nota admin: '.$this->violation->admin_note);
+            $message->line(__('notifications.violation.admin_note', ['note' => $this->violation->admin_note]));
         }
 
         $message->line(match ($action) {
-            ViolationAction::Warning => 'Ini adalah amaran pertama. Pastikan semua booking dan pembayaran direkod melalui platform.',
-            ViolationAction::PointDeduction => 'Point anda dipotong dan ranking diturunkan satu tahap.',
-            ViolationAction::Suspension => 'Akaun anda digantung sementara dan tidak dipaparkan di marketplace.',
-            ViolationAction::Removal => 'Akaun anda telah disingkirkan daripada marketplace kerana pelanggaran berulang.',
+            ViolationAction::Warning => __('notifications.violation.warning'),
+            ViolationAction::PointDeduction => __('notifications.violation.point_deduction'),
+            ViolationAction::Suspension => __('notifications.violation.suspension'),
+            ViolationAction::Removal => __('notifications.violation.removal'),
         });
 
         return $message
-            ->action('Buka dashboard', route('vendor.dashboard'))
-            ->salutation('Terima kasih, Neekah');
+            ->action(__('notifications.actions.open_dashboard'), route('vendor.dashboard'));
     }
 }

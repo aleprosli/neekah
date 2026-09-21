@@ -1,4 +1,4 @@
-@props(['series' => [], 'format' => null, 'empty' => 'Tiada data untuk tempoh ini.'])
+@props(['series' => [], 'format' => null, 'empty' => __('pages.tables.tiada_data_untuk_tempoh_ini_2')])
 
 @php
     $rows = collect($series)->values()->filter(fn ($row) => (float) $row['value'] > 0)->values();

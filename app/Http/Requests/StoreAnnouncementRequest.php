@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use App\Enums\AnnouncementAudience;
 use App\Models\User;
+use App\Support\Locales;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -50,7 +51,7 @@ class StoreAnnouncementRequest extends FormRequest
                 }
 
                 // A test send goes to the admin alone, so it needs no recipients yet.
-                if ($this->routeIs('admin.announcements.store') && $this->input('user_ids', []) === [] && $this->typedAddresses()->isEmpty()) {
+                if (Locales::routeIs('admin.announcements.store') && $this->input('user_ids', []) === [] && $this->typedAddresses()->isEmpty()) {
                     $validator->errors()->add('user_ids', 'Pilih sekurang-kurangnya seorang penerima, atau taip satu alamat emel.');
                 }
             },
@@ -84,13 +85,13 @@ class StoreAnnouncementRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'audience' => 'penerima',
-            'subject' => 'tajuk',
-            'body' => 'isi kandungan',
-            'user_ids' => 'penerima',
-            'emails' => 'alamat emel',
-            'action_label' => 'teks butang',
-            'action_url' => 'pautan butang',
+            'audience' => __('fields.penerima'),
+            'subject' => __('fields.tajuk'),
+            'body' => __('fields.isi_kandungan'),
+            'user_ids' => __('fields.penerima'),
+            'emails' => __('fields.alamat_emel'),
+            'action_label' => __('fields.teks_butang'),
+            'action_url' => __('fields.pautan_butang'),
         ];
     }
 }

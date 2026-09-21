@@ -3,8 +3,10 @@
 namespace App\Models;
 
 use App\Enums\UserRole;
+use App\Support\Locales;
 use App\Support\PhoneNumber;
 use Database\Factories\UserFactory;
+use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -15,9 +17,9 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Lab404\Impersonate\Models\Impersonate;
 
-#[Fillable(['name', 'email', 'password', 'role', 'phone', 'google_id', 'avatar_url', 'deactivated_at'])]
+#[Fillable(['name', 'email', 'password', 'role', 'phone', 'locale', 'google_id', 'avatar_url', 'deactivated_at'])]
 #[Hidden(['password', 'remember_token'])]
-class User extends Authenticatable
+class User extends Authenticatable implements HasLocalePreference
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, Impersonate, Notifiable;
@@ -150,5 +152,17 @@ class User extends Authenticatable
             $this->isVendor() => route('vendor.dashboard'),
             default => route('dashboard'),
         };
+    }
+
+    /**
+     * Which language to write to this person in.
+     *
+     * Laravel reads this when it queues a mail notification, so the email is
+     * rendered in their language rather than whichever one happened to be
+     * being served when the job ran.
+     */
+    public function preferredLocale(): ?string
+    {
+        return Locales::supported($this->locale) ? $this->locale : null;
     }
 }

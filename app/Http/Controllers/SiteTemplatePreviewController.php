@@ -20,8 +20,8 @@ class SiteTemplatePreviewController extends Controller
         $templates = SiteTemplate::active()->ordered()->get();
         $style = $request->string('style')->toString();
 
-        $seo->title($style ? 'Template kad jemputan '.$style : 'Template kad kahwin digital')
-            ->description('Pilih daripada '.$templates->count().' reka bentuk kad jemputan digital. Setiap kad datang dengan alamat web sendiri, RSVP, atur cara dan peta lokasi.')
+        $seo->title($style ? __('seo.templates.title_style', ['style' => $style]) : __('seo.templates.title'))
+            ->description(__('seo.templates.description', ['count' => $templates->count()]))
             ->canonical(url()->current().($style ? '?'.http_build_query(['style' => $style]) : ''));
 
         return view('sites.templates', [
@@ -43,8 +43,8 @@ class SiteTemplatePreviewController extends Controller
             RenderInvitationPreview::WIDTH,
             RenderInvitationPreview::HEIGHT,
         )
-            ->title('Kad jemputan '.$template->name)
-            ->description('Contoh kad jemputan digital reka bentuk '.$template->name.'. Gaya '.$template->style.', dengan animasi pembuka, kiraan detik, RSVP dan peta.');
+            ->title(__('seo.templates.show_title', ['name' => $template->name]))
+            ->description(__('seo.templates.show_description', ['name' => $template->name, 'style' => $template->style]));
 
         return view('sites.show', [
             'site' => $this->sample($template),

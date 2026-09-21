@@ -24,6 +24,9 @@ class UpdateSeoSettingsRequest extends FormRequest
             'tagline' => ['required', 'string', 'max:'.SeoSettings::TAGLINE_LIMIT],
             'description' => ['required', 'string', 'min:50', 'max:'.Seo::DESCRIPTION_LIMIT],
             'twitter' => ['nullable', 'string', 'max:30', 'regex:/^@?[A-Za-z0-9_]+$/'],
+            // Optional: an empty English field falls back to the Malay one.
+            'tagline_en' => ['nullable', 'string', 'max:'.SeoSettings::TAGLINE_LIMIT],
+            'description_en' => ['nullable', 'string', 'min:50', 'max:'.Seo::DESCRIPTION_LIMIT],
         ];
     }
 
@@ -33,9 +36,11 @@ class UpdateSeoSettingsRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'tagline' => 'tagline',
-            'description' => 'penerangan',
-            'twitter' => 'akaun X',
+            'tagline' => __('fields.tagline'),
+            'description' => __('fields.penerangan'),
+            'twitter' => __('fields.akaun_x'),
+            'tagline_en' => __('fields.tagline_english'),
+            'description_en' => __('fields.penerangan_english'),
         ];
     }
 
@@ -45,7 +50,7 @@ class UpdateSeoSettingsRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'twitter.regex' => 'Akaun X hanya boleh mengandungi huruf, nombor dan garis bawah.',
+            'twitter.regex' => __('validation.custom.twitter_handle'),
         ];
     }
 }

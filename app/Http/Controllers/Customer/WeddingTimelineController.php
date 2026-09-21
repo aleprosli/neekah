@@ -56,7 +56,7 @@ class WeddingTimelineController extends Controller
     {
         $wedding->timelineItems()->create($request->validated());
 
-        return back()->with('status', 'Aktiviti ditambah ke timeline.');
+        return back()->with('status', __('flash.couple.timeline_added'));
     }
 
     public function update(StoreTimelineItemRequest $request, Wedding $wedding, WeddingTimelineItem $item): RedirectResponse
@@ -65,7 +65,7 @@ class WeddingTimelineController extends Controller
 
         $item->update($request->validated());
 
-        return back()->with('status', 'Aktiviti dikemas kini.');
+        return back()->with('status', __('flash.couple.timeline_updated'));
     }
 
     public function destroy(Wedding $wedding, WeddingTimelineItem $item): RedirectResponse
@@ -75,7 +75,7 @@ class WeddingTimelineController extends Controller
 
         $item->delete();
 
-        return back()->with('status', 'Aktiviti dipadam.');
+        return back()->with('status', __('flash.couple.timeline_deleted'));
     }
 
     /**

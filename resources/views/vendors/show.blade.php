@@ -63,7 +63,7 @@
                 <div class="flex items-center gap-4 py-6">
                     <x-vendor-avatar :vendor="$vendor" class="size-12 text-lg" />
                     <div class="min-w-0">
-                        <p class="font-semibold">Dikendalikan oleh {{ $vendor->name }}</p>
+                        <p class="font-semibold">{{ __('pages.profile.run_by', ['name' => $vendor->name]) }}</p>
                         <p class="text-sm text-ink-muted">@if ($vendor->tier === VendorTier::Recommended)🏆 @endif{{ $vendor->tier->label() }} Vendor · Response rate {{ $vendor->responseRateLabel() }}</p>
                     </div>
                 </div>
@@ -74,7 +74,7 @@
                 <div class="flex flex-col gap-4 py-6">
                     @if ($extraCategories->isNotEmpty())
                         <div class="flex flex-col gap-2">
-                            <p class="text-sm font-medium">Juga menawarkan</p>
+                            <p class="text-sm font-medium">{{ __('pages.profile.juga_menawarkan') }}</p>
                             <ul class="flex flex-wrap gap-2 text-xs font-semibold">
                                 @foreach ($extraCategories as $extra)
                                     <li><a href="{{ route('vendors.index', ['category' => $extra->slug]) }}" class="block rounded-full border border-line px-3.5 py-2 transition hover:border-brand-400"><x-category-icon class="inline-block size-4 shrink-0 align-[-0.25em]" :category="$extra" /> {{ $extra->name }}</a></li>
@@ -84,7 +84,7 @@
                     @endif
 
                     <div class="flex flex-col gap-2">
-                        <p class="text-sm font-medium">Kawasan perkhidmatan</p>
+                        <p class="text-sm font-medium">{{ __('pages.profile.kawasan_perkhidmatan') }}</p>
                         <ul class="flex flex-wrap gap-2 text-xs font-semibold">
                             @foreach ($vendor->serviceStates() as $serviceState)
                                 <li><a href="{{ route('vendors.index', ['state' => $serviceState]) }}" @class(['flex items-center gap-2 rounded-full border px-3.5 py-2 transition hover:border-brand-400', 'border-brand-300 bg-brand-50 text-brand-700' => $serviceState === $vendor->state, 'border-line' => $serviceState !== $vendor->state])><x-state-flag :state="$serviceState" /> {{ $serviceState }}</a></li>
@@ -108,7 +108,7 @@
 
                 {{-- Highlights --}}
                 <ul class="flex flex-col gap-5 py-6">
-                    @foreach ([['💬', 'Berhubung terus dengan vendor', 'Hantar enquiry atau WhatsApp mereka sendiri. Neekah tidak mengambil komisen dan tidak memegang bayaran anda.'], ['⚡', 'Response rate '.$vendor->responseRateLabel(), $vendor->response_rate === null ? 'Vendor ini belum menerima cukup enquiry untuk kami mengukur kadar balasan mereka.' : 'Diukur dari enquiry yang diterima melalui Neekah.'], ['★', $publishedReviewsCount.' review', 'Sesiapa boleh menulis review di sini; yang datang daripada tempahan disahkan ditandakan berasingan.']] as [$icon, $title, $text])
+                    @foreach ([['💬', __('pages.profile.highlight_contact'), __('pages.profile.highlight_contact_detail')], ['⚡', __('pages.profile.highlight_response', ['rate' => $vendor->responseRateLabel()]), $vendor->response_rate === null ? __('pages.profile.highlight_response_none') : __('pages.profile.highlight_response_detail')], ['★', __('pages.profile.highlight_reviews', ['count' => $publishedReviewsCount]), __('pages.profile.highlight_reviews_detail')]] as [$icon, $title, $text])
                         <li class="flex gap-4">
                             <span class="w-6 shrink-0 text-center text-xl leading-6">{{ $icon }}</span>
                             <div class="min-w-0">
@@ -126,7 +126,7 @@
 
                 {{-- Packages --}}
                 <section id="pakej" class="flex flex-col gap-4 py-6">
-                    <h2 class="font-display text-2xl font-semibold">Pakej yang ditawarkan</h2>
+                    <h2 class="font-display text-2xl font-semibold">{{ __('pages.profile.pakej_yang_ditawarkan') }}</h2>
                     <div class="grid gap-4 sm:grid-cols-2 [&>article]:min-w-0">
                         @forelse ($vendor->packages as $package)
                             <article class="flex flex-col overflow-hidden rounded-2xl border border-line transition hover:border-brand-300">
@@ -152,7 +152,7 @@
                                 </div>
                             </article>
                         @empty
-                            <p class="text-sm text-ink-muted">Vendor ini belum menambah pakej.</p>
+                            <p class="text-sm text-ink-muted">{{ __('pages.profile.vendor_ini_belum_menambah_pakej') }}</p>
                         @endforelse
                     </div>
                 </section>
@@ -160,7 +160,7 @@
                 {{-- Reviews --}}
                 <section id="review" class="flex flex-col gap-6 py-6">
                     <div class="flex flex-col gap-2">
-                        <h2 class="font-display text-2xl font-semibold">Review</h2>
+                        <h2 class="font-display text-2xl font-semibold">{{ __('pages.profile.review') }}</h2>
                         {{-- Two numbers, never merged. Only the booking-backed
                              ones move the vendor's rating and ranking, so a page
                              that showed one combined average would be claiming
@@ -176,7 +176,7 @@
                     </div>
 
                     @if ($vendor->reviews->isEmpty())
-                        <p class="text-sm text-ink-muted">Belum ada review. Jadi yang pertama menulis tentang {{ $vendor->name }}.</p>
+                        <p class="text-sm text-ink-muted">{{ __('pages.profile.no_reviews', ['name' => $vendor->name]) }}</p>
                     @else
                         <ul class="grid gap-8 sm:grid-cols-2 [&>li]:min-w-0">
                             @foreach ($vendor->reviews as $review)
@@ -231,7 +231,7 @@
                 @if (config('neekah.bookings_enabled'))
                     <form method="POST" action="{{ route('vendors.bookings.store', $vendor) }}" class="flex flex-col gap-4 rounded-2xl border border-line bg-surface-raised p-6 shadow-xl shadow-brand-900/10">
                         @csrf
-                        <p class="text-sm text-ink-muted">Dari <span class="font-display text-2xl font-semibold text-ink">RM{{ number_format($vendor->price_from) }}</span> / {{ $vendor->price_unit->label() }}</p>
+                        <p class="text-sm text-ink-muted">{{ __('pages.profile.dari') }}<span class="font-display text-2xl font-semibold text-ink">RM{{ number_format($vendor->price_from) }}</span> / {{ $vendor->price_unit->label() }}</p>
 
                         @if ($errors->any())
                             <ul class="flex flex-col gap-1 rounded-xl bg-brand-50 p-3 text-xs text-brand-800">
@@ -243,11 +243,11 @@
 
                         <div class="overflow-hidden rounded-xl border border-line">
                             <label class="flex flex-col gap-0.5 border-b border-line px-4 py-2.5 focus-within:bg-surface-muted">
-                                <span class="text-[10px] font-semibold tracking-wide uppercase">Tarikh majlis</span>
+                                <span class="text-[10px] font-semibold tracking-wide uppercase">{{ __('pages.profile.tarikh_majlis') }}</span>
                                 <input type="date" name="event_date" value="{{ old('event_date', $defaultEventDate ?? '') }}" min="{{ now()->addDay()->toDateString() }}" required class="bg-transparent text-sm focus:outline-none">
                             </label>
                             <label class="flex flex-col gap-0.5 border-b border-line px-4 py-2.5 focus-within:bg-surface-muted">
-                                <span class="text-[10px] font-semibold tracking-wide uppercase">Pakej</span>
+                                <span class="text-[10px] font-semibold tracking-wide uppercase">{{ __('pages.profile.pakej') }}</span>
                                 <select name="package_id" class="nk-select w-full bg-transparent pr-6 text-sm focus:outline-none" required>
                                     @foreach ($vendor->packages as $package)
                                         <option value="{{ $package->id }}" @selected((int) old('package_id') === $package->id)>{{ $package->name }} · RM{{ number_format($package->price) }}</option>
@@ -255,15 +255,15 @@
                                 </select>
                             </label>
                             <label class="flex flex-col gap-0.5 px-4 py-2.5 focus-within:bg-surface-muted">
-                                <span class="text-[10px] font-semibold tracking-wide uppercase">Nota untuk vendor</span>
-                                <input type="text" name="notes" value="{{ old('notes') }}" placeholder="Contoh: majlis di dewan, 500 tetamu" class="bg-transparent text-sm focus:outline-none">
+                                <span class="text-[10px] font-semibold tracking-wide uppercase">{{ __('pages.profile.nota_untuk_vendor') }}</span>
+                                <input type="text" name="notes" value="{{ old('notes') }}" :placeholder="__('pages.profile.contoh_majlis_di_dewan_500')" class="bg-transparent text-sm focus:outline-none">
                             </label>
                         </div>
 
                         <x-turnstile />
 
                         <button type="submit" class="rounded-full bg-brand-600 py-3.5 text-sm font-semibold text-white transition hover:bg-brand-700 disabled:opacity-50" @disabled($vendor->packages->isEmpty())>
-                            {{ auth()->check() ? 'Tempah sekarang' : 'Log masuk untuk tempah' }}
+                            {{ auth()->check() ? __('pages.profile.book_now') : __('pages.profile.login_to_book') }}
                         </button>
 
                         @auth
@@ -271,77 +271,69 @@
                                  visitor, so it cannot be scraped from the public markup. --}}
                             @if ($whatsapp = $vendor->whatsappUrl('Hai '.$vendor->name.', saya jumpa anda di Neekah. Boleh saya tanya tentang pakej untuk majlis saya?'))
                                 <a href="{{ $whatsapp }}" target="_blank" rel="noopener" class="flex items-center justify-center gap-2 rounded-full border border-brand-600 py-3.5 text-sm font-semibold text-brand-700 transition hover:bg-brand-50">
-                                    <span aria-hidden="true">💬</span> WhatsApp vendor
-                                </a>
+                                    <span aria-hidden="true">💬</span>{{ __('pages.profile.whatsapp_vendor') }}</a>
                             @endif
 
                             @if ($vendor->phone)
-                                <p class="text-center text-sm text-ink-muted">
-                                    Atau hubungi terus di <a href="tel:{{ preg_replace('/[^0-9+]/', '', $vendor->phone) }}" class="font-medium text-ink underline underline-offset-4">{{ $vendor->phone }}</a>
+                                <p class="text-center text-sm text-ink-muted">{{ __('pages.profile.atau_hubungi_terus_di') }}<a href="tel:{{ preg_replace('/[^0-9+]/', '', $vendor->phone) }}" class="font-medium text-ink underline underline-offset-4">{{ $vendor->phone }}</a>
                                 </p>
                             @endif
                         @else
                             @if ($vendor->phone || $vendor->whatsapp)
                                 <a href="{{ route('login') }}" class="flex items-center justify-center gap-2 rounded-full border border-brand-600 py-3.5 text-sm font-semibold text-brand-700 transition hover:bg-brand-50">
-                                    <span aria-hidden="true">💬</span> Log masuk untuk WhatsApp vendor
-                                </a>
-                                <p class="text-center text-sm text-ink-muted">Nombor vendor hanya dipaparkan kepada pengguna berdaftar.</p>
+                                    <span aria-hidden="true">💬</span>{{ __('pages.profile.log_masuk_untuk_whatsapp_vendor') }}</a>
+                                <p class="text-center text-sm text-ink-muted">{{ __('pages.profile.nombor_vendor_hanya_dipaparkan_kepada') }}</p>
                             @endif
                         @endauth
 
-                        <p class="text-center text-sm text-ink-muted">Anda tidak dicaj di sini. Tempahan ini menghubungkan anda dengan vendor; bayaran diurus terus antara anda berdua dan direkodkan di halaman booking.</p>
+                        <p class="text-center text-sm text-ink-muted">{{ __('pages.profile.anda_tidak_dicaj_di_sini') }}</p>
                     </form>
                 @else
                     <div class="flex flex-col gap-4 rounded-2xl border border-line bg-surface-raised p-6 shadow-xl shadow-brand-900/10">
-                        <p class="text-sm text-ink-muted">Dari <span class="font-display text-2xl font-semibold text-ink">RM{{ number_format($vendor->price_from) }}</span> / {{ $vendor->price_unit->label() }}</p>
+                        <p class="text-sm text-ink-muted">{{ __('pages.profile.dari_2') }}<span class="font-display text-2xl font-semibold text-ink">RM{{ number_format($vendor->price_from) }}</span> / {{ $vendor->price_unit->label() }}</p>
 
                         @auth
                             {{-- The vendor's own number is only ever rendered for a signed-in
                                  visitor, so it cannot be scraped from the public markup. --}}
                             @if ($whatsapp = $vendor->whatsappUrl('Hai '.$vendor->name.', saya jumpa anda di Neekah. Boleh saya tanya tentang pakej untuk majlis saya?'))
                                 <a href="{{ $whatsapp }}" target="_blank" rel="noopener" class="flex items-center justify-center gap-2 rounded-full bg-brand-600 py-3.5 text-sm font-semibold text-white transition hover:bg-brand-700">
-                                    <span aria-hidden="true">💬</span> WhatsApp vendor
-                                </a>
+                                    <span aria-hidden="true">💬</span>{{ __('pages.profile.whatsapp_vendor_2') }}</a>
                             @endif
 
                             @if ($vendor->phone)
-                                <p class="text-center text-sm text-ink-muted">
-                                    Atau hubungi terus di <a href="tel:{{ preg_replace('/[^0-9+]/', '', $vendor->phone) }}" class="font-medium text-ink underline underline-offset-4">{{ $vendor->phone }}</a>
+                                <p class="text-center text-sm text-ink-muted">{{ __('pages.profile.atau_hubungi_terus_di_2') }}<a href="tel:{{ preg_replace('/[^0-9+]/', '', $vendor->phone) }}" class="font-medium text-ink underline underline-offset-4">{{ $vendor->phone }}</a>
                                 </p>
                             @endif
                         @else
                             <a href="{{ route('login') }}" class="flex items-center justify-center gap-2 rounded-full bg-brand-600 py-3.5 text-sm font-semibold text-white transition hover:bg-brand-700">
-                                <span aria-hidden="true">💬</span> Log masuk untuk WhatsApp vendor
-                            </a>
-                            <p class="text-center text-sm text-ink-muted">Nombor vendor hanya dipaparkan kepada pengguna berdaftar.</p>
+                                <span aria-hidden="true">💬</span>{{ __('pages.profile.log_masuk_untuk_whatsapp_vendor_2') }}</a>
+                            <p class="text-center text-sm text-ink-muted">{{ __('pages.profile.nombor_vendor_hanya_dipaparkan_kepada_2') }}</p>
                         @endauth
 
-                        <p class="text-center text-sm text-ink-muted">Anda berurusan terus dengan vendor. Neekah tidak memegang bayaran dan tidak mengambil komisen.</p>
+                        <p class="text-center text-sm text-ink-muted">{{ __('pages.profile.anda_berurusan_terus_dengan_vendor') }}</p>
                     </div>
                 @endif
 
                 {{-- Enquiry. Not folded into a <details> any more: with booking
                      off this is the action the page is here for. --}}
                 <div class="mt-4 rounded-2xl border border-line bg-surface-raised p-5">
-                    <p class="text-sm font-semibold">Hantar enquiry</p>
-                    <p class="mt-1 text-sm text-ink-muted">Tanya tentang tarikh, pakej atau harga. Vendor menjawab terus kepada anda.</p>
+                    <p class="text-sm font-semibold">{{ __('pages.profile.hantar_enquiry') }}</p>
+                    <p class="mt-1 text-sm text-ink-muted">{{ __('pages.profile.tanya_tentang_tarikh_pakej_atau') }}</p>
                     @auth
                         <form method="POST" action="{{ route('vendors.enquiries.store', $vendor) }}" class="mt-4 flex flex-col gap-3">
                             @csrf
-                            <textarea name="message" rows="4" required placeholder="Contoh: Masih ada slot untuk 20 Disember? Boleh kongsi pakej untuk 500 tetamu?" class="rounded-xl border border-line bg-surface px-4 py-2.5 text-sm focus:border-brand-400 focus:outline-none">{{ old('message') }}</textarea>
+                            <textarea name="message" rows="4" required :placeholder="__('pages.profile.contoh_masih_ada_slot_untuk')" class="rounded-xl border border-line bg-surface px-4 py-2.5 text-sm focus:border-brand-400 focus:outline-none">{{ old('message') }}</textarea>
                             <input type="date" name="event_date" value="{{ old('event_date', $defaultEventDate ?? '') }}" min="{{ now()->addDay()->toDateString() }}" class="rounded-xl border border-line bg-surface px-4 py-2.5 text-sm focus:border-brand-400 focus:outline-none">
-                            <button type="submit" class="rounded-full border border-brand-600 py-2.5 text-sm font-semibold text-brand-700 transition hover:bg-brand-50">Hantar enquiry</button>
+                            <button type="submit" class="rounded-full border border-brand-600 py-2.5 text-sm font-semibold text-brand-700 transition hover:bg-brand-50">{{ __('pages.profile.hantar_enquiry_2') }}</button>
                         </form>
                     @else
-                        <p class="mt-3 text-sm text-ink-muted"><a href="{{ route('login') }}" class="font-medium text-brand-600 underline underline-offset-4">Log masuk</a> untuk menghantar enquiry kepada vendor ini.</p>
+                        <p class="mt-3 text-sm text-ink-muted"><a href="{{ route('login') }}" class="font-medium text-brand-600 underline underline-offset-4">{{ __('pages.profile.log_masuk') }}</a> untuk menghantar enquiry kepada vendor ini.</p>
                     @endauth
                 </div>
 
                 @auth
                     @if (auth()->user()->isCustomer())
-                        <p class="mt-3 text-center text-xs text-ink-muted">
-                            Ada masalah dengan vendor ini?
-                            <a href="{{ route('vendors.report.create', $vendor) }}" class="font-medium underline underline-offset-4 hover:text-ink">Laporkan vendor</a>
+                        <p class="mt-3 text-center text-xs text-ink-muted">{{ __('pages.profile.ada_masalah_dengan_vendor_ini') }}<a href="{{ route('vendors.report.create', $vendor) }}" class="font-medium underline underline-offset-4 hover:text-ink">{{ __('pages.profile.laporkan_vendor') }}</a>
                         </p>
                     @endif
                 @endauth
@@ -367,7 +359,7 @@
                 <p><span class="font-semibold">RM{{ number_format($vendor->price_from) }}</span> <span class="text-ink-muted">/ {{ $vendor->price_unit->label() }}</span></p>
                 <p class="text-xs"><span class="text-gold-500">★</span> {{ $vendor->reviews_count ? number_format($vendor->rating_avg, 1) : 'Baru' }} <span class="text-ink-muted">· {{ $publishedReviewsCount }} review</span></p>
             </div>
-            <a href="#hubungi" class="rounded-full bg-brand-600 px-6 py-3 text-sm font-semibold text-white">Hubungi vendor</a>
+            <a href="#hubungi" class="rounded-full bg-brand-600 px-6 py-3 text-sm font-semibold text-white">{{ __('pages.profile.hubungi_vendor') }}</a>
         </div>
     </div>
 

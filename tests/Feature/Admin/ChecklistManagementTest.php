@@ -30,22 +30,22 @@ it('adds a phase at the end and a task at the end of its phase', function () {
     $lastPosition = (int) $section->items()->max('sort_order');
 
     $this->actingAs($this->admin)
-        ->post(route('admin.checklist.sections.store'), ['title' => 'Bulan Madu', 'icon' => '🌴', 'is_active' => 1])
+        ->post(route('admin.checklist.sections.store'), ['title' => ['ms' => 'Bulan Madu', 'en' => 'Honeymoon'], 'icon' => '🌴', 'is_active' => 1])
         ->assertRedirect();
 
-    $added = ChecklistSection::where('title', 'Bulan Madu')->sole();
+    $added = ChecklistSection::whereTranslated('title', 'Bulan Madu')->sole();
     expect($added->sort_order)->toBe((int) ChecklistSection::where('id', '!=', $added->id)->max('sort_order') + 1);
 
     $this->actingAs($this->admin)
         ->post(route('admin.checklist.items.store'), [
             'checklist_section_id' => $section->id,
-            'title' => 'Tempah kereta pengantin',
+            'title' => ['ms' => 'Tempah kereta pengantin'],
             'months_before' => 3,
             'is_active' => 1,
         ])
         ->assertRedirect();
 
-    $item = ChecklistItem::where('title', 'Tempah kereta pengantin')->sole();
+    $item = ChecklistItem::whereTranslated('title', 'Tempah kereta pengantin')->sole();
     expect($item->sort_order)->toBe($lastPosition + 1)
         ->and($item->checklist_section_id)->toBe($section->id);
 });
@@ -54,13 +54,13 @@ it('keeps a task without a deadline when no month is given', function () {
     $this->actingAs($this->admin)
         ->post(route('admin.checklist.items.store'), [
             'checklist_section_id' => ChecklistSection::first()->id,
-            'title' => 'Rancang takaful',
+            'title' => ['ms' => 'Rancang takaful'],
             'months_before' => '',
             'is_active' => 1,
         ])
         ->assertRedirect();
 
-    expect(ChecklistItem::where('title', 'Rancang takaful')->sole()->months_before)->toBeNull();
+    expect(ChecklistItem::whereTranslated('title', 'Rancang takaful')->sole()->months_before)->toBeNull();
 });
 
 it('edits a phase and a task', function () {
@@ -68,14 +68,14 @@ it('edits a phase and a task', function () {
     $item = $section->items()->ordered()->first();
 
     $this->actingAs($this->admin)
-        ->put(route('admin.checklist.sections.update', $section), ['title' => 'Perancangan', 'icon' => '📝', 'note' => 'Mula awal.', 'is_active' => 1])
+        ->put(route('admin.checklist.sections.update', $section), ['title' => ['ms' => 'Perancangan'], 'icon' => '📝', 'note' => ['ms' => 'Mula awal.'], 'is_active' => 1])
         ->assertRedirect();
 
     $this->actingAs($this->admin)
         ->put(route('admin.checklist.items.update', $item), [
             'checklist_section_id' => $section->id,
-            'title' => 'Bincang dengan keluarga',
-            'group' => 'Awal',
+            'title' => ['ms' => 'Bincang dengan keluarga'],
+            'group' => ['ms' => 'Awal'],
             'is_active' => 0,
         ])
         ->assertRedirect();
@@ -126,7 +126,7 @@ it('lets nobody but an admin touch the master checklist', function () {
 
     $this->get(route('admin.checklist.index'))->assertRedirect(route('login'));
     $this->actingAs($couple)->get(route('admin.checklist.index'))->assertForbidden();
-    $this->actingAs($couple)->post(route('admin.checklist.sections.store'), ['title' => 'Penyusup'])->assertForbidden();
+    $this->actingAs($couple)->post(route('admin.checklist.sections.store'), ['title' => ['ms' => 'Penyusup']])->assertForbidden();
     $this->actingAs($couple)->delete(route('admin.checklist.sections.destroy', $section))->assertForbidden();
     $this->actingAs($couple)
         ->putJson(route('admin.checklist.order'), ['sections' => [['id' => $section->id, 'sort_order' => 0]]])

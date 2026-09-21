@@ -16,14 +16,14 @@ class ChecklistItemController extends Controller
             'sort_order' => (int) ChecklistItem::where('checklist_section_id', $request->integer('checklist_section_id'))->max('sort_order') + 1,
         ]);
 
-        return back()->with('status', 'Tugasan ditambah. Ia akan muncul dalam checklist pengantin pada lawatan berikutnya.');
+        return back()->with('status', __('flash.admin.item_added'));
     }
 
     public function update(StoreChecklistItemRequest $request, ChecklistItem $item): RedirectResponse
     {
         $item->update($request->attributesForItem());
 
-        return back()->with('status', 'Tugasan dikemas kini.');
+        return back()->with('status', __('flash.admin.item_updated'));
     }
 
     /**
@@ -34,6 +34,6 @@ class ChecklistItemController extends Controller
     {
         $item->delete();
 
-        return back()->with('status', 'Tugasan dipadam daripada senarai induk.');
+        return back()->with('status', __('flash.admin.item_deleted'));
     }
 }

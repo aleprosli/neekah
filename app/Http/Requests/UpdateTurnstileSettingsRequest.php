@@ -49,8 +49,8 @@ class UpdateTurnstileSettingsRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'site_key' => 'site key',
-            'secret_key' => 'secret key',
+            'site_key' => __('fields.site_key'),
+            'secret_key' => __('fields.secret_key'),
         ];
     }
 }

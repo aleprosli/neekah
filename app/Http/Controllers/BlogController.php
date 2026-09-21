@@ -16,8 +16,8 @@ class BlogController extends Controller
         $posts = Post::query()->published()->latest('published_at')->orderByDesc('id')->paginate(12);
         $page = $posts->currentPage();
 
-        $seo->title('Blog perkahwinan'.($page > 1 ? ' — halaman '.$page : ''))
-            ->description('Tip, idea dan panduan merancang majlis perkahwinan di Malaysia: bajet, vendor, adat, kad jemputan dan banyak lagi.')
+        $seo->title($page > 1 ? __('seo.blog.title_page', ['page' => $page]) : __('seo.blog.title'))
+            ->description(__('seo.blog.description'))
             ->canonical(route('blog.index', $page > 1 ? ['page' => $page] : []))
             ->breadcrumbs(['Neekah' => route('vendors.index'), 'Blog' => route('blog.index')]);
 

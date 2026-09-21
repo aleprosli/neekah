@@ -3,6 +3,7 @@
 namespace App\Notifications;
 
 use App\Models\Booking;
+use App\Support\NeekahMail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -29,8 +30,10 @@ class BookingConfirmed extends Notification implements ShouldQueue
     {
         return [
             'icon' => '✅',
-            'title' => "Booking {$this->booking->reference} disahkan",
-            'body' => "Tarikh majlis {$this->booking->event_date->translatedFormat('j M Y')} kini terjamin.",
+            'title_key' => 'notifications.booking_confirmed.title',
+            'title_params' => ['reference' => $this->booking->reference],
+            'body_key' => 'notifications.booking_confirmed.body',
+            'body_params' => ['date' => $this->booking->event_date->translatedFormat('j M Y')],
             'url' => $notifiable->isVendor() ? route('vendor.bookings.show', $this->booking) : route('bookings.show', $this->booking),
         ];
     }
@@ -39,14 +42,12 @@ class BookingConfirmed extends Notification implements ShouldQueue
     {
         $isVendor = $notifiable->isVendor();
 
-        return (new MailMessage)
-            ->subject('Booking '.$this->booking->reference.' disahkan')
-            ->greeting('Hai '.$notifiable->name.',')
-            ->line('Bayaran telah disahkan dan booking '.$this->booking->reference.' kini Confirmed.')
-            ->line(($isVendor ? 'Pelanggan: '.$this->booking->user->name : 'Vendor: '.$this->booking->vendor->name).' · '.$this->booking->package_name)
-            ->line('Tarikh majlis: '.$this->booking->event_date->translatedFormat('l, j F Y'))
-            ->line('Baki RM'.number_format($this->booking->outstandingAmount(), 2).' masih belum direkod.')
-            ->action('Lihat booking', $isVendor ? route('vendor.bookings.show', $this->booking) : route('bookings.show', $this->booking))
-            ->salutation('Terima kasih, Neekah');
+        return NeekahMail::to($notifiable)
+            ->subject(__('notifications.booking_confirmed.subject', ['reference' => $this->booking->reference]))
+            ->line(__('notifications.booking_confirmed.intro', ['reference' => $this->booking->reference]))
+            ->line(($isVendor ? __('notifications.customer_is', ['name' => $this->booking->user->name]) : __('notifications.vendor_is', ['name' => $this->booking->vendor->name])).' · '.$this->booking->package_name)
+            ->line(__('notifications.event_date', ['date' => $this->booking->event_date->translatedFormat('l, j F Y')]))
+            ->line(__('notifications.booking_confirmed.outstanding', ['amount' => 'RM'.number_format($this->booking->outstandingAmount(), 2)]))
+            ->action(__('notifications.actions.view_booking'), $isVendor ? route('vendor.bookings.show', $this->booking) : route('bookings.show', $this->booking));
     }
 }

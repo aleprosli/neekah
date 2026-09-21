@@ -11,6 +11,7 @@ import UiField from '../ui/UiField.vue';
 import UiTextarea from '../ui/UiTextarea.vue';
 
 const props = defineProps({
+    locales: { type: Array, required: true },
     sections: { type: Array, required: true },
     categories: { type: Array, required: true },
     stats: { type: Array, required: true },
@@ -43,20 +44,23 @@ const toggle = (id) => {
     open.value = next;
 };
 
+/** A value per language, from what the server sent or empty. */
+const perLocale = (values) => Object.fromEntries(props.locales.map((l) => [l.code, values?.[l.code] ?? '']));
+
 const editSection = (row = null) => {
     panel.value = { kind: 'section', row };
-    form.value = { title: row?.title ?? '', icon: row?.icon ?? '', note: row?.note ?? '', is_active: row ? row.is_active : true };
+    form.value = { title: perLocale(row?.titles), icon: row?.icon ?? '', note: perLocale(row?.notes_all), is_active: row ? row.is_active : true };
 };
 
 const editItem = (sectionId, row = null) => {
     panel.value = { kind: 'item', row, sectionId };
     form.value = {
         checklist_section_id: row?.checklist_section_id ?? sectionId,
-        title: row?.title ?? '',
-        group: row?.group ?? '',
+        title: perLocale(row?.titles),
+        group: perLocale(row?.groups),
         category_id: row?.category_id ?? '',
         months_before: row?.months_before ?? '',
-        notes: row?.notes ?? '',
+        notes: perLocale(row?.notes_all),
         is_active: row ? row.is_active : true,
     };
 };
@@ -127,17 +131,14 @@ const dueLabel = (months) => {
             </div>
         </dl>
 
-        <p class="rounded-2xl border border-line bg-surface-raised p-4 text-sm text-ink-muted">
-            Tugasan yang ditambah di sini akan muncul dalam checklist setiap pengantin pada lawatan berikutnya.
-            Tugasan yang dipadam hanya hilang dari senarai induk ini — apa yang pengantin sudah tanda kekal milik mereka.
-        </p>
+        <p class="rounded-2xl border border-line bg-surface-raised p-4 text-sm text-ink-muted">{{ $t('admin_checklist.tugasan_yang_ditambah_di_sini') }}</p>
 
         <p v-if="orderError" class="rounded-2xl bg-brand-50 p-4 text-sm text-brand-800">{{ orderError }}</p>
 
         <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
             <div class="flex min-w-0 flex-col gap-3">
                 <div class="flex flex-wrap items-center justify-between gap-2">
-                    <p class="text-sm text-ink-muted">Seret untuk susun fasa dan tugasan. Susunan disimpan sendiri.</p>
+                    <p class="text-sm text-ink-muted">{{ $t('admin_checklist.seret_untuk_susun_fasa_dan') }}</p>
                     <button type="button" class="rounded-full bg-brand-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-700" @click="editSection()">+ Tambah fasa</button>
                 </div>
 
@@ -165,22 +166,22 @@ const dueLabel = (months) => {
                                 <p class="truncate text-xs text-ink-muted">{{ section.items.length }} tugasan</p>
                             </button>
 
-                            <span v-if="!section.is_active" class="hidden shrink-0 rounded-full bg-surface-muted px-2.5 py-1 text-xs font-semibold text-ink-muted sm:inline-flex">Tidak aktif</span>
+                            <span v-if="!section.is_active" class="hidden shrink-0 rounded-full bg-surface-muted px-2.5 py-1 text-xs font-semibold text-ink-muted sm:inline-flex">{{ $t('admin_checklist.tidak_aktif') }}</span>
 
                             <div class="flex shrink-0 items-center gap-1">
-                                <button type="button" class="rounded-full px-2 py-1 text-xs text-ink-muted transition hover:bg-surface-muted disabled:opacity-30" :disabled="at === 0" aria-label="Alih ke atas" @click="moveSection(at, at - 1)">↑</button>
-                                <button type="button" class="rounded-full px-2 py-1 text-xs text-ink-muted transition hover:bg-surface-muted disabled:opacity-30" :disabled="at === list.length - 1" aria-label="Alih ke bawah" @click="moveSection(at, at + 1)">↓</button>
-                                <button type="button" class="rounded-full border border-line px-3 py-1.5 text-xs font-medium transition hover:border-brand-400" @click="editSection(section)">Edit</button>
+                                <button type="button" class="rounded-full px-2 py-1 text-xs text-ink-muted transition hover:bg-surface-muted disabled:opacity-30" :disabled="at === 0" :aria-label="$t('admin_checklist.alih_ke_atas')" @click="moveSection(at, at - 1)">↑</button>
+                                <button type="button" class="rounded-full px-2 py-1 text-xs text-ink-muted transition hover:bg-surface-muted disabled:opacity-30" :disabled="at === list.length - 1" :aria-label="$t('admin_checklist.alih_ke_bawah')" @click="moveSection(at, at + 1)">↓</button>
+                                <button type="button" class="rounded-full border border-line px-3 py-1.5 text-xs font-medium transition hover:border-brand-400" @click="editSection(section)">{{ $t('admin_checklist.edit') }}</button>
                                 <UiConfirm
                                     :action="section.destroy_url"
                                     method="DELETE"
                                     tone="danger"
                                     :title="`Padam fasa ${section.title}?`"
                                     :message="`${section.items.length} tugasan dalam fasa ini akan hilang dari senarai induk. Checklist pengantin sedia ada tidak berubah.`"
-                                    confirm-label="Padam fasa"
+                                    confirm-:label="$t('admin_checklist.padam_fasa')"
                                     trigger-class="rounded-full px-2 py-1.5 text-xs font-medium text-ink-muted transition hover:text-brand-700"
                                     :csrf="csrf"
-                                >Padam</UiConfirm>
+                                >{{ $t('admin_checklist.padam_2') }}</UiConfirm>
                             </div>
                         </div>
 
@@ -210,19 +211,19 @@ const dueLabel = (months) => {
                                     </div>
 
                                     <div class="flex shrink-0 items-center gap-1">
-                                        <button type="button" class="rounded-full px-2 py-1 text-xs text-ink-muted transition hover:bg-surface-muted disabled:opacity-30" :disabled="index === 0" aria-label="Alih ke atas" @click="moveItem(section, index, index - 1)">↑</button>
-                                        <button type="button" class="rounded-full px-2 py-1 text-xs text-ink-muted transition hover:bg-surface-muted disabled:opacity-30" :disabled="index === section.items.length - 1" aria-label="Alih ke bawah" @click="moveItem(section, index, index + 1)">↓</button>
-                                        <button type="button" class="rounded-full px-2 py-1.5 text-xs font-medium transition hover:text-brand-700" @click="editItem(section.id, item)">Edit</button>
+                                        <button type="button" class="rounded-full px-2 py-1 text-xs text-ink-muted transition hover:bg-surface-muted disabled:opacity-30" :disabled="index === 0" :aria-label="$t('admin_checklist.alih_ke_atas_2')" @click="moveItem(section, index, index - 1)">↑</button>
+                                        <button type="button" class="rounded-full px-2 py-1 text-xs text-ink-muted transition hover:bg-surface-muted disabled:opacity-30" :disabled="index === section.items.length - 1" :aria-label="$t('admin_checklist.alih_ke_bawah_2')" @click="moveItem(section, index, index + 1)">↓</button>
+                                        <button type="button" class="rounded-full px-2 py-1.5 text-xs font-medium transition hover:text-brand-700" @click="editItem(section.id, item)">{{ $t('admin_checklist.edit_2') }}</button>
                                         <UiConfirm
                                             :action="item.destroy_url"
                                             method="DELETE"
                                             tone="danger"
-                                            title="Padam tugasan ini dari senarai induk?"
+                                            :title="$t('admin_checklist.padam_tugasan_ini_dari_senarai')"
                                             :message="item.title"
-                                            confirm-label="Padam"
+                                            confirm-:label="$t('admin_checklist.padam')"
                                             trigger-class="rounded-full px-2 py-1.5 text-xs font-medium text-ink-muted transition hover:text-brand-700"
                                             :csrf="csrf"
-                                        >Padam</UiConfirm>
+                                        >{{ $t('admin_checklist.padam_3') }}</UiConfirm>
                                     </div>
                                 </li>
                             </ul>
@@ -241,33 +242,33 @@ const dueLabel = (months) => {
                     <h2 class="font-semibold">
                         {{ panel.kind === 'section' ? (panel.row ? 'Edit fasa' : 'Tambah fasa') : (panel.row ? 'Edit tugasan' : 'Tambah tugasan') }}
                     </h2>
-                    <button type="button" class="text-sm text-ink-muted hover:text-ink" aria-label="Tutup" @click="panel = null">✕</button>
+                    <button type="button" class="text-sm text-ink-muted hover:text-ink" :aria-label="$t('admin_checklist.tutup')" @click="panel = null">✕</button>
                 </div>
 
                 <template v-if="panel.kind === 'section'">
-                    <UiField v-model="form.title" label="Nama fasa" name="title" placeholder="Urusan Borang & Dokumen Nikah" :error="errors.title" required />
-                    <UiField v-model="form.icon" label="Ikon (emoji)" name="icon" placeholder="📄" :error="errors.icon" />
-                    <UiTextarea v-model="form.note" label="Nota" name="note" rows="3" :error="errors.note" help="Dipaparkan di atas fasa ini dalam checklist pengantin." />
+                    <UiField v-for="locale in locales" :key="`st-${locale.code}`" v-model="form.title[locale.code]" :label="`${$t('admin_checklist.nama_fasa')} · ${locale.label}`" :name="`title[${locale.code}]`" :placeholder="$t('admin_checklist.urusan_borang_dokumen_nikah')" :error="errors[`title.${locale.code}`]" :required="locale.code === locales[0].code" />
+                    <UiField v-model="form.icon" :label="$t('admin_checklist.ikon_emoji')" name="icon" placeholder="📄" :error="errors.icon" />
+                    <UiTextarea v-for="locale in locales" :key="`sn-${locale.code}`" v-model="form.note[locale.code]" :label="`${$t('admin_checklist.nota')} · ${locale.label}`" :name="`note[${locale.code}]`" rows="3" :error="errors[`note.${locale.code}`]" :help="$t('admin_checklist.dipaparkan_di_atas_fasa_ini')" />
                 </template>
 
                 <template v-else>
                     <input type="hidden" name="checklist_section_id" :value="form.checklist_section_id">
 
-                    <UiField v-model="form.title" label="Tugasan" name="title" placeholder="Submit permohonan ke pejabat agama" :error="errors.title" required />
-                    <UiField v-model="form.group" label="Kumpulan" name="group" placeholder="Dokumen Asas" :error="errors.group" help="Tajuk kecil dalam fasa ini. Kosongkan jika tiada." />
+                    <UiField v-for="locale in locales" :key="`it-${locale.code}`" v-model="form.title[locale.code]" :label="`${$t('admin_checklist.tugasan')} · ${locale.label}`" :name="`title[${locale.code}]`" :placeholder="$t('admin_checklist.submit_permohonan_ke_pejabat_agama')" :error="errors[`title.${locale.code}`]" :required="locale.code === locales[0].code" />
+                    <UiField v-for="locale in locales" :key="`ig-${locale.code}`" v-model="form.group[locale.code]" :label="`${$t('admin_checklist.kumpulan')} · ${locale.label}`" :name="`group[${locale.code}]`" :placeholder="$t('admin_checklist.dokumen_asas')" :error="errors[`group.${locale.code}`]" :help="$t('admin_checklist.tajuk_kecil_dalam_fasa_ini')" />
 
                     <label class="flex flex-col gap-1.5">
-                        <span class="text-sm font-medium">Kategori vendor</span>
+                        <span class="text-sm font-medium">{{ $t('admin_checklist.kategori_vendor') }}</span>
                         <select v-model="form.category_id" name="category_id" class="nk-select rounded-xl border border-line bg-surface px-3 py-2.5 pr-9 text-sm focus:border-brand-400 focus:outline-none">
-                            <option value="">Tiada</option>
+                            <option value="">{{ $t('admin_checklist.tiada') }}</option>
                             <option v-for="category in categories" :key="category.id" :value="category.id">{{ category.icon }} {{ category.name }}</option>
                         </select>
-                        <span class="text-xs text-ink-muted">Memberi pengantin pautan "Cari vendor" pada tugasan ini.</span>
+                        <span class="text-xs text-ink-muted">{{ $t('admin_checklist.memberi_pengantin_pautan_cari_vendor') }}</span>
                     </label>
 
                     <UiField
                         v-model="form.months_before"
-                        label="Bulan sebelum majlis"
+                        :label="$t('admin_checklist.bulan_sebelum_majlis')"
                         name="months_before"
                         type="number"
                         min="0"
@@ -276,14 +277,12 @@ const dueLabel = (months) => {
                         help="0 bermaksud hari majlis. Kosongkan untuk tugasan tanpa tarikh akhir."
                     />
 
-                    <UiTextarea v-model="form.notes" label="Nota" name="notes" rows="3" :error="errors.notes" />
+                    <UiTextarea v-for="locale in locales" :key="`in-${locale.code}`" v-model="form.notes[locale.code]" :label="`${$t('admin_checklist.nota_2')} · ${locale.label}`" :name="`notes[${locale.code}]`" rows="3" :error="errors[`notes.${locale.code}`]" />
                 </template>
 
                 <label class="flex items-center gap-2 text-sm">
                     <input type="hidden" name="is_active" value="0">
-                    <input v-model="form.is_active" type="checkbox" name="is_active" value="1" class="accent-brand-600">
-                    Aktif
-                </label>
+                    <input v-model="form.is_active" type="checkbox" name="is_active" value="1" class="accent-brand-600">{{ $t('admin_checklist.aktif') }}</label>
 
                 <button type="submit" class="rounded-full bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700">
                     {{ panel.row ? 'Simpan' : 'Tambah' }}

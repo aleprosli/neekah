@@ -19,8 +19,8 @@ class RegisterController extends Controller
 {
     public function create(Seo $seo): View
     {
-        $seo->title('Daftar sebagai vendor perkahwinan')
-            ->description('Sertai Neekah dan terima tempahan daripada pasangan di seluruh Malaysia. Profil percuma, bayaran direkod dalam platform, ranking ikut prestasi sebenar.');
+        $seo->title(__('seo.vendor_register.title'))
+            ->description(__('seo.vendor_register.description'));
 
         $turnstile = app(TurnstileSettings::class);
 
@@ -46,6 +46,6 @@ class RegisterController extends Controller
 
         return redirect()
             ->route('vendor.dashboard')
-            ->with('status', 'Pendaftaran diterima. Lengkapkan profil anda sementara admin menyemak permohonan.');
+            ->with('status', __('flash.vendor.registered'));
     }
 }

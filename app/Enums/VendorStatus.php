@@ -12,10 +12,10 @@ enum VendorStatus: string
     public function label(): string
     {
         return match ($this) {
-            self::Pending => 'Menunggu kelulusan',
-            self::Approved => 'Diluluskan',
-            self::Rejected => 'Ditolak',
-            self::Suspended => 'Digantung',
+            self::Pending => __('enums.vendor_status.pending'),
+            self::Approved => __('enums.vendor_status.approved'),
+            self::Rejected => __('enums.vendor_status.rejected'),
+            self::Suspended => __('enums.vendor_status.suspended'),
         };
     }
 
