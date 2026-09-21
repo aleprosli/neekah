@@ -23,9 +23,9 @@ defineProps({
     <UiEmptyState
         v-if="!hasWedding"
         icon="💍"
-        title="Mula dengan wedding project anda"
+        :title="$t('customer.start_project_title')"
         message="Tetapkan tarikh, lokasi dan bajet. Neekah akan jejak vendor, bayaran dan baki bajet anda."
-        action-label="Cipta wedding project"
+        action-:label="$t('customer.start_project_action')"
         :action-url="createUrl"
     />
 
@@ -36,7 +36,7 @@ defineProps({
 
         <div class="mt-6 rounded-2xl border border-line bg-surface-raised p-5">
             <div class="flex flex-wrap items-center justify-between gap-x-3 text-sm">
-                <span class="font-medium">Penggunaan bajet</span>
+                <span class="font-medium">{{ $t('customer.budget_usage') }}</span>
                 <span class="text-ink-muted">{{ budget.caption }}</span>
             </div>
 
@@ -51,10 +51,10 @@ defineProps({
 
         <div class="mt-8 grid gap-8 break-words lg:grid-cols-[minmax(0,1fr)_320px]">
             <section class="flex min-w-0 flex-col gap-4">
-                <h2 class="font-display text-xl font-semibold">Vendor majlis anda</h2>
+                <h2 class="font-display text-xl font-semibold">{{ $t('customer.your_vendors') }}</h2>
 
                 <p v-if="!bookings.length" class="rounded-2xl border border-dashed border-line p-6 text-sm text-ink-muted">
-                    Belum ada vendor ditempah. <a :href="findVendorsUrl" class="font-medium text-brand-600 underline underline-offset-4">Cari vendor</a> untuk mula.
+                    Belum ada vendor ditempah. <a :href="findVendorsUrl" class="font-medium text-brand-600 underline underline-offset-4">{{ $t('common.find_vendors') }}</a> untuk mula.
                 </p>
 
                 <ul v-else class="divide-y divide-line rounded-2xl border border-line">
@@ -77,7 +77,7 @@ defineProps({
             </section>
 
             <section class="flex min-w-0 flex-col gap-4">
-                <h2 class="font-display text-xl font-semibold">Checklist kategori</h2>
+                <h2 class="font-display text-xl font-semibold">{{ $t('customer.checklist_categories') }}</h2>
                 <ul class="flex flex-col gap-1 rounded-2xl border border-line p-3">
                     <li v-for="category in categories" :key="category.name">
                         <a :href="category.url" class="flex items-center gap-3 rounded-xl px-2 py-1.5 text-sm transition hover:bg-surface-muted">

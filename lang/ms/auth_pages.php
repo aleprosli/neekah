@@ -2,6 +2,11 @@
 
 return [
 
+    'register' => [
+        'vendor_title' => 'Sertai Neekah sebagai vendor',
+        'vendor_subtitle' => 'Daftar percuma. Selepas admin meluluskan profil anda, perniagaan anda akan dipaparkan di marketplace dan pengantin boleh tempah terus.',
+    ],
+
     'login' => [
         'chooser_title' => 'Log masuk ke Neekah',
         'chooser_subtitle' => 'Pilih cara anda nak teruskan.',

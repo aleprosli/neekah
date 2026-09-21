@@ -2,6 +2,11 @@
 
 return [
 
+    'register' => [
+        'vendor_title' => 'Join Neekah as a vendor',
+        'vendor_subtitle' => 'Signing up is free. Once an admin approves your profile, your business appears in the marketplace and couples can book you directly.',
+    ],
+
     'login' => [
         'chooser_title' => 'Log in to Neekah',
         'chooser_subtitle' => 'Choose how you want to continue.',

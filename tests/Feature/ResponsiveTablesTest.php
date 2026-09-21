@@ -66,5 +66,7 @@ it('gives the shared table a card layout for narrow screens', function () {
     expect($table)
         ->toContain('md:hidden')                                  // cards, on a phone
         ->toContain('hidden min-w-0 overflow-x-auto')             // the table, from md up
-        ->toContain('Susun ikut');                                // sorting without headers to click
+        // Sorting without headers to click. The label is translated now, so
+        // the key is what pins the control being there.
+        ->toContain("\$t('common.sort_by')");
 });

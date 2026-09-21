@@ -137,3 +137,19 @@ it('changes language with a whole page load, not a region swap', function () {
     // was refreshed by hand.
     $this->get('/')->assertOk()->assertSee('data-no-swap', false);
 });
+
+it('translates the vendor sign-up form, which is all Vue', function () {
+    $this->get('/vendor/register')->assertOk()
+        ->assertSee('Sertai Neekah sebagai vendor');
+
+    $english = $this->get('/en/vendor/register')->assertOk();
+
+    $english->assertSee('Join Neekah as a vendor')->assertDontSee('Sertai Neekah sebagai vendor');
+
+    // The fields themselves live in Vue and read the shipped dictionary.
+    preg_match('/id="translations">(.*?)<\/script>/s', $english->getContent(), $m);
+    $dictionary = json_decode(html_entity_decode($m[1] ?? '{}'), true);
+
+    expect($dictionary['vendor_signup']['business_name'])->toBe('Business name')
+        ->and($dictionary['vendor_signup']['owner_heading'])->toBe('Owner account');
+});

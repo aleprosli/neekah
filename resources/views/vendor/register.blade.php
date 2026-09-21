@@ -9,11 +9,11 @@
             <x-nav-icon :name="$audience->icon()" />
             {{ $audience->label() }}
             <span class="text-line" aria-hidden="true">·</span>
-            <a href="{{ route('register') }}" class="font-semibold text-brand-600 hover:underline">Tukar</a>
+            <a href="{{ route('register') }}" class="font-semibold text-brand-600 hover:underline">{{ __('auth_pages.links.switch') }}</a>
         </p>
 
-        <h1 class="font-display text-2xl font-semibold tracking-tight sm:text-3xl">Sertai Neekah sebagai vendor</h1>
-        <p class="mx-auto mt-2 max-w-xl text-sm text-ink-muted">Daftar percuma. Selepas admin meluluskan profil anda, perniagaan anda akan dipaparkan di marketplace dan pengantin boleh tempah terus.</p>
+        <h1 class="font-display text-2xl font-semibold tracking-tight sm:text-3xl">{{ __('auth_pages.register.vendor_title') }}</h1>
+        <p class="mx-auto mt-2 max-w-xl text-sm text-ink-muted">{{ __('auth_pages.register.vendor_subtitle') }}</p>
     </div>
 
     {{-- resources/js/components/vendor/VendorRegisterForm.vue --}}

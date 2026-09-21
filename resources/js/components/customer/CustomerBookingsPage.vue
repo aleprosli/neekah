@@ -15,9 +15,9 @@ defineProps({
     <UiEmptyState
         v-if="!bookings.length"
         icon="🗓️"
-        title="Belum ada tempahan"
-        message="Cari vendor, pilih pakej dan tempah terus dalam Neekah."
-        action-label="Cari vendor"
+        :title="$t('customer.no_bookings_title')"
+        :message="$t('customer.no_bookings_message')"
+        :action-label="$t('common.find_vendors')"
         :action-url="findVendorsUrl"
     />
 

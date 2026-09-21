@@ -16,8 +16,8 @@ defineProps({
             Pratonton draf. Hanya admin boleh melihat halaman ini sehingga artikel disiarkan.
         </p>
 
-        <nav aria-label="Breadcrumb" class="text-xs font-semibold tracking-wide text-brand-600 uppercase">
-            <a :href="blogUrl" class="hover:text-brand-800">Blog</a>
+        <nav :aria-label="$t('blog.breadcrumb')" class="text-xs font-semibold tracking-wide text-brand-600 uppercase">
+            <a :href="blogUrl" class="hover:text-brand-800">{{ $t('common.blog') }}</a>
         </nav>
 
         <h1 class="mt-3 font-display text-3xl font-semibold tracking-tight text-balance sm:text-4xl lg:text-5xl">{{ post.title }}</h1>
@@ -33,7 +33,7 @@ defineProps({
     </article>
 
     <section v-if="related.length" class="mx-auto mt-20 max-w-6xl border-t border-line pt-10" aria-labelledby="baca-juga">
-        <h2 id="baca-juga" class="font-display text-2xl font-semibold">Baca juga</h2>
+        <h2 id="baca-juga" class="font-display text-2xl font-semibold">{{ $t('blog.read_next') }}</h2>
 
         <div class="mt-6 grid gap-8 sm:grid-cols-3">
             <a v-for="other in related" :key="other.url" :href="other.url" class="group flex flex-col gap-3">
