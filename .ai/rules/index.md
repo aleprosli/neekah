@@ -4,7 +4,7 @@ Before planning or editing, find the row whose globs match the file's path and r
 
 | Applies to | Rule file |
 | --- | --- |
-| app/Actions/SeedWeddingChecklist.php | .ai/rules/actions.md |
+| app/Actions/SeedWeddingChecklist.php, app/Actions/StoreOptimizedImage.php | .ai/rules/actions.md |
 | app/Http/Controllers/Admin/** | .ai/rules/admin.md |
 | app/** | .ai/rules/app.md |
 | resources/js/components/** | .ai/rules/components.md |

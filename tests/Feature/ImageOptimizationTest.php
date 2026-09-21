@@ -186,3 +186,33 @@ it('optimises images uploaded before optimisation existed, and only once', funct
 
     expect($item->fresh()->path)->toBe($item->path);
 });
+
+it('refuses to hand back a path for a file it could not write', function () {
+    Storage::fake('public');
+
+    // The public disk is configured not to throw, so an unwritable directory
+    // comes back as false. Ignoring that is how a wedding card ended up
+    // pointing at a 404 while the upload reported success.
+    Storage::shouldReceive('disk')->with('public')->andReturn($disk = Mockery::mock());
+    $disk->shouldReceive('put')->andReturn(false);
+    $disk->shouldReceive('delete')->once();
+
+    expect(fn () => app(StoreOptimizedImage::class)
+        ->handle(UploadedFile::fake()->image('cover.jpg', 800, 600), 'sites/43'))
+        ->toThrow(RuntimeException::class);
+});
+
+it('cleans up the half that landed when the other half fails', function () {
+    Storage::fake('public');
+
+    Storage::shouldReceive('disk')->with('public')->andReturn($disk = Mockery::mock());
+    // The full-size image writes; the thumbnail does not.
+    $disk->shouldReceive('put')->once()->andReturn(true);
+    $disk->shouldReceive('put')->once()->andReturn(false);
+    // A full-size image with no thumbnail is of no use to any page.
+    $disk->shouldReceive('delete')->once()->with(Mockery::type('array'));
+
+    expect(fn () => app(StoreOptimizedImage::class)
+        ->handle(UploadedFile::fake()->image('cover.jpg', 800, 600), 'sites/43'))
+        ->toThrow(RuntimeException::class);
+});

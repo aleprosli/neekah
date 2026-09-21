@@ -43,8 +43,21 @@ class StoreOptimizedImage
         $disk = Storage::disk('public');
 
         $largest = $this->settings->maxDimension();
-        $disk->put($path, $this->encode($this->resize($image, $largest, $largest), $extension));
-        $disk->put(self::thumbnailPath($path), $this->encode($this->resize($image, $this->settings->thumbnailWidth(), PHP_INT_MAX), $extension));
+        $thumbnail = self::thumbnailPath($path);
+
+        // The public disk is configured not to throw, so a write it cannot make
+        // comes back as false. Ignoring that returned a path for a file that was
+        // never written, and the caller saved it: a wedding card pointing at a
+        // 404, with nothing anywhere saying the upload had failed.
+        $stored = $disk->put($path, $this->encode($this->resize($image, $largest, $largest), $extension))
+            && $disk->put($thumbnail, $this->encode($this->resize($image, $this->settings->thumbnailWidth(), PHP_INT_MAX), $extension));
+
+        if (! $stored) {
+            // Whichever half landed is of no use on its own.
+            $disk->delete([$path, $thumbnail]);
+
+            throw new RuntimeException('Could not write the uploaded image to '.$directory.'.');
+        }
 
         return $path;
     }
