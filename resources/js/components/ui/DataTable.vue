@@ -30,8 +30,8 @@ const props = defineProps({
      */
     filters: { type: Array, default: () => [] },
     searchPlaceholder: { type: String, default: 'Cari…' },
-    emptyTitle: { type: String, default: 'Tiada rekod' },
-    emptyMessage: { type: String, default: 'Tiada apa-apa untuk dipaparkan buat masa ini.' },
+    emptyTitle: { type: String, default: null },
+    emptyMessage: { type: String, default: null },
     initialSort: { type: String, default: '' },
     perPage: { type: Number, default: 15 },
     /**
@@ -489,8 +489,8 @@ onMounted(load);
         <p v-else-if="loading" class="rounded-2xl border border-dashed border-line p-8 text-center text-sm text-ink-muted md:hidden">{{ $t('common.memuatkan') }}…</p>
 
         <div v-else class="rounded-2xl border border-dashed border-line p-8 text-center md:hidden">
-            <p class="font-medium">{{ emptyTitle }}</p>
-            <p class="mt-1 text-sm text-ink-muted">{{ emptyMessage }}</p>
+            <p class="font-medium">{{ emptyTitle ?? $t('common.tiada_rekod') }}</p>
+            <p class="mt-1 text-sm text-ink-muted">{{ emptyMessage ?? $t('common.tiada_untuk_dipaparkan') }}</p>
         </div>
 
         <div class="hidden min-w-0 overflow-x-auto rounded-2xl border border-line md:block">

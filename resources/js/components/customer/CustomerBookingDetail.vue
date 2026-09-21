@@ -143,8 +143,10 @@ const tones = {
 
                     <UiConfirmSubmit
                         :title="$t('booking.rekod_bayaran_ini')"
-                        :message="`${money(amount)} akan dihantar kepada vendor untuk disahkan${receiptName ? ` bersama resit ${receiptName}` : ''}. Vendor akan menyemak akaun mereka sebelum booking disahkan.`"
-                        confirm-:label="$t('booking.ya_rekodkan')"
+                        :message="receiptName
+                            ? $t('booking.bayaran_akan_dihantar_resit', { amount: money(amount), receipt: receiptName })
+                            : $t('booking.bayaran_akan_dihantar', { amount: money(amount) })"
+                        :confirm-label="$t('booking.ya_rekodkan')"
                         button-class="w-fit rounded-full bg-brand-600 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700 disabled:opacity-60"
                         :disabled="uploading"
                     >{{ $t('booking.rekod_bayaran_2') }}</UiConfirmSubmit>
@@ -190,7 +192,7 @@ const tones = {
                     <UiConfirmSubmit
                         :title="$t('booking.hantar_review_ini')"
                         :message="$t('booking.review_dipaparkan_di_halaman_awam')"
-                        confirm-:label="$t('booking.ya_hantar')"
+                        :confirm-label="$t('booking.ya_hantar')"
                         button-class="w-fit rounded-full bg-brand-600 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700"
                     >{{ $t('booking.hantar_review') }}</UiConfirmSubmit>
                 </form>
@@ -222,7 +224,7 @@ const tones = {
                         method="DELETE"
                         :title="$t('booking.buang_rekod_bayaran_ini')"
                         :message="$t('booking.rekod_ini_belum_disahkan_vendor')"
-                        confirm-:label="$t('booking.ya_buang')"
+                        :confirm-label="$t('booking.ya_buang')"
                         tone="danger"
                         :csrf="csrf"
                     >{{ $t('booking.buang_rekod') }}</UiConfirm>
@@ -238,8 +240,8 @@ const tones = {
                 :action="cancelForm.action"
                 :title="$t('booking.batalkan_booking_ini')"
                 :message="$t('booking.vendor_akan_dimaklumkan_tindakan_ini')"
-                confirm-:label="$t('booking.ya_batalkan_booking')"
-                cancel-:label="$t('booking.jangan_batalkan')"
+                :confirm-label="$t('booking.ya_batalkan_booking')"
+                :cancel-label="$t('booking.jangan_batalkan')"
                 tone="danger"
                 trigger-class="w-full rounded-full border border-line px-4 py-2.5 text-sm font-medium text-ink-muted transition hover:border-red-300 hover:text-red-700"
                 :csrf="csrf"

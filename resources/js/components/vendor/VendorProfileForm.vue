@@ -102,7 +102,7 @@ const stateChoices = computed(() =>
                     :options="categoryChoices"
                     :max="maxCategories"
                     :error="errors.category_ids || errors['category_ids.0']"
-                    :help="`Maksimum ${maxCategories}. Pencari akan jumpa anda dalam setiap satu.`"
+                    :help="$t('vendor_profile.maksimum_kategori', { count: maxCategories })"
                 />
 
                 <UiMultiSelect

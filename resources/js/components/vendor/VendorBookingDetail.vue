@@ -81,8 +81,8 @@ const tones = {
                         <UiConfirm
                             :action="payment.verify_url"
                             :title="$t('vendor_booking.sahkan_bayaran_ini_diterima')"
-                            :message="`Pastikan ${payment.amount} benar-benar masuk ke akaun anda. Booking akan disahkan dan pengantin dimaklumkan.`"
-                            confirm-:label="$t('vendor_booking.ya_saya_telah_terima')"
+                            :message="$t('vendor_booking.pastikan_bayaran_masuk', { amount: payment.amount })"
+                            :confirm-label="$t('vendor_booking.ya_saya_telah_terima')"
                             trigger-class="rounded-full bg-emerald-600 px-4 py-1.5 text-xs font-semibold text-white transition hover:bg-emerald-700"
                             :csrf="csrf"
                         >{{ $t('vendor_booking.sahkan_diterima') }}</UiConfirm>
@@ -92,7 +92,7 @@ const tones = {
                             method="DELETE"
                             :title="$t('vendor_booking.tanda_bayaran_ini_tidak_diterima')"
                             :message="$t('vendor_booking.pengantin_akan_diminta_menyemak_resit')"
-                            confirm-:label="$t('vendor_booking.ya_saya_tidak_jumpa')"
+                            :confirm-label="$t('vendor_booking.ya_saya_tidak_jumpa')"
                             tone="danger"
                             :csrf="csrf"
                         >{{ $t('vendor_booking.tidak_diterima') }}</UiConfirm>

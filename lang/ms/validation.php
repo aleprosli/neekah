@@ -181,6 +181,10 @@ return [
     */
 
     'custom' => [
+        'credentials' => 'Emel atau kata laluan tidak sepadan dengan rekod kami.',
+        'too_many_attempts' => 'Terlalu banyak percubaan. Cuba lagi dalam :minutes minit.',
+        'reset_link_invalid' => 'Pautan set semula tidak sah atau telah tamat tempoh.',
+
         'timeline_vendor_not_booked' => 'Anda hanya boleh menugaskan vendor yang telah ditempah untuk majlis ini.',
         'no_customer_account' => 'Tiada akaun pengantin dengan emel ini. Minta pelanggan daftar di Neekah dahulu.',
         'twitter_handle' => 'Akaun X hanya boleh mengandungi huruf, nombor dan garis bawah.',

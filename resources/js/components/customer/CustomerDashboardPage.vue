@@ -25,7 +25,7 @@ defineProps({
         icon="💍"
         :title="$t('customer.start_project_title')"
         :message="$t('customer.tetapkan_tarikh_lokasi_dan_bajet')"
-        action-:label="$t('customer.start_project_action')"
+        :action-label="$t('customer.start_project_action')"
         :action-url="createUrl"
     />
 

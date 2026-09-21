@@ -42,7 +42,7 @@ class LoginRequest extends FormRequest
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
-                'email' => 'Emel atau kata laluan tidak sepadan dengan rekod kami.',
+                'email' => __('validation.custom.credentials'),
             ]);
         }
 
@@ -63,7 +63,7 @@ class LoginRequest extends FormRequest
         $seconds = RateLimiter::availableIn($this->throttleKey());
 
         throw ValidationException::withMessages([
-            'email' => 'Terlalu banyak percubaan. Cuba lagi dalam '.ceil($seconds / 60).' minit.',
+            'email' => __('validation.custom.too_many_attempts', ['minutes' => ceil($seconds / 60)]),
         ]);
     }
 

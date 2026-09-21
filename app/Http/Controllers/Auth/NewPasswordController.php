@@ -54,7 +54,7 @@ class NewPasswordController extends Controller
 
         if ($status !== Password::PasswordReset) {
             throw ValidationException::withMessages([
-                'email' => 'Pautan set semula tidak sah atau telah tamat tempoh.',
+                'email' => __('validation.custom.reset_link_invalid'),
             ]);
         }
 

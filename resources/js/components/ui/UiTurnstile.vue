@@ -14,6 +14,11 @@ import { onBeforeUnmount, onMounted, ref } from 'vue';
 
 const props = defineProps({
     siteKey: { type: String, required: true },
+    // Turnstile draws its own wording, so it has to be told which language the
+    // page is in; left alone it said "sahkan anda manusia" on /en. Taken from
+    // the document rather than a prop, so every place that mounts this widget
+    // gets it right without having to remember to pass it.
+    language: { type: String, default: null },
 });
 
 const SCRIPT_URL = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
@@ -46,7 +51,7 @@ onMounted(async () => {
 
         widget.value = turnstile.render(element.value, {
             sitekey: props.siteKey,
-            language: 'ms',
+            language: props.language ?? document.documentElement.lang ?? 'ms',
             size: 'flexible',
         });
     } catch {

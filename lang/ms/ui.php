@@ -10,6 +10,10 @@ return [
     ],
 
     'common' => [
+        'teruskan' => 'Teruskan',
+        'semak_semula' => 'Semak semula',
+        'tiada_rekod' => 'Tiada rekod',
+        'tiada_untuk_dipaparkan' => 'Tiada apa-apa untuk dipaparkan buat masa ini.',
         'memuatkan' => 'Memuatkan',
         'blog' => 'Blog',
         'login' => 'Log masuk',
@@ -190,6 +194,7 @@ return [
     ],
 
     'guests' => [
+        'tetamu_akan_dibuang' => ':name akan dibuang dari senarai. Jawapan RSVP mereka kekal.',
         'aina_sofea_0123456789_bride_family' => 'Aina Sofea, 0123456789, bride, family, 2&#10;Pak Long Rahim, , groom, family, 4',
         'senarai_tetamu_masih_kosong' => 'Senarai tetamu masih kosong',
         'tambah_tetamu_satu_per_satu' => 'Tambah tetamu satu per satu, atau tampal senarai dari Excel atau WhatsApp. Setiap tetamu dapat pautan kad peribadi mereka sendiri.',
@@ -220,6 +225,8 @@ return [
     ],
 
     'booking' => [
+        'bayaran_akan_dihantar' => ':amount akan dihantar kepada vendor untuk disahkan. Vendor akan menyemak akaun mereka sebelum booking disahkan.',
+        'bayaran_akan_dihantar_resit' => ':amount akan dihantar kepada vendor untuk disahkan bersama resit :receipt. Vendor akan menyemak akaun mereka sebelum booking disahkan.',
         'contoh_bayaran_pendahuluan_transfer_maybank2u' => 'Contoh: bayaran pendahuluan, transfer Maybank2u',
         'memuat_naik_resit' => 'Memuat naik resit',
         'rekod_bayaran_ini' => 'Rekod bayaran ini?',
@@ -264,6 +271,7 @@ return [
     ],
 
     'vendor_profile' => [
+        'maksimum_kategori' => 'Maksimum :count. Pencari akan jumpa anda dalam setiap satu.',
         'nama_perniagaan' => 'Nama perniagaan',
         'kategori_utama' => 'Kategori utama',
         'kategori_ini_yang_dipaparkan_pada' => 'Kategori ini yang dipaparkan pada kad dan profil anda.',
@@ -296,6 +304,7 @@ return [
     ],
 
     'vendor_booking' => [
+        'pastikan_bayaran_masuk' => 'Pastikan :amount benar-benar masuk ke akaun anda. Booking akan disahkan dan pengantin dimaklumkan.',
         'sahkan_bayaran_ini_diterima' => 'Sahkan bayaran ini diterima?',
         'ya_saya_telah_terima' => 'Ya, saya telah terima',
         'tanda_bayaran_ini_tidak_diterima' => 'Tanda bayaran ini tidak diterima?',
@@ -378,6 +387,7 @@ return [
     ],
 
     'packages' => [
+        'padam_pakej_nama' => 'Padam pakej :name?',
         'pakej_ini_tidak_akan_dipaparkan' => 'Pakej ini tidak akan dipaparkan lagi pada profil anda. Tempahan sedia ada tidak terjejas.',
         'padam_pakej' => 'Padam pakej',
         'belum_ada_pakej' => 'Belum ada pakej',
@@ -461,6 +471,9 @@ return [
     ],
 
     'admin_checklist' => [
+        'padam_fasa_nama' => 'Padam fasa :name?',
+        'tugasan_akan_hilang' => ':count tugasan dalam fasa ini akan hilang dari senarai induk. Checklist pengantin sedia ada tidak berubah.',
+        'bulan_sebelum_majlis_help' => '0 bermaksud hari majlis. Kosongkan untuk tugasan tanpa tarikh akhir.',
         'alih_ke_atas' => 'Alih ke atas',
         'alih_ke_bawah' => 'Alih ke bawah',
         'padam_fasa' => 'Padam fasa',
@@ -496,6 +509,8 @@ return [
     ],
 
     'admin_announcements' => [
+        'hantar_kepada_penerima' => 'Hantar kepada :count penerima?',
+        'emel_dan_notifikasi_akan_dihantar' => ':audience. Emel dan notifikasi akan dihantar, dan pengumuman yang sudah keluar tidak boleh ditarik balik.',
         'taip_nama_atau_emel' => 'Taip nama atau emel…',
         'atau_taip_alamat_emel' => 'Atau taip alamat emel',
         'satu_alamat_setiap_baris_atau' => 'Satu alamat setiap baris, atau dipisahkan dengan koma. Alamat tanpa akaun akan terima emel sahaja.',
@@ -543,6 +558,7 @@ return [
     ],
 
     'admin_categories' => [
+        'padam_kategori_nama' => 'Padam kategori :name?',
         'alih_ke_atas' => 'Alih ke atas',
         'alih_ke_bawah' => 'Alih ke bawah',
         'kategori_ini_tiada_vendor_jadi' => 'Kategori ini tiada vendor, jadi ia selamat dipadam. Tindakan ini tidak boleh dibatalkan.',
@@ -612,6 +628,7 @@ return [
     ],
 
     'admin_posts' => [
+        'padam_artikel_tajuk' => 'Padam artikel :title?',
         'artikel_dan_gambar_utamanya_akan' => 'Artikel dan gambar utamanya akan dipadam. Tindakan ini tidak boleh dibatalkan.',
         'padam_artikel' => 'Padam artikel',
         'belum_ada_artikel' => 'Belum ada artikel.',

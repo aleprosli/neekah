@@ -46,9 +46,9 @@ const tones = {
                     :action="row.destroy_url"
                     method="DELETE"
                     tone="danger"
-                    :title="`Padam artikel ${row.title}?`"
+                    :title="$t('admin_posts.padam_artikel_tajuk', { title: row.title })"
                     :message="$t('admin_posts.artikel_dan_gambar_utamanya_akan')"
-                    confirm-:label="$t('admin_posts.padam_artikel')"
+                    :confirm-label="$t('admin_posts.padam_artikel')"
                     trigger-class="ml-3 text-xs font-medium text-ink-muted hover:text-brand-700"
                     :csrf="csrf"
                 >{{ $t('admin_posts.padam') }}</UiConfirm>

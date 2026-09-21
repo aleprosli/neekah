@@ -219,9 +219,9 @@ const sendTest = (event) => {
 
             <div class="flex flex-wrap items-center gap-3">
                 <UiConfirmSubmit
-                    :title="`Hantar kepada ${total} penerima?`"
-                    :message="`${chosen?.label}. Emel dan notifikasi akan dihantar, dan pengumuman yang sudah keluar tidak boleh ditarik balik.`"
-                    confirm-:label="$t('admin_announcements.hantar_sekarang')"
+                    :title="$t('admin_announcements.hantar_kepada_penerima', { count: total })"
+                    :message="$t('admin_announcements.emel_dan_notifikasi_akan_dihantar', { audience: chosen?.label })"
+                    :confirm-label="$t('admin_announcements.hantar_sekarang')"
                     button-class="rounded-full bg-brand-600 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700"
                 >{{ $t('admin_announcements.hantar_pengumuman') }}</UiConfirmSubmit>
 
@@ -235,8 +235,8 @@ const sendTest = (event) => {
             <DataTable
                 :rows="announcements"
                 :columns="columns"
-                empty-:title="$t('admin_announcements.belum_ada_pengumuman')"
-                empty-:message="$t('admin_announcements.pengumuman_yang_dihantar_akan_disenaraikan')"
+                :empty-title="$t('admin_announcements.belum_ada_pengumuman')"
+                :empty-message="$t('admin_announcements.pengumuman_yang_dihantar_akan_disenaraikan')"
                 :csrf="csrf"
             >
                 <template #cell-subject="{ row }">

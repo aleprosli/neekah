@@ -10,6 +10,10 @@ return [
     ],
 
     'common' => [
+        'teruskan' => 'Continue',
+        'semak_semula' => 'Let me check',
+        'tiada_rekod' => 'Nothing here',
+        'tiada_untuk_dipaparkan' => 'There is nothing to show right now.',
         'memuatkan' => 'Loading',
         'blog' => 'Blog',
         'login' => 'Log in',
@@ -190,6 +194,7 @@ return [
     ],
 
     'guests' => [
+        'tetamu_akan_dibuang' => ':name will be removed from the list. Their RSVP reply stays.',
         'aina_sofea_0123456789_bride_family' => 'Aina Sofea, 0123456789, bride, family, 2&#10;Pak Long Rahim, , groom, family, 4',
         'senarai_tetamu_masih_kosong' => 'Your guest list is empty',
         'tambah_tetamu_satu_per_satu' => 'Add guests one at a time, or paste a list from Excel or WhatsApp. Each guest gets their own personal card link.',
@@ -220,6 +225,8 @@ return [
     ],
 
     'booking' => [
+        'bayaran_akan_dihantar' => ':amount will be sent to the vendor to confirm. They will check their account before the booking is confirmed.',
+        'bayaran_akan_dihantar_resit' => ':amount will be sent to the vendor to confirm, along with the receipt :receipt. They will check their account before the booking is confirmed.',
         'contoh_bayaran_pendahuluan_transfer_maybank2u' => 'For example: deposit, Maybank2u transfer',
         'memuat_naik_resit' => 'Uploading receipt',
         'rekod_bayaran_ini' => 'Record this payment?',
@@ -264,6 +271,7 @@ return [
     ],
 
     'vendor_profile' => [
+        'maksimum_kategori' => 'At most :count. Searchers will find you under each one.',
         'nama_perniagaan' => 'Business name',
         'kategori_utama' => 'Main category',
         'kategori_ini_yang_dipaparkan_pada' => 'This is the category shown on your card and profile.',
@@ -296,6 +304,7 @@ return [
     ],
 
     'vendor_booking' => [
+        'pastikan_bayaran_masuk' => 'Make sure :amount really reached your account. The booking will be confirmed and the couple told.',
         'sahkan_bayaran_ini_diterima' => 'Confirm you received this payment?',
         'ya_saya_telah_terima' => 'Yes, I received it',
         'tanda_bayaran_ini_tidak_diterima' => 'Mark this payment as not received?',
@@ -378,6 +387,7 @@ return [
     ],
 
     'packages' => [
+        'padam_pakej_nama' => 'Delete the package :name?',
         'pakej_ini_tidak_akan_dipaparkan' => 'This package will no longer show on your profile. Existing bookings are unaffected.',
         'padam_pakej' => 'Delete package',
         'belum_ada_pakej' => 'No packages yet',
@@ -461,6 +471,9 @@ return [
     ],
 
     'admin_checklist' => [
+        'padam_fasa_nama' => 'Delete the :name phase?',
+        'tugasan_akan_hilang' => ':count tasks in this phase will go from the master list. Existing couples’ checklists are unchanged.',
+        'bulan_sebelum_majlis_help' => '0 means the wedding day itself. Leave it empty for a task with no deadline.',
         'alih_ke_atas' => 'Move up',
         'alih_ke_bawah' => 'Move down',
         'padam_fasa' => 'Delete phase',
@@ -496,6 +509,8 @@ return [
     ],
 
     'admin_announcements' => [
+        'hantar_kepada_penerima' => 'Send to :count recipients?',
+        'emel_dan_notifikasi_akan_dihantar' => ':audience. Emails and notifications go out, and an announcement that has left cannot be pulled back.',
         'taip_nama_atau_emel' => 'Type a name or an email…',
         'atau_taip_alamat_emel' => 'Or type email addresses',
         'satu_alamat_setiap_baris_atau' => 'One address per line, or separated by commas. Addresses with no account receive the email only.',
@@ -543,6 +558,7 @@ return [
     ],
 
     'admin_categories' => [
+        'padam_kategori_nama' => 'Delete the :name category?',
         'alih_ke_atas' => 'Move up',
         'alih_ke_bawah' => 'Move down',
         'kategori_ini_tiada_vendor_jadi' => 'This category has no vendors, so it is safe to delete. This cannot be undone.',
@@ -612,6 +628,7 @@ return [
     ],
 
     'admin_posts' => [
+        'padam_artikel_tajuk' => 'Delete the article :title?',
         'artikel_dan_gambar_utamanya_akan' => 'The article and its featured image will be deleted. This cannot be undone.',
         'padam_artikel' => 'Delete article',
         'belum_ada_artikel' => 'No articles yet.',

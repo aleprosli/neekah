@@ -13,8 +13,8 @@ import { ref } from 'vue';
 defineProps({
     title: { type: String, required: true },
     message: { type: String, default: null },
-    confirmLabel: { type: String, default: 'Teruskan' },
-    cancelLabel: { type: String, default: 'Semak semula' },
+    confirmLabel: { type: String, default: null },
+    cancelLabel: { type: String, default: null },
     buttonClass: { type: String, default: 'w-full rounded-full bg-brand-600 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700' },
     disabled: { type: Boolean, default: false },
 });
@@ -47,8 +47,8 @@ const confirm = () => {
                 <p v-if="message" class="mt-1 text-sm text-ink-muted">{{ message }}</p>
 
                 <div class="mt-5 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-                    <button type="button" class="rounded-full border border-line px-5 py-2.5 text-sm font-medium transition hover:bg-surface-muted" @click="open = false">{{ cancelLabel }}</button>
-                    <button type="button" class="rounded-full bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700" @click="confirm">{{ confirmLabel }}</button>
+                    <button type="button" class="rounded-full border border-line px-5 py-2.5 text-sm font-medium transition hover:bg-surface-muted" @click="open = false">{{ cancelLabel ?? $t('common.semak_semula') }}</button>
+                    <button type="button" class="rounded-full bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700" @click="confirm">{{ confirmLabel ?? $t('common.teruskan') }}</button>
                 </div>
             </div>
         </div>

@@ -154,9 +154,9 @@ const saveOrder = async () => {
                                 :action="row.destroy_url"
                                 method="DELETE"
                                 tone="danger"
-                                :title="`Padam kategori ${row.name}?`"
+                                :title="$t('admin_categories.padam_kategori_nama', { name: row.name })"
                                 :message="$t('admin_categories.kategori_ini_tiada_vendor_jadi')"
-                                confirm-:label="$t('admin_categories.padam_kategori')"
+                                :confirm-label="$t('admin_categories.padam_kategori')"
                                 trigger-class="rounded-full px-2 py-1.5 text-xs font-medium text-ink-muted transition hover:text-brand-700"
                                 :csrf="csrf"
                             >{{ $t('admin_categories.padam') }}</UiConfirm>

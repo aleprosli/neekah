@@ -66,7 +66,7 @@ defineProps({
                         :fields="{ status: 'approved' }"
                         :title="`Luluskan ${vendor.name}?`"
                         :message="$t('admin_dashboard.profil_ini_akan_dipaparkan_di')"
-                        confirm-:label="$t('admin_dashboard.ya_luluskan')"
+                        :confirm-label="$t('admin_dashboard.ya_luluskan')"
                         trigger-class="shrink-0 rounded-full bg-brand-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-brand-700"
                         :csrf="csrf"
                     >{{ $t('admin_dashboard.lulus') }}</UiConfirm>

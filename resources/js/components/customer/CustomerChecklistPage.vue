@@ -221,7 +221,7 @@ const tone = (progress) => {
                                     tone="danger"
                                     :title="$t('checklist.padam_tugasan_ini')"
                                     :message="task.title"
-                                    confirm-:label="$t('checklist.padam')"
+                                    :confirm-label="$t('checklist.padam')"
                                     trigger-class="shrink-0 text-xs font-medium text-ink-muted hover:text-brand-700"
                                     :csrf="csrf"
                                 >{{ $t('checklist.padam_2') }}</UiConfirm>

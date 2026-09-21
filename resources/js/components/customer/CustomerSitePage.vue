@@ -410,7 +410,7 @@ const previewFile = (event, target) => {
                     tone="danger"
                     :title="$t('card_editor.padam_gambar_ini')"
                     :message="$t('card_editor.gambar_akan_dibuang_dari_galeri')"
-                    confirm-:label="$t('card_editor.padam')"
+                    :confirm-label="$t('card_editor.padam')"
                     trigger-class="text-xs font-medium text-ink-muted hover:text-brand-700"
                     :csrf="csrf"
                 >{{ $t('card_editor.padam_2') }}</UiConfirm>

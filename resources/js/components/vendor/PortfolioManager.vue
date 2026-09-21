@@ -174,7 +174,7 @@ const destroyUrl = (photo) => props.destroyUrlTemplate.replace('__ID__', photo.i
                         method="DELETE"
                         :title="$t('portfolio.padam_gambar_ini')"
                         :message="$t('portfolio.fail_dibuang_untuk_selamanya_termasuk')"
-                        confirm-:label="$t('portfolio.ya_padam')"
+                        :confirm-label="$t('portfolio.ya_padam')"
                         tone="danger"
                         trigger-class="rounded-full px-2 py-1 text-xs text-ink-muted transition hover:bg-surface-muted hover:text-brand-700"
                         :csrf="csrf"

@@ -196,8 +196,8 @@ const tones = {
                         method="DELETE"
                         tone="danger"
                         :title="$t('guests.padam_tetamu_ini')"
-                        :message="`${guest.name} akan dibuang dari senarai. Jawapan RSVP mereka kekal.`"
-                        confirm-:label="$t('guests.padam')"
+                        :message="$t('guests.tetamu_akan_dibuang', { name: guest.name })"
+                        :confirm-label="$t('guests.padam')"
                         trigger-class="text-xs font-medium text-ink-muted hover:text-brand-700"
                         :csrf="csrf"
                     >{{ $t('guests.padam_2') }}</UiConfirm>

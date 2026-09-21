@@ -98,7 +98,7 @@ defineProps({
                         tone="danger"
                         :title="$t('timeline.padam_aktiviti_ini')"
                         :message="`${item.starts_at} · ${item.title}`"
-                        confirm-:label="$t('timeline.padam')"
+                        :confirm-label="$t('timeline.padam')"
                         trigger-class="shrink-0 self-start text-xs font-medium text-ink-muted hover:text-brand-700"
                         :csrf="csrf"
                     >{{ $t('timeline.padam_2') }}</UiConfirm>

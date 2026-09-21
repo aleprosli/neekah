@@ -43,9 +43,9 @@ defineProps({
                         :action="item.destroy_url"
                         method="DELETE"
                         tone="danger"
-                        :title="`Padam pakej ${item.name}?`"
+                        :title="$t('packages.padam_pakej_nama', { name: item.name })"
                         :message="$t('packages.pakej_ini_tidak_akan_dipaparkan')"
-                        confirm-:label="$t('packages.padam_pakej')"
+                        :confirm-label="$t('packages.padam_pakej')"
                         trigger-class="rounded-full px-4 py-1.5 font-medium text-ink-muted transition hover:bg-surface-muted hover:text-ink"
                         :csrf="csrf"
                     >{{ $t('packages.padam') }}</UiConfirm>

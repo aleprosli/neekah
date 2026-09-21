@@ -181,6 +181,10 @@ return [
     */
 
     'custom' => [
+        'credentials' => 'That email and password do not match our records.',
+        'too_many_attempts' => 'Too many attempts. Try again in :minutes minutes.',
+        'reset_link_invalid' => 'That reset link is not valid, or it has expired.',
+
         'timeline_vendor_not_booked' => 'You can only assign a vendor you have booked for this wedding.',
         'no_customer_account' => 'There is no couple account with this email. Ask your customer to register on Neekah first.',
         'twitter_handle' => 'An X account can only contain letters, numbers and underscores.',

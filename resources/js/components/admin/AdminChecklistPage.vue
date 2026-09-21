@@ -176,9 +176,9 @@ const dueLabel = (months) => {
                                     :action="section.destroy_url"
                                     method="DELETE"
                                     tone="danger"
-                                    :title="`Padam fasa ${section.title}?`"
-                                    :message="`${section.items.length} tugasan dalam fasa ini akan hilang dari senarai induk. Checklist pengantin sedia ada tidak berubah.`"
-                                    confirm-:label="$t('admin_checklist.padam_fasa')"
+                                    :title="$t('admin_checklist.padam_fasa_nama', { name: section.title })"
+                                    :message="$t('admin_checklist.tugasan_akan_hilang', { count: section.items.length })"
+                                    :confirm-label="$t('admin_checklist.padam_fasa')"
                                     trigger-class="rounded-full px-2 py-1.5 text-xs font-medium text-ink-muted transition hover:text-brand-700"
                                     :csrf="csrf"
                                 >{{ $t('admin_checklist.padam_2') }}</UiConfirm>
@@ -220,7 +220,7 @@ const dueLabel = (months) => {
                                             tone="danger"
                                             :title="$t('admin_checklist.padam_tugasan_ini_dari_senarai')"
                                             :message="item.title"
-                                            confirm-:label="$t('admin_checklist.padam')"
+                                            :confirm-label="$t('admin_checklist.padam')"
                                             trigger-class="rounded-full px-2 py-1.5 text-xs font-medium text-ink-muted transition hover:text-brand-700"
                                             :csrf="csrf"
                                         >{{ $t('admin_checklist.padam_3') }}</UiConfirm>
@@ -274,7 +274,7 @@ const dueLabel = (months) => {
                         min="0"
                         max="36"
                         :error="errors.months_before"
-                        help="0 bermaksud hari majlis. Kosongkan untuk tugasan tanpa tarikh akhir."
+                        :help="$t('admin_checklist.bulan_sebelum_majlis_help')"
                     />
 
                     <UiTextarea v-for="locale in locales" :key="`in-${locale.code}`" v-model="form.notes[locale.code]" :label="`${$t('admin_checklist.nota_2')} · ${locale.label}`" :name="`notes[${locale.code}]`" rows="3" :error="errors[`notes.${locale.code}`]" />
