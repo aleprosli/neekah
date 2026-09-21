@@ -1,11 +1,11 @@
 @php use App\Enums\VendorTier; @endphp
 
-<x-layouts.app title="Banding vendor">
+<x-layouts.app :title="__('pages.compare.banding_vendor')">
     <x-site.header />
 
     <main class="mx-auto max-w-6xl px-4 pt-24 pb-24 sm:px-6 lg:px-10 lg:pt-28">
         <div class="flex flex-col gap-1">
-            <h1 class="font-display text-3xl font-semibold tracking-tight">Banding vendor</h1>
+            <h1 class="font-display text-3xl font-semibold tracking-tight">{{ __('pages.compare.banding_vendor_2') }}</h1>
             <p class="text-sm text-ink-muted">
                 @if ($sharedCategory)
                     <x-category-icon class="inline-block size-5 shrink-0 align-[-0.3em]" :category="$sharedCategory" /> {{ $sharedCategory->name }} · {{ $vendors->count() }} vendor dibandingkan
@@ -18,9 +18,9 @@
         @if ($vendors->isEmpty())
             <div class="mt-10 flex flex-col items-center gap-3 rounded-3xl border border-dashed border-line px-6 py-16 text-center">
                 <span class="text-4xl">⚖️</span>
-                <h2 class="font-display text-xl font-semibold">Belum ada vendor dipilih</h2>
-                <p class="max-w-md text-sm text-ink-muted">Di marketplace, tandakan kotak "Banding" pada kad vendor. Anda boleh membandingkan harga, pakej, rating dan prestasi mereka bersebelahan.</p>
-                <a href="{{ route('vendors.index') }}" class="rounded-full bg-brand-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-brand-700">Cari vendor</a>
+                <h2 class="font-display text-xl font-semibold">{{ __('pages.compare.belum_ada_vendor_dipilih') }}</h2>
+                <p class="max-w-md text-sm text-ink-muted">{{ __('pages.compare.di_marketplace_tandakan_kotak_banding') }}</p>
+                <a href="{{ route('vendors.index') }}" class="rounded-full bg-brand-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-brand-700">{{ __('pages.compare.cari_vendor') }}</a>
             </div>
         @else
             @php $columns = 'grid-cols-['.str_repeat('1fr_', $vendors->count()).']'; @endphp
@@ -29,7 +29,7 @@
                 <table class="w-full min-w-[40rem] border-separate border-spacing-0 text-sm">
                     <thead>
                         <tr>
-                            <th class="sticky left-0 z-10 w-32 bg-surface p-3 text-left align-bottom text-xs font-semibold tracking-wide text-ink-muted uppercase">Perbandingan</th>
+                            <th class="sticky left-0 z-10 w-32 bg-surface p-3 text-left align-bottom text-xs font-semibold tracking-wide text-ink-muted uppercase">{{ __('pages.compare.perbandingan') }}</th>
                             @foreach ($vendors as $vendor)
                                 <th class="p-3 align-bottom">
                                     <a href="{{ route('vendors.show', $vendor) }}" class="group flex flex-col gap-2 text-left">
@@ -64,7 +64,7 @@
 
                         {{-- Packages --}}
                         <tr class="border-t border-line">
-                            <th class="sticky left-0 z-10 border-t border-line bg-surface p-3 text-left align-top font-medium text-ink-muted">Pakej</th>
+                            <th class="sticky left-0 z-10 border-t border-line bg-surface p-3 text-left align-top font-medium text-ink-muted">{{ __('pages.compare.pakej') }}</th>
                             @foreach ($vendors as $vendor)
                                 <td class="border-t border-line p-3 align-top">
                                     @forelse ($vendor->packages as $package)
@@ -73,7 +73,7 @@
                                             <p class="text-xs text-ink-muted">RM{{ number_format((float) $package->price) }} · {{ $package->duration }}</p>
                                         </div>
                                     @empty
-                                        <span class="text-ink-muted">Tiada pakej</span>
+                                        <span class="text-ink-muted">{{ __('pages.compare.tiada_pakej') }}</span>
                                     @endforelse
                                 </td>
                             @endforeach
@@ -83,7 +83,7 @@
                             <th class="sticky left-0 z-10 border-t border-line bg-surface p-3"></th>
                             @foreach ($vendors as $vendor)
                                 <td class="border-t border-line p-3">
-                                    <a href="{{ route('vendors.show', $vendor) }}#hubungi" class="inline-flex rounded-full bg-brand-600 px-4 py-2 text-xs font-semibold text-white transition hover:bg-brand-700">Hubungi</a>
+                                    <a href="{{ route('vendors.show', $vendor) }}#hubungi" class="inline-flex rounded-full bg-brand-600 px-4 py-2 text-xs font-semibold text-white transition hover:bg-brand-700">{{ __('pages.compare.hubungi') }}</a>
                                 </td>
                             @endforeach
                         </tr>
@@ -92,8 +92,8 @@
             </div>
 
             <div class="mt-6 flex flex-wrap gap-2">
-                <a href="{{ route('vendors.index', $sharedCategory ? ['category' => $sharedCategory->slug] : []) }}" class="rounded-full border border-line px-5 py-2.5 text-sm font-medium transition hover:border-brand-400">Tambah vendor lain</a>
-                <a href="{{ route('vendors.compare') }}" class="rounded-full px-5 py-2.5 text-sm font-medium text-ink-muted transition hover:bg-surface-muted">Kosongkan</a>
+                <a href="{{ route('vendors.index', $sharedCategory ? ['category' => $sharedCategory->slug] : []) }}" class="rounded-full border border-line px-5 py-2.5 text-sm font-medium transition hover:border-brand-400">{{ __('pages.compare.tambah_vendor_lain') }}</a>
+                <a href="{{ route('vendors.compare') }}" class="rounded-full px-5 py-2.5 text-sm font-medium text-ink-muted transition hover:bg-surface-muted">{{ __('pages.compare.kosongkan') }}</a>
             </div>
         @endif
     </main>
