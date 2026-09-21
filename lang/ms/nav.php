@@ -20,6 +20,11 @@ return [
     'back_to_site' => 'Kembali ke Neekah',
     'main' => 'Utama',
     'open_menu' => 'Buka menu',
+    'admin_panel' => 'Admin panel',
+    'vendor_dashboard' => 'Dashboard vendor',
+    'my_bookings' => 'Tempahan saya',
+    'enquiries' => 'Enquiry',
+    'home' => 'Laman utama',
     'language' => 'Bahasa',
 
 ];

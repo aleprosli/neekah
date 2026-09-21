@@ -40,25 +40,19 @@
         <div class="min-w-0 flex-1">
             @if ($state === 'connected')
                 <p class="flex items-center gap-2 text-xs font-semibold tracking-wide text-emerald-700 uppercase">
-                    <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
-                    Terhubung
-                </p>
+                    <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>{{ __('pages.couple.terhubung') }}</p>
                 <h2 class="mt-1 font-display text-xl font-semibold">{{ $owner->name }} &amp; {{ $partner->name }}</h2>
-                <p class="mt-1 text-sm text-ink-muted">Anda berdua menguruskan majlis ini bersama. Setiap tempahan, bayaran dan perubahan bajet dikongsi serta-merta.</p>
+                <p class="mt-1 text-sm text-ink-muted">{{ __('pages.couple.anda_berdua_menguruskan_majlis_ini') }}</p>
             @elseif ($state === 'pending')
                 <p class="flex items-center gap-2 text-xs font-semibold tracking-wide text-gold-600 uppercase">
-                    <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 7v5l3 2"/><circle cx="12" cy="12" r="9"/></svg>
-                    Menunggu jawapan
-                </p>
-                <h2 class="mt-1 font-display text-xl font-semibold">Jemputan dihantar</h2>
+                    <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 7v5l3 2"/><circle cx="12" cy="12" r="9"/></svg>{{ __('pages.couple.menunggu_jawapan') }}</p>
+                <h2 class="mt-1 font-display text-xl font-semibold">{{ __('pages.couple.jemputan_dihantar') }}</h2>
                 <p class="mt-1 text-sm break-words text-ink-muted">{{ $pendingInvite->email }} belum menerima jemputan. Pautan ini sah sehingga {{ $pendingInvite->expires_at->translatedFormat('j F Y') }}.</p>
             @else
                 <p class="flex items-center gap-2 text-xs font-semibold tracking-wide text-ink-muted uppercase">
-                    <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 15 6-6M6.5 10.5 5 12a4 4 0 0 0 5.7 5.7l1.3-1.5M17.5 13.5 19 12a4 4 0 0 0-5.7-5.7L12 7.8"/></svg>
-                    Belum terhubung
-                </p>
-                <h2 class="mt-1 font-display text-xl font-semibold">Uruskan majlis berdua</h2>
-                <p class="mt-1 text-sm text-ink-muted">Jemput bakal pasangan anda supaya kalian boleh merancang bersama: checklist, bajet, tetamu dan kad jemputan yang sama. Setiap seorang log masuk dengan akaun sendiri.</p>
+                    <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 15 6-6M6.5 10.5 5 12a4 4 0 0 0 5.7 5.7l1.3-1.5M17.5 13.5 19 12a4 4 0 0 0-5.7-5.7L12 7.8"/></svg>{{ __('pages.couple.belum_terhubung') }}</p>
+                <h2 class="mt-1 font-display text-xl font-semibold">{{ __('pages.couple.uruskan_majlis_berdua') }}</h2>
+                <p class="mt-1 text-sm text-ink-muted">{{ __('pages.couple.jemput_bakal_pasangan_anda_supaya') }}</p>
             @endif
         </div>
 
@@ -66,8 +60,8 @@
         <div class="shrink-0 lg:w-72">
             @if ($state === 'connected')
                 <dl class="flex flex-col gap-1.5 rounded-2xl bg-surface-raised/70 p-4 text-sm">
-                    <div class="flex items-center justify-between gap-3"><dt class="text-ink-muted">Pemilik</dt><dd class="truncate font-medium">{{ $owner->name }}</dd></div>
-                    <div class="flex items-center justify-between gap-3"><dt class="text-ink-muted">Pasangan</dt><dd class="truncate font-medium">{{ $partner->name }}</dd></div>
+                    <div class="flex items-center justify-between gap-3"><dt class="text-ink-muted">{{ __('pages.couple.pemilik') }}</dt><dd class="truncate font-medium">{{ $owner->name }}</dd></div>
+                    <div class="flex items-center justify-between gap-3"><dt class="text-ink-muted">{{ __('pages.couple.pasangan') }}</dt><dd class="truncate font-medium">{{ $partner->name }}</dd></div>
                 </dl>
                 @if ($isOwner)
                     <div class="mt-2 text-center">
@@ -76,10 +70,10 @@
                             method="DELETE"
                             tone="danger"
                             :title="'Buang '.$partner->name.' daripada majlis ini?'"
-                            message="Mereka akan hilang akses kepada checklist, bajet dan semua tempahan majlis ini serta-merta. Anda boleh menjemput semula kemudian."
-                            confirm="Buang pasangan"
+                            :message="__('pages.couple.mereka_akan_hilang_akses_kepada')"
+                            :confirm="__('pages.couple.buang_pasangan')"
                             trigger-class="text-xs font-medium text-ink-muted underline underline-offset-4 hover:text-brand-700"
-                        >Buang pasangan</x-confirm-action>
+                        >{{ __('pages.couple.buang_pasangan_2') }}</x-confirm-action>
                     </div>
                 @endif
             @elseif ($state === 'pending')
@@ -88,18 +82,18 @@
                     <form method="POST" action="{{ route('weddings.invitations.destroy', [$wedding, $pendingInvite]) }}" class="mt-2 text-center">
                         @csrf
                         @method('DELETE')
-                        <button type="submit" class="text-xs font-medium text-ink-muted underline underline-offset-4 hover:text-brand-700">Batalkan jemputan</button>
+                        <button type="submit" class="text-xs font-medium text-ink-muted underline underline-offset-4 hover:text-brand-700">{{ __('pages.couple.batalkan_jemputan') }}</button>
                     </form>
                 @endif
             @elseif ($isOwner)
                 <form method="POST" action="{{ route('weddings.invitations.store', $wedding) }}" class="flex flex-col gap-2">
                     @csrf
-                    <label class="sr-only" for="partner-email">Emel pasangan</label>
+                    <label class="sr-only" for="partner-email">{{ __('pages.couple.emel_pasangan') }}</label>
                     <input id="partner-email" type="email" name="email" value="{{ old('email') }}" placeholder="emel pasangan anda" required class="rounded-xl border border-line bg-surface px-4 py-2.5 text-sm focus:border-brand-400 focus:outline-none">
-                    <button type="submit" class="rounded-full bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700">Jemput pasangan</button>
+                    <button type="submit" class="rounded-full bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700">{{ __('pages.couple.jemput_pasangan') }}</button>
                 </form>
             @else
-                <p class="rounded-2xl bg-surface-raised/70 p-4 text-xs text-ink-muted">Hanya pemilik majlis boleh menjemput pasangan.</p>
+                <p class="rounded-2xl bg-surface-raised/70 p-4 text-xs text-ink-muted">{{ __('pages.couple.hanya_pemilik_majlis_boleh_menjemput') }}</p>
             @endif
         </div>
     </div>

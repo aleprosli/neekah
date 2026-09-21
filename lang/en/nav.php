@@ -20,6 +20,11 @@ return [
     'back_to_site' => 'Back to Neekah',
     'main' => 'Main',
     'open_menu' => 'Open menu',
+    'admin_panel' => 'Admin panel',
+    'vendor_dashboard' => 'Vendor dashboard',
+    'my_bookings' => 'My bookings',
+    'enquiries' => 'Enquiries',
+    'home' => 'Home',
     'language' => 'Language',
 
 ];

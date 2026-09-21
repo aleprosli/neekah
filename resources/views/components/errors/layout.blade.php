@@ -30,8 +30,8 @@
             <p class="mt-3 text-sm text-ink-muted">{{ $message }}</p>
 
             <div class="mt-8 flex flex-wrap items-center justify-center gap-2">
-                <a href="{{ url('/') }}" class="rounded-full bg-brand-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-brand-700">Cari vendor</a>
-                <a href="{{ url('/about') }}" class="rounded-full border border-line px-6 py-3 text-sm font-medium transition hover:border-brand-400">Tentang Neekah</a>
+                <a href="{{ url('/') }}" class="rounded-full bg-brand-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-brand-700">{{ __('pages.errors.cari_vendor') }}</a>
+                <a href="{{ url('/about') }}" class="rounded-full border border-line px-6 py-3 text-sm font-medium transition hover:border-brand-400">{{ __('pages.errors.tentang_neekah') }}</a>
             </div>
         </main>
     </body>

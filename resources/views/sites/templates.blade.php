@@ -10,15 +10,15 @@
     $startUrl = auth()->check() ? route('site.edit') : route('register');
 @endphp
 
-<x-layouts.app title="Template kad jemputan">
+<x-layouts.app :title="__('pages.gallery_page.template_kad_jemputan')">
     <x-site.header />
 
     <main class="pt-24 pb-24 lg:pt-28">
         {{-- Intro --}}
         <section class="mx-auto max-w-3xl px-4 text-center sm:px-6">
-            <p class="text-sm font-semibold tracking-wide text-brand-600 uppercase">Kad kahwin digital</p>
-            <h1 class="mt-3 font-display text-3xl font-semibold tracking-tight text-balance sm:text-5xl">Kad jemputan yang terasa seperti kad sebenar</h1>
-            <p class="mx-auto mt-4 max-w-xl text-ink-muted">Sampul yang dibuka, kertas bertekstur dan nama anda dalam tulisan khat. Tetamu dapat peta, kalendar dan RSVP dalam satu pautan &mdash; <span class="font-medium text-ink">{{ $templates->count() }} template untuk dipilih</span>, percuma.</p>
+            <p class="text-sm font-semibold tracking-wide text-brand-600 uppercase">{{ __('pages.gallery_page.kad_kahwin_digital') }}</p>
+            <h1 class="mt-3 font-display text-3xl font-semibold tracking-tight text-balance sm:text-5xl">{{ __('pages.gallery_page.kad_jemputan_yang_terasa_seperti') }}</h1>
+            <p class="mx-auto mt-4 max-w-xl text-ink-muted">{{ __('pages.gallery_page.sampul_yang_dibuka_kertas_bertekstur') }}<span class="font-medium text-ink">{{ $templates->count() }} template untuk dipilih</span>, percuma.</p>
             <a href="{{ $startUrl }}" class="mt-7 inline-flex rounded-full bg-brand-600 px-7 py-3 text-sm font-semibold text-white shadow-lg shadow-brand-600/20 transition hover:bg-brand-700">
                 {{ auth()->check() ? 'Cipta kad saya' : 'Daftar & cipta kad percuma' }}
             </a>
@@ -42,9 +42,9 @@
         </ol>
 
         {{-- Style filter --}}
-        <nav class="sticky top-[5.25rem] z-20 mt-12 border-y border-line bg-surface/90 backdrop-blur" aria-label="Gaya">
+        <nav class="sticky top-[5.25rem] z-20 mt-12 border-y border-line bg-surface/90 backdrop-blur" :aria-label="__('pages.gallery_page.gaya')">
             <div class="no-scrollbar mx-auto flex max-w-6xl gap-2 overflow-x-auto px-4 py-3 sm:justify-center sm:px-6">
-                <a href="{{ route('sites.templates') }}" @class(['shrink-0 rounded-full border px-4 py-1.5 text-sm font-medium transition', 'border-brand-600 bg-brand-600 text-white' => ! $style, 'border-line hover:border-brand-400' => $style])>Semua</a>
+                <a href="{{ route('sites.templates') }}" @class(['shrink-0 rounded-full border px-4 py-1.5 text-sm font-medium transition', 'border-brand-600 bg-brand-600 text-white' => ! $style, 'border-line hover:border-brand-400' => $style])>{{ __('pages.gallery_page.semua') }}</a>
                 @foreach ($styles as $name)
                     <a href="{{ route('sites.templates', ['style' => $name]) }}" @class(['shrink-0 rounded-full border px-4 py-1.5 text-sm font-medium transition', 'border-brand-600 bg-brand-600 text-white' => $style === $name, 'border-line hover:border-brand-400' => $style !== $name])>{{ $name }}</a>
                 @endforeach
@@ -71,7 +71,7 @@
                                     </span>
                                     <span class="mt-3 flex items-center justify-between gap-2">
                                         <span class="truncate text-sm font-semibold group-hover:text-brand-700">{{ $template->name }}</span>
-                                        <span class="shrink-0 text-xs font-medium text-brand-600 opacity-0 transition group-hover:opacity-100">Lihat &rarr;</span>
+                                        <span class="shrink-0 text-xs font-medium text-brand-600 opacity-0 transition group-hover:opacity-100">{{ __('pages.gallery_page.lihat') }}</span>
                                     </span>
                                     <span class="mt-0.5 line-clamp-2 block text-xs text-ink-muted">{{ $template->description }}</span>
                                 </a>
@@ -83,8 +83,8 @@
         </div>
 
         <div class="mx-auto mt-16 max-w-xl px-4 text-center">
-            <p class="font-display text-xl font-semibold">Sudah jumpa yang berkenan?</p>
-            <p class="mt-2 text-sm text-ink-muted">Anda boleh tukar template bila-bila masa; maklumat majlis kekal.</p>
+            <p class="font-display text-xl font-semibold">{{ __('pages.gallery_page.sudah_jumpa_yang_berkenan') }}</p>
+            <p class="mt-2 text-sm text-ink-muted">{{ __('pages.gallery_page.anda_boleh_tukar_template_bila') }}</p>
             <a href="{{ $startUrl }}" class="mt-5 inline-flex rounded-full bg-brand-600 px-8 py-3 text-sm font-semibold text-white transition hover:bg-brand-700">
                 {{ auth()->check() ? 'Cipta kad jemputan saya' : 'Daftar untuk mula' }}
             </a>

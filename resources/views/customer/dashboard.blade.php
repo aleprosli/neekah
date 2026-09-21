@@ -1,4 +1,4 @@
-<x-layouts.customer title="Majlis saya" :heading="$wedding?->title ?? 'Majlis saya'" :subheading="$wedding ? $wedding->event_date->translatedFormat('l, j F Y').' · '.$wedding->city.', '.$wedding->state : 'Cipta wedding project untuk mula merancang.'">
+<x-layouts.customer :title="__('pages.dash.majlis_saya')" :heading="$wedding?->title ?? 'Majlis saya'" :subheading="$wedding ? $wedding->event_date->translatedFormat('l, j F Y').' · '.$wedding->city.', '.$wedding->state : 'Cipta wedding project untuk mula merancang.'">
     <x-slot:actions>
         {{-- On a phone the buttons get a fixed shape instead of wrapping
              wherever they land: the digital card on a row of its own, first,
@@ -14,12 +14,12 @@
                     <svg class="size-4 text-gold-300" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l1.8 5.6L19.5 9l-5.7 1.4L12 16l-1.8-5.6L4.5 9l5.7-1.4L12 2Zm7 11 .9 2.6 2.6.9-2.6.9L19 20l-.9-2.6-2.6-.9 2.6-.9L19 13ZM5 15l.7 1.8 1.8.7-1.8.7L5 20l-.7-1.8-1.8-.7 1.8-.7L5 15Z"/></svg>
                     {{ $wedding->site?->is_published ? 'Kad digital saya' : 'Buat kad digital' }}
                 </a>
-                <a href="{{ route('weddings.edit', $wedding) }}" class="inline-flex items-center justify-center rounded-full border border-line bg-surface-raised px-4 py-2.5 text-sm font-medium transition hover:border-brand-400 sm:py-2">Edit majlis</a>
+                <a href="{{ route('weddings.edit', $wedding) }}" class="inline-flex items-center justify-center rounded-full border border-line bg-surface-raised px-4 py-2.5 text-sm font-medium transition hover:border-brand-400 sm:py-2">{{ __('pages.dash.edit_majlis') }}</a>
             @endif
             @if (auth()->user()->canBecomeVendor())
-                <a href="{{ route('vendor.convert') }}" class="inline-flex items-center justify-center rounded-full border border-line bg-surface-raised px-4 py-2.5 text-sm font-medium transition hover:border-brand-400 sm:py-2">Saya vendor</a>
+                <a href="{{ route('vendor.convert') }}" class="inline-flex items-center justify-center rounded-full border border-line bg-surface-raised px-4 py-2.5 text-sm font-medium transition hover:border-brand-400 sm:py-2">{{ __('pages.dash.saya_vendor') }}</a>
             @endif
-            <a href="{{ route('vendors.index') }}" class="inline-flex items-center justify-center rounded-full border border-line bg-surface-raised px-4 py-2.5 text-sm font-medium transition hover:border-brand-400 sm:py-2">Cari vendor</a>
+            <a href="{{ route('vendors.index') }}" class="inline-flex items-center justify-center rounded-full border border-line bg-surface-raised px-4 py-2.5 text-sm font-medium transition hover:border-brand-400 sm:py-2">{{ __('pages.dash.cari_vendor') }}</a>
         </div>
     </x-slot:actions>
 

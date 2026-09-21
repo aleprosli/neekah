@@ -1,18 +1,15 @@
-<x-layouts.vendor title="Review" heading="Review" subheading="Apa yang pelanggan tulis tentang {{ $vendor->name }}.">
+<x-layouts.vendor :title="__('pages.reviews.review')" :heading="__('pages.reviews.review_2')" subheading="Apa yang pelanggan tulis tentang {{ $vendor->name }}.">
     @if (session('status'))
         <p class="mb-6 rounded-xl bg-emerald-50 px-4 py-3 text-sm text-emerald-800">{{ session('status') }}</p>
     @endif
 
-    <p class="mb-6 max-w-2xl text-sm text-ink-muted">
-        Anda boleh menjawab mana-mana review di sini, dan melaporkan yang anda rasa tidak benar. Hanya admin yang boleh menariknya — supaya rating pada profil anda bermakna sesuatu kepada pengantin yang membacanya.
-    </p>
+    <p class="mb-6 max-w-2xl text-sm text-ink-muted">{{ __('pages.reviews.anda_boleh_menjawab_mana_mana') }}</p>
 
     {{-- Carrying over reviews the vendor already has somewhere else. --}}
     <details class="mb-6 min-w-0 rounded-2xl border border-line bg-surface-muted/40 p-4 sm:p-6" @if ($errors->addReview->any()) open @endif>
-        <summary class="cursor-pointer text-sm font-semibold">Tambah review dari tempat lain</summary>
+        <summary class="cursor-pointer text-sm font-semibold">{{ __('pages.reviews.tambah_review_dari_tempat_lain') }}</summary>
 
-        <p class="mt-2 max-w-2xl text-sm text-ink-muted">
-            Untuk review sebenar yang anda sudah terima di Google, Instagram atau WhatsApp. Ia akan dipaparkan pada profil anda dengan label <span class="font-medium text-ink">"Ditambah oleh vendor"</span>, supaya pengantin tahu ia datang daripada anda dan bukan dihantar melalui Neekah. Ia tidak menaikkan rating, mata atau ranking anda.
+        <p class="mt-2 max-w-2xl text-sm text-ink-muted">{{ __('pages.reviews.untuk_review_sebenar_yang_anda') }}<span class="font-medium text-ink">"Ditambah oleh vendor"</span>, supaya pengantin tahu ia datang daripada anda dan bukan dihantar melalui Neekah. Ia tidak menaikkan rating, mata atau ranking anda.
         </p>
 
         <form method="POST" action="{{ route('vendor.reviews.store') }}" enctype="multipart/form-data" class="mt-4 flex flex-col gap-4">
@@ -28,21 +25,21 @@
 
             <div class="grid min-w-0 gap-4 sm:grid-cols-3">
                 <label class="flex min-w-0 flex-col gap-1">
-                    <span class="text-xs font-semibold tracking-wide uppercase">Nama pelanggan</span>
+                    <span class="text-xs font-semibold tracking-wide uppercase">{{ __('pages.reviews.nama_pelanggan') }}</span>
                     <input type="text" name="author_name" value="{{ old('author_name') }}" required minlength="2" maxlength="80" class="w-full rounded-xl border border-line bg-surface px-4 py-3 text-sm focus:border-brand-400 focus:outline-none">
                 </label>
                 <label class="flex min-w-0 flex-col gap-1">
-                    <span class="text-xs font-semibold tracking-wide uppercase">Emel <span class="font-normal normal-case opacity-70">(pilihan)</span></span>
+                    <span class="text-xs font-semibold tracking-wide uppercase">{{ __('pages.reviews.emel') }}<span class="font-normal normal-case opacity-70">(pilihan)</span></span>
                     <input type="email" name="author_email" value="{{ old('author_email') }}" maxlength="255" class="w-full rounded-xl border border-line bg-surface px-4 py-3 text-sm focus:border-brand-400 focus:outline-none">
                 </label>
                 <label class="flex min-w-0 flex-col gap-1">
-                    <span class="text-xs font-semibold tracking-wide uppercase">Tarikh asal <span class="font-normal normal-case opacity-70">(pilihan)</span></span>
+                    <span class="text-xs font-semibold tracking-wide uppercase">{{ __('pages.reviews.tarikh_asal') }}<span class="font-normal normal-case opacity-70">(pilihan)</span></span>
                     <input type="date" name="written_on" value="{{ old('written_on') }}" max="{{ now()->toDateString() }}" class="w-full rounded-xl border border-line bg-surface px-4 py-3 text-sm focus:border-brand-400 focus:outline-none">
                 </label>
             </div>
 
             <fieldset class="min-w-0">
-                <legend class="text-xs font-semibold tracking-wide uppercase">Berapa bintang?</legend>
+                <legend class="text-xs font-semibold tracking-wide uppercase">{{ __('pages.reviews.berapa_bintang') }}</legend>
                 <div class="mt-1 flex flex-row-reverse justify-end">
                     @foreach ([5, 4, 3, 2, 1] as $value)
                         <input type="radio" id="vendor-review-star-{{ $value }}" name="rating" value="{{ $value }}" class="peer sr-only" required @checked((int) old('rating') === $value)>
@@ -55,23 +52,23 @@
             </fieldset>
 
             <label class="flex min-w-0 flex-col gap-1">
-                <span class="text-xs font-semibold tracking-wide uppercase">Ulasan</span>
-                <textarea name="comment" rows="3" required minlength="10" maxlength="1000" placeholder="Salin apa yang pelanggan tulis." class="w-full rounded-xl border border-line bg-surface px-4 py-3 text-sm focus:border-brand-400 focus:outline-none">{{ old('comment') }}</textarea>
+                <span class="text-xs font-semibold tracking-wide uppercase">{{ __('pages.reviews.ulasan') }}</span>
+                <textarea name="comment" rows="3" required minlength="10" maxlength="1000" :placeholder="__('pages.reviews.salin_apa_yang_pelanggan_tulis')" class="w-full rounded-xl border border-line bg-surface px-4 py-3 text-sm focus:border-brand-400 focus:outline-none">{{ old('comment') }}</textarea>
             </label>
 
             <div data-vue="ui-photo-picker" data-props="@vueProps(['name' => 'photos[]', 'max' => App\Models\Review::MAX_PHOTOS])">
                 <label class="flex min-w-0 flex-col gap-1">
-                    <span class="text-xs font-semibold tracking-wide uppercase">Gambar <span class="font-normal normal-case opacity-70">(pilihan)</span></span>
+                    <span class="text-xs font-semibold tracking-wide uppercase">{{ __('pages.reviews.gambar') }}<span class="font-normal normal-case opacity-70">(pilihan)</span></span>
                     <input type="file" name="photos[]" multiple accept="image/jpeg,image/png,image/webp" class="w-full text-sm">
                 </label>
             </div>
 
-            <button type="submit" class="rounded-full bg-brand-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-brand-700 sm:self-start">Tambah review</button>
+            <button type="submit" class="rounded-full bg-brand-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-brand-700 sm:self-start">{{ __('pages.reviews.tambah_review') }}</button>
         </form>
     </details>
 
     @if ($reviews->isEmpty())
-        <p class="rounded-2xl border border-dashed border-line p-8 text-center text-sm text-ink-muted">Belum ada review.</p>
+        <p class="rounded-2xl border border-dashed border-line p-8 text-center text-sm text-ink-muted">{{ __('pages.reviews.belum_ada_review') }}</p>
     @else
         <ul class="flex flex-col gap-4">
             @foreach ($reviews as $review)
@@ -108,7 +105,7 @@
 
                     @if ($review->hasReply())
                         <div class="mt-3 min-w-0 rounded-xl border-l-2 border-brand-200 bg-surface-muted/60 px-3 py-2">
-                            <p class="text-xs font-semibold">Jawapan anda</p>
+                            <p class="text-xs font-semibold">{{ __('pages.reviews.jawapan_anda') }}</p>
                             <p class="mt-1 text-sm leading-relaxed">{{ $review->reply }}</p>
                         </div>
                     @endif
@@ -140,18 +137,18 @@
                                 <summary class="cursor-pointer text-xs font-semibold">{{ $review->hasReply() ? 'Kemas kini jawapan' : 'Jawab review ini' }}</summary>
                                 <form method="POST" action="{{ route('vendor.reviews.reply', $review) }}" class="mt-2 flex flex-col gap-2">
                                     @csrf
-                                    <textarea name="reply" rows="3" required minlength="5" maxlength="1000" placeholder="Jawapan anda dipaparkan di bawah review ini pada profil awam." class="w-full rounded-xl border border-line bg-surface px-3 py-2 text-sm focus:border-brand-400 focus:outline-none">{{ old('reply', $review->reply) }}</textarea>
-                                    <button type="submit" class="rounded-full bg-brand-600 px-4 py-2 text-xs font-semibold text-white transition hover:bg-brand-700 sm:self-start">Hantar jawapan</button>
+                                    <textarea name="reply" rows="3" required minlength="5" maxlength="1000" :placeholder="__('pages.reviews.jawapan_anda_dipaparkan_di_bawah')" class="w-full rounded-xl border border-line bg-surface px-3 py-2 text-sm focus:border-brand-400 focus:outline-none">{{ old('reply', $review->reply) }}</textarea>
+                                    <button type="submit" class="rounded-full bg-brand-600 px-4 py-2 text-xs font-semibold text-white transition hover:bg-brand-700 sm:self-start">{{ __('pages.reviews.hantar_jawapan') }}</button>
                                 </form>
                             </details>
 
                             @can('report', $review)
                                 <details class="min-w-0 flex-1">
-                                    <summary class="cursor-pointer text-xs font-semibold text-ink-muted">Laporkan kepada admin</summary>
+                                    <summary class="cursor-pointer text-xs font-semibold text-ink-muted">{{ __('pages.reviews.laporkan_kepada_admin') }}</summary>
                                     <form method="POST" action="{{ route('vendor.reviews.report', $review) }}" class="mt-2 flex flex-col gap-2">
                                         @csrf
-                                        <textarea name="reason" rows="3" required minlength="10" maxlength="1000" placeholder="Terangkan kenapa review ini tidak benar. Review kekal dipaparkan sehingga admin memeriksanya." class="w-full rounded-xl border border-line bg-surface px-3 py-2 text-sm focus:border-brand-400 focus:outline-none">{{ old('reason') }}</textarea>
-                                        <button type="submit" class="rounded-full border border-line px-4 py-2 text-xs font-semibold transition hover:border-brand-400 sm:self-start">Hantar laporan</button>
+                                        <textarea name="reason" rows="3" required minlength="10" maxlength="1000" :placeholder="__('pages.reviews.terangkan_kenapa_review_ini_tidak')" class="w-full rounded-xl border border-line bg-surface px-3 py-2 text-sm focus:border-brand-400 focus:outline-none">{{ old('reason') }}</textarea>
+                                        <button type="submit" class="rounded-full border border-line px-4 py-2 text-xs font-semibold transition hover:border-brand-400 sm:self-start">{{ __('pages.reviews.hantar_laporan') }}</button>
                                     </form>
                                 </details>
                             @endcan

@@ -102,7 +102,7 @@
                                 <p class="nk-muted text-xs tracking-[0.2em] uppercase">{{ $account['bank'] }}</p>
                                 <p class="nk-name mt-1 text-xl tabular-nums">{{ $account['number'] }}</p>
                                 <p class="nk-body text-sm">{{ $account['holder'] }}</p>
-                                <button type="button" data-copy="{{ $account['number'] }}" class="nk-button mt-3 rounded-full px-6 py-2 text-xs font-semibold">Salin nombor akaun</button>
+                                <button type="button" data-copy="{{ $account['number'] }}" class="nk-button mt-3 rounded-full px-6 py-2 text-xs font-semibold">{{ __('pages.card.copy_account') }}</button>
                             </div>
                         @endforeach
                     </div>

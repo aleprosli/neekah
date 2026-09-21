@@ -33,20 +33,20 @@
                     <div class="absolute top-full right-0 z-20 mt-2 w-56 rounded-2xl border border-line bg-surface-raised p-2 text-sm shadow-xl shadow-brand-900/10">
                         <p class="truncate px-3 py-2 text-xs text-ink-muted">{{ auth()->user()->email }}</p>
                         @if (auth()->user()->isAdmin())
-                            <a href="{{ route('admin.dashboard') }}" class="block rounded-xl px-3 py-2 hover:bg-surface-muted">Admin panel</a>
+                            <a href="{{ route('admin.dashboard') }}" class="block rounded-xl px-3 py-2 hover:bg-surface-muted">{{ __('nav.admin_panel') }}</a>
                         @elseif (auth()->user()->isVendor())
-                            <a href="{{ route('vendor.dashboard') }}" class="block rounded-xl px-3 py-2 hover:bg-surface-muted">Dashboard vendor</a>
+                            <a href="{{ route('vendor.dashboard') }}" class="block rounded-xl px-3 py-2 hover:bg-surface-muted">{{ __('nav.vendor_dashboard') }}</a>
                         @else
                             <a href="{{ route('dashboard') }}" class="block rounded-xl px-3 py-2 hover:bg-surface-muted">{{ __('nav.my_wedding') }}</a>
-                            <a href="{{ route('bookings.index') }}" class="block rounded-xl px-3 py-2 hover:bg-surface-muted">Tempahan saya</a>
-                            <a href="{{ route('enquiries.index') }}" class="block rounded-xl px-3 py-2 hover:bg-surface-muted">Enquiry</a>
+                            <a href="{{ route('bookings.index') }}" class="block rounded-xl px-3 py-2 hover:bg-surface-muted">{{ __('nav.my_bookings') }}</a>
+                            <a href="{{ route('enquiries.index') }}" class="block rounded-xl px-3 py-2 hover:bg-surface-muted">{{ __('nav.enquiries') }}</a>
                         @endif
                         <a href="{{ route('account.edit') }}" class="block rounded-xl px-3 py-2 hover:bg-surface-muted">{{ __('nav.account') }}</a>
 
 
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
-                            <button type="submit" class="w-full rounded-xl px-3 py-2 text-left hover:bg-surface-muted">Log keluar</button>
+                            <button type="submit" class="w-full rounded-xl px-3 py-2 text-left hover:bg-surface-muted">{{ __('nav.logout') }}</button>
                         </form>
                     </div>
                 </details>

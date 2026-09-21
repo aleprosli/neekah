@@ -94,7 +94,7 @@
                             <span class="flex size-10 shrink-0 items-center justify-center rounded-full bg-linear-to-br from-brand-500 to-brand-700 font-display text-base font-semibold text-white ring-2 ring-gold-300 ring-offset-2 ring-offset-surface-raised">{{ mb_substr($user->name, 0, 1) }}</span>
                             <span class="min-w-0 flex-1">
                                 <span class="block truncate text-sm font-semibold">{{ $user->name }}</span>
-                                <span class="block truncate text-xs text-ink-muted">Akaun saya</span>
+                                <span class="block truncate text-xs text-ink-muted">{{ __('nav.account') }}</span>
                             </span>
                         </a>
 
@@ -137,7 +137,7 @@
                 <div class="ml-auto flex shrink-0 items-center gap-1">
                     <a href="{{ route('vendors.index') }}" class="hidden items-center gap-1.5 rounded-full px-3 py-2 text-sm font-medium text-ink-muted transition hover:bg-brand-50 hover:text-brand-700 md:flex">
                         <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1v-9.5Z"/></svg>
-                        Laman utama
+                        {{ __('nav.home') }}
                     </a>
                     <x-site.language-switcher />
                     <x-notification-bell />

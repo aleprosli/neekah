@@ -21,7 +21,7 @@
         <span>{{ $rows->last()['label'] }}</span>
     </div>
     <details class="mt-2 text-xs text-ink-muted">
-        <summary class="cursor-pointer">Lihat nombor</summary>
+        <summary class="cursor-pointer">{{ __('pages.chartc.lihat_nombor') }}</summary>
         <ul class="mt-2 flex flex-col gap-1">
             @foreach ($rows as $row)
                 <li class="flex justify-between gap-4"><span>{{ $row['label'] }}</span><span>{{ $formatValue($row['value']) }}</span></li>
