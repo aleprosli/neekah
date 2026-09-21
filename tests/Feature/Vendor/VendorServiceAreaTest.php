@@ -100,3 +100,15 @@ it('hands the form what is already ticked', function () {
         ->assertSee('&quot;service_states&quot;:[&quot;Selangor&quot;,&quot;Johor&quot;]', false)
         ->assertSee('&quot;maxCategories&quot;:'.UpdateVendorProfileRequest::MAX_CATEGORIES, false);
 });
+
+it('does not wipe a vendor coverage when the negeri config has not loaded', function () {
+    $this->vendor->update(['service_states' => ['Selangor', 'Johor']]);
+
+    // What a deploy looks like between pulling config/states.php and running
+    // config:cache: the list is empty, so nothing may be judged invalid.
+    config()->set('states', []);
+
+    $this->vendor->touch();
+
+    expect($this->vendor->fresh()->serviceStates())->toBe(['Selangor', 'Johor']);
+});

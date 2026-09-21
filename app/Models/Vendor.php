@@ -111,6 +111,15 @@ class Vendor extends Model
     protected static function booted(): void
     {
         static::saving(function (self $vendor): void {
+            // No negeri at all means config/states.php did not load — a deploy
+            // that pulled the new config but skipped config:cache. Filtering
+            // against an empty list would quietly wipe every vendor's coverage
+            // on their next save, so leave it alone and let the empty dropdown
+            // be the thing that is noticed.
+            if (States::names() === []) {
+                return;
+            }
+
             $covered = collect($vendor->service_states ?? [])
                 ->filter(fn (mixed $state): bool => States::has(is_string($state) ? $state : null));
 
