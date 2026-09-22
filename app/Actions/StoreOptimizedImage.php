@@ -63,6 +63,59 @@ class StoreOptimizedImage
     }
 
     /**
+     * Give an image a new name and a thumbnail drawn at today's settings,
+     * leaving the image itself byte for byte as it was.
+     *
+     * The rename is the point. Thumbnails are served with
+     * "Cache-Control: immutable, max-age=31536000", which is a promise that
+     * what lives at a URL never changes, and browsers hold them for a year on
+     * the strength of it. Redrawing a thumbnail in place would break that
+     * promise: every visitor who already has the old one would keep it until
+     * 2027. A new name is a new URL, so the promise stands and the old pair is
+     * deleted behind it.
+     *
+     * The image is copied rather than re-encoded because it has already been
+     * through here once. Running it through the encoder again would cost a
+     * generation of quality to produce a file nobody asked to change.
+     *
+     * @return string The new path on the public disk.
+     */
+    public function refreshThumbnail(string $path): string
+    {
+        $this->allowMemoryForDecoding();
+
+        $disk = Storage::disk('public');
+        $contents = $disk->get($path);
+
+        if ($contents === null) {
+            throw new RuntimeException('There is no image at '.$path.'.');
+        }
+
+        $extension = pathinfo($path, PATHINFO_EXTENSION) ?: 'webp';
+        $directory = trim((string) pathinfo($path, PATHINFO_DIRNAME), '/');
+        $newPath = $directory.'/'.Str::random(40).'.'.$extension;
+        $thumbnail = self::thumbnailPath($newPath);
+
+        // As in storeContents: the disk is configured not to throw, so a write
+        // it cannot make comes back false, and half a pair is of no use.
+        $stored = $disk->put($newPath, $contents)
+            && $disk->put($thumbnail, $this->encode(
+                $this->resize($this->decode($contents), $this->settings->thumbnailWidth(), PHP_INT_MAX),
+                $extension,
+            ));
+
+        if (! $stored) {
+            $disk->delete([$newPath, $thumbnail]);
+
+            throw new RuntimeException('Could not write the redrawn image to '.$directory.'.');
+        }
+
+        $disk->delete([$path, self::thumbnailPath($path)]);
+
+        return $newPath;
+    }
+
+    /**
      * Remove an image and its thumbnail.
      */
     public function delete(?string $path): void

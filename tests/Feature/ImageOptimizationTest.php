@@ -221,3 +221,82 @@ it('cleans up the half that landed when the other half fails', function () {
         ->handle(UploadedFile::fake()->image('cover.jpg', 800, 600), 'sites/43'))
         ->toThrow(RuntimeException::class);
 });
+
+it('redraws thumbnails at a new width, under a new name, leaving the image alone', function () {
+    Storage::fake('public');
+    $disk = Storage::disk('public');
+
+    app(ImageSettings::class)->save(['thumbnail_width' => 640]);
+
+    $vendor = Vendor::factory()->for(Category::first())->create();
+    $item = PortfolioItem::factory()->for($vendor)->create([
+        'path' => app(StoreOptimizedImage::class)->handle(
+            UploadedFile::fake()->image('asal.jpg', 2000, 3000),
+            'portfolio/'.$vendor->id,
+        ),
+    ]);
+
+    $originalPath = $item->path;
+    $originalBytes = $disk->get($originalPath);
+    $updatedAt = $item->updated_at;
+
+    expect(imagesx(imagecreatefromstring($disk->get(StoreOptimizedImage::thumbnailPath($originalPath)))))->toBe(640);
+
+    app(ImageSettings::class)->save(['thumbnail_width' => 480]);
+
+    $this->artisan('neekah:optimize-images --thumbnails')
+        ->expectsOutputToContain('1 thumbnail dilukis semula')
+        ->assertSuccessful();
+
+    $item->refresh();
+
+    // A new name, because the old thumbnail is cached immutable for a year and
+    // redrawing it in place would leave every visitor holding the old one.
+    expect($item->path)->not->toBe($originalPath);
+
+    // The image itself crossed over byte for byte: it has been encoded once and
+    // encoding it again would cost a generation for nothing.
+    expect($disk->get($item->path))->toBe($originalBytes);
+
+    expect(imagesx(imagecreatefromstring($disk->get(StoreOptimizedImage::thumbnailPath($item->path)))))->toBe(480);
+
+    // Swapping the file is not an edit, so the sitemap's lastmod stays put.
+    expect($item->updated_at->equalTo($updatedAt))->toBeTrue();
+
+    $disk->assertMissing($originalPath);
+    $disk->assertMissing(StoreOptimizedImage::thumbnailPath($originalPath));
+});
+
+it('leaves thumbnails alone unless it is asked to redraw them', function () {
+    Storage::fake('public');
+
+    $vendor = Vendor::factory()->for(Category::first())->create();
+    $item = PortfolioItem::factory()->for($vendor)->create([
+        'path' => app(StoreOptimizedImage::class)->handle(
+            UploadedFile::fake()->image('asal.jpg', 2000, 3000),
+            'portfolio/'.$vendor->id,
+        ),
+    ]);
+
+    app(ImageSettings::class)->save(['thumbnail_width' => 480]);
+
+    $this->artisan('neekah:optimize-images')
+        ->expectsOutputToContain('0 gambar dioptimumkan')
+        ->assertSuccessful();
+
+    expect($item->fresh()->path)->toBe($item->path);
+});
+
+it('gives an image with no thumbnail one when it redraws', function () {
+    Storage::fake('public');
+    $disk = Storage::disk('public');
+    $disk->put('portfolio/1/sendirian.webp', UploadedFile::fake()->image('sendirian.jpg', 1000, 1000)->getContent());
+
+    $item = PortfolioItem::factory()
+        ->for(Vendor::factory()->for(Category::first()))
+        ->create(['path' => 'portfolio/1/sendirian.webp']);
+
+    $this->artisan('neekah:optimize-images --thumbnails')->assertSuccessful();
+
+    $disk->assertExists(StoreOptimizedImage::thumbnailPath($item->fresh()->path));
+});
