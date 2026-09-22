@@ -130,6 +130,7 @@ return [
     ],
 
     'compare' => [
+        'sebelum_anda_pilih' => 'Before you choose',
         'kategori' => 'Category',
         'lokasi' => 'Location',
         'kawasan_dicover' => 'Areas covered',

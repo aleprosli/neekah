@@ -67,7 +67,9 @@ onBeforeUnmount(() => {
 
 <template>
     <div class="relative">
-        <div class="grid h-72 grid-cols-4 grid-rows-2 gap-2 sm:overflow-hidden sm:rounded-2xl md:h-[420px]">
+        <!-- Tall on a phone: vendors upload portrait photos straight off a phone,
+             and a portrait photo fills a 4:5-ish box without losing its subject. -->
+        <div class="grid h-[26rem] grid-cols-4 grid-rows-2 gap-2 sm:overflow-hidden sm:rounded-2xl md:h-[420px]">
             <template v-if="photos.length">
                 <button
                     v-for="(photo, at) in hero"
@@ -79,26 +81,17 @@ onBeforeUnmount(() => {
                     ]"
                     @click="show(at)"
                 >
-                    <!-- Vendors upload portrait photos straight off a phone, and
-                         cropping one into this landscape box hid half of it. The
-                         photo is shown whole, over a blurred copy of itself so the
-                         cell is still filled. A landscape photo is so close to the
-                         cell's own shape that it covers the blur entirely. -->
-                    <img
-                        :src="photo.thumbnail || photo.url"
-                        alt=""
-                        aria-hidden="true"
-                        loading="lazy"
-                        decoding="async"
-                        class="absolute inset-0 size-full scale-110 object-cover blur-xl"
-                    >
+                    <!-- The photo fills its tile. A blurred copy behind a letterboxed
+                         photo read as a broken image on the vendor pages, so the tile
+                         is tall enough for a portrait and the photo covers it. The
+                         lightbox is where a photo is seen whole. -->
                     <img
                         :src="at === 0 ? photo.url : photo.thumbnail"
                         :alt="photo.caption || vendorName"
                         :fetchpriority="at === 0 ? 'high' : undefined"
                         :loading="at === 0 ? undefined : 'lazy'"
                         decoding="async"
-                        class="relative size-full object-contain transition duration-300 group-hover:scale-[1.03]"
+                        class="size-full object-cover transition duration-300 group-hover:scale-[1.03]"
                     >
                 </button>
             </template>
@@ -118,7 +111,6 @@ onBeforeUnmount(() => {
             class="absolute right-4 bottom-4 rounded-full border border-line bg-surface/95 px-4 py-2 text-sm font-semibold shadow-lg backdrop-blur transition hover:bg-surface sm:right-5 sm:bottom-5"
             @click="show(0)"
         >
-            <span aria-hidden="true">🖼️</span>
             {{ hasMore ? `Tunjuk semua ${photos.length} gambar` : `Lihat ${photos.length} gambar` }}
         </button>
 

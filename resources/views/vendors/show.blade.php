@@ -3,7 +3,9 @@
 <x-layouts.app :title="$vendor->name" :description="$vendor->tagline">
     <x-site.header />
 
-    <main class="mx-auto max-w-6xl px-4 pt-24 pb-28 sm:px-6 lg:px-10 lg:pt-28 lg:pb-16">
+    {{-- On a phone the photo is the first thing on the page, so it sits just
+         under the floating header rather than a heading's worth below it. --}}
+    <main class="mx-auto max-w-6xl px-4 pt-[4.75rem] pb-28 sm:px-6 md:pt-24 lg:px-10 lg:pt-28 lg:pb-16">
         @if (session('status'))
             <div class="mb-4 rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm text-emerald-900">
                 {{ session('status') }}
@@ -27,7 +29,7 @@
                 ])"
             >
                 {{-- Rendered server-side too, so the first photo is in the markup Google and a link preview read. --}}
-                <div class="grid h-72 grid-cols-4 grid-rows-2 gap-2 sm:overflow-hidden sm:rounded-2xl md:h-[420px]">
+                <div class="grid h-[26rem] grid-cols-4 grid-rows-2 gap-2 sm:overflow-hidden sm:rounded-2xl md:h-[420px]">
                     @forelse ($gallery->take(5) as $index => $item)
                         <div @class(['overflow-hidden', 'col-span-4 row-span-2 md:col-span-2' => $index === 0, 'hidden md:block' => $index !== 0])>
                             <img src="{{ $index === 0 ? $item['url'] : $item['thumbnail'] }}" alt="{{ $item['caption'] ?: $vendor->name }}" @if ($index === 0) fetchpriority="high" @else loading="lazy" @endif decoding="async" class="size-full object-cover">

@@ -13,11 +13,19 @@
     $summary = collect([$current['q'] ? '"'.$current['q'].'"' : null, $activeCategory?->name, $current['state']])->filter();
 @endphp
 
-<section class="relative overflow-hidden bg-[radial-gradient(ellipse_at_top_left,var(--color-brand-100),transparent_60%),radial-gradient(ellipse_at_bottom_right,var(--color-gold-300),transparent_55%)] pt-24 pb-8 md:pt-28 md:pb-12">
-    <div class="mx-auto flex max-w-[1760px] flex-col gap-5 px-4 sm:px-6 md:items-center md:gap-7 md:text-center lg:px-10">
+{{-- The same paper and florals as the About page, the gallery and the blog
+     (<x-site.ornament> draws the invitation cards' own artwork). --}}
+<section class="relative overflow-hidden bg-ivory pt-24 pb-8 md:pt-28 md:pb-12">
+    <x-site.ornament name="corner-peony" class="absolute -top-16 -left-16 size-[18rem] opacity-50 sm:size-[26rem]" color="var(--color-brand-200)" color2="var(--color-brand-100)" />
+    <x-site.ornament name="corner-peony" class="absolute -top-12 -right-20 size-[18rem] rotate-90 opacity-40 sm:size-[26rem]" color="var(--color-gold-300)" color2="var(--color-brand-100)" />
+    <x-site.ornament name="particles" class="absolute inset-0 opacity-30" color="var(--color-gold-400)" />
+
+    <div class="relative mx-auto flex max-w-[1760px] flex-col gap-5 px-4 sm:px-6 md:items-center md:gap-7 md:text-center lg:px-10">
         <div class="max-w-2xl">
-            <h1 class="font-display text-2xl font-semibold tracking-tight sm:text-3xl md:text-4xl">{{ __('marketplace.heading') }}</h1>
-            <p class="mt-1 text-sm text-ink-muted sm:text-base md:mt-2">{{ __('marketplace.subheading') }}</p>
+            <p class="font-script text-2xl text-brand-600 sm:text-3xl">{{ __('pages.landing.script_eyebrow') }}</p>
+            <h1 class="mt-1 font-display text-2xl font-semibold tracking-tight sm:text-3xl md:text-4xl">{{ __('marketplace.heading') }}</h1>
+            <x-site.ornament name="divider-floral" class="mt-3 h-5 w-36 md:mx-auto" color="var(--color-gold-500)" color2="var(--color-gold-300)" />
+            <p class="mt-3 text-sm text-ink-muted sm:text-base">{{ __('marketplace.subheading') }}</p>
         </div>
 
         {{-- Desktop search bar --}}
