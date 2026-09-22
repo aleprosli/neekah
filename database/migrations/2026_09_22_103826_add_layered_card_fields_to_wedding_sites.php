@@ -45,13 +45,23 @@ return new class extends Migration
             return $first === '' ? null : mb_substr($first, 0, 40);
         };
 
-        // "Father & Mother" as the couple typed it, into the two columns designs print.
+        // "Father & Mother" as the couple typed it, into the two columns designs
+        // print. Some of them wrote "Nama Pengantin (Bapa & Ibu)" — the names in the
+        // brackets are the parents, so that is what is kept.
         $split = function (string $side, ?string $parents): array {
-            $parts = preg_split('/\s*[&+]\s*|\s+dan\s+/iu', trim((string) $parents), 2) ?: [];
+            $value = trim((string) $parents);
+
+            if (preg_match('/\((.+)\)/u', $value, $inside) === 1) {
+                $value = trim($inside[1]);
+            }
+
+            $parts = preg_split('/\s*[&+]\s*|\s+dan\s+/iu', $value, 2) ?: [];
+            $father = trim($parts[0] ?? '');
+            $mother = trim($parts[1] ?? '');
 
             return [
-                $side.'_father' => ($parts[0] ?? '') === '' ? null : mb_substr($parts[0], 0, 255),
-                $side.'_mother' => ($parts[1] ?? '') === '' ? null : mb_substr($parts[1], 0, 255),
+                $side.'_father' => $father === '' ? null : mb_substr($father, 0, 255),
+                $side.'_mother' => $mother === '' ? null : mb_substr($mother, 0, 255),
             ];
         };
 
