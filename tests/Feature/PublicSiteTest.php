@@ -222,6 +222,18 @@ it('shows the gallery, filters it by category, and samples every design', functi
     $this->get(route('sites.templates.show', 'tiada'))->assertNotFound();
 });
 
+it('leaves the gallery tiles to mount as the visitor scrolls, and the single sample at once', function () {
+    // Fifty live card apps mounted on load is what data-vue-lazy exists to avoid.
+    $gallery = $this->get(route('sites.templates'))->assertOk();
+
+    expect(substr_count($gallery->getContent(), 'data-vue="card-view" data-vue-lazy'))->toBe(50);
+
+    $this->get(route('sites.templates.show', 'rose-garden'))
+        ->assertOk()
+        ->assertSee('data-vue="card-view"', false)
+        ->assertDontSee('data-vue-lazy', false);
+});
+
 it('greets the named guest behind their personal link and records the open', function () {
     $site = WeddingSite::factory()->published()->create();
     $guest = WeddingGuest::factory()->for($site->wedding)->create(['name' => 'Pak Long Rahim', 'pax_invited' => 4]);

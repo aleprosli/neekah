@@ -68,7 +68,7 @@
                                              resources/js/components/card/CardView.vue at
                                              thumbnail size. Without JavaScript the name
                                              and the palette still describe it. --}}
-                                        <div class="aspect-[9/16] overflow-hidden shadow-[0_12px_28px_-12px_rgb(0_0_0/0.35)] transition group-hover:shadow-[0_20px_36px_-14px_rgb(0_0_0/0.4)]" data-vue="card-view" data-props="@vueProps($thumbnails[$template->slug])">
+                                        <div class="aspect-[9/16] overflow-hidden shadow-[0_12px_28px_-12px_rgb(0_0_0/0.35)] transition group-hover:shadow-[0_20px_36px_-14px_rgb(0_0_0/0.4)]" data-vue="card-view" data-vue-lazy data-props="@vueProps($thumbnails[$template->slug])">
                                             <div class="flex h-full w-full flex-col items-center justify-center gap-2 p-3 text-center" style="{{ $template->cssVariables() }};background:var(--c-bg);color:var(--c-onbg)">
                                                 <span class="text-[0.6rem] tracking-[0.3em] uppercase" style="color:var(--c-acc)">Walimatul Urus</span>
                                                 <span class="text-sm" style="font-family:var(--f-s);color:var(--c-head)">{{ $template->name }}</span>
