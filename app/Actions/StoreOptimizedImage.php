@@ -78,6 +78,14 @@ class StoreOptimizedImage
      * through here once. Running it through the encoder again would cost a
      * generation of quality to produce a file nobody asked to change.
      *
+     * The copy is the disk's own, which on S3 is a CopyObject the bucket
+     * performs for itself: nothing is uploaded, and the object's Cache-Control
+     * comes across with it. That last part is worth knowing - the copy inherits
+     * the header from the source rather than from the disk's options, so an
+     * object that somehow has no Cache-Control produces another one without it.
+     * Every object written through storeContents has it, and the bucket was
+     * backfilled, so that is a note rather than a hazard.
+     *
      * @return string The new path on the public disk.
      */
     public function refreshThumbnail(string $path): string
@@ -98,7 +106,7 @@ class StoreOptimizedImage
 
         // As in storeContents: the disk is configured not to throw, so a write
         // it cannot make comes back false, and half a pair is of no use.
-        $stored = $disk->put($newPath, $contents)
+        $stored = $disk->copy($path, $newPath)
             && $disk->put($thumbnail, $this->encode(
                 $this->resize($this->decode($contents), $this->settings->thumbnailWidth(), PHP_INT_MAX),
                 $extension,
