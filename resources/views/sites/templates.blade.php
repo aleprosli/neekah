@@ -9,9 +9,8 @@
 
     {{-- The same paper and florals as the About page: the gallery is the
          stationery itself, so it wears what the cards are drawn with. --}}
-    <main class="relative overflow-hidden bg-ivory pt-24 pb-24 lg:pt-28">
-        <x-site.ornament name="corner-peony" class="absolute -top-16 -left-16 size-[20rem] opacity-50 sm:size-[28rem]" color="var(--color-brand-200)" color2="var(--color-brand-100)" />
-        <x-site.ornament name="corner-peony" class="absolute -top-12 -right-20 size-[20rem] rotate-90 opacity-40 sm:size-[28rem]" color="var(--color-gold-300)" color2="var(--color-brand-100)" />
+    <main class="relative bg-ivory pt-24 pb-24 lg:pt-28">
+        <x-site.florals />
 
         {{-- Intro --}}
         <section class="relative mx-auto max-w-3xl px-4 text-center sm:px-6">

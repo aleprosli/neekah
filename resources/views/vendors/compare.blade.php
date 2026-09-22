@@ -6,8 +6,8 @@
     {{-- The same paper and florals as the rest of the public site. The comparison
          itself is a grid, not a table: on a phone every measure becomes a block
          with the vendors side by side under it, which a scrolling table cannot. --}}
-    <main class="relative overflow-hidden bg-ivory">
-        <x-site.ornament name="corner-peony" class="absolute -top-16 -right-20 size-[18rem] rotate-90 opacity-40 sm:size-[26rem]" color="var(--color-brand-200)" color2="var(--color-gold-300)" />
+    <main class="relative bg-ivory">
+        <x-site.florals corners="right" />
 
         <div class="relative mx-auto max-w-6xl px-4 pt-24 pb-24 sm:px-6 lg:px-10 lg:pt-28">
             <header class="flex flex-col gap-1">

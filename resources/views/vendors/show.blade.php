@@ -5,7 +5,10 @@
 
     {{-- On a phone the photo is the first thing on the page, so it sits just
          under the floating header rather than a heading's worth below it. --}}
-    <main class="mx-auto max-w-6xl px-4 pt-[4.75rem] pb-28 sm:px-6 md:pt-24 lg:px-10 lg:pt-28 lg:pb-16">
+    <main class="relative bg-ivory">
+        <x-site.florals corners="right" sprig />
+
+        <div class="relative mx-auto max-w-6xl px-4 pt-[4.75rem] pb-28 sm:px-6 md:pt-24 lg:px-10 lg:pt-28 lg:pb-16">
         @if (session('status'))
             <div class="mb-4 rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm text-emerald-900">
                 {{ session('status') }}
@@ -352,6 +355,7 @@
                 </ul>
             </section>
         @endif
+        </div>
     </main>
 
     {{-- Mobile sticky booking bar --}}

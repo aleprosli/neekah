@@ -2,7 +2,11 @@
     <x-site.header />
     <x-vendor-search filter-dialog="filters" :categories="$categories" :states="$states" :state-options="$stateOptions" />
 
-    <main class="mx-auto max-w-[1760px] px-4 pb-24 sm:px-6 md:pb-10 lg:px-10">
+    <main class="relative bg-ivory">
+        <x-site.florals corners="none" sprig />
+        <x-site.ornament name="cluster-peony" class="pointer-events-none absolute top-[14rem] -right-24 size-72 opacity-25 sm:size-96" color="var(--color-gold-300)" color2="var(--color-brand-200)" />
+
+        <div class="relative mx-auto max-w-[1760px] px-4 pb-24 sm:px-6 md:pb-10 lg:px-10">
         {{-- Category tiles --}}
         {{-- Centred while the tiles fit; once there are more than the width holds
              they start at the left and scroll, with arrows on a desktop, which
@@ -196,6 +200,7 @@
 
             {{ $vendors->onEachSide(1)->links() }}
         @endif
+        </div>
     </main>
 
     {{-- Compare tray --}}

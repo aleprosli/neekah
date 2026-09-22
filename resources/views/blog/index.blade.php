@@ -2,9 +2,8 @@
     <x-site.header />
 
     {{-- The same paper and florals as the About page and the card gallery. --}}
-    <main class="relative overflow-hidden bg-ivory">
-        <x-site.ornament name="corner-peony" class="absolute -top-16 -right-20 size-[20rem] rotate-90 opacity-40 sm:size-[28rem]" color="var(--color-brand-200)" color2="var(--color-gold-300)" />
-        <x-site.ornament name="leaf-sprig" class="absolute top-[28rem] -left-8 h-64 w-40 opacity-30 sm:h-80 sm:w-52" color="var(--color-brand-200)" />
+    <main class="relative bg-ivory">
+        <x-site.florals corners="right" sprig />
 
         <div class="relative mx-auto max-w-6xl px-4 pt-24 pb-20 sm:px-6 lg:px-10 lg:pt-28">
             <header class="max-w-2xl">
