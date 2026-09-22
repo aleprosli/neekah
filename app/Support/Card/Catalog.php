@@ -100,6 +100,50 @@ class Catalog
     }
 
     /**
+     * The design each card wore before the layered ones, mapped to the nearest of
+     * these.
+     *
+     * A published card is out in the world on people's phones. Moving every couple
+     * to one flagship design would change a card their guests have already opened,
+     * so the switch keeps each of them as close to what they chose as the new
+     * catalogue allows: the same colour family, the same mood. The migration reads
+     * this once and nothing else ever should.
+     *
+     * @var array<string, string>
+     */
+    public const REPLACES = [
+        // Klasik
+        'seri-gangsa' => 'seri-melayu',
+        'gerbang-emas' => 'balai-seri',
+        'bingkai-warisan' => 'songket-ivory',
+        'kemboja' => 'cempaka-gold',
+        'songket-diraja' => 'royal-songket-gold',
+        // Islamik
+        'nur-geometri' => 'geometric-noor',
+        'tenun-songket' => 'tenun-heritage',
+        'mihrab-nilam' => 'midnight-noor',
+        // Bunga
+        'mawar-pagi' => 'rose-garden',
+        'taman-lavender' => 'lavender-dream',
+        'kebun-sakura' => 'english-garden',
+        'bunga-raya' => 'romantic-burgundy-floral',
+        'daun-hijau' => 'botanical-green',
+        'bunga-pic' => 'floral-arch',
+        // Moden
+        'putih-tenang' => 'white-luxury',
+        'garis-halus' => 'modern-gold-line',
+        'kanvas-pasir' => 'beige-modern',
+        'mozek-kenangan' => 'polaroid-love',
+        'pita-moden' => 'modern-abstract',
+        'kraf-rustik' => 'scrapbook-romance',
+        // Malam
+        'malam-emas' => 'midnight-luxury',
+        'zamrud' => 'emerald-estate',
+        'marun-malam' => 'velvet-burgundy',
+        'langit-senja' => 'lavender-dream',
+    ];
+
+    /**
      * Every photo a design may ask a couple for. The editor offers only the slots
      * the chosen design actually uses, but a save may carry any of them, because a
      * couple who switches design keeps the photos they already uploaded.

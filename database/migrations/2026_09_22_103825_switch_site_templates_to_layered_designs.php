@@ -1,5 +1,6 @@
 <?php
 
+use App\Support\Card\Catalog;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
@@ -29,9 +30,18 @@ return new class extends Migration
             $table->dropColumn('design');
         });
 
-        // Every old slug is gone with its Blade partial, so point existing cards at
-        // the flagship design; the seeder creates it immediately after this runs.
-        DB::table('wedding_sites')->update(['template' => 'neekah-signature']);
+        // Every old slug goes with its Blade partial, so a card already published —
+        // one guests may have opened this morning — is moved to the nearest of the
+        // new designs rather than all of them to one flagship. The seeder creates
+        // those designs immediately after this migration runs.
+        foreach (Catalog::REPLACES as $old => $new) {
+            DB::table('wedding_sites')->where('template', $old)->update(['template' => $new]);
+        }
+
+        DB::table('wedding_sites')
+            ->whereNotIn('template', array_values(Catalog::REPLACES))
+            ->update(['template' => 'neekah-signature']);
+
         DB::table('site_templates')->delete();
     }
 

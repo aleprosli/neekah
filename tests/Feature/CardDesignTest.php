@@ -212,3 +212,55 @@ it('drops a section key that is not a section', function () {
 
     expect(cardWidgets($this->get(cardUrlFor($site))))->toBe(['location']);
 });
+
+/*
+|--------------------------------------------------------------------------
+| Cards that existed before the layered designs
+|--------------------------------------------------------------------------
+|
+| A published card is on people's phones already. The switch has to leave it
+| recognisable: the nearest design rather than one flagship for everybody, and
+| the photo they uploaded still on the card.
+|
+*/
+
+it('replaces every retired design with one that still exists', function () {
+    $live = SiteTemplate::active()->pluck('slug');
+
+    expect(Catalog::REPLACES)->toHaveCount(24)
+        ->and(collect(Catalog::REPLACES)->values()->unique()->every(fn (string $slug): bool => $live->contains($slug)))->toBeTrue();
+});
+
+it('keeps a card whose design was retired on a design of the same colour family', function () {
+    // "Malam Emas" was navy and gold; Midnight Luxury is the same card at night.
+    $site = WeddingSite::factory()->published()->create(['template' => Catalog::REPLACES['malam-emas']]);
+
+    $props = cardProps($this->get(cardUrlFor($site)));
+
+    expect($props['design']['slug'])->toBe('midnight-luxury')
+        ->and($props['design']['dark'])->toBeTrue();
+});
+
+it('still renders a card whose design has been withdrawn altogether', function () {
+    $site = WeddingSite::factory()->published()->create();
+    // A row can outlive its design: the seeder deactivates a withdrawn one.
+    $site->forceFill(['template' => 'reka-bentuk-yang-sudah-tiada'])->save();
+
+    $this->get(cardUrlFor($site))->assertOk();
+
+    expect(cardProps($this->get(cardUrlFor($site)))['canvases'])->toHaveCount(3);
+});
+
+it('shows the photo an older card uploaded as its cover wherever the design asks for the couple', function () {
+    $site = WeddingSite::factory()->published()->create([
+        'template' => 'neekah-signature',
+        'cover_image' => 'sites/1/gambar.webp',
+        'slot_images' => null,
+    ]);
+
+    // Most designs ask for couple_image; the photo was stored as the cover long
+    // before slots existed, and it must not vanish from their card.
+    expect($site->slotImage('couple_image'))->toEndWith('sites/1/gambar.webp')
+        ->and($site->slotImage('cover_image'))->toEndWith('sites/1/gambar.webp')
+        ->and($site->slotImage('groom_image'))->toBeNull();
+});

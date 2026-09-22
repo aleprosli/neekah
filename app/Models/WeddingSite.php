@@ -159,14 +159,25 @@ class WeddingSite extends Model
     }
 
     /**
+     * The slots that show the couple themselves. Both fall back to cover_image, so
+     * the one photo a card carried before the layered designs still appears: most
+     * designs ask for couple_image, and their photo was stored as the cover.
+     *
+     * @var array<int, string>
+     */
+    public const MAIN_PHOTO_SLOTS = ['cover_image', 'couple_image'];
+
+    /**
      * The photo the couple put in one of the design's slots (couple_image,
      * cover_image, groom_image…).
      */
     public function slotImage(string $slot): ?string
     {
-        $path = $slot === 'cover_image'
-            ? ($this->slot_images[$slot] ?? $this->cover_image)
-            : ($this->slot_images[$slot] ?? null);
+        $path = $this->slot_images[$slot] ?? null;
+
+        if (blank($path) && in_array($slot, self::MAIN_PHOTO_SLOTS, true)) {
+            $path = $this->cover_image;
+        }
 
         return is_string($path) && $path !== '' ? Storage::disk('public')->url($path) : null;
     }
