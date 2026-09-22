@@ -27,6 +27,8 @@
         ['label' => __('pages.sidebar_admin.kandungan'), 'items' => [
             $item(__('pages.sidebar_admin.checklist_induk'), 'check', 'admin.checklist.index', 'admin.checklist.*'),
             $item(__('pages.sidebar_admin.blog'), 'pencil', 'admin.posts.index', 'admin.posts.*'),
+            $item(__('pages.sidebar_admin.muzik_kad'), 'music', 'admin.card-music.index', 'admin.card-music.*'),
+            $item(__('pages.sidebar_admin.kad_nfc'), 'tag', 'admin.card-nfc.index', 'admin.card-nfc.*'),
         ]],
         ['label' => __('pages.sidebar_admin.sistem'), 'items' => [
             $item(__('pages.sidebar_admin.tetapan'), 'settings', 'admin.settings.edit', 'admin.settings.*'),

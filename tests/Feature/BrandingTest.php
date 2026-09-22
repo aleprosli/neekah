@@ -34,15 +34,15 @@ it('covers the page with a preloader that javascript takes down', function () {
 it('opens an invitation in the couple own colours, never the neekah brand', function () {
     $this->seed(SiteTemplateSeeder::class);
     $site = WeddingSite::factory()->published()->create([
-        'template' => 'seri-gangsa',
+        'template' => 'royal-songket-gold',
         'bride_name' => 'Aina',
         'groom_name' => 'Hakim',
     ]);
 
     $response = $this->get('http://'.$site->subdomain.'.'.config('neekah.site_domain').'/')->assertOk();
 
-    $response->assertSee('class="nk-preloader nk-card"', false)
-        ->assertSee('--nk-page:', false)
+    $response->assertSee('class="nk-preloader nkc-card"', false)
+        ->assertSee('--c-bg:', false)
         ->assertSee('Memuatkan Aina &amp; Hakim', false);
 
     // Guests are the couple's, not ours. Our logo has no place in front of

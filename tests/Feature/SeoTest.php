@@ -225,7 +225,7 @@ it('refuses to serve the app sitemap from a card subdomain', function () {
 it('previews a shared card as the couple own design, not the neekah logo', function () {
     $this->seed(SiteTemplateSeeder::class);
     $site = WeddingSite::factory()->published()->create([
-        'template' => 'malam-emas',
+        'template' => 'midnight-luxury',
         'bride_name' => 'Aina',
         'groom_name' => 'Hakim',
     ]);
@@ -241,7 +241,7 @@ it('previews a shared card as the couple own design, not the neekah logo', funct
 it('draws that preview at the size whatsapp and facebook render', function () {
     Storage::fake('public');
     $this->seed(SiteTemplateSeeder::class);
-    $site = WeddingSite::factory()->published()->create(['template' => 'seri-gangsa']);
+    $site = WeddingSite::factory()->published()->create(['template' => 'royal-songket-gold']);
 
     $response = $this->get('http://'.$site->subdomain.'.'.config('neekah.site_domain').'/preview.png')
         ->assertOk()
@@ -267,7 +267,7 @@ it('paints the preview in the palette of the template the couple chose', functio
     };
 
     // A light template and a dark one must not come out the same picture.
-    expect($corner('seri-gangsa'))->not->toBe($corner('malam-emas'));
+    expect($corner('royal-songket-gold'))->not->toBe($corner('midnight-luxury'));
 });
 
 it('redraws the preview when the couple edits the card', function () {
@@ -287,7 +287,7 @@ it('redraws the preview when the couple edits the card', function () {
 
 it('gives each template gallery page a preview of that design', function () {
     $this->seed(SiteTemplateSeeder::class);
-    $template = SiteTemplate::where('slug', 'mawar-pagi')->sole();
+    $template = SiteTemplate::where('slug', 'rose-garden')->sole();
 
     $this->get(route('sites.templates.show', $template))
         ->assertOk()

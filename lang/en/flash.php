@@ -21,6 +21,14 @@ return [
     ],
 
     'admin' => [
+        'card_music_added' => 'Music track added.',
+        'card_music_updated' => 'Music track updated.',
+        'card_music_deleted' => 'Music track removed.',
+        'card_music_in_use' => 'A card is playing this track. Turn it off first.',
+        'nfc_cards_created' => ':count NFC cards minted.',
+        'nfc_card_updated' => 'NFC card updated.',
+        'nfc_card_deleted' => 'NFC card removed.',
+        'nfc_card_in_use' => 'This card has already been tapped, so it is in someone\'s hands. Deactivate it instead.',
         'user_deactivated' => ':name’s account has been deactivated.',
         'user_reactivated' => ':name’s account has been reactivated.',
         'user_reactivated_vendor_suspended' => ':name’s account has been reactivated. Their vendor profile is still suspended; approve it again on the vendor page.',
@@ -49,6 +57,7 @@ return [
     ],
 
     'couple' => [
+        'nfc_card_not_ready' => 'This card is not linked to an invitation yet.',
         'wedding_created' => 'Your wedding project is ready, with a checklist and a suggested budget. Next: create your digital wedding card.',
         'wedding_updated' => 'The wedding details have been updated.',
         'task_added' => 'The task has been added.',

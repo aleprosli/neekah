@@ -48,10 +48,10 @@ it('returns 404 for an unpublished or unknown address', function () {
     $this->get('http://tiada-langsung.'.config('neekah.site_domain'))->assertNotFound();
 });
 
-it('renders all twenty-four templates', function () {
+it('renders all fifty designs', function () {
     $templates = SiteTemplate::active()->get();
 
-    expect($templates)->toHaveCount(24);
+    expect($templates)->toHaveCount(50);
 
     foreach ($templates as $template) {
         $site = WeddingSite::factory()->published()->create(['template' => $template->slug]);
@@ -78,6 +78,21 @@ it('records an RSVP from a guest', function () {
         ->and($rsvp->pax)->toBe(4);
 });
 
+it('answers the card in the background with a thank-you rather than a redirect', function () {
+    $site = WeddingSite::factory()->published()->create();
+
+    // A redirect would make the browser reload the card the guest just opened.
+    $this->postJson(siteUrl($site, '/rsvp'), ['name' => 'Pak Cik Samad', 'attending' => 1, 'pax' => 2])
+        ->assertOk()
+        ->assertJsonPath('message', __('props.couple.terima_kasih_kehadiran'));
+
+    $this->postJson(siteUrl($site, '/rsvp'), ['attending' => 1, 'pax' => 2])
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors('name');
+
+    expect(WeddingRsvp::count())->toBe(1);
+});
+
 it('stores a decline with zero pax', function () {
     $site = WeddingSite::factory()->published()->create();
 
@@ -96,60 +111,73 @@ it('refuses an RSVP after the deadline or without a name', function () {
     expect(WeddingRsvp::count())->toBe(0);
 });
 
-it('seals the card behind an opening gate with motion and a live countdown', function () {
-    // Seri Gangsa is a design with drifting petals; some designs are deliberately still.
-    $site = WeddingSite::factory()->published()->create(['template' => 'seri-gangsa', 'bride_name' => 'Aina', 'groom_name' => 'Hakim', 'starts_at' => '11:00']);
+it('seals the card behind an opening gate with a live countdown', function () {
+    $site = WeddingSite::factory()->published()->create(['template' => 'neekah-signature', 'bride_name' => 'Aina', 'groom_name' => 'Hakim', 'starts_at' => '11:00']);
 
     $response = $this->get(siteUrl($site));
 
+    // The card is one Vue island; what it draws is in the props it is handed.
     $response->assertOk()
-        ->assertSee('data-gate', false)
+        ->assertSee('data-vue="card-view"', false)
         ->assertSee('Buka kad')
-        ->assertSee('data-countdown', false)
-        ->assertSee('data-reveal', false)
-        ->assertSee('nk-petal', false)
-        ->assertSee('data-unit="seconds"', false);
+        ->assertSee('&quot;countdown&quot;', false);
 
     // The countdown targets the ceremony start, not midnight.
-    $response->assertSee($site->event_date->copy()->setTimeFromTimeString('11:00:00')->toIso8601String(), false);
+    $props = cardProps($response);
+
+    expect($props['gate']['enabled'])->toBeTrue()
+        ->and(collect($props['widgets'])->firstWhere('key', 'countdown')['target'])
+        ->toBe($site->event_date->copy()->setTimeFromTimeString('11:00:00')->toIso8601String());
 });
 
 it('opens the traditional designs with the Bismillah and leaves the modern ones without', function () {
-    $traditional = WeddingSite::factory()->published()->create(['template' => 'nur-geometri']);
-    $modern = WeddingSite::factory()->published()->create(['template' => 'putih-tenang']);
+    $traditional = WeddingSite::factory()->published()->create(['template' => 'islamic-gold']);
+    $modern = WeddingSite::factory()->published()->create(['template' => 'black-gold']);
 
-    $this->get(siteUrl($traditional))->assertOk()->assertSee('lang="ar"', false);
-    $this->get(siteUrl($modern))->assertOk()->assertDontSee('lang="ar"', false);
+    expect(SiteTemplate::where('slug', 'islamic-gold')->sole()->showsBismillah())->toBeTrue()
+        ->and(SiteTemplate::where('slug', 'black-gold')->sole()->showsBismillah())->toBeFalse();
+
+    // The Bismillah is a layer in the artwork, so it travels in the card's props.
+    $this->get(siteUrl($traditional))->assertOk()->assertSee('Bismillah', false);
+    $this->get(siteUrl($modern))->assertOk()->assertDontSee('Bismillah', false);
 });
 
-it('pins a toolbar to the card with only the shortcuts this card can answer', function () {
+it('carries only the sections this card can answer', function () {
     $site = WeddingSite::factory()->published()->create([
         'map_url' => 'https://maps.google.com/?q=dewan',
         'contacts' => [['name' => 'Puan Rohana', 'phone' => '012-345 6789']],
         'rsvp_enabled' => true,
         'gift_enabled' => false,
+        'wishes_enabled' => false,
     ]);
 
-    $this->get(siteUrl($site))
-        ->assertOk()
-        ->assertSee('data-dock', false)
-        ->assertSee('https://maps.google.com/?q=dewan', false)
-        ->assertSee('href="#rsvp"', false)
-        ->assertSee('href="#hubungi"', false)
-        ->assertDontSee('href="#hadiah"', false);
+    $widgets = collect(cardProps($this->get(siteUrl($site))->assertOk())['widgets'])->pluck('key');
+
+    expect($widgets)->toContain('location', 'contacts', 'rsvp')
+        ->and($widgets)->not->toContain('gift')
+        ->and($widgets)->not->toContain('wishes')
+        // Nothing was uploaded and no tentatif was written, so neither is drawn.
+        ->and($widgets)->not->toContain('gallery')
+        ->and($widgets)->not->toContain('itinerary');
 });
 
-it('leaves the quiet designs unanimated', function () {
-    $still = WeddingSite::factory()->published()->create(['template' => 'putih-tenang']);
+it('hands the browser the design the couple chose, not the one before it', function () {
+    $site = WeddingSite::factory()->published()->create(['template' => 'black-gold']);
 
-    $this->get(siteUrl($still))->assertOk()->assertDontSee('nk-petal', false);
+    $props = cardProps($this->get(siteUrl($site))->assertOk());
+
+    expect($props['design']['slug'])->toBe('black-gold')
+        ->and($props['canvases'])->toHaveCount(3)
+        ->and(collect($props['canvases'])->pluck('key')->all())->toBe(['cover', 'invitation', 'event'])
+        // The palette reaches the page as CSS variables, which is what lets a
+        // colour change repaint the card without recomposing a single layer.
+        ->and($props['vars']['--c-bg'])->toBe('#0a0a0a');
 });
 
 it('opens the card straight away in preview, with no gate to click through', function () {
-    $this->get(route('sites.templates.show', 'mawar-pagi'))
-        ->assertOk()
-        ->assertSee('data-card', false)
-        ->assertDontSee('data-gate', false);
+    $response = $this->get(route('sites.templates.show', 'rose-garden'))->assertOk();
+
+    expect(cardProps($response)['gate']['enabled'])->toBeFalse();
 });
 
 it('offers a calendar file guests can add to their phone', function () {
@@ -172,17 +200,17 @@ it('offers a calendar file guests can add to their phone', function () {
     $this->get('http://tiada.'.config('neekah.site_domain').'/kalendar.ics')->assertNotFound();
 });
 
-it('shows the gallery, filters it by style, and samples every design', function () {
+it('shows the gallery, filters it by category, and samples every design', function () {
     $this->get(route('sites.templates'))
         ->assertOk()
-        ->assertSee('24 template untuk dipilih')
-        ->assertSee('Seri Gangsa')
-        ->assertSee('Malam Emas');
+        ->assertSee('50 template untuk dipilih')
+        ->assertSee('Royal Songket Gold')
+        ->assertSee('Midnight Luxury');
 
-    $this->get(route('sites.templates', ['style' => 'Islamik']))
+    $this->get(route('sites.templates', ['category' => 'Islamic']))
         ->assertOk()
-        ->assertSee('Nur Geometri')
-        ->assertDontSee('Malam Emas');
+        ->assertSee('Islamic Gold')
+        ->assertDontSee('Midnight Luxury');
 
     foreach (SiteTemplate::active()->get() as $template) {
         $this->get(route('sites.templates.show', $template))
@@ -198,10 +226,13 @@ it('greets the named guest behind their personal link and records the open', fun
     $site = WeddingSite::factory()->published()->create();
     $guest = WeddingGuest::factory()->for($site->wedding)->create(['name' => 'Pak Long Rahim', 'pax_invited' => 4]);
 
-    $this->get(siteUrl($site, '/?u='.$guest->token))
-        ->assertOk()
-        ->assertSee('Kepada Pak Long Rahim')
-        ->assertSee('value="'.$guest->token.'"', false);
+    $response = $this->get(siteUrl($site, '/?u='.$guest->token))->assertOk()->assertSee('Pak Long Rahim');
+
+    $props = cardProps($response);
+
+    expect($props['guest']['name'])->toBe('Pak Long Rahim')
+        ->and($props['guest']['token'])->toBe($guest->token)
+        ->and($props['guest']['pax_invited'])->toBe(4);
 
     $guest->refresh();
 

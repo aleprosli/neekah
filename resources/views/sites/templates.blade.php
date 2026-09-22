@@ -1,6 +1,6 @@
 @php
-    $notes = __('pages.template_style_notes');
-    $groups = $templates->groupBy('style');
+    $notes = __('pages.template_category_notes');
+    $groups = $templates->groupBy('category');
     $startUrl = auth()->check() ? route('site.edit') : route('register');
 @endphp
 
@@ -38,9 +38,9 @@
         {{-- Style filter --}}
         <nav class="sticky top-[5.25rem] z-20 mt-12 border-y border-line bg-surface/90 backdrop-blur" :aria-label="__('pages.gallery_page.gaya')">
             <div class="no-scrollbar mx-auto flex max-w-6xl gap-2 overflow-x-auto px-4 py-3 sm:justify-center sm:px-6">
-                <a href="{{ route('sites.templates') }}" @class(['shrink-0 rounded-full border px-4 py-1.5 text-sm font-medium transition', 'border-brand-600 bg-brand-600 text-white' => ! $style, 'border-line hover:border-brand-400' => $style])>{{ __('pages.gallery_page.semua') }}</a>
-                @foreach ($styles as $name)
-                    <a href="{{ route('sites.templates', ['style' => $name]) }}" @class(['shrink-0 rounded-full border px-4 py-1.5 text-sm font-medium transition', 'border-brand-600 bg-brand-600 text-white' => $style === $name, 'border-line hover:border-brand-400' => $style !== $name])>{{ __('pages.template_style.'.$name) }}</a>
+                <a href="{{ route('sites.templates') }}" @class(['shrink-0 rounded-full border px-4 py-1.5 text-sm font-medium transition', 'border-brand-600 bg-brand-600 text-white' => ! $category, 'border-line hover:border-brand-400' => $category])>{{ __('pages.gallery_page.semua') }}</a>
+                @foreach ($categories as $name)
+                    <a href="{{ route('sites.templates', ['category' => $name]) }}" @class(['shrink-0 rounded-full border px-4 py-1.5 text-sm font-medium transition', 'border-brand-600 bg-brand-600 text-white' => $category === $name, 'border-line hover:border-brand-400' => $category !== $name])>{{ __('pages.template_category.'.$name) }}</a>
                 @endforeach
             </div>
         </nav>
@@ -50,7 +50,7 @@
             @foreach ($groups as $name => $group)
                 <section>
                     <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-line pb-3">
-                        <h2 class="font-display text-2xl font-semibold">{{ __('pages.template_style.'.$name) }}</h2>
+                        <h2 class="font-display text-2xl font-semibold">{{ __('pages.template_category.'.$name) }}</h2>
                         <p class="text-sm text-ink-muted">{{ $notes[$name] ?? '' }} <span class="whitespace-nowrap">· {{ __('pages.gallery_page.designs', ['count' => $group->count()]) }}</span></p>
                     </div>
 
@@ -58,16 +58,26 @@
                         @foreach ($group as $template)
                             <li>
                                 <a href="{{ route('sites.templates.show', $template) }}" class="group block">
-                                    <span class="block overflow-hidden rounded-md bg-surface-muted p-2.5 transition group-hover:-translate-y-1 sm:p-3.5">
-                                        <span class="block shadow-[0_12px_28px_-12px_rgb(0_0_0/0.35)] transition group-hover:shadow-[0_20px_36px_-14px_rgb(0_0_0/0.4)]">
-                                            @include('sites.partials.thumbnail', ['template' => $template])
-                                        </span>
-                                    </span>
+                                    <div class="overflow-hidden rounded-md bg-surface-muted p-2.5 transition group-hover:-translate-y-1 sm:p-3.5">
+                                        {{-- The tile is the design itself, drawn by
+                                             resources/js/components/card/CardView.vue at
+                                             thumbnail size. Without JavaScript the name
+                                             and the palette still describe it. --}}
+                                        <div class="aspect-[9/16] overflow-hidden shadow-[0_12px_28px_-12px_rgb(0_0_0/0.35)] transition group-hover:shadow-[0_20px_36px_-14px_rgb(0_0_0/0.4)]" data-vue="card-view" data-props="@vueProps($thumbnails[$template->slug])">
+                                            <div class="flex h-full w-full flex-col items-center justify-center gap-2 p-3 text-center" style="{{ $template->cssVariables() }};background:var(--c-bg);color:var(--c-onbg)">
+                                                <span class="text-[0.6rem] tracking-[0.3em] uppercase" style="color:var(--c-acc)">Walimatul Urus</span>
+                                                <span class="text-sm" style="font-family:var(--f-s);color:var(--c-head)">{{ $template->name }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
                                     <span class="mt-3 flex items-center justify-between gap-2">
                                         <span class="truncate text-sm font-semibold group-hover:text-brand-700">{{ $template->name }}</span>
                                         <span class="shrink-0 text-xs font-medium text-brand-600 opacity-0 transition group-hover:opacity-100">{{ __('pages.gallery_page.lihat') }}</span>
                                     </span>
                                     <span class="mt-0.5 line-clamp-2 block text-xs text-ink-muted">{{ $template->description }}</span>
+                                    @if ($template->is_premium)
+                                        <span class="mt-1 inline-flex rounded-full bg-brand-50 px-2 py-0.5 text-[0.65rem] font-semibold text-brand-700">{{ __('pages.gallery_page.premium') }}</span>
+                                    @endif
                                 </a>
                             </li>
                         @endforeach

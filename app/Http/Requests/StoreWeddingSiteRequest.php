@@ -2,8 +2,13 @@
 
 namespace App\Http\Requests;
 
+use App\Models\CardMusicTrack;
 use App\Models\SiteTemplate;
 use App\Models\WeddingSite;
+use App\Support\Card\Catalog;
+use App\Support\Card\Fonts;
+use App\Support\Card\Palettes;
+use App\Support\Card\Widgets;
 use App\Support\ImageSettings;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -34,8 +39,14 @@ class StoreWeddingSiteRequest extends FormRequest
             'template' => ['required', Rule::exists(SiteTemplate::class, 'slug')->where('is_active', true)],
             'bride_name' => ['required', 'string', 'max:80'],
             'groom_name' => ['required', 'string', 'max:80'],
-            'bride_parents' => ['nullable', 'string', 'max:160'],
-            'groom_parents' => ['nullable', 'string', 'max:160'],
+            'bride_short' => ['nullable', 'string', 'max:40'],
+            'groom_short' => ['nullable', 'string', 'max:40'],
+            'bride_father' => ['nullable', 'string', 'max:120'],
+            'bride_mother' => ['nullable', 'string', 'max:120'],
+            'groom_father' => ['nullable', 'string', 'max:120'],
+            'groom_mother' => ['nullable', 'string', 'max:120'],
+            'bride_bio' => ['nullable', 'string', 'max:300'],
+            'groom_bio' => ['nullable', 'string', 'max:300'],
             'salutation' => ['nullable', 'string', 'max:200'],
             'invitation_note' => ['nullable', 'string', 'max:1000'],
             'event_date' => ['required', 'date'],
@@ -50,7 +61,19 @@ class StoreWeddingSiteRequest extends FormRequest
             'contacts' => ['nullable', 'array', 'max:6'],
             'contacts.*.name' => ['nullable', 'string', 'max:80'],
             'contacts.*.phone' => ['nullable', 'string', 'max:30'],
-            'cover_image' => ['nullable', ...$images->uploadRules()],
+            // The design's photo slots, and the colours and faces it is worn with.
+            'photos' => ['nullable', 'array'],
+            'photos.*' => ['nullable', ...$images->uploadRules()],
+            'remove_photos' => ['nullable', 'array'],
+            'remove_photos.*' => ['string', Rule::in(Catalog::photoSlotKeys())],
+            'palette' => ['nullable', 'array'],
+            'palette.*' => ['nullable', 'string', 'regex:/^#[0-9a-fA-F]{6}$/'],
+            'fonts' => ['nullable', 'array'],
+            'fonts.*' => ['nullable', 'string', Rule::in(array_keys(Fonts::all()))],
+            'widgets' => ['nullable', 'array'],
+            'widgets.*' => ['string', Rule::in(Widgets::keys())],
+            'music_enabled' => ['nullable', 'boolean'],
+            'music_track_id' => ['nullable', Rule::exists(CardMusicTrack::class, 'id')->where('is_active', true)],
             'rsvp_enabled' => ['nullable', 'boolean'],
             'rsvp_deadline' => ['nullable', 'date', 'before_or_equal:event_date'],
             'closing_note' => ['nullable', 'string', 'max:500'],
@@ -100,7 +123,16 @@ class StoreWeddingSiteRequest extends FormRequest
      */
     public function siteAttributes(): array
     {
-        $data = $this->safe()->except(['cover_image', 'gift_qr_image']);
+        $data = $this->safe()->except(['gift_qr_image', 'photos', 'remove_photos']);
+
+        // Only the roles the couple actually chose, so re-tuning a design later still
+        // reaches the cards that never overrode it.
+        $data['palette'] = Palettes::sanitize($data['palette'] ?? []) ?: null;
+        $data['fonts'] = collect($data['fonts'] ?? [])
+            ->only(Fonts::ROLES)
+            ->filter(fn (mixed $family): bool => Fonts::isValid(is_string($family) ? $family : null))
+            ->all() ?: null;
+        $data['widgets'] = Widgets::sanitize($data['widgets'] ?? null);
 
         $data['itinerary'] = collect($data['itinerary'] ?? [])
             ->filter(fn (array $row): bool => filled($row['time'] ?? null) && filled($row['label'] ?? null))
@@ -123,6 +155,7 @@ class StoreWeddingSiteRequest extends FormRequest
         $data['rsvp_enabled'] = $this->boolean('rsvp_enabled');
         $data['gift_enabled'] = $this->boolean('gift_enabled');
         $data['wishes_enabled'] = $this->boolean('wishes_enabled');
+        $data['music_enabled'] = $this->boolean('music_enabled');
 
         return $data;
     }
@@ -141,7 +174,8 @@ class StoreWeddingSiteRequest extends FormRequest
             'starts_at' => __('fields.masa_mula'),
             'ends_at' => __('fields.masa_tamat'),
             'map_url' => __('fields.pautan_peta'),
-            'cover_image' => __('fields.gambar_utama'),
+            'bride_short' => __('fields.nama_pendek_perempuan'),
+            'groom_short' => __('fields.nama_pendek_lelaki'),
             'rsvp_deadline' => __('fields.tarikh_akhir_rsvp'),
             'gift_note' => __('fields.nota_hadiah'),
             'gift_qr_image' => __('fields.kod_qr_duitnow'),

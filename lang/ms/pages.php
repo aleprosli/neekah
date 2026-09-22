@@ -146,6 +146,16 @@ return [
     ],
 
     'dash' => [
+        'statistik_kad' => 'Statistik kad',
+        'statistik_kad_jemputan' => 'Statistik kad jemputan',
+        'siapa_membuka_kad_anda' => 'Siapa membuka kad anda, dan siapa sudah menjawab.',
+        'kembali_ke_editor' => 'Kembali ke editor',
+        'muzik_kad' => 'Muzik kad',
+        'muzik_kad_jemputan' => 'Muzik kad jemputan',
+        'trek_yang_boleh_dipilih_pengantin' => 'Trek yang boleh dipilih pengantin untuk dimainkan pada kad mereka.',
+        'kad_nfc' => 'Kad NFC',
+        'kad_nfc_fizikal' => 'Kad NFC fizikal',
+        'setiap_tag_membawa_satu_uid' => 'Setiap tag membawa satu uid sahaja, jadi alamat kad boleh berubah tanpa merosakkan kad yang sudah dicetak.',
         'tempoh_terakhir' => 'Tempoh: :period terakhir',
         'artikel_baru' => 'Artikel baru',
         'sunting_artikel' => 'Sunting artikel',
@@ -419,6 +429,7 @@ return [
     ],
 
     'gallery_page' => [
+        'premium' => 'Premium',
         'template_untuk_dipilih' => ':count template untuk dipilih',
         'percuma' => ', percuma.',
         'cipta_kad_saya' => 'Cipta kad saya',
@@ -472,7 +483,35 @@ return [
         'neekah' => 'Neekah',
     ],
 
+    'card_widgets' => [
+        'countdown' => 'Detik menanti',
+        'itinerary' => 'Tentatif majlis',
+        'location' => 'Lokasi majlis',
+        'gallery' => 'Galeri',
+        'rsvp' => 'Sahkan kehadiran (RSVP)',
+        'wishes' => 'Ucapan & doa',
+        'gift' => 'Salam kaut',
+        'contacts' => 'Hubungi kami',
+        'closing' => 'Penutup',
+    ],
+
+    'card_slots' => [
+        'cover_image' => 'Gambar kulit kad',
+        'couple_image' => 'Gambar berdua',
+        'groom_image' => 'Gambar pengantin lelaki',
+        'bride_image' => 'Gambar pengantin perempuan',
+        'closing_image' => 'Gambar penutup',
+    ],
+
+    'card_fonts' => [
+        'd' => 'Nama pengantin',
+        's' => 'Tajuk tulisan tangan',
+        'r' => 'Tulisan badan',
+        'n' => 'Label kecil',
+    ],
+
     'card' => [
+        'walimatulurus' => 'Walimatulurus',
         'copy_account' => 'Salin nombor akaun',
         'send_rsvp' => 'Hantar RSVP',
     ],
@@ -512,20 +551,22 @@ return [
         'tentang_neekah' => 'Tentang Neekah',
     ],
 
-    'template_style' => [
-        'Klasik' => 'Klasik',
-        'Islamik' => 'Islamik',
-        'Bunga' => 'Bunga',
-        'Moden' => 'Moden',
-        'Malam' => 'Malam',
+    'template_category' => [
+        'Traditional' => 'Tradisional',
+        'Modern' => 'Moden',
+        'Floral' => 'Bunga',
+        'Islamic' => 'Islamik',
+        'Minimalist' => 'Minimalis',
+        'Creative' => 'Kreatif',
     ],
 
-    'template_style_notes' => [
-        'Klasik' => 'Kertas krim, dakwat marun dan emas — gaya kad cetak tradisional.',
-        'Islamik' => 'Dibuka dengan Bismillah, bercorak geometri dan gerbang mihrab.',
-        'Bunga' => 'Warna pastel dengan kelopak yang gugur perlahan.',
-        'Moden' => 'Tipografi bersih, ruang lapang dan tona tanah.',
-        'Malam' => 'Latar gelap dan kilauan emas untuk resepsi malam.',
+    'template_category_notes' => [
+        'Traditional' => 'Songket, tenun dan pucuk rebung — emas di atas kertas tebal.',
+        'Modern' => 'Tipografi besar, ruang lapang dan satu aksen emas.',
+        'Floral' => 'Peoni, mawar dan dedaun yang melimpah di tepi kad.',
+        'Islamic' => 'Dibuka dengan Bismillah, bercorak geometri dan gerbang mihrab.',
+        'Minimalist' => 'Hampir kosong: satu dahan, taip kecil, banyak ruang.',
+        'Creative' => 'Majalah, filem, polaroid dan poskad — untuk yang mahu lain.',
     ],
 
     'sidebar_couple' => [
@@ -564,6 +605,8 @@ return [
     ],
 
     'sidebar_admin' => [
+        'muzik_kad' => 'Muzik kad',
+        'kad_nfc' => 'Kad NFC',
         'ringkasan' => 'Ringkasan',
         'analitik' => 'Analitik',
         'marketplace' => 'Marketplace',

@@ -228,27 +228,27 @@ it('finds a row by its text in whichever language the caller knows', function ()
 it('keeps the template style in the url while translating what is shown', function () {
     $this->seed(SiteTemplateSeeder::class);
 
-    // The style is a closed set of five and it is in the gallery's URLs, so
+    // The category is a closed set of six and it is in the gallery's URLs, so
     // translating the value itself would move every one of those URLs.
     $this->get('/en/kad-jemputan')->assertOk()
-        ->assertSee('Classic')
-        ->assertSee('?style=Klasik', false);
+        ->assertSee('Traditional')
+        ->assertSee('?category=Traditional', false);
 
-    $this->get('/kad-jemputan')->assertOk()->assertSee('Klasik');
+    $this->get('/kad-jemputan')->assertOk()->assertSee('Tradisional');
 });
 
 it('translates what a designer wrote about a template, not its name', function () {
     $this->seed(SiteTemplateSeeder::class);
 
-    $template = SiteTemplate::where('slug', 'mawar-pagi')->sole();
+    $template = SiteTemplate::where('slug', 'rose-garden')->sole();
 
-    // "Mawar Pagi" is the name of a design, the way a paint colour has a name.
+    // "Rose Garden" is the name of a design, the way a paint colour has a name.
     app()->setLocale('en');
-    expect($template->name)->toBe('Mawar Pagi')
-        ->and($template->description)->toBe('Soft pink with a fall of petals.');
+    expect($template->name)->toBe('Rose Garden')
+        ->and($template->description)->toBe('Dusty pink roses in sprays and clusters on ivory, softly romantic.');
 
     app()->setLocale('ms');
-    expect($template->description)->toBe('Merah jambu lembut dengan hujan kelopak.');
+    expect($template->description)->toBe('Mawar merah jambu lembut dalam jambangan di atas gading, romantis dan tenang.');
 });
 
 it('adds the language a checklist row is missing without duplicating or overwriting it', function () {

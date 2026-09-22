@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\Card\Widgets;
 use Database\Factories\WeddingSiteFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Scope;
@@ -11,14 +12,17 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsTo as EloquentBelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 #[Fillable([
     'wedding_id', 'subdomain', 'template', 'is_published', 'salutation', 'bride_name', 'groom_name',
-    'bride_parents', 'groom_parents', 'invitation_note', 'event_date', 'starts_at', 'ends_at',
+    'bride_short', 'groom_short', 'bride_father', 'bride_mother', 'groom_father', 'groom_mother',
+    'bride_bio', 'groom_bio', 'invitation_note', 'event_date', 'starts_at', 'ends_at',
     'venue_name', 'venue_address', 'map_url', 'itinerary', 'contacts', 'cover_image',
+    'palette', 'fonts', 'slot_images', 'widgets', 'music_track_id', 'music_enabled',
     'rsvp_enabled', 'rsvp_deadline', 'closing_note',
     'gift_enabled', 'gift_note', 'gift_qr_image', 'gift_accounts', 'wishes_enabled',
 ])]
@@ -75,6 +79,11 @@ class WeddingSite extends Model
             'gift_accounts' => 'array',
             'gift_enabled' => 'boolean',
             'wishes_enabled' => 'boolean',
+            'palette' => 'array',
+            'fonts' => 'array',
+            'slot_images' => 'array',
+            'widgets' => 'array',
+            'music_enabled' => 'boolean',
         ];
     }
 
@@ -103,9 +112,110 @@ class WeddingSite extends Model
             ?? throw new \RuntimeException('No invitation card template is active.');
     }
 
+    public function musicTrack(): EloquentBelongsTo
+    {
+        return $this->belongsTo(CardMusicTrack::class, 'music_track_id');
+    }
+
+    public function dailyViews(): HasMany
+    {
+        return $this->hasMany(WeddingSiteView::class)->orderBy('viewed_on');
+    }
+
+    public function nfcCards(): HasMany
+    {
+        return $this->hasMany(CardNfcCard::class);
+    }
+
     public function rsvps(): HasMany
     {
         return $this->hasMany(WeddingRsvp::class)->latest();
+    }
+
+    /**
+     * Count one opening: the running total on the card and the day's counter the
+     * insights page draws. A guest arriving on their personal link is counted apart,
+     * so the couple can tell their own list reading it from a forward.
+     */
+    public function recordView(bool $fromGuestLink = false): void
+    {
+        $this->increment('views');
+
+        $date = today()->toDateString();
+
+        // Two guests opening the card in the same second both try to start the day's
+        // row; the loser of that race reads the winner's rather than failing the page.
+        try {
+            $today = $this->dailyViews()->firstOrCreate(['viewed_on' => $date]);
+        } catch (QueryException) {
+            $today = $this->dailyViews()->where('viewed_on', $date)->firstOrFail();
+        }
+
+        $today->increment('views');
+
+        if ($fromGuestLink) {
+            $today->increment('guest_views');
+        }
+    }
+
+    /**
+     * The slots that show the couple themselves. Both fall back to cover_image, so
+     * the one photo a card carried before the layered designs still appears: most
+     * designs ask for couple_image, and their photo was stored as the cover.
+     *
+     * @var array<int, string>
+     */
+    public const MAIN_PHOTO_SLOTS = ['cover_image', 'couple_image'];
+
+    /**
+     * The photo the couple put in one of the design's slots (couple_image,
+     * cover_image, groom_image…).
+     */
+    public function slotImage(string $slot): ?string
+    {
+        $path = $this->slot_images[$slot] ?? null;
+
+        if (blank($path) && in_array($slot, self::MAIN_PHOTO_SLOTS, true)) {
+            $path = $this->cover_image;
+        }
+
+        return is_string($path) && $path !== '' ? Storage::disk('public')->url($path) : null;
+    }
+
+    /**
+     * Stored paths of every slot photo, so they can be deleted with the card.
+     *
+     * @return array<int, string>
+     */
+    public function slotImagePaths(): array
+    {
+        return collect($this->slot_images ?? [])->filter(fn (mixed $path): bool => is_string($path) && $path !== '')->values()->all();
+    }
+
+    /**
+     * The sections that follow the designed canvases, in the couple's order.
+     *
+     * @return array<int, string>
+     */
+    public function widgetKeys(): array
+    {
+        return Widgets::sanitize($this->widgets);
+    }
+
+    /**
+     * The short name a cover prints, falling back to the first name.
+     */
+    public function shortName(string $side): string
+    {
+        $short = trim((string) ($side === 'bride' ? $this->bride_short : $this->groom_short));
+
+        if ($short !== '') {
+            return $short;
+        }
+
+        $full = trim((string) ($side === 'bride' ? $this->bride_name : $this->groom_name));
+
+        return preg_split('/\s+/', $full)[0] ?? $full;
     }
 
     /**
@@ -183,11 +293,14 @@ class WeddingSite extends Model
     }
 
     /**
-     * The couple's initials for the monogram, bride first as the names are printed.
+     * The couple's initials for the monogram, groom first as the cards print them.
+     *
+     * Taken from the short names: "Muhammad Hakim" and "Nur Aina" are on the card
+     * as Hakim and Aina, and a seal reading "MN" belongs to nobody.
      */
     public function initials(): string
     {
-        return mb_strtoupper(mb_substr(trim((string) $this->bride_name), 0, 1).mb_substr(trim((string) $this->groom_name), 0, 1));
+        return mb_strtoupper(mb_substr($this->shortName('groom'), 0, 1).mb_substr($this->shortName('bride'), 0, 1));
     }
 
     public function templateName(): string

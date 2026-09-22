@@ -24,13 +24,26 @@ class RenderInvitationPreview
     public const HEIGHT = 630;
 
     /**
-     * The families the twenty templates draw from, mapped to files we ship.
-     * A template asking for anything else falls back to the serif.
+     * The four faces this picture can draw with. The card itself has eighteen, but
+     * a link preview is one line of names in a box — a design asking for a face we
+     * do not ship here is drawn in the nearest one we do.
      */
     private const FONTS = [
         'Great Vibes' => 'GreatVibes-Regular.ttf',
+        'Allura' => 'GreatVibes-Regular.ttf',
+        'Parisienne' => 'GreatVibes-Regular.ttf',
         'Playfair Display' => 'PlayfairDisplay.ttf',
+        'Bodoni Moda' => 'PlayfairDisplay.ttf',
+        'Abril Fatface' => 'PlayfairDisplay.ttf',
+        'DM Serif Display' => 'PlayfairDisplay.ttf',
+        'Cinzel' => 'PlayfairDisplay.ttf',
         'Cormorant Garamond' => 'CormorantGaramond.ttf',
+        'Lora' => 'CormorantGaramond.ttf',
+        'Libre Baskerville' => 'CormorantGaramond.ttf',
+        'Montserrat' => 'InstrumentSans.ttf',
+        'Poppins' => 'InstrumentSans.ttf',
+        'Lato' => 'InstrumentSans.ttf',
+        'Inter' => 'InstrumentSans.ttf',
         'Instrument Sans' => 'InstrumentSans.ttf',
     ];
 
@@ -44,6 +57,8 @@ class RenderInvitationPreview
         $key = substr(sha1(implode('|', [
             $site->id, $template->slug, $site->bride_name, $site->groom_name,
             $site->event_date?->toDateString(), $site->venue_name, $site->cover_image,
+            // A couple who recoloured their card gets a picture in their colours.
+            json_encode($site->palette), json_encode($site->fonts),
         ])), 0, 12);
 
         $path = 'og/'.($site->subdomain ?: 'contoh').'-'.$key.'.png';
@@ -58,31 +73,33 @@ class RenderInvitationPreview
 
     public function draw(WeddingSite $site, SiteTemplate $template): string
     {
-        $palette = $template->design['palette'] ?? [];
+        // The design's own colours, with whatever the couple changed on top.
+        $palette = $template->palette($site->palette);
+        $fonts = $template->fonts($site->fonts);
         $canvas = imagecreatetruecolor(self::WIDTH, self::HEIGHT);
 
-        $page = $this->colour($canvas, $palette['page'] ?? '#ffffff');
+        $page = $this->colour($canvas, $palette['bg']);
         imagefill($canvas, 0, 0, $page);
 
-        $this->drawCover($canvas, $site, $palette['page'] ?? '#ffffff');
+        $this->drawCover($canvas, $site, $palette['bg']);
 
-        $accent = $this->colour($canvas, $palette['accent'] ?? '#c19a4b');
-        $name = $this->colour($canvas, $palette['name'] ?? '#2b2b2b');
-        $body = $this->colour($canvas, $palette['body'] ?? '#5f5f5f');
+        $accent = $this->colour($canvas, $palette['acc']);
+        $name = $this->colour($canvas, $palette['head']);
+        $body = $this->colour($canvas, $palette['onbg']);
 
         // A hairline frame, the way the card itself is bordered.
         imagesetthickness($canvas, 2);
         imagerectangle($canvas, 40, 40, self::WIDTH - 41, self::HEIGHT - 41, $accent);
 
-        $script = $this->font($template->design['type']['script'] ?? '', 'GreatVibes-Regular.ttf');
-        $serif = $this->font($template->design['type']['body'] ?? '', 'CormorantGaramond.ttf');
+        $script = $this->font($fonts['s'], 'GreatVibes-Regular.ttf');
+        $serif = $this->font($fonts['r'], 'CormorantGaramond.ttf');
 
-        $this->centred($canvas, Str::upper($template->eyebrow()), $serif, 20, 148, $accent, 8);
+        $this->centred($canvas, Str::upper(__('pages.card.walimatulurus')), $serif, 20, 148, $accent, 8);
 
         // The names carry the card, so they are sized to fit rather than clipped.
-        $this->centred($canvas, $site->bride_name, $script, $this->fitting($site->bride_name, $script, 82), 290, $name);
+        $this->centred($canvas, $site->groom_name, $script, $this->fitting($site->groom_name, $script, 82), 290, $name);
         $this->centred($canvas, '&', $serif, 34, 360, $accent);
-        $this->centred($canvas, $site->groom_name, $script, $this->fitting($site->groom_name, $script, 82), 450, $name);
+        $this->centred($canvas, $site->bride_name, $script, $this->fitting($site->bride_name, $script, 82), 450, $name);
 
         $rule = (int) (self::WIDTH / 2);
         imagesetthickness($canvas, 1);
@@ -165,16 +182,10 @@ class RenderInvitationPreview
         }
     }
 
-    /** Resolve a CSS font stack such as "'Great Vibes', cursive" to a file. */
-    private function font(string $stack, string $fallback): string
+    /** The nearest file we ship to the family a design asked for. */
+    private function font(string $family, string $fallback): string
     {
-        foreach (self::FONTS as $family => $file) {
-            if (str_contains($stack, $family)) {
-                return resource_path('fonts/'.$file);
-            }
-        }
-
-        return resource_path('fonts/'.$fallback);
+        return resource_path('fonts/'.(self::FONTS[$family] ?? $fallback));
     }
 
     private function colour(GdImage $canvas, string $hex): int
