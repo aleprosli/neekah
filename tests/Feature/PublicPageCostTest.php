@@ -3,6 +3,7 @@
 use App\Models\Category;
 use App\Models\Package;
 use App\Models\Review;
+use App\Models\ReviewPhoto;
 use App\Models\Setting;
 use App\Models\SiteTemplate;
 use App\Models\Vendor;
@@ -235,4 +236,22 @@ describe('cached public pages', function () {
 
         $this->get(route('vendors.show', $edited))->assertOk()->assertSee('Pakej Baharu');
     });
+});
+
+it('drops a vendor\'s cached page when one of their review photos moves', function () {
+    config(['cache.default' => 'database']);
+    Cache::store('database')->flush();
+    $this->seed(CategorySeeder::class);
+
+    $vendor = Vendor::factory()->for(Category::where('slug', 'photography')->first())->create();
+    $review = Review::factory()->for($vendor)->create();
+    $photo = ReviewPhoto::factory()->for($review)->create();
+
+    $before = ContentVersion::forVendor($vendor->getKey());
+
+    // What --thumbnails does: the file moves, so the page must stop pointing
+    // at where it was.
+    $photo->forceFill(['path' => 'reviews/'.$review->id.'/baharu.webp'])->save();
+
+    expect(ContentVersion::forVendor($vendor->getKey()))->not->toBe($before);
 });
