@@ -3,8 +3,7 @@
     <x-vendor-search filter-dialog="filters" :categories="$categories" :states="$states" :state-options="$stateOptions" />
 
     <main class="relative bg-ivory">
-        <x-site.florals corners="none" sprig />
-        <x-site.ornament name="cluster-peony" class="pointer-events-none absolute top-[14rem] -right-24 size-72 opacity-25 sm:size-96" color="var(--color-gold-300)" color2="var(--color-brand-200)" />
+        <x-site.florals corners="none" sprig cluster />
 
         <div class="relative mx-auto max-w-[1760px] px-4 pb-24 sm:px-6 md:pb-10 lg:px-10">
         {{-- Category tiles --}}

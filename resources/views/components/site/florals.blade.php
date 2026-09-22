@@ -5,6 +5,8 @@
     'particles' => false,
     /** A leaf sprig low on the left, for a long page that would otherwise go bare. */
     'sprig' => false,
+    /** A cluster of peonies part-way down the right, for a page of many cards. */
+    'cluster' => false,
 ])
 
 {{-- The florals every public page wears, in one clipped layer.
@@ -26,5 +28,8 @@
     @endif
     @if ($sprig)
         <x-site.ornament name="leaf-sprig" class="absolute top-[36rem] -left-8 h-64 w-40 opacity-25 sm:h-80 sm:w-52" color="var(--color-brand-200)" />
+    @endif
+    @if ($cluster)
+        <x-site.ornament name="cluster-peony" class="absolute top-[14rem] -right-24 size-72 opacity-25 sm:size-96" color="var(--color-gold-300)" color2="var(--color-brand-200)" />
     @endif
 </div>

@@ -124,7 +124,7 @@
         </section>
 
         {{-- Marketplace preview --}}
-        <section id="marketplace" class="relative bg-ivory-deep">
+        <section id="marketplace" class="relative overflow-hidden bg-ivory-deep">
             <x-site.ornament name="garland" class="absolute -top-2 left-1/2 h-14 w-[36rem] max-w-full -translate-x-1/2 opacity-50" color="var(--color-gold-400)" color2="var(--color-brand-300)" />
 
             <div class="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
