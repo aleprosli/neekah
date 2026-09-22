@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\Vendor;
+use App\Support\Card\SampleCard;
 use App\Support\ContactSettings;
 use App\Support\Seo;
 use Illuminate\Contracts\View\View;
@@ -24,6 +25,9 @@ class LandingController extends Controller
 
         return view('landing', [
             'flow' => $this->flow(),
+            // Three real designs fanned out in the hero: the card is the one thing on
+            // this page a couple can picture themselves holding.
+            'covers' => SampleCard::covers(['neekah-signature', 'royal-songket-gold', 'midnight-luxury']),
             'categories' => $categories,
             'vendors' => Vendor::query()->approved()->with('category')->orderByDesc('score')->orderBy('id')->limit(6)->get(),
             'features' => $this->features(),
@@ -48,17 +52,19 @@ class LandingController extends Controller
     }
 
     /**
-     * @return array<int, array{title: string, description: string, icon: string}>
+     * @return array<int, array{icon: string, title: string, description: string}>
      */
     private function features(): array
     {
         return [
-            ['icon' => '🔎', 'title' => __('pages.landing.features.search'), 'description' => __('pages.landing.features.search_detail')],
-            ['icon' => '✉️', 'title' => __('pages.landing.features.card'), 'description' => __('pages.landing.features.card_detail')],
-            ['icon' => '📋', 'title' => __('pages.landing.features.checklist'), 'description' => __('pages.landing.features.checklist_detail')],
-            ['icon' => '💰', 'title' => __('pages.landing.features.budget'), 'description' => __('pages.landing.features.budget_detail')],
-            ['icon' => '🗓️', 'title' => __('pages.landing.features.timeline'), 'description' => __('pages.landing.features.timeline_detail')],
-            ['icon' => '👥', 'title' => __('pages.landing.features.guests'), 'description' => __('pages.landing.features.guests_detail')],
+            // Line icons from components/nav-icon, not emoji: an emoji is drawn by
+            // whichever operating system opens the page, at its own weight.
+            ['icon' => 'search', 'title' => __('pages.landing.features.search'), 'description' => __('pages.landing.features.search_detail')],
+            ['icon' => 'mail', 'title' => __('pages.landing.features.card'), 'description' => __('pages.landing.features.card_detail')],
+            ['icon' => 'check', 'title' => __('pages.landing.features.checklist'), 'description' => __('pages.landing.features.checklist_detail')],
+            ['icon' => 'wallet', 'title' => __('pages.landing.features.budget'), 'description' => __('pages.landing.features.budget_detail')],
+            ['icon' => 'calendar', 'title' => __('pages.landing.features.timeline'), 'description' => __('pages.landing.features.timeline_detail')],
+            ['icon' => 'users', 'title' => __('pages.landing.features.guests'), 'description' => __('pages.landing.features.guests_detail')],
         ];
     }
 

@@ -3,6 +3,17 @@
 return [
 
     'landing' => [
+        'script_eyebrow' => 'Every wedding errand',
+        'hero_note' => 'Couples and vendors deal directly. Neekah is free for both.',
+        'covers_caption' => 'Three of fifty invitation designs',
+        'covers_link' => 'See every design',
+        'cara_ia_berjalan' => 'How it works',
+        'direct_title' => 'Book and pay the vendor directly',
+        'direct_detail' => 'No booking through Neekah, no payment through Neekah, no commission. You deal with the vendor directly — price, deposit and how you pay are between the two of you. We only make sure you find the right one.',
+        'direct_point_1' => 'The vendor\'s WhatsApp number right on the profile, for members who are signed in',
+        'direct_point_2' => 'Pay the vendor the way you both agree — never us',
+        'direct_point_3' => 'Every planning tool free, with no strings',
+        'tier_note' => 'Vendors climb from New to Recommended through a complete profile, quick replies and reviews from couples.',
         'stages' => [
             'Find a vendor',
             'Look at profiles & packages',

@@ -4,6 +4,7 @@ use App\Models\Category;
 use App\Models\Vendor;
 use App\Support\ContactSettings;
 use Database\Seeders\CategorySeeder;
+use Database\Seeders\SiteTemplateSeeder;
 
 beforeEach(function () {
     $this->seed(CategorySeeder::class);
@@ -15,6 +16,38 @@ it('renders the About page as a network for finding vendors', function () {
         ->assertSee('Cari vendor kahwin')
         ->assertSee('terus berurusan dengan mereka')
         ->assertSee('Deal terus dengan vendor. Kami cuma jambatan.');
+});
+
+it('shows three real card designs in the hero, drawn by the card renderer, with a made-up couple', function () {
+    $this->seed(SiteTemplateSeeder::class);
+
+    $response = $this->get(route('landing'))->assertOk()
+        ->assertSee('Neekah Signature')
+        ->assertSee('Royal Songket Gold')
+        ->assertSee('Midnight Luxury')
+        ->assertSee('data-vue="card-view"', false);
+
+    // The sample couple on every card is invented: no card on neekah.my is
+    // used as an example, and no real name is printed on the About page.
+    $response->assertSee('Irdina')->assertSee('Danish');
+});
+
+it('says booking and payment happen with the vendor directly, in the words a couple reads', function () {
+    $this->get(route('landing'))
+        ->assertOk()
+        ->assertSee('Tempahan dan bayaran terus kepada vendor')
+        ->assertSee('Tiada tempahan melalui Neekah')
+        ->assertSee('bukan kepada kami');
+});
+
+it('draws its icons as line art rather than emoji', function () {
+    $html = $this->get(route('landing'))->assertOk()->getContent();
+
+    // An emoji is drawn by whichever operating system opens the page, at its own
+    // weight, so a row of them never reads as one set.
+    expect($html)->not->toContain('🔎')->not->toContain('📋')->not->toContain('🏆')->not->toContain('💍')
+        ->and($html)->toContain('img/layers/corner-peony.svg')
+        ->and($html)->not->toContain('data-icon-missing');
 });
 
 it('promises nothing the platform does not do while it takes no payment', function () {

@@ -3,6 +3,17 @@
 return [
 
     'landing' => [
+        'script_eyebrow' => 'Semua urusan majlis',
+        'hero_note' => 'Pengantin & vendor berurusan terus. Neekah percuma untuk kedua-duanya.',
+        'covers_caption' => 'Tiga daripada 50 reka bentuk kad jemputan',
+        'covers_link' => 'Lihat semua reka bentuk',
+        'cara_ia_berjalan' => 'Cara ia berjalan',
+        'direct_title' => 'Tempahan dan bayaran terus kepada vendor',
+        'direct_detail' => 'Tiada tempahan melalui Neekah, tiada bayaran melalui Neekah, tiada komisen. Anda deal terus dengan vendor — harga, deposit dan cara bayar ikut persetujuan anda berdua. Kami cuma pastikan anda jumpa vendor yang tepat.',
+        'direct_point_1' => 'Nombor WhatsApp vendor terus pada profil, untuk ahli yang log masuk',
+        'direct_point_2' => 'Bayar vendor cara yang anda berdua setuju — bukan kepada kami',
+        'direct_point_3' => 'Semua alat perancangan percuma, tanpa syarat',
+        'tier_note' => 'Vendor naik tangga dari Baharu ke Disyorkan melalui profil yang lengkap, respons yang cepat dan ulasan pengantin.',
         'stages' => [
             'Cari vendor',
             'Lihat profil & pakej',

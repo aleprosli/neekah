@@ -216,7 +216,7 @@ it('shows the gallery, filters it by category, and samples every design', functi
         $this->get(route('sites.templates.show', $template))
             ->assertOk()
             ->assertSee('Contoh template '.$template->name)
-            ->assertSee('Aina Zulkifli');
+            ->assertSee('Irdina Maisarah');
     }
 
     $this->get(route('sites.templates.show', 'tiada'))->assertNotFound();
