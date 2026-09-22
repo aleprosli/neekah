@@ -24,3 +24,12 @@ thumbnailUrl() derives the "-thumb" path and returns its URL without touching th
 The exists() check that used to be there was a free stat() locally and an HTTPS round trip per image on an object store. The marketplace listing draws about thirty-five images, so it would have added thirty-five sequential requests to Cloudflare before the first byte of HTML. Do not reintroduce it, and do not add any other per-image disk call to a listing path.
 
 Run neekah:optimize-images before pointing MEDIA_DISK at a bucket. Its COLUMNS list must cover every image column that a model turns into a thumbnail URL, or those images 404.
+
+## A thumbnail is never redrawn in place — it gets a new name
+Media is served with "Cache-Control: public, max-age=31536000, immutable" (set on the R2 disk in config/filesystems.php). That is a promise that what lives at a URL never changes, and browsers hold the file for a year on it. So nothing may overwrite a path.
+
+Changing the admin thumbnail width therefore cannot redraw thumbnails where they are: every visitor who already has the old one would keep it until the TTL runs out. `php artisan neekah:optimize-images --thumbnails` goes through StoreOptimizedImage::refreshThumbnail(), which writes the pair under a fresh random name, updates the record and deletes the old pair. New URL, promise intact.
+
+refreshThumbnail copies the image itself byte for byte and only re-encodes the thumbnail. The stored image has already been through the encoder once; running it again would cost a generation of quality for a file nobody asked to change.
+
+Changing the width alone does nothing to existing images - the plain command skips anything that already has a thumbnail. Change the setting, then run with --thumbnails. Note quality is global: lowering it to shrink thumbnails also recompresses full-size portfolio photos.

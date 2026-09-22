@@ -19,7 +19,7 @@ use Throwable;
 
 class OptimizeImages extends Command
 {
-    protected $signature = 'neekah:optimize-images';
+    protected $signature = 'neekah:optimize-images {--thumbnails : Redraw every thumbnail at the current settings, leaving the images themselves alone}';
 
     protected $description = 'Re-encode images uploaded before optimisation existed, using the admin image settings';
 
@@ -50,22 +50,34 @@ class OptimizeImages extends Command
     public function handle(StoreOptimizedImage $storeImage): int
     {
         $disk = Storage::disk('public');
+        $redrawThumbnails = (bool) $this->option('thumbnails');
         $optimised = 0;
         $skipped = 0;
         $failed = 0;
 
         foreach (self::COLUMNS as [$model, $column, $lossless]) {
-            $model::query()->whereNotNull($column)->lazyById()->each(function (Model $record) use ($disk, $storeImage, $column, $lossless, &$optimised, &$skipped, &$failed): void {
+            $model::query()->whereNotNull($column)->lazyById()->each(function (Model $record) use ($disk, $storeImage, $column, $lossless, $redrawThumbnails, &$optimised, &$skipped, &$failed): void {
                 $path = $record->getAttribute($column);
 
-                if (! $disk->exists($path) || $disk->exists(StoreOptimizedImage::thumbnailPath($path))) {
+                if (! $disk->exists($path)) {
+                    $skipped++;
+
+                    return;
+                }
+
+                // Without --thumbnails, an image that already has one has been
+                // through here and is left alone. With it, that is exactly the
+                // set to redraw, because the admin has changed the size.
+                if (! $redrawThumbnails && $disk->exists(StoreOptimizedImage::thumbnailPath($path))) {
                     $skipped++;
 
                     return;
                 }
 
                 try {
-                    $newPath = $storeImage->storeContents($disk->get($path), dirname($path), $lossless);
+                    $newPath = $redrawThumbnails
+                        ? $storeImage->refreshThumbnail($path)
+                        : $storeImage->storeContents($disk->get($path), dirname($path), $lossless);
                 } catch (Throwable $exception) {
                     $failed++;
                     $this->components->warn($path.': '.$exception->getMessage());
@@ -73,15 +85,26 @@ class OptimizeImages extends Command
                     return;
                 }
 
-                // Swapping the file is not an edit, so lastmod in the sitemap stays put.
+                // Swapping the file is not an edit, so lastmod in the sitemap
+                // stays put. The model event still fires, though: the image now
+                // lives at a different URL, and anything holding the old one
+                // has to hear about it.
                 $record->timestamps = false;
-                $record->forceFill([$column => $newPath])->saveQuietly();
-                $disk->delete($path);
+                $record->forceFill([$column => $newPath])->save();
+
+                // refreshThumbnail removes the old pair itself; storeContents
+                // only writes the new one.
+                if (! $redrawThumbnails) {
+                    $disk->delete($path);
+                }
+
                 $optimised++;
             });
         }
 
-        $this->components->info("{$optimised} gambar dioptimumkan, {$skipped} dilangkau, {$failed} gagal.");
+        $this->components->info($redrawThumbnails
+            ? "{$optimised} thumbnail dilukis semula, {$skipped} dilangkau, {$failed} gagal."
+            : "{$optimised} gambar dioptimumkan, {$skipped} dilangkau, {$failed} gagal.");
 
         return $failed > 0 ? self::FAILURE : self::SUCCESS;
     }
