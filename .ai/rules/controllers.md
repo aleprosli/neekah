@@ -26,3 +26,8 @@ Building fifty CardProps::forThumbnail arrays is the most expensive thing the de
 VueProps::for() is applied AFTER the cache read, one tile at a time. It injects csrf_token() and the session's validation errors, so caching its output would hand every visitor the first visitor's CSRF token. PublicPageCostTest asserts two sessions get different tokens.
 
 Call thumbnails() once per request, not inside the per-tile closure.
+
+## Never keep request state on a controller property
+Route::getController() caches the controller instance on the Route object, and the RouteCollection lives as long as the application. A property set during one request is still there on the next one in the same process - in tests, and under Octane in production. A per-request memo on VendorController served the second visitor the first visitor's vendor catalogue, and it looked like a cache-invalidation bug for an hour.
+
+Read the value once at the top of the action and pass it down as an argument. If something really is per-request, put it in a scoped binding (see Seo in AppServiceProvider), not on the controller.

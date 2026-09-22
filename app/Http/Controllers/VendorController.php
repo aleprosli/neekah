@@ -4,20 +4,38 @@ namespace App\Http\Controllers;
 
 use App\Enums\VendorTier;
 use App\Models\Category;
+use App\Models\Package;
 use App\Models\PortfolioItem;
+use App\Models\Review;
+use App\Models\ReviewPhoto;
+use App\Models\User;
 use App\Models\Vendor;
 use App\Support\ContactSettings;
+use App\Support\ContentVersion;
 use App\Support\Seo;
 use App\Support\SeoSettings;
 use App\Support\States;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 
 class VendorController extends Controller
 {
+    /** Vendors per page of the listing. */
+    private const PER_PAGE = 12;
+
+    /** How many reviews a visitor reads on a profile before paging. */
+    private const REVIEWS_ON_PAGE = 12;
+
+    /** Other vendors suggested at the foot of a profile. */
+    private const RELATED_VENDORS = 3;
+
     /**
      * The orders the list can be put in. A method rather than a constant: the
      * labels are translated, and a constant cannot hold a function call.
@@ -40,7 +58,7 @@ class VendorController extends Controller
      */
     public function index(Request $request, Seo $seo): View
     {
-        $categories = Category::active()->ordered()->get();
+        $categories = $this->categories();
         $sort = $request->string('sort')->toString();
 
         $filters = [
@@ -56,26 +74,7 @@ class VendorController extends Controller
 
         $activeCategory = $filters['category'] ? $categories->firstWhere('slug', $filters['category']) : null;
 
-        $vendors = Vendor::query()
-            ->approved()
-            ->with('category')
-            ->when($filters['q'], fn (Builder $query, string $keyword) => $query->matching($keyword))
-            ->when($activeCategory, fn (Builder $query, Category $category) => $query->inCategory($category))
-            ->when($filters['state'], fn (Builder $query, string $state) => $query->servingState($state))
-            ->when($filters['min_price'] !== null, fn (Builder $query) => $query->where('price_from', '>=', $filters['min_price']))
-            ->when($filters['max_price'] !== null, fn (Builder $query) => $query->where('price_from', '<=', $filters['max_price']))
-            ->when($filters['min_rating'] !== null, fn (Builder $query) => $query->where('rating_avg', '>=', $filters['min_rating']))
-            ->when($filters['tier'], fn (Builder $query, string $tier) => $query->where('tier', $tier))
-            ->tap(fn (Builder $query) => match ($filters['sort']) {
-                'rating' => $query->orderByDesc('rating_avg')->orderByDesc('reviews_count'),
-                'price_asc' => $query->orderBy('price_from'),
-                'price_desc' => $query->orderByDesc('price_from'),
-                'reviews' => $query->orderByDesc('reviews_count'),
-                default => $query->orderByDesc('score'),
-            })
-            ->orderBy('id')
-            ->paginate(12)
-            ->withQueryString();
+        $vendors = $this->listing($filters, $activeCategory, $request);
 
         $this->describeListing($seo, $request, $activeCategory, $filters);
 
@@ -91,6 +90,95 @@ class VendorController extends Controller
             'activeFilterCount' => count(array_filter([$filters['state'], $filters['min_price'], $filters['max_price'], $filters['min_rating'], $filters['tier']], fn ($value) => $value !== null)),
             'helpUrl' => $vendors->isEmpty() ? $this->helpUrl($activeCategory, $filters) : null,
         ]);
+    }
+
+    /**
+     * The category list every marketplace render draws, cached against the
+     * global version so a category added or hidden is picked up with nothing
+     * to clear.
+     *
+     * Raw attribute rows rather than the models themselves. config/cache.php
+     * sets serializable_classes to false on purpose - no PHP object comes back
+     * out of the cache, so a leaked APP_KEY cannot be turned into a gadget
+     * chain - and hydrate() rebuilds the models from plain arrays without
+     * going back to the database.
+     *
+     * No language in the key either: name and examples are Translatable casts,
+     * which resolve from the raw JSON when they are read, so one cached row
+     * serves both languages.
+     *
+     * @return Collection<int, Category>
+     */
+    private function categories(): Collection
+    {
+        $rows = Cache::remember(
+            'marketplace:categories:'.ContentVersion::global(),
+            ContentVersion::TTL,
+            fn (): array => self::rows(Category::active()->ordered()->get()),
+        );
+
+        return Category::hydrate($rows);
+    }
+
+    /**
+     * A page of the listing, cached against the global version and the filters
+     * that produced it.
+     *
+     * The filters are hashed rather than spelled out, because a keyword search
+     * is free text and would otherwise put anything a visitor types into a
+     * cache key. The page number and the request URL go into the hash too: the
+     * paginator builds its page links from the path it was given, and that path
+     * is /en on the English side.
+     *
+     * What is cached is the page's rows and its three counters, not the
+     * paginator - see categories() for why nothing here may be an object.
+     *
+     * @param  array<string, mixed>  $filters
+     * @return LengthAwarePaginator<int, Vendor>
+     */
+    private function listing(array $filters, ?Category $activeCategory, Request $request): LengthAwarePaginator
+    {
+        $page = $request->integer('page', 1) ?: 1;
+        $key = md5(serialize([$filters, $page, $request->url()]));
+
+        $cached = Cache::remember(
+            'marketplace:list:'.$key.':'.ContentVersion::global(),
+            ContentVersion::TTL,
+            function () use ($filters, $activeCategory): array {
+                $paginator = Vendor::query()
+                    ->approved()
+                    ->with('category')
+                    ->when($filters['q'], fn (Builder $query, string $keyword) => $query->matching($keyword))
+                    ->when($activeCategory, fn (Builder $query, Category $category) => $query->inCategory($category))
+                    ->when($filters['state'], fn (Builder $query, string $state) => $query->servingState($state))
+                    ->when($filters['min_price'] !== null, fn (Builder $query) => $query->where('price_from', '>=', $filters['min_price']))
+                    ->when($filters['max_price'] !== null, fn (Builder $query) => $query->where('price_from', '<=', $filters['max_price']))
+                    ->when($filters['min_rating'] !== null, fn (Builder $query) => $query->where('rating_avg', '>=', $filters['min_rating']))
+                    ->when($filters['tier'], fn (Builder $query, string $tier) => $query->where('tier', $tier))
+                    ->tap(fn (Builder $query) => match ($filters['sort']) {
+                        'rating' => $query->orderByDesc('rating_avg')->orderByDesc('reviews_count'),
+                        'price_asc' => $query->orderBy('price_from'),
+                        'price_desc' => $query->orderByDesc('price_from'),
+                        'reviews' => $query->orderByDesc('reviews_count'),
+                        default => $query->orderByDesc('score'),
+                    })
+                    ->orderBy('id')
+                    ->paginate(self::PER_PAGE);
+
+                return [
+                    'total' => $paginator->total(),
+                    'rows' => self::vendorRows($paginator->getCollection()),
+                ];
+            },
+        );
+
+        return (new LengthAwarePaginator(
+            self::hydrateVendors($cached['rows']),
+            $cached['total'],
+            self::PER_PAGE,
+            $page,
+            ['path' => Paginator::resolveCurrentPath(), 'pageName' => 'page'],
+        ))->withQueryString();
     }
 
     /**
@@ -120,26 +208,25 @@ class VendorController extends Controller
     {
         abort_unless($vendor->isApproved(), 404);
 
-        $vendor->load([
-            'category',
-            'categories',
-            'packages' => fn ($query) => $query->active(),
-            'portfolioItems' => fn ($query) => $query->visible(),
-            'reviews' => fn ($query) => $query->published()->with(['user', 'photos'])->latest()->limit(12),
-        ]);
+        // The two category relations stay live. They are a vendor's own rows but
+        // a category's own text, which the vendor's version cannot see moving.
+        $vendor->load(['category', 'categories']);
+
+        // Read once and passed down. It used to be memoised on the controller,
+        // which is wrong: Route::getController() keeps the controller on the
+        // route, so the property outlived the request and the next visitor was
+        // served the last one's catalogue.
+        $payload = $this->cachedPayload($vendor);
+
+        $this->attachCatalogue($vendor, $payload);
 
         // Each review belongs to the vendor already in hand. Setting the
         // inverse keeps sourceLabel() from fetching it back one row at a time.
+        // After the cache read, never before it: the vendor carries its own
+        // reviews, so caching the pair would serialise a loop.
         $vendor->reviews->each->setRelation('vendor', $vendor);
 
-        $related = Vendor::query()
-            ->approved()
-            ->with('category')
-            ->inCategory($vendor->category)
-            ->whereKeyNot($vendor->getKey())
-            ->orderByDesc('score')
-            ->limit(3)
-            ->get();
+        $related = $this->related($vendor);
 
         $description = $vendor->tagline ?: Str::of((string) $vendor->description)->squish()->value();
 
@@ -172,7 +259,7 @@ class VendorController extends Controller
                 ] : null,
             ]);
 
-        $openReviews = $this->openReviewSummary($vendor);
+        $openReviews = $payload['openReviews'];
 
         return view('vendors.show', [
             'vendor' => $vendor,
@@ -180,12 +267,144 @@ class VendorController extends Controller
             // How many reviews a visitor can read on the page. reviews_count
             // stays booking-backed only, because the ranking reads it.
             'publishedReviewsCount' => $vendor->reviews_count + $openReviews['total'],
-            'gallery' => $this->gallery($vendor),
+            // Back into a collection: the view takes the first five off it.
+            'gallery' => collect($payload['gallery']),
             'category' => $vendor->category,
             'extraCategories' => $vendor->extraCategories(),
             'related' => $related,
             'defaultEventDate' => $request->user()?->weddings()->latest('event_date')->first()?->event_date->toDateString(),
         ]);
+    }
+
+    /**
+     * Everything on a vendor's page that is the same for every visitor, read
+     * once and held against that vendor's own version.
+     *
+     * Scoped to the one vendor on purpose: a global version would mean any of
+     * the other three hundred editing a price threw this away too. What a
+     * vendor's version cannot see - a category renamed, a review photo removed
+     * without its review being saved - is what ContentVersion::TTL is for.
+     *
+     * The author is stored as id and name alone. The rest of a user row has no
+     * business on this page, and CACHE_STORE is database in production, so
+     * everything cached here is a row in MySQL holding a copy of it.
+     *
+     * @return array{packages: array<int, array<string, mixed>>, portfolioItems: array<int, array<string, mixed>>, reviews: array<int, array{review: array<string, mixed>, user: array<string, mixed>|null, photos: array<int, array<string, mixed>>}>, gallery: array<int, array{id: int, url: string, thumbnail: string|null, caption: string|null}>, openReviews: array{total: int, average: float}}
+     */
+    private function cachedPayload(Vendor $vendor): array
+    {
+        return Cache::remember(
+            'vendor-page:'.$vendor->getKey().':'.ContentVersion::forVendor($vendor->getKey()),
+            ContentVersion::TTL,
+            function () use ($vendor): array {
+                $portfolio = $vendor->portfolioItems()->visible()->get();
+
+                $reviews = $vendor->reviews()
+                    ->published()
+                    ->with(['user:id,name', 'photos'])
+                    ->latest()
+                    ->limit(self::REVIEWS_ON_PAGE)
+                    ->get();
+
+                return [
+                    'packages' => self::rows($vendor->packages()->active()->get()),
+                    'portfolioItems' => self::rows($portfolio),
+                    'reviews' => $reviews->map(fn (Review $review): array => [
+                        'review' => $review->getAttributes(),
+                        'user' => $review->user?->getAttributes(),
+                        'photos' => self::rows($review->photos),
+                    ])->all(),
+                    'gallery' => $this->gallery($portfolio)->all(),
+                    'openReviews' => $this->openReviewSummary($vendor),
+                ];
+            },
+        );
+    }
+
+    /**
+     * Hand the cached rows back to the model as ordinary loaded relations, so
+     * every view and every method downstream reads them the way it always did.
+     *
+     * @param  array<string, mixed>  $payload
+     */
+    private function attachCatalogue(Vendor $vendor, array $payload): void
+    {
+        $vendor->setRelation('packages', Package::hydrate($payload['packages']));
+        $vendor->setRelation('portfolioItems', PortfolioItem::hydrate($payload['portfolioItems']));
+
+        $vendor->setRelation('reviews', Review::hydrate(array_column($payload['reviews'], 'review'))
+            ->each(function (Review $review, int $index) use ($payload): void {
+                $row = $payload['reviews'][$index];
+
+                $review->setRelation('user', $row['user'] ? User::hydrate([$row['user']])->first() : null);
+                $review->setRelation('photos', ReviewPhoto::hydrate($row['photos']));
+            }));
+    }
+
+    /**
+     * Three more vendors in the same category. Held against the global version
+     * rather than this vendor's, because it is the others that decide it.
+     *
+     * @return Collection<int, Vendor>
+     */
+    private function related(Vendor $vendor): Collection
+    {
+        $rows = Cache::remember(
+            'vendor-related:'.$vendor->getKey().':'.ContentVersion::global(),
+            ContentVersion::TTL,
+            fn (): array => self::vendorRows(
+                Vendor::query()
+                    ->approved()
+                    ->with('category')
+                    ->inCategory($vendor->category)
+                    ->whereKeyNot($vendor->getKey())
+                    ->orderByDesc('score')
+                    ->limit(self::RELATED_VENDORS)
+                    ->get()
+            ),
+        );
+
+        return self::hydrateVendors($rows);
+    }
+
+    /**
+     * A vendor card needs its category, so each row carries both.
+     *
+     * @param  Collection<int, Vendor>  $vendors
+     * @return array<int, array{vendor: array<string, mixed>, category: array<string, mixed>|null}>
+     */
+    private static function vendorRows(Collection $vendors): array
+    {
+        return $vendors->map(fn (Vendor $vendor): array => [
+            'vendor' => $vendor->getAttributes(),
+            'category' => $vendor->category?->getAttributes(),
+        ])->values()->all();
+    }
+
+    /**
+     * @param  array<int, array{vendor: array<string, mixed>, category: array<string, mixed>|null}>  $rows
+     * @return Collection<int, Vendor>
+     */
+    private static function hydrateVendors(array $rows): Collection
+    {
+        return Vendor::hydrate(array_column($rows, 'vendor'))
+            ->each(function (Vendor $vendor, int $index) use ($rows): void {
+                $category = $rows[$index]['category'];
+
+                $vendor->setRelation('category', $category ? Category::hydrate([$category])->first() : null);
+            });
+    }
+
+    /**
+     * The raw column values behind a set of models, which is what hydrate()
+     * takes and what a cache holding no objects can store.
+     *
+     * @param  Collection<int, Model>  $models
+     * @return array<int, array<string, mixed>>
+     */
+    private static function rows(Collection $models): array
+    {
+        return $models->map(fn (Model $model): array => $model->getAttributes())->values()->all();
     }
 
     /**
@@ -214,11 +433,12 @@ class VendorController extends Controller
      * arranged them. Thumbnails ride along so the grid and the filmstrip never
      * download a full-size photo they only show at 56 pixels.
      *
+     * @param  Collection<int, PortfolioItem>  $portfolioItems
      * @return Collection<int, array{id: int, url: string, thumbnail: string|null, caption: string|null}>
      */
-    private function gallery(Vendor $vendor): Collection
+    private function gallery(Collection $portfolioItems): Collection
     {
-        return $vendor->portfolioItems->map(fn (PortfolioItem $item): array => [
+        return $portfolioItems->map(fn (PortfolioItem $item): array => [
             'id' => $item->id,
             'url' => $item->url(),
             'thumbnail' => $item->thumbnailUrl(),

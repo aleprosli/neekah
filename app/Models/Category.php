@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Actions\StoreOptimizedImage;
 use App\Casts\Translatable;
 use App\Models\Concerns\HasTranslatedText;
+use App\Support\ContentVersion;
 use Database\Factories\CategoryFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Scope;
@@ -44,6 +45,21 @@ class Category extends Model
      * drawing that ships with the slug. Falls back to the emoji when neither
      * exists, which is what a brand new category starts with.
      */
+    /**
+     * The category list is on every marketplace render, and hiding a category
+     * changes which vendors the listing may show, so this moves the global
+     * version rather than any one vendor's.
+     */
+    protected static function booted(): void
+    {
+        $bump = function (): void {
+            ContentVersion::bumpGlobal();
+        };
+
+        static::saved($bump);
+        static::deleted($bump);
+    }
+
     public function illustrationUrl(): ?string
     {
         if (filled($this->image)) {

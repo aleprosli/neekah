@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\ContentVersion;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
@@ -55,5 +56,9 @@ class Setting extends Model
         // Through memo() as well, so the value this request already read is
         // dropped along with the one in the underlying store.
         Cache::memo()->forget(self::CACHE_KEY);
+
+        // Settings reach the public pages - contact details, SEO copy, image
+        // sizes - and those pages are cached against the global version.
+        ContentVersion::bumpGlobal();
     }
 }

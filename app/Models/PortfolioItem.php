@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Actions\StoreOptimizedImage;
+use App\Support\ContentVersion;
 use Database\Factories\PortfolioItemFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Scope;
@@ -31,6 +32,20 @@ class PortfolioItem extends Model
     protected function visible(Builder $query): Builder
     {
         return $query->where('is_visible', true)->orderBy('sort_order');
+    }
+
+    /**
+     * A portfolio photo is read on the vendor's own page and nowhere else, so
+     * adding or hiding one throws away that vendor's cached payload only.
+     */
+    protected static function booted(): void
+    {
+        $bump = function (self $model): void {
+            ContentVersion::bumpVendor($model->vendor_id);
+        };
+
+        static::saved($bump);
+        static::deleted($bump);
     }
 
     public function thumbnailUrl(): ?string

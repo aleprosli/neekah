@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\ContentVersion;
 use Database\Factories\ReviewFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Scope;
@@ -37,6 +38,20 @@ class Review extends Model
             'reported_at' => 'datetime',
             'replied_at' => 'datetime',
         ];
+    }
+
+    /**
+     * A review is read on the vendor's own page. Hiding one counts too, which
+     * is why this hangs off saved() rather than created().
+     */
+    protected static function booted(): void
+    {
+        $bump = function (self $model): void {
+            ContentVersion::bumpVendor($model->vendor_id);
+        };
+
+        static::saved($bump);
+        static::deleted($bump);
     }
 
     public function booking(): BelongsTo
