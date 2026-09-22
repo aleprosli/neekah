@@ -181,8 +181,9 @@ it('keeps the couple content out of the design and the design out of the content
     // The artwork carries tokens; the browser resolves them from `content`, which
     // is what makes the editor redraw the card as a couple types.
     expect($props['content']['groom_short'])->toBe('Hakim')
-        // No short name was given for the bride, so her first name stands in.
-        ->and($props['content']['bride_short'])->toBe('Nur')
+        // No short name was given for the bride, so the name she is called by
+        // stands in — not "Nur", which opens half the names in the country.
+        ->and($props['content']['bride_short'])->toBe('Aina')
         ->and($props['content']['venue'])->toBe('Dewan Seri Melati');
 
     $names = collect($props['canvases'])

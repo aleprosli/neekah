@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\CallingName;
 use App\Support\Card\Widgets;
 use Database\Factories\WeddingSiteFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -203,7 +204,7 @@ class WeddingSite extends Model
     }
 
     /**
-     * The short name a cover prints, falling back to the first name.
+     * The short name a cover prints, falling back to the name they are called by.
      */
     public function shortName(string $side): string
     {
@@ -213,9 +214,7 @@ class WeddingSite extends Model
             return $short;
         }
 
-        $full = trim((string) ($side === 'bride' ? $this->bride_name : $this->groom_name));
-
-        return preg_split('/\s+/', $full)[0] ?? $full;
+        return CallingName::from($side === 'bride' ? $this->bride_name : $this->groom_name);
     }
 
     /**
