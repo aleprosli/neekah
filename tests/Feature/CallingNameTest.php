@@ -16,6 +16,9 @@ it('skips the honorific a Malaysian name opens with', function (string $full, st
     ['Mohd. Firdaus bin Rahman', 'Firdaus'],
     ['Siti Nurhaliza Tarudin', 'Nurhaliza'],
     ['Nurul Izzah Anwar', 'Izzah'],
+    // Two honorifics in a row: skipping one would leave the other on the cover.
+    ['Muhammad Nur Haikal Firdaus Bin Roslan', 'Haikal'],
+    ['Nur Fa\'izah Binti Muhamad Tamizi', 'Fa\'izah'],
     // Left alone: these are the names people are actually called by.
     ['Ahmad Zulkifli', 'Ahmad'],
     ['Wan Aisyah Wan Ismail', 'Wan'],

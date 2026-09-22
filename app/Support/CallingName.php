@@ -35,14 +35,15 @@ class CallingName
             return '';
         }
 
-        $first = Str::lower(rtrim($words[0], '.'));
+        // Names open with two of these often enough — "Muhammad Nur Haikal" — that
+        // skipping one leaves the other standing on the cover.
+        $at = 0;
 
-        // Only when there is something better to use: "Nur" on its own stays "Nur".
-        if (in_array($first, self::PREFIXES, true) && isset($words[1])) {
-            return $words[1];
+        while (isset($words[$at + 1]) && in_array(Str::lower(rtrim($words[$at], '.')), self::PREFIXES, true)) {
+            $at++;
         }
 
-        return $words[0];
+        return $words[$at];
     }
 
     /**
