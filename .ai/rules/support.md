@@ -3,6 +3,7 @@ paths:
   - app/Support/Seo.php
   - 'app/Support/**'
   - app/Support/ImageSettings.php
+  - app/Support/ContentVersion.php
 ---
 
 # Support
@@ -24,3 +25,10 @@ Anything an admin can change under Admin → Tetapan lives in a class extending 
 
 ## Upload limits are capped by php.ini, not by the admin setting
 ImageSettings::maxUploadMegabytes() is what the admin saved; uploadRules() and every page hint use effectiveUploadMegabytes(), which is the smaller of that and serverUploadMegabytes() (upload_max_filesize vs post_max_size). A POST above post_max_size is discarded by PHP before any controller runs, so bootstrap/app.php renders PostTooLargeException as a redirect back with a readable error instead of a bare "page expired". Never print a limit from the raw admin value, and show upload rules through <x-form.image-hint />.
+
+## Public pages are cached against ContentVersion, and nothing objecty goes in
+Every cached public payload carries a ContentVersion string in its key. A write bumps the version, so the stale entry is never asked for again - nothing is deleted and nothing is cleared by hand. Two scopes: global() moves on any Vendor, Category or Setting save (the listings); forVendor($id) moves on that vendor's Package, PortfolioItem or Review save, so one vendor editing a price does not throw away all the others. Hooks live in each model's booted(). TTL is the backstop for what the version cannot see (a ReviewPhoto deleted without its Review being saved, a query-builder update firing no model event).
+
+Trap 1 - order inside bump(). Cache::memo()->forget() clears the UNDERLYING store as well as the memo. Forget first, write second. Writing then forgetting deletes the version just minted and leaves the next reader to invent another one, so the payload is written under a key nobody reads back.
+
+Trap 2 - config/cache.php sets serializable_classes to false, deliberately: no PHP object may be unserialized from the cache, so a leaked APP_KEY cannot become a gadget chain. Cache raw attribute arrays (Model::getAttributes()) and rebuild with Model::hydrate(). Caching a model or an Eloquent collection gives __PHP_Incomplete_Class on read. Do not widen that setting to make a cache work. PublicPageCostTest asserts no cache row contains "O:".

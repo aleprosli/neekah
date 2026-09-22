@@ -27,7 +27,7 @@ Before planning or editing, find the row whose globs match the file's path and r
 | routes/** | .ai/rules/routes.md |
 | app/Rules/** | .ai/rules/rules.md |
 | resources/views/sites/** | .ai/rules/sites.md |
-| app/Support/Seo.php, app/Support/**, app/Support/ImageSettings.php | .ai/rules/support.md |
+| app/Support/Seo.php, app/Support/**, app/Support/ImageSettings.php, app/Support/ContentVersion.php | .ai/rules/support.md |
 | resources/js/components/ui/DataTable.vue, resources/js/components/ui/UiFlagSelect.vue | .ai/rules/ui.md |
 | app/Http/Controllers/Vendor/ReviewController.php | .ai/rules/vendor.md |
 | resources/views/vendors/** | .ai/rules/vendors.md |

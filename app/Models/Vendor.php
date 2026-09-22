@@ -7,6 +7,7 @@ use App\Enums\BookingStatus;
 use App\Enums\PriceUnit;
 use App\Enums\VendorStatus;
 use App\Enums\VendorTier;
+use App\Support\ContentVersion;
 use App\Support\PhoneNumber;
 use App\Support\SocialLinks;
 use App\Support\States;
@@ -130,6 +131,21 @@ class Vendor extends Model
             if ($vendor->category_id && ($vendor->wasRecentlyCreated || $vendor->wasChanged('category_id'))) {
                 $vendor->categories()->syncWithoutDetaching([$vendor->category_id]);
             }
+        });
+
+        // Both scopes: a vendor's name, price or score is on the listing as
+        // well as on their own page. RecalculateVendorStats saves with
+        // timestamps off, which is right for the sitemap's lastmod but is
+        // still a change to what the listing orders by, so this deliberately
+        // hangs off saved() rather than off updated_at moving.
+        static::saved(function (self $vendor): void {
+            ContentVersion::bumpGlobal();
+            ContentVersion::bumpVendor($vendor->getKey());
+        });
+
+        static::deleted(function (self $vendor): void {
+            ContentVersion::bumpGlobal();
+            ContentVersion::bumpVendor($vendor->getKey());
         });
     }
 

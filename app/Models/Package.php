@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Actions\StoreOptimizedImage;
+use App\Support\ContentVersion;
 use Database\Factories\PackageFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Scope;
@@ -33,6 +34,20 @@ class Package extends Model
     /**
      * The full-size image, for the package card on the vendor's public page.
      */
+    /**
+     * A package is read on the vendor's own page and nowhere else, so a price
+     * change throws away that vendor's cached payload and no one else's.
+     */
+    protected static function booted(): void
+    {
+        $bump = function (self $model): void {
+            ContentVersion::bumpVendor($model->vendor_id);
+        };
+
+        static::saved($bump);
+        static::deleted($bump);
+    }
+
     public function imageUrl(): ?string
     {
         return $this->image ? Storage::disk('public')->url($this->image) : null;
