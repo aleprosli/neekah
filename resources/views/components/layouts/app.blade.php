@@ -20,6 +20,12 @@
              public page hold their <main> in completely different furniture. --}}
         <meta name="page-shell" content="{{ $shell ?? 'site' }}">
 
+        {{-- The preloader is a curtain for the first arrival, not something to
+             sit through on every click. This runs before the first paint, so a
+             visitor already in this tab never sees it flash. The flag is set in
+             resources/js/app.js once the page is up. --}}
+        <script>try{sessionStorage.getItem('neekah:arrived')&&document.documentElement.classList.add('nk-arrived')}catch(e){}</script>
+
         @fonts
         @vite(['resources/css/app.css', 'resources/js/app.js'])
 

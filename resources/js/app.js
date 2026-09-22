@@ -16,6 +16,14 @@ mountIslands();
  * where `load` never fires a second time.
  */
 (() => {
+    // Remembered for the inline script in the layout head, which hides the
+    // preloader before the first paint on every later arrival in this tab.
+    try {
+        sessionStorage.setItem('neekah:arrived', '1');
+    } catch {
+        // A private window without storage simply keeps seeing the preloader.
+    }
+
     const overlay = document.getElementById('nk-preloader');
     if (!overlay) {
         return;

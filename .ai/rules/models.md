@@ -4,6 +4,7 @@ paths:
   - app/Models/Vendor.php
   - app/Models/Post.php
   - app/Models/Review.php
+  - app/Models/Setting.php
 ---
 
 # Models
@@ -36,3 +37,8 @@ vendors.category_id and vendors.state stay the one category and the one address 
 Vendor::booted() keeps the primary category in the pivot and the home state in service_states on every model save, so search reads one place and trusts it: scope inCategory() and servingState(), never where('category_id') or where('state'), and never whereBelongsTo(category). A query-builder update bypasses the hook — save the model.
 
 A vendor may untick an extra category but never the primary: Vendor\ProfileController pushes category_id back into the sync, and UpdateVendorProfileRequest::prepareForValidation folds category_id and state into the posted lists so MAX_CATEGORIES counts what is really saved. Covered by Vendor/VendorServiceAreaTest and VendorMarketplaceTest.
+
+## Setting::values() reads through Cache::memo(), never the bare store
+CACHE_STORE is database in production, so every Cache::get is a round trip to MySQL. Roughly twenty callers ask Setting::values() during one page render, which was twenty of the ~26 queries on every public page. Cache::memo() collapses them to one. Setting::put() must forget through Cache::memo() too, so the copy this request already read is dropped along with the stored one.
+
+PublicPageCostTest guards it, and it switches to the database store on purpose: under the array store the repetition is free and the regression is invisible.

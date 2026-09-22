@@ -2,6 +2,7 @@
 paths:
   - 'app/Http/Controllers/**'
   - app/Http/Controllers/SitemapController.php
+  - app/Http/Controllers/SiteTemplatePreviewController.php
 ---
 
 # Controllers
@@ -18,3 +19,10 @@ The sitemap is built from the database on every request — there is nothing to 
 Areas: account, admin, couple, vendor, impersonation, confirm (the confirm group also feeds the `rowAction`/confirm-dialog props in Blade).
 
 These are the one category the render-and-grep sweep in .ai/rules/lang.md cannot reach, because a flash message only exists after a POST. They were all still Malay long after every page was translated. Verify instead by asserting every `__('flash.*')` in the source resolves in both lang files, and that a key carrying `:param` is always called with an array.
+
+## Cache the gallery artwork, never the per-visitor half of the props
+Building fifty CardProps::forThumbnail arrays is the most expensive thing the design gallery does. It is cached under "card-thumbnails:<locale>:<count>-<max updated_at>", so an admin editing or hiding a design busts it with nothing to clear, and until end of day, because SampleCard's event date is relative to today.
+
+VueProps::for() is applied AFTER the cache read, one tile at a time. It injects csrf_token() and the session's validation errors, so caching its output would hand every visitor the first visitor's CSRF token. PublicPageCostTest asserts two sessions get different tokens.
+
+Call thumbnails() once per request, not inside the per-tile closure.

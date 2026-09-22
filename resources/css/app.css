@@ -106,6 +106,12 @@ html {
     color: var(--c-acc);
 }
 
+/* A repeat arrival in the same tab. The invitation keeps its curtain, which
+   carries the couple's names and is part of the card, not a loading state. */
+.nk-arrived #nk-preloader:not(.nkc-card) {
+    display: none;
+}
+
 #nk-preloader.is-done {
     visibility: hidden;
     opacity: 0;
