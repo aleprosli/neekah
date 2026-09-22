@@ -64,6 +64,15 @@ return [
                 'url' => env('R2_URL'),
                 // R2 does not answer to bucket.endpoint, only endpoint/bucket.
                 'use_path_style_endpoint' => true,
+                // Sent with every object written, which is what makes a browser
+                // and Cloudflare's edge both keep it. Safe to say immutable:
+                // StoreOptimizedImage names every file with forty random
+                // characters and writes a new name rather than overwriting, so
+                // what lives at a URL never changes. Replacing an image gives a
+                // new URL, and the old one is deleted.
+                'options' => [
+                    'CacheControl' => 'public, max-age=31536000, immutable',
+                ],
                 'throw' => false,
                 'report' => false,
             ]

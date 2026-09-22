@@ -103,7 +103,7 @@ it('points the media disk at the R2 bucket when the environment says so', functi
         'region' => 'auto',
         'bucket' => 'neekah',
         'url' => 'https://cdn.neekah.my',
-        // R2 answers on endpoint/bucket, never bucket.endpoint.
         'use_path_style_endpoint' => true,
+        'options' => ['CacheControl' => 'public, max-age=31536000, immutable'],
     ]);
 });
