@@ -243,11 +243,13 @@ it('draws that preview at the size whatsapp and facebook render', function () {
     $this->seed(SiteTemplateSeeder::class);
     $site = WeddingSite::factory()->published()->create(['template' => 'royal-songket-gold']);
 
-    $response = $this->get('http://'.$site->subdomain.'.'.config('neekah.site_domain').'/preview.png')
-        ->assertOk()
-        ->assertHeader('content-type', 'image/png');
+    // The route hands the picture over rather than streaming it, so that an
+    // object store is never read back through PHP just to re-send the bytes.
+    $redirect = $this->get('http://'.$site->subdomain.'.'.config('neekah.site_domain').'/preview.png')
+        ->assertRedirect();
 
-    $image = imagecreatefromstring($response->getContent());
+    $stored = parse_url($redirect->headers->get('location'), PHP_URL_PATH);
+    $image = imagecreatefromstring(Storage::disk('public')->get(Str::after((string) $stored, '/storage/')));
 
     expect(imagesx($image))->toBe(1200)
         ->and(imagesy($image))->toBe(630);

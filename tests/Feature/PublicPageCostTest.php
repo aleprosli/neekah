@@ -72,3 +72,38 @@ it('rebuilds the gallery artwork when a design changes, with nothing to clear by
 
     $this->get(route('sites.templates'))->assertOk()->assertDontSee('Royal Songket Gold');
 });
+
+it('points the media disk at the R2 bucket when the environment says so', function () {
+    // config/filesystems.php is read once at boot, so the file itself is what
+    // this reads back. The disk keeps the name "public" on purpose: every
+    // caller and every Storage::fake('public') in the suite stays untouched.
+    $with = function (array $env): array {
+        foreach ($env as $key => $value) {
+            $_SERVER[$key] = $value;
+        }
+
+        $disks = (require base_path('config/filesystems.php'))['disks'];
+
+        foreach ($env as $key => $value) {
+            unset($_SERVER[$key]);
+        }
+
+        return $disks['public'];
+    };
+
+    expect($with(['MEDIA_DISK' => 'local'])['driver'])->toBe('local');
+
+    expect($with([
+        'MEDIA_DISK' => 'r2',
+        'R2_BUCKET' => 'neekah',
+        'R2_ENDPOINT' => 'https://acc.r2.cloudflarestorage.com',
+        'R2_URL' => 'https://cdn.neekah.my',
+    ]))->toMatchArray([
+        'driver' => 's3',
+        'region' => 'auto',
+        'bucket' => 'neekah',
+        'url' => 'https://cdn.neekah.my',
+        // R2 answers on endpoint/bucket, never bucket.endpoint.
+        'use_path_style_endpoint' => true,
+    ]);
+});
