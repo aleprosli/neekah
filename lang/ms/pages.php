@@ -483,6 +483,28 @@ return [
         'neekah' => 'Neekah',
     ],
 
+    'announcement_presets' => [
+        'vendor_profile' => 'Lengkapkan profil (untuk kelulusan)',
+        'vendor_catalogue' => 'Tambah pakej & harga',
+        'vendor_response' => 'Balas pertanyaan dalam 24 jam',
+        'feature_launch' => 'Ciri baharu',
+        'card_designs' => 'Reka bentuk kad baharu',
+        'couple_start' => 'Ajak pengantin mula merancang',
+        'guest_links' => 'Pautan peribadi tetamu',
+        'maintenance' => 'Penyelenggaraan berjadual',
+    ],
+
+    'announcement_preset_hints' => [
+        'vendor_profile' => 'Vendor · minta mereka lengkapkan profil supaya boleh disahkan',
+        'vendor_catalogue' => 'Vendor · tanpa harga, mereka tidak muncul dalam carian',
+        'vendor_response' => 'Vendor · kadar respons menentukan kedudukan',
+        'feature_launch' => 'Semua · rangka kosong untuk anda isi',
+        'card_designs' => 'Pengantin · 50 reka bentuk kad berlapis',
+        'couple_start' => 'Pengantin · yang mendaftar tetapi belum mula',
+        'guest_links' => 'Pengantin · hantar kad ikut pautan setiap tetamu',
+        'maintenance' => 'Semua · isi tarikh dan masa sebelum hantar',
+    ],
+
     'card_widgets' => [
         'countdown' => 'Detik menanti',
         'itinerary' => 'Tentatif majlis',

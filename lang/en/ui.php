@@ -534,6 +534,9 @@ return [
     ],
 
     'admin_announcements' => [
+        'mula_dengan_preset' => 'Start from a preset',
+        'preset_mengisi_borang_sahaja' => 'A preset only fills the form below — read it and edit before sending. The ones with [brackets] are meant to be filled in.',
+        'kosongkan_borang' => 'Clear the form',
         'hantar_kepada_penerima' => 'Send to :count recipients?',
         'emel_dan_notifikasi_akan_dihantar' => ':audience. Emails and notifications go out, and an announcement that has left cannot be pulled back.',
         'taip_nama_atau_emel' => 'Type a name or an email…',

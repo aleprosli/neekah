@@ -483,6 +483,28 @@ return [
         'neekah' => 'Neekah',
     ],
 
+    'announcement_presets' => [
+        'vendor_profile' => 'Complete the profile (for approval)',
+        'vendor_catalogue' => 'Add packages & prices',
+        'vendor_response' => 'Answer enquiries within 24 hours',
+        'feature_launch' => 'New feature',
+        'card_designs' => 'New card designs',
+        'couple_start' => 'Nudge couples to start planning',
+        'guest_links' => 'Personal guest links',
+        'maintenance' => 'Scheduled maintenance',
+    ],
+
+    'announcement_preset_hints' => [
+        'vendor_profile' => 'Vendors · ask them to finish the profile so it can be verified',
+        'vendor_catalogue' => 'Vendors · without prices they do not show up in search',
+        'vendor_response' => 'Vendors · the response rate drives their ranking',
+        'feature_launch' => 'Everyone · an outline for you to fill in',
+        'card_designs' => 'Couples · the fifty layered card designs',
+        'couple_start' => 'Couples · signed up but never started',
+        'guest_links' => 'Couples · send the card by each guest\'s own link',
+        'maintenance' => 'Everyone · fill in the date and time before sending',
+    ],
+
     'card_widgets' => [
         'countdown' => 'Counting down',
         'itinerary' => 'Order of the day',

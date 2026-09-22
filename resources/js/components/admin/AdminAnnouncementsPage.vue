@@ -18,6 +18,7 @@ import UiTextarea from '../ui/UiTextarea.vue';
 
 const props = defineProps({
     audiences: { type: Array, required: true },
+    presets: { type: Array, default: () => [] },
     announcements: { type: Array, required: true },
     storeUrl: { type: String, required: true },
     testUrl: { type: String, required: true },
@@ -46,6 +47,52 @@ const form = ref({
 });
 
 const chosen = computed(() => props.audiences.find((audience) => audience.value === form.value.audience));
+
+/*
+| Presets
+|--------------------------------------------------------------------------
+| A starting point, never a send. The fields are filled and the admin reads
+| and edits them like anything else they typed — the presets with a [bracket]
+| in them are written expecting exactly that.
+*/
+const applied = ref(null);
+
+const applyPreset = (preset) => {
+    form.value = {
+        ...form.value,
+        audience: preset.audience,
+        subject: preset.subject,
+        body: preset.body,
+        action_label: preset.action_label ?? '',
+        action_url: preset.action_url ?? '',
+    };
+
+    // A preset carries its own audience, so a list picked by hand for the last
+    // one would otherwise be posted with it.
+    if (preset.audience !== 'custom') {
+        picked.value = [];
+        form.value.emails = '';
+    }
+
+    applied.value = preset.key;
+};
+
+const clearForm = () => {
+    form.value = { ...form.value, subject: '', body: '', action_label: '', action_url: '' };
+    applied.value = null;
+};
+
+/** A preset the admin has since edited is no longer that preset. */
+watch(
+    () => [form.value.subject, form.value.body],
+    () => {
+        const preset = props.presets.find((item) => item.key === applied.value);
+
+        if (preset && (preset.subject !== form.value.subject || preset.body !== form.value.body)) {
+            applied.value = null;
+        }
+    },
+);
 
 /** Accounts picked by hand, kept in full so the list can show who they are. */
 const picked = ref([]);
@@ -129,6 +176,31 @@ const sendTest = (event) => {
 
         <form :action="storeUrl" method="POST" class="flex flex-col gap-4 rounded-2xl border border-line bg-surface-raised p-5">
             <input type="hidden" name="_token" :value="csrf">
+
+            <fieldset v-if="presets.length" class="flex flex-col gap-2">
+                <legend class="text-sm font-medium">{{ $t('admin_announcements.mula_dengan_preset') }}</legend>
+                <p class="text-xs text-ink-muted">{{ $t('admin_announcements.preset_mengisi_borang_sahaja') }}</p>
+
+                <div class="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                    <button
+                        v-for="preset in presets"
+                        :key="preset.key"
+                        type="button"
+                        :class="[
+                            'flex min-w-0 flex-col gap-0.5 rounded-xl border p-3 text-left transition',
+                            applied === preset.key ? 'border-brand-400 bg-brand-50' : 'border-line hover:border-brand-400',
+                        ]"
+                        @click="applyPreset(preset)"
+                    >
+                        <span class="truncate text-sm font-medium">{{ preset.label }}</span>
+                        <span class="text-xs break-words text-ink-muted">{{ preset.hint }}</span>
+                    </button>
+                </div>
+
+                <button v-if="form.subject || form.body" type="button" class="w-fit text-xs font-medium text-ink-muted underline underline-offset-4 hover:text-brand-700" @click="clearForm()">
+                    {{ $t('admin_announcements.kosongkan_borang') }}
+                </button>
+            </fieldset>
 
             <fieldset class="flex flex-col gap-2">
                 <legend class="text-sm font-medium">{{ $t('admin_announcements.penerima') }}</legend>

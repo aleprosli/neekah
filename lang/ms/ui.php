@@ -534,6 +534,9 @@ return [
     ],
 
     'admin_announcements' => [
+        'mula_dengan_preset' => 'Mula dengan preset',
+        'preset_mengisi_borang_sahaja' => 'Preset hanya mengisi borang di bawah — baca dan ubah dahulu sebelum hantar. Yang ada [kurungan] memang perlu diisi.',
+        'kosongkan_borang' => 'Kosongkan borang',
         'hantar_kepada_penerima' => 'Hantar kepada :count penerima?',
         'emel_dan_notifikasi_akan_dihantar' => ':audience. Emel dan notifikasi akan dihantar, dan pengumuman yang sudah keluar tidak boleh ditarik balik.',
         'taip_nama_atau_emel' => 'Taip nama atau emel…',

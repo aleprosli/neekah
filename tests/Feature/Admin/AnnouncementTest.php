@@ -1,10 +1,12 @@
 <?php
 
+use App\Enums\AnnouncementAudience;
 use App\Enums\AnnouncementStatus;
 use App\Jobs\SendAnnouncement;
 use App\Models\Announcement;
 use App\Models\User;
 use App\Notifications\AnnouncementPublished;
+use App\Support\AnnouncementPresets;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Queue;
 
@@ -315,4 +317,75 @@ it('names everyone a hand-picked announcement went to', function () {
         ->assertSee($this->aina->email)
         ->assertSee('orang@luar.test')
         ->assertSee('tiada akaun');
+});
+
+/*
+|--------------------------------------------------------------------------
+| Presets
+|--------------------------------------------------------------------------
+|
+| A preset only fills the form. What matters is that every one of them is a
+| message the application would actually accept and send, and that the button
+| on it points somewhere real.
+|
+*/
+
+it('offers a preset for each message the admin keeps rewriting', function () {
+    $presets = $this->actingAs($this->admin)
+        ->get(route('admin.announcements.index'))
+        ->assertOk()
+        ->viewData('props')['presets'];
+
+    expect(collect($presets)->pluck('key')->all())
+        ->toContain('vendor_profile', 'vendor_catalogue', 'vendor_response', 'feature_launch', 'card_designs', 'couple_start', 'guest_links', 'maintenance');
+
+    foreach ($presets as $preset) {
+        expect($preset['label'])->not->toBe('pages.announcement_presets.'.$preset['key'])
+            ->and($preset['hint'])->not->toBe('pages.announcement_preset_hints.'.$preset['key'])
+            ->and(AnnouncementAudience::tryFrom($preset['audience']))->not->toBeNull();
+    }
+});
+
+it('sends every preset as it stands, without the admin having to fix it first', function () {
+    Notification::fake();
+
+    foreach (AnnouncementPresets::all() as $preset) {
+        // The test send goes to the admin alone, and runs the same validation a
+        // real send does, so a preset that is too long or missing half a button
+        // fails here rather than in front of 775 people.
+        $this->actingAs($this->admin)
+            ->post(route('admin.announcements.test'), [
+                'audience' => $preset['audience'],
+                'subject' => $preset['subject'],
+                'body' => $preset['body'],
+                'action_label' => $preset['action_label'],
+                'action_url' => $preset['action_url'],
+            ])
+            ->assertSessionHasNoErrors();
+    }
+
+    Notification::assertSentToTimes($this->admin, AnnouncementPublished::class, count(AnnouncementPresets::all()));
+});
+
+it('points every preset button at a page on Neekah, in Malay', function () {
+    foreach (AnnouncementPresets::all() as $preset) {
+        if ($preset['action_url'] === null) {
+            expect($preset['action_label'])->toBeNull();
+
+            continue;
+        }
+
+        expect($preset['action_url'])->toStartWith(config('app.url'))
+            // The Malay addresses: the message is Malay and those are the URLs
+            // that have been shared and indexed.
+            ->and($preset['action_url'])->not->toContain('/en/');
+    }
+});
+
+it('asks the vendors to finish their profile, and nobody else', function () {
+    $preset = collect(AnnouncementPresets::all())->firstWhere('key', 'vendor_profile');
+
+    expect($preset['audience'])->toBe(AnnouncementAudience::Vendors->value)
+        ->and($preset['subject'])->toContain('profil')
+        ->and($preset['action_url'])->toBe(url()->routeIn('ms', 'vendor.profile.edit'));
 });

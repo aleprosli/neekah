@@ -10,6 +10,7 @@ use App\Jobs\SendAnnouncement;
 use App\Models\Announcement;
 use App\Models\User;
 use App\Notifications\AnnouncementPublished;
+use App\Support\AnnouncementPresets;
 use App\Support\VueProps;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
@@ -33,6 +34,8 @@ class AnnouncementController extends Controller
         return view('admin.announcements.index', [
             'props' => VueProps::for([
                 'storeUrl' => route('admin.announcements.store'),
+                // A starting point for the messages that get written over and over.
+                'presets' => AnnouncementPresets::all(),
                 'testUrl' => route('admin.announcements.test'),
                 'searchUrl' => route('admin.announcements.recipients'),
                 'audiences' => collect(AnnouncementAudience::cases())
