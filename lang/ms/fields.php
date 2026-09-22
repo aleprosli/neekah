@@ -129,4 +129,7 @@ return [
     'waktu_operasi_en' => 'waktu operasi English',
     'warna' => 'warna',
 
+    'nama_pendek_perempuan' => 'nama pendek pengantin perempuan',
+    'nama_pendek_lelaki' => 'nama pendek pengantin lelaki',
+    'fail_audio' => 'fail audio',
 ];

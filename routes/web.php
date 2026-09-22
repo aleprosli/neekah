@@ -16,6 +16,7 @@ use App\Http\Controllers\Customer\PaymentController;
 use App\Http\Controllers\InvitationAcceptanceController;
 use App\Http\Controllers\InvitationPreviewController;
 use App\Http\Controllers\LandingController;
+use App\Http\Controllers\NfcCardController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PublicSiteController;
 use App\Http\Controllers\ReportVendorController;
@@ -38,6 +39,13 @@ Route::domain('{subdomain}.'.config('neekah.site_domain'))->middleware('locale')
     Route::get('/kalendar.ics', CalendarController::class)->name('sites.calendar');
     Route::get('/preview.png', InvitationPreviewController::class)->name('sites.preview-image');
 });
+
+// A physical NFC card or printed QR. Registered once, outside the per-language
+// sets: it is a redirect to a card, and cards are Malay only.
+Route::get('/n/{uid}', NfcCardController::class)
+    ->where('uid', '[A-Za-z0-9\-]+')
+    ->middleware('throttle:60,1')
+    ->name('nfc.tap');
 
 /*
 |--------------------------------------------------------------------------
@@ -185,6 +193,8 @@ $site = function (): void {
         Route::get('/kad', [CustomerArea\WeddingSiteController::class, 'edit'])->middleware('wedding')->name('site.edit');
         Route::get('/kad/preview', [CustomerArea\WeddingSiteController::class, 'preview'])->middleware('wedding')->name('site.preview');
         Route::get('/kad/alamat', [CustomerArea\WeddingSiteController::class, 'checkSubdomain'])->middleware(['wedding', 'throttle:60,1'])->name('site.subdomain');
+        Route::get('/kad/reka-bentuk', [CustomerArea\WeddingSiteController::class, 'designs'])->middleware(['wedding', 'throttle:120,1'])->name('site.designs');
+        Route::get('/kad/statistik', CustomerArea\WeddingSiteInsightsController::class)->middleware('wedding')->name('site.insights');
         Route::put('/weddings/{wedding}/kad', [CustomerArea\WeddingSiteController::class, 'update'])->name('weddings.site.update');
         Route::post('/weddings/{wedding}/kad/galeri', [CustomerArea\WeddingSitePhotoController::class, 'store'])->name('weddings.site.photos.store');
         Route::delete('/weddings/{wedding}/kad/galeri/{photo}', [CustomerArea\WeddingSitePhotoController::class, 'destroy'])->name('weddings.site.photos.destroy');
@@ -238,6 +248,14 @@ $site = function (): void {
         Route::post('/checklist/items', [AdminArea\ChecklistItemController::class, 'store'])->name('checklist.items.store');
         Route::put('/checklist/items/{item}', [AdminArea\ChecklistItemController::class, 'update'])->name('checklist.items.update');
         Route::delete('/checklist/items/{item}', [AdminArea\ChecklistItemController::class, 'destroy'])->name('checklist.items.destroy');
+        Route::get('/muzik-kad', [AdminArea\CardMusicController::class, 'index'])->name('card-music.index');
+        Route::post('/muzik-kad', [AdminArea\CardMusicController::class, 'store'])->name('card-music.store');
+        Route::put('/muzik-kad/{track}', [AdminArea\CardMusicController::class, 'update'])->name('card-music.update');
+        Route::delete('/muzik-kad/{track}', [AdminArea\CardMusicController::class, 'destroy'])->name('card-music.destroy');
+        Route::get('/kad-nfc', [AdminArea\CardNfcController::class, 'index'])->name('card-nfc.index');
+        Route::post('/kad-nfc', [AdminArea\CardNfcController::class, 'store'])->name('card-nfc.store');
+        Route::put('/kad-nfc/{card}', [AdminArea\CardNfcController::class, 'update'])->name('card-nfc.update');
+        Route::delete('/kad-nfc/{card}', [AdminArea\CardNfcController::class, 'destroy'])->name('card-nfc.destroy');
         Route::get('/announcements', [AdminArea\AnnouncementController::class, 'index'])->name('announcements.index');
         Route::post('/announcements', [AdminArea\AnnouncementController::class, 'store'])->name('announcements.store');
         Route::post('/announcements/test', [AdminArea\AnnouncementController::class, 'test'])->name('announcements.test');

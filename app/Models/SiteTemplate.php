@@ -4,6 +4,9 @@ namespace App\Models;
 
 use App\Casts\Translatable;
 use App\Models\Concerns\HasTranslatedText;
+use App\Support\Card\Fonts;
+use App\Support\Card\Palettes;
+use App\Support\Card\SceneComposer;
 use Database\Factories\SiteTemplateFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Scope;
@@ -11,27 +14,21 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-#[Fillable(['slug', 'name', 'style', 'description', 'design', 'sort_order', 'is_active'])]
+/**
+ * One invitation-card design: a palette of ten colour roles, four type faces and
+ * three composed canvases (kulit, jemputan, butiran). The layers are drawn from
+ * App\Support\Card\Catalog by the seeder, never edited by hand.
+ */
+#[Fillable([
+    'slug', 'name', 'style', 'category', 'description', 'is_premium',
+    'palette', 'fonts', 'scenes', 'photo_slots', 'sort_order', 'is_active',
+])]
 class SiteTemplate extends Model
 {
     /** @use HasFactory<SiteTemplateFactory> */
     use HasFactory;
 
     use HasTranslatedText;
-
-    /**
-     * Layout skeletons. Each one is a Blade partial under sites/layouts.
-     *
-     * @var array<int, string>
-     */
-    public const LAYOUTS = ['centered', 'arch', 'frame', 'banner', 'split', 'minimal', 'ribbon', 'mosaic'];
-
-    /**
-     * Corner and border ornaments, drawn as SVG.
-     *
-     * @var array<int, string>
-     */
-    public const ORNAMENTS = ['floral', 'vine', 'geometric', 'deco', 'botanical', 'none'];
 
     /**
      * @return array<string, string>
@@ -41,7 +38,11 @@ class SiteTemplate extends Model
         return [
             'name' => Translatable::class,
             'description' => Translatable::class,
-            'design' => 'array',
+            'palette' => 'array',
+            'fonts' => 'array',
+            'scenes' => 'array',
+            'photo_slots' => 'array',
+            'is_premium' => 'boolean',
             'is_active' => 'boolean',
         ];
     }
@@ -60,78 +61,127 @@ class SiteTemplate extends Model
     #[Scope]
     protected function ordered(Builder $query): Builder
     {
-        // sort_order is what actually orders these; the name was only a
-        // tiebreak, and sorting by it now would sort by JSON text.
+        // sort_order is what actually orders these; the name is JSON text now.
         return $query->orderBy('sort_order')->orderBy('id');
     }
 
-    public function layout(): string
+    /**
+     * The three designed canvases, each {key, name, width, height, layers}.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    public function canvases(): array
     {
-        return $this->design['layout'] ?? 'centered';
-    }
-
-    public function ornament(): string
-    {
-        return $this->design['ornament'] ?? 'floral';
-    }
-
-    public function motion(): string
-    {
-        return $this->design['motion'] ?? 'petals';
-    }
-
-    public function eyebrow(): string
-    {
-        return $this->design['eyebrow'] ?? 'Walimatulurus';
+        return $this->scenes ?? [];
     }
 
     /**
-     * Whether the card opens with the Bismillah, as most Malay invitations do.
+     * The design's own ten colours, with the couple's overrides applied if given.
+     *
+     * @param  array<string, mixed>|null  $override
+     * @return array<string, string>
+     */
+    public function palette(?array $override = null): array
+    {
+        return Palettes::resolve($this->palette ?? [], $override);
+    }
+
+    /**
+     * The four type faces, by role, with the couple's overrides applied if given.
+     *
+     * @param  array<string, mixed>|null  $override
+     * @return array<string, string>
+     */
+    public function fonts(?array $override = null): array
+    {
+        // The column is keyed by role. MySQL normalises JSON object keys into
+        // alphabetical order, so reading it positionally would hand the script face
+        // to the small-caps labels and print the names in Montserrat.
+        $roles = Fonts::byRole($this->fonts ?? []);
+
+        foreach (Fonts::ROLES as $role) {
+            if (Fonts::isValid($override[$role] ?? null)) {
+                $roles[$role] = $override[$role];
+            }
+        }
+
+        return $roles;
+    }
+
+    /**
+     * The design's colours and faces as one inline style, for the few places Blade
+     * paints before the renderer has mounted (the opening screen, a fallback).
+     *
+     * @param  array<string, mixed>|null  $paletteOverride
+     * @param  array<string, mixed>|null  $fontsOverride
+     */
+    public function cssVariables(?array $paletteOverride = null, ?array $fontsOverride = null): string
+    {
+        $vars = [
+            ...Palettes::cssVariables($this->palette($paletteOverride)),
+            ...Fonts::cssVariables($this->fonts($fontsOverride)),
+        ];
+
+        return collect($vars)->map(fn (string $value, string $name): string => $name.':'.$value)->implode(';');
+    }
+
+    /**
+     * Content keys of the photos this design asks for, e.g. couple_image.
+     *
+     * @return array<int, string>
+     */
+    public function photoSlots(): array
+    {
+        return $this->photo_slots ?? [];
+    }
+
+    /**
+     * Whether the cover opens with the Bismillah, as most Malay invitations do.
+     * It is a layer in the artwork, so the answer is in the layers.
      */
     public function showsBismillah(): bool
     {
-        return (bool) ($this->design['bismillah'] ?? false);
+        foreach ($this->canvases() as $scene) {
+            foreach ($scene['layers'] ?? [] as $layer) {
+                if (($layer['name'] ?? '') === 'Bismillah') {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
+    /**
+     * Whether the cover is dark, so the link-preview image knows which way to paint.
+     */
     public function isDark(): bool
     {
-        return (bool) ($this->design['palette']['dark'] ?? false);
+        return Palettes::isDark($this->palette()['bg']);
     }
 
     /**
-     * The palette and type choices as CSS custom properties, so one stylesheet
-     * can render every template without a class per design.
+     * Compose the design from its catalogue definition. Used by the seeder.
+     *
+     * @param  array<string, mixed>  $definition
+     * @return array<string, mixed>
      */
-    public function cssVariables(): string
+    public static function attributesFromDefinition(array $definition): array
     {
-        $palette = $this->design['palette'] ?? [];
-        $type = $this->design['type'] ?? [];
+        $scenes = (new SceneComposer($definition))->scenes();
 
-        $variables = [
-            '--nk-page' => $palette['page'] ?? '#ffffff',
-            '--nk-ink' => $palette['ink'] ?? '#2b2b2b',
-            '--nk-name' => $palette['name'] ?? '#2b2b2b',
-            '--nk-accent' => $palette['accent'] ?? '#c19a4b',
-            '--nk-body' => $palette['body'] ?? '#5f5f5f',
-            '--nk-muted' => $palette['muted'] ?? '#9a9a9a',
-            '--nk-panel' => $palette['panel'] ?? '#ffffff',
-            '--nk-line' => $palette['line'] ?? '#e5e5e5',
-            '--nk-button-bg' => $palette['buttonBg'] ?? '#2b2b2b',
-            '--nk-button-text' => $palette['buttonText'] ?? '#ffffff',
-            '--nk-script' => $type['script'] ?? "'Great Vibes', cursive",
-            '--nk-serif' => $type['body'] ?? "'Cormorant Garamond', serif",
+        return [
+            'name' => $definition['name'],
+            'style' => $definition['style'],
+            'category' => $definition['category'],
+            'description' => $definition['desc'],
+            'is_premium' => $definition['premium'],
+            'palette' => $definition['pal'],
+            'fonts' => Fonts::roles($definition['fonts']),
+            'scenes' => $scenes,
+            'photo_slots' => SceneComposer::photoSlots($scenes),
+            'sort_order' => $definition['n'],
+            'is_active' => true,
         ];
-
-        return collect($variables)
-            ->map(fn (string $value, string $key): string => $key.':'.$value)
-            ->implode(';');
-    }
-
-    /**
-     * @return array<int, string>
-     */
-    public function petalColors(): array
-    {
-        return $this->design['petals'] ?? ['#f2c6d4', '#e9b8c6', '#f6dcc2'];
     }
 }

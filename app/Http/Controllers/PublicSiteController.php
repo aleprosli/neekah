@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Actions\RenderInvitationPreview;
 use App\Models\WeddingGuest;
 use App\Models\WeddingSite;
+use App\Support\Card\CardProps;
 use App\Support\Seo;
+use App\Support\VueProps;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -28,11 +30,9 @@ class PublicSiteController extends Controller
     {
         $site = WeddingSite::query()
             ->published()
-            ->with('siteTemplate')
+            ->with(['siteTemplate', 'musicTrack', 'photos', 'approvedWishes'])
             ->where('subdomain', $subdomain)
             ->firstOr(fn () => abort(404, __('validation.custom.card_not_found')));
-
-        $site->increment('views');
 
         $seo->title($site->coupleNames())
             ->description(__('seo.card.description', [
@@ -49,12 +49,19 @@ class PublicSiteController extends Controller
             ->noindex();
 
         $guest = $this->resolveGuest($request, $site);
+        $template = $site->design();
+
+        // A link-preview fetch is not a guest opening the card, so it moves no counter.
+        if (! $this->isPreviewBot($request)) {
+            $site->recordView(fromGuestLink: $guest !== null);
+        }
 
         return view('sites.show', [
             'site' => $site,
-            'template' => $site->design(),
+            'template' => $template,
             'preview' => false,
             'guest' => $guest,
+            'props' => VueProps::for(CardProps::forSite($site, $template, preview: false, guest: $guest)),
         ]);
     }
 

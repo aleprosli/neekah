@@ -36,7 +36,7 @@ it('creates the invitation as a draft that is not public yet', function () {
     $site = WeddingSite::sole();
 
     expect($site->subdomain)->toBe('ainapilihhakim')
-        ->and($site->template)->toBe('mawar-pagi')
+        ->and($site->template)->toBe('rose-garden')
         ->and($site->is_published)->toBeFalse()
         ->and($site->itinerary)->toHaveCount(2)
         ->and($site->contacts)->toHaveCount(1);
@@ -180,7 +180,7 @@ function siteData(): array
 {
     return [
         'subdomain' => 'ainapilihhakim',
-        'template' => 'mawar-pagi',
+        'template' => 'rose-garden',
         'bride_name' => 'Aina Zulkifli',
         'groom_name' => 'Hakim Ismail',
         'event_date' => now()->addMonths(4)->toDateString(),

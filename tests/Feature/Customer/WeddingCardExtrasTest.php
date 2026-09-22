@@ -26,7 +26,7 @@ it('saves a duitnow qr and bank accounts, dropping the empty rows', function () 
     $this->actingAs($this->aina)
         ->put(route('weddings.site.update', $this->wedding), [
             'subdomain' => $this->site->subdomain,
-            'template' => 'mawar-pagi',
+            'template' => 'rose-garden',
             'bride_name' => 'Aina Zulkifli',
             'groom_name' => 'Hakim Ismail',
             'event_date' => now()->addMonths(4)->toDateString(),
@@ -54,15 +54,15 @@ it('saves a duitnow qr and bank accounts, dropping the empty rows', function () 
 it('shows the gift section on the card only when it is switched on', function () {
     $this->site->update(['gift_enabled' => false, 'gift_accounts' => [['bank' => 'Maybank', 'holder' => 'Aina', 'number' => '112233445566']]]);
 
-    $this->get(cardUrl($this->site))->assertOk()->assertDontSee('Salam kaut');
+    // Every card carries the whole card dictionary, so what proves the section is
+    // absent is the section list, not the words.
+    expect(cardWidgets($this->get(cardUrl($this->site))->assertOk()))->not->toContain('gift');
 
     $this->site->update(['gift_enabled' => true]);
 
-    $this->get(cardUrl($this->site))
-        ->assertOk()
-        ->assertSee('Salam kaut')
-        ->assertSee('112233445566')
-        ->assertSee('Hadiah');
+    $response = $this->get(cardUrl($this->site))->assertOk()->assertSee('112233445566');
+
+    expect(cardWidgets($response))->toContain('gift');
 });
 
 it('keeps a wish off the card until the couple approves it', function () {
@@ -137,7 +137,7 @@ it('renders the extras across a light and a dark design', function () {
     WeddingRsvp::factory()->create(['wedding_site_id' => $this->site->id, 'message' => 'Barakallah!', 'message_approved_at' => now()]);
     WeddingSitePhoto::factory()->create(['wedding_site_id' => $this->site->id, 'caption' => 'Prewedding']);
 
-    foreach (['mawar-pagi', 'malam-emas'] as $design) {
+    foreach (['rose-garden', 'midnight-luxury'] as $design) {
         $this->site->update(['template' => $design]);
 
         $this->get(cardUrl($this->site))

@@ -3,11 +3,11 @@
 <x-layouts.app :title="$site->coupleNames()" :description="'Jemputan majlis perkahwinan '.$site->coupleNames()" :preloader="false" shell="card">
     {{-- The invitation opens with the couple's own names in their own colours.
          The Neekah brand has no business standing in front of their card. --}}
-    <x-site.preloader class="nk-card" :style="$template->cssVariables()" :label="$site->coupleNames()">
-        <p class="nk-script text-center">
-            <span class="nk-name block text-3xl sm:text-4xl">{{ $site->bride_name }}</span>
-            <span class="nk-accent my-2 block text-xl">&amp;</span>
-            <span class="nk-name block text-3xl sm:text-4xl">{{ $site->groom_name }}</span>
+    <x-site.preloader class="nkc-card" :style="$template->cssVariables($site->palette, $site->fonts)" :label="$site->coupleNames()">
+        <p class="nkc-preloader-names text-center">
+            {{ $site->groom_name }}
+            <span class="nkc-preloader-amp">&amp;</span>
+            {{ $site->bride_name }}
         </p>
     </x-site.preloader>
 

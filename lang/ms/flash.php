@@ -21,6 +21,14 @@ return [
     ],
 
     'admin' => [
+        'card_music_added' => 'Trek muzik ditambah.',
+        'card_music_updated' => 'Trek muzik dikemas kini.',
+        'card_music_deleted' => 'Trek muzik dibuang.',
+        'card_music_in_use' => 'Trek ini sedang dimainkan pada sebuah kad. Matikan ia dahulu.',
+        'nfc_cards_created' => ':count kad NFC dijana.',
+        'nfc_card_updated' => 'Kad NFC dikemas kini.',
+        'nfc_card_deleted' => 'Kad NFC dibuang.',
+        'nfc_card_in_use' => 'Kad ini sudah pernah ditap, jadi ia ada di tangan orang. Matikan ia dahulu.',
         'user_deactivated' => 'Akaun :name dinyahaktifkan.',
         'user_reactivated' => 'Akaun :name diaktifkan semula.',
         'user_reactivated_vendor_suspended' => 'Akaun :name diaktifkan semula. Profil vendornya masih digantung; luluskan semula di halaman vendor.',
@@ -49,6 +57,7 @@ return [
     ],
 
     'couple' => [
+        'nfc_card_not_ready' => 'Kad ini belum dihubungkan dengan mana-mana jemputan.',
         'wedding_created' => 'Wedding project dicipta, lengkap dengan checklist dan cadangan bajet. Langkah seterusnya: cipta kad kahwin digital anda.',
         'wedding_updated' => 'Maklumat majlis dikemas kini.',
         'task_added' => 'Tugasan ditambah.',

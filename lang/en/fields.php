@@ -129,4 +129,7 @@ return [
     'waktu_operasi_en' => 'English opening hours',
     'warna' => 'colour',
 
+    'nama_pendek_perempuan' => "bride's short name",
+    'nama_pendek_lelaki' => "groom's short name",
+    'fail_audio' => 'audio file',
 ];

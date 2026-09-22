@@ -1,4 +1,20 @@
 {
+  "_abril-fatface-400-normal-CSRW-xuf.woff": {
+    "file": "assets/abril-fatface-400-normal-CSRW-xuf.woff",
+    "src": "_abril-fatface-400-normal-CSRW-xuf.woff"
+  },
+  "_abril-fatface-400-normal-utNZUC9m.woff2": {
+    "file": "assets/abril-fatface-400-normal-utNZUC9m.woff2",
+    "src": "_abril-fatface-400-normal-utNZUC9m.woff2"
+  },
+  "_allura-400-normal-4sUZKTf1.woff2": {
+    "file": "assets/allura-400-normal-4sUZKTf1.woff2",
+    "src": "_allura-400-normal-4sUZKTf1.woff2"
+  },
+  "_allura-400-normal-DcxZAN6k.woff": {
+    "file": "assets/allura-400-normal-DcxZAN6k.woff",
+    "src": "_allura-400-normal-DcxZAN6k.woff"
+  },
   "_amiri-400-normal-C_1DQziU.woff": {
     "file": "assets/amiri-400-normal-C_1DQziU.woff",
     "src": "_amiri-400-normal-C_1DQziU.woff"
@@ -6,6 +22,86 @@
   "_amiri-400-normal-D0NIBXga.woff2": {
     "file": "assets/amiri-400-normal-D0NIBXga.woff2",
     "src": "_amiri-400-normal-D0NIBXga.woff2"
+  },
+  "_bodoni-moda-400-normal-9rKXKbpF.woff": {
+    "file": "assets/bodoni-moda-400-normal-9rKXKbpF.woff",
+    "src": "_bodoni-moda-400-normal-9rKXKbpF.woff"
+  },
+  "_bodoni-moda-400-normal-CIWtV3SY.woff2": {
+    "file": "assets/bodoni-moda-400-normal-CIWtV3SY.woff2",
+    "src": "_bodoni-moda-400-normal-CIWtV3SY.woff2"
+  },
+  "_bodoni-moda-500-normal-B12im5S-.woff": {
+    "file": "assets/bodoni-moda-500-normal-B12im5S-.woff",
+    "src": "_bodoni-moda-500-normal-B12im5S-.woff"
+  },
+  "_bodoni-moda-500-normal-CtAcMono.woff2": {
+    "file": "assets/bodoni-moda-500-normal-CtAcMono.woff2",
+    "src": "_bodoni-moda-500-normal-CtAcMono.woff2"
+  },
+  "_bodoni-moda-600-normal-DbXDFeqY.woff2": {
+    "file": "assets/bodoni-moda-600-normal-DbXDFeqY.woff2",
+    "src": "_bodoni-moda-600-normal-DbXDFeqY.woff2"
+  },
+  "_bodoni-moda-600-normal-DgnCXU2s.woff": {
+    "file": "assets/bodoni-moda-600-normal-DgnCXU2s.woff",
+    "src": "_bodoni-moda-600-normal-DgnCXU2s.woff"
+  },
+  "_bodoni-moda-700-normal-B4v_frWu.woff": {
+    "file": "assets/bodoni-moda-700-normal-B4v_frWu.woff",
+    "src": "_bodoni-moda-700-normal-B4v_frWu.woff"
+  },
+  "_bodoni-moda-700-normal-_PBEXphw.woff2": {
+    "file": "assets/bodoni-moda-700-normal-_PBEXphw.woff2",
+    "src": "_bodoni-moda-700-normal-_PBEXphw.woff2"
+  },
+  "_caveat-400-normal-BzhAQZkN.woff": {
+    "file": "assets/caveat-400-normal-BzhAQZkN.woff",
+    "src": "_caveat-400-normal-BzhAQZkN.woff"
+  },
+  "_caveat-400-normal-D6LQsQ_v.woff2": {
+    "file": "assets/caveat-400-normal-D6LQsQ_v.woff2",
+    "src": "_caveat-400-normal-D6LQsQ_v.woff2"
+  },
+  "_caveat-600-normal-DUjB8dgm.woff": {
+    "file": "assets/caveat-600-normal-DUjB8dgm.woff",
+    "src": "_caveat-600-normal-DUjB8dgm.woff"
+  },
+  "_caveat-600-normal-zlTlWIYU.woff2": {
+    "file": "assets/caveat-600-normal-zlTlWIYU.woff2",
+    "src": "_caveat-600-normal-zlTlWIYU.woff2"
+  },
+  "_cinzel-400-normal-C8jUSQqm.woff": {
+    "file": "assets/cinzel-400-normal-C8jUSQqm.woff",
+    "src": "_cinzel-400-normal-C8jUSQqm.woff"
+  },
+  "_cinzel-400-normal-DnUIPmzd.woff2": {
+    "file": "assets/cinzel-400-normal-DnUIPmzd.woff2",
+    "src": "_cinzel-400-normal-DnUIPmzd.woff2"
+  },
+  "_cinzel-500-normal-B-2dbOfA.woff2": {
+    "file": "assets/cinzel-500-normal-B-2dbOfA.woff2",
+    "src": "_cinzel-500-normal-B-2dbOfA.woff2"
+  },
+  "_cinzel-500-normal-DMNTwV-V.woff": {
+    "file": "assets/cinzel-500-normal-DMNTwV-V.woff",
+    "src": "_cinzel-500-normal-DMNTwV-V.woff"
+  },
+  "_cinzel-600-normal-CH_LB4su.woff": {
+    "file": "assets/cinzel-600-normal-CH_LB4su.woff",
+    "src": "_cinzel-600-normal-CH_LB4su.woff"
+  },
+  "_cinzel-600-normal-Dd5YO2UX.woff2": {
+    "file": "assets/cinzel-600-normal-Dd5YO2UX.woff2",
+    "src": "_cinzel-600-normal-Dd5YO2UX.woff2"
+  },
+  "_cinzel-700-normal-C-gK7hA8.woff": {
+    "file": "assets/cinzel-700-normal-C-gK7hA8.woff",
+    "src": "_cinzel-700-normal-C-gK7hA8.woff"
+  },
+  "_cinzel-700-normal-Dkw14w9r.woff2": {
+    "file": "assets/cinzel-700-normal-Dkw14w9r.woff2",
+    "src": "_cinzel-700-normal-Dkw14w9r.woff2"
   },
   "_cormorant-garamond-300-normal-BuXLI6C0.woff": {
     "file": "assets/cormorant-garamond-300-normal-BuXLI6C0.woff",
@@ -39,9 +135,17 @@
     "file": "assets/cormorant-garamond-600-normal-Co1r35X9.woff2",
     "src": "_cormorant-garamond-600-normal-Co1r35X9.woff2"
   },
-  "_fonts-vQMMn0Pm.css": {
-    "file": "assets/fonts-vQMMn0Pm.css",
-    "src": "_fonts-vQMMn0Pm.css"
+  "_dm-serif-display-400-normal-C5_t9oOD.woff2": {
+    "file": "assets/dm-serif-display-400-normal-C5_t9oOD.woff2",
+    "src": "_dm-serif-display-400-normal-C5_t9oOD.woff2"
+  },
+  "_dm-serif-display-400-normal-_kVFYEpx.woff": {
+    "file": "assets/dm-serif-display-400-normal-_kVFYEpx.woff",
+    "src": "_dm-serif-display-400-normal-_kVFYEpx.woff"
+  },
+  "_fonts-VIkRNZSg.css": {
+    "file": "assets/fonts-VIkRNZSg.css",
+    "src": "_fonts-VIkRNZSg.css"
   },
   "_great-vibes-400-normal-BAZ173uY.woff": {
     "file": "assets/great-vibes-400-normal-BAZ173uY.woff",
@@ -75,6 +179,158 @@
     "file": "assets/instrument-sans-600-normal-B9e8oLYv.woff",
     "src": "_instrument-sans-600-normal-B9e8oLYv.woff"
   },
+  "_inter-300-normal-BVlfKGgI.woff2": {
+    "file": "assets/inter-300-normal-BVlfKGgI.woff2",
+    "src": "_inter-300-normal-BVlfKGgI.woff2"
+  },
+  "_inter-300-normal-i8F0SvXL.woff": {
+    "file": "assets/inter-300-normal-i8F0SvXL.woff",
+    "src": "_inter-300-normal-i8F0SvXL.woff"
+  },
+  "_inter-400-normal-C38fXH4l.woff2": {
+    "file": "assets/inter-400-normal-C38fXH4l.woff2",
+    "src": "_inter-400-normal-C38fXH4l.woff2"
+  },
+  "_inter-400-normal-CyCys3Eg.woff": {
+    "file": "assets/inter-400-normal-CyCys3Eg.woff",
+    "src": "_inter-400-normal-CyCys3Eg.woff"
+  },
+  "_inter-500-normal-BL9OpVg8.woff": {
+    "file": "assets/inter-500-normal-BL9OpVg8.woff",
+    "src": "_inter-500-normal-BL9OpVg8.woff"
+  },
+  "_inter-500-normal-Cerq10X2.woff2": {
+    "file": "assets/inter-500-normal-Cerq10X2.woff2",
+    "src": "_inter-500-normal-Cerq10X2.woff2"
+  },
+  "_inter-600-normal-CiBQ2DWP.woff": {
+    "file": "assets/inter-600-normal-CiBQ2DWP.woff",
+    "src": "_inter-600-normal-CiBQ2DWP.woff"
+  },
+  "_inter-600-normal-LgqL8muc.woff2": {
+    "file": "assets/inter-600-normal-LgqL8muc.woff2",
+    "src": "_inter-600-normal-LgqL8muc.woff2"
+  },
+  "_lato-300-normal-BP2wSCML.woff2": {
+    "file": "assets/lato-300-normal-BP2wSCML.woff2",
+    "src": "_lato-300-normal-BP2wSCML.woff2"
+  },
+  "_lato-300-normal-CINZtfFB.woff": {
+    "file": "assets/lato-300-normal-CINZtfFB.woff",
+    "src": "_lato-300-normal-CINZtfFB.woff"
+  },
+  "_lato-400-normal-B11PyLys.woff": {
+    "file": "assets/lato-400-normal-B11PyLys.woff",
+    "src": "_lato-400-normal-B11PyLys.woff"
+  },
+  "_lato-400-normal-BEhtfm5r.woff2": {
+    "file": "assets/lato-400-normal-BEhtfm5r.woff2",
+    "src": "_lato-400-normal-BEhtfm5r.woff2"
+  },
+  "_lato-700-normal-BUGMgin4.woff2": {
+    "file": "assets/lato-700-normal-BUGMgin4.woff2",
+    "src": "_lato-700-normal-BUGMgin4.woff2"
+  },
+  "_lato-700-normal-DAdL7O4w.woff": {
+    "file": "assets/lato-700-normal-DAdL7O4w.woff",
+    "src": "_lato-700-normal-DAdL7O4w.woff"
+  },
+  "_libre-baskerville-400-normal-BTm3cn9P.woff": {
+    "file": "assets/libre-baskerville-400-normal-BTm3cn9P.woff",
+    "src": "_libre-baskerville-400-normal-BTm3cn9P.woff"
+  },
+  "_libre-baskerville-400-normal-C42RasBZ.woff2": {
+    "file": "assets/libre-baskerville-400-normal-C42RasBZ.woff2",
+    "src": "_libre-baskerville-400-normal-C42RasBZ.woff2"
+  },
+  "_libre-baskerville-700-normal-CLGq6Yj4.woff2": {
+    "file": "assets/libre-baskerville-700-normal-CLGq6Yj4.woff2",
+    "src": "_libre-baskerville-700-normal-CLGq6Yj4.woff2"
+  },
+  "_libre-baskerville-700-normal-D1DCMXWx.woff": {
+    "file": "assets/libre-baskerville-700-normal-D1DCMXWx.woff",
+    "src": "_libre-baskerville-700-normal-D1DCMXWx.woff"
+  },
+  "_lora-400-normal-DBJS-Hc6.woff": {
+    "file": "assets/lora-400-normal-DBJS-Hc6.woff",
+    "src": "_lora-400-normal-DBJS-Hc6.woff"
+  },
+  "_lora-400-normal-DnxXpLNu.woff2": {
+    "file": "assets/lora-400-normal-DnxXpLNu.woff2",
+    "src": "_lora-400-normal-DnxXpLNu.woff2"
+  },
+  "_lora-500-normal-Dbc_1yrl.woff": {
+    "file": "assets/lora-500-normal-Dbc_1yrl.woff",
+    "src": "_lora-500-normal-Dbc_1yrl.woff"
+  },
+  "_lora-500-normal-Dh16O2IA.woff2": {
+    "file": "assets/lora-500-normal-Dh16O2IA.woff2",
+    "src": "_lora-500-normal-Dh16O2IA.woff2"
+  },
+  "_lora-600-normal-B-3RcLOQ.woff2": {
+    "file": "assets/lora-600-normal-B-3RcLOQ.woff2",
+    "src": "_lora-600-normal-B-3RcLOQ.woff2"
+  },
+  "_lora-600-normal-Dc3EneHn.woff": {
+    "file": "assets/lora-600-normal-Dc3EneHn.woff",
+    "src": "_lora-600-normal-Dc3EneHn.woff"
+  },
+  "_lora-700-normal-BHK4Pzk4.woff2": {
+    "file": "assets/lora-700-normal-BHK4Pzk4.woff2",
+    "src": "_lora-700-normal-BHK4Pzk4.woff2"
+  },
+  "_lora-700-normal-Yfa97ytg.woff": {
+    "file": "assets/lora-700-normal-Yfa97ytg.woff",
+    "src": "_lora-700-normal-Yfa97ytg.woff"
+  },
+  "_montserrat-300-normal-BgP24wlQ.woff2": {
+    "file": "assets/montserrat-300-normal-BgP24wlQ.woff2",
+    "src": "_montserrat-300-normal-BgP24wlQ.woff2"
+  },
+  "_montserrat-300-normal-sTRdVzlf.woff": {
+    "file": "assets/montserrat-300-normal-sTRdVzlf.woff",
+    "src": "_montserrat-300-normal-sTRdVzlf.woff"
+  },
+  "_montserrat-400-normal-BLhwKU8k.woff2": {
+    "file": "assets/montserrat-400-normal-BLhwKU8k.woff2",
+    "src": "_montserrat-400-normal-BLhwKU8k.woff2"
+  },
+  "_montserrat-400-normal-xItZbAXg.woff": {
+    "file": "assets/montserrat-400-normal-xItZbAXg.woff",
+    "src": "_montserrat-400-normal-xItZbAXg.woff"
+  },
+  "_montserrat-500-normal-DRFEGfly.woff2": {
+    "file": "assets/montserrat-500-normal-DRFEGfly.woff2",
+    "src": "_montserrat-500-normal-DRFEGfly.woff2"
+  },
+  "_montserrat-500-normal-Dok2oTci.woff": {
+    "file": "assets/montserrat-500-normal-Dok2oTci.woff",
+    "src": "_montserrat-500-normal-Dok2oTci.woff"
+  },
+  "_montserrat-600-normal-CdhFl4lI.woff": {
+    "file": "assets/montserrat-600-normal-CdhFl4lI.woff",
+    "src": "_montserrat-600-normal-CdhFl4lI.woff"
+  },
+  "_montserrat-600-normal-UVxSCcoG.woff2": {
+    "file": "assets/montserrat-600-normal-UVxSCcoG.woff2",
+    "src": "_montserrat-600-normal-UVxSCcoG.woff2"
+  },
+  "_montserrat-700-normal-BWkrl476.woff": {
+    "file": "assets/montserrat-700-normal-BWkrl476.woff",
+    "src": "_montserrat-700-normal-BWkrl476.woff"
+  },
+  "_montserrat-700-normal-BdjcYUrC.woff2": {
+    "file": "assets/montserrat-700-normal-BdjcYUrC.woff2",
+    "src": "_montserrat-700-normal-BdjcYUrC.woff2"
+  },
+  "_parisienne-400-normal-21gANpEP.woff2": {
+    "file": "assets/parisienne-400-normal-21gANpEP.woff2",
+    "src": "_parisienne-400-normal-21gANpEP.woff2"
+  },
+  "_parisienne-400-normal-C9Kl9k4-.woff": {
+    "file": "assets/parisienne-400-normal-C9Kl9k4-.woff",
+    "src": "_parisienne-400-normal-C9Kl9k4-.woff"
+  },
   "_pinyon-script-400-normal-3W0BoeAr.woff": {
     "file": "assets/pinyon-script-400-normal-3W0BoeAr.woff",
     "src": "_pinyon-script-400-normal-3W0BoeAr.woff"
@@ -82,6 +338,14 @@
   "_pinyon-script-400-normal-HCoaxbyT.woff2": {
     "file": "assets/pinyon-script-400-normal-HCoaxbyT.woff2",
     "src": "_pinyon-script-400-normal-HCoaxbyT.woff2"
+  },
+  "_playfair-display-400-normal-CFtfchNt.woff2": {
+    "file": "assets/playfair-display-400-normal-CFtfchNt.woff2",
+    "src": "_playfair-display-400-normal-CFtfchNt.woff2"
+  },
+  "_playfair-display-400-normal-DHYHbkg3.woff": {
+    "file": "assets/playfair-display-400-normal-DHYHbkg3.woff",
+    "src": "_playfair-display-400-normal-DHYHbkg3.woff"
   },
   "_playfair-display-500-normal-BScSeVwi.woff": {
     "file": "assets/playfair-display-500-normal-BScSeVwi.woff",
@@ -106,6 +370,46 @@
   "_playfair-display-700-normal-CuDiGg7c.woff2": {
     "file": "assets/playfair-display-700-normal-CuDiGg7c.woff2",
     "src": "_playfair-display-700-normal-CuDiGg7c.woff2"
+  },
+  "_poppins-300-normal-DCNuMXUj.woff": {
+    "file": "assets/poppins-300-normal-DCNuMXUj.woff",
+    "src": "_poppins-300-normal-DCNuMXUj.woff"
+  },
+  "_poppins-300-normal-Dku2WoCh.woff2": {
+    "file": "assets/poppins-300-normal-Dku2WoCh.woff2",
+    "src": "_poppins-300-normal-Dku2WoCh.woff2"
+  },
+  "_poppins-400-normal-BOb3E3N0.woff": {
+    "file": "assets/poppins-400-normal-BOb3E3N0.woff",
+    "src": "_poppins-400-normal-BOb3E3N0.woff"
+  },
+  "_poppins-400-normal-cpxAROuN.woff2": {
+    "file": "assets/poppins-400-normal-cpxAROuN.woff2",
+    "src": "_poppins-400-normal-cpxAROuN.woff2"
+  },
+  "_poppins-500-normal-C8OXljZJ.woff2": {
+    "file": "assets/poppins-500-normal-C8OXljZJ.woff2",
+    "src": "_poppins-500-normal-C8OXljZJ.woff2"
+  },
+  "_poppins-500-normal-DGXqpDMm.woff": {
+    "file": "assets/poppins-500-normal-DGXqpDMm.woff",
+    "src": "_poppins-500-normal-DGXqpDMm.woff"
+  },
+  "_poppins-600-normal-BJdTmd5m.woff": {
+    "file": "assets/poppins-600-normal-BJdTmd5m.woff",
+    "src": "_poppins-600-normal-BJdTmd5m.woff"
+  },
+  "_poppins-600-normal-zEkxB9Mr.woff2": {
+    "file": "assets/poppins-600-normal-zEkxB9Mr.woff2",
+    "src": "_poppins-600-normal-zEkxB9Mr.woff2"
+  },
+  "_special-elite-400-normal-BtSRmyJ6.woff": {
+    "file": "assets/special-elite-400-normal-BtSRmyJ6.woff",
+    "src": "_special-elite-400-normal-BtSRmyJ6.woff"
+  },
+  "_special-elite-400-normal-YjDd9tmf.woff2": {
+    "file": "assets/special-elite-400-normal-YjDd9tmf.woff2",
+    "src": "_special-elite-400-normal-YjDd9tmf.woff2"
   },
   "node_modules/@tiptap/core/dist/index.js": {
     "file": "assets/dist-BPdMn0UN.js",
@@ -132,7 +436,7 @@
     ]
   },
   "resources/css/app.css": {
-    "file": "assets/app-CUVSglJq.css",
+    "file": "assets/app-BANp8R6Y.css",
     "name": "app",
     "names": [
       "app.css"
@@ -141,7 +445,7 @@
     "isEntry": true
   },
   "resources/js/app.js": {
-    "file": "assets/app-CLF5QgNZ.js",
+    "file": "assets/app-DbeskRFu.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,

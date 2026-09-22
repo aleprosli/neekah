@@ -25,10 +25,12 @@ class WeddingSiteFactory extends Factory
             'wedding_id' => Wedding::factory(),
             'subdomain' => Str::slug($bride.'-'.$groom).'-'.fake()->unique()->numberBetween(100, 999),
             'template' => SiteTemplate::query()->orderBy('sort_order')->value('slug')
-                ?? SiteTemplate::factory()->create(['slug' => 'seri-gangsa'])->slug,
+                ?? SiteTemplate::factory()->fromCatalog('neekah-signature')->create()->slug,
             'is_published' => false,
             'bride_name' => $bride,
             'groom_name' => $groom,
+            'bride_short' => $bride,
+            'groom_short' => $groom,
             'event_date' => fake()->dateTimeBetween('+2 months', '+1 year')->format('Y-m-d'),
             'starts_at' => '11:00',
             'ends_at' => '16:00',

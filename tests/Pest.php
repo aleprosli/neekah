@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Testing\TestResponse;
 use Tests\TestCase;
 
 /*
@@ -44,7 +45,31 @@ expect()->extend('toBeOne', function () {
 |
 */
 
-function something()
+/**
+ * The props the card renderer was handed.
+ *
+ * The invitation is one Vue island, so this is the honest place to assert what a
+ * guest is shown: the markup is built in the browser from exactly this. Asserting
+ * on words alone would also match the card's own dictionary, which travels with
+ * every card whether the section is drawn or not.
+ *
+ * @return array<string, mixed>
+ */
+function cardProps(TestResponse $response): array
 {
-    // ..
+    preg_match('/data-vue="card-view" data-props="([^"]*)"/', $response->getContent(), $matches);
+
+    expect($matches)->not->toBeEmpty('The page mounts no card-view island.');
+
+    return json_decode(html_entity_decode($matches[1], ENT_QUOTES), true, flags: JSON_THROW_ON_ERROR);
+}
+
+/**
+ * The keys of the sections a card draws, in order.
+ *
+ * @return array<int, string>
+ */
+function cardWidgets(TestResponse $response): array
+{
+    return collect(cardProps($response)['widgets'])->pluck('key')->all();
 }

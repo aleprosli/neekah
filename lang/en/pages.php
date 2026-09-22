@@ -146,6 +146,16 @@ return [
     ],
 
     'dash' => [
+        'statistik_kad' => 'Card insights',
+        'statistik_kad_jemputan' => 'Invitation card insights',
+        'siapa_membuka_kad_anda' => 'Who is opening your card, and who has replied.',
+        'kembali_ke_editor' => 'Back to the editor',
+        'muzik_kad' => 'Card music',
+        'muzik_kad_jemputan' => 'Invitation card music',
+        'trek_yang_boleh_dipilih_pengantin' => 'The tracks couples may choose to play on their card.',
+        'kad_nfc' => 'NFC cards',
+        'kad_nfc_fizikal' => 'Physical NFC cards',
+        'setiap_tag_membawa_satu_uid' => 'A tag carries only its uid, so a couple can change their address without bricking printed cards.',
         'tempoh_terakhir' => 'Period: last :period',
         'artikel_baru' => 'New article',
         'sunting_artikel' => 'Edit article',
@@ -419,6 +429,7 @@ return [
     ],
 
     'gallery_page' => [
+        'premium' => 'Premium',
         'template_untuk_dipilih' => ':count templates to choose from',
         'percuma' => ', free.',
         'cipta_kad_saya' => 'Create my card',
@@ -472,7 +483,35 @@ return [
         'neekah' => 'Neekah',
     ],
 
+    'card_widgets' => [
+        'countdown' => 'Counting down',
+        'itinerary' => 'Order of the day',
+        'location' => 'Venue',
+        'gallery' => 'Gallery',
+        'rsvp' => 'Attendance (RSVP)',
+        'wishes' => 'Wishes & prayers',
+        'gift' => 'Wedding gift',
+        'contacts' => 'Contact us',
+        'closing' => 'Closing',
+    ],
+
+    'card_slots' => [
+        'cover_image' => 'Cover photo',
+        'couple_image' => 'Photo of you both',
+        'groom_image' => "Groom's photo",
+        'bride_image' => "Bride's photo",
+        'closing_image' => 'Closing photo',
+    ],
+
+    'card_fonts' => [
+        'd' => 'The names',
+        's' => 'Handwritten headings',
+        'r' => 'Body text',
+        'n' => 'Small labels',
+    ],
+
     'card' => [
+        'walimatulurus' => 'Walimatulurus',
         'copy_account' => 'Copy account number',
         'send_rsvp' => 'Send RSVP',
     ],
@@ -512,20 +551,22 @@ return [
         'tentang_neekah' => 'About Neekah',
     ],
 
-    'template_style' => [
-        'Klasik' => 'Classic',
-        'Islamik' => 'Islamic',
-        'Bunga' => 'Floral',
-        'Moden' => 'Modern',
-        'Malam' => 'Evening',
+    'template_category' => [
+        'Traditional' => 'Traditional',
+        'Modern' => 'Modern',
+        'Floral' => 'Floral',
+        'Islamic' => 'Islamic',
+        'Minimalist' => 'Minimalist',
+        'Creative' => 'Creative',
     ],
 
-    'template_style_notes' => [
-        'Klasik' => 'Cream paper, maroon and gold ink — the traditional printed look.',
-        'Islamik' => 'Opens with the Bismillah, with geometry and a mihrab arch.',
-        'Bunga' => 'Pastel colours with petals drifting slowly down.',
-        'Moden' => 'Clean type, plenty of room and earth tones.',
-        'Malam' => 'A dark ground and gold shimmer, for an evening reception.',
+    'template_category_notes' => [
+        'Traditional' => 'Songket, woven cloth and pucuk rebung — gold on heavy paper.',
+        'Modern' => 'Large type, generous space and a single gold accent.',
+        'Floral' => 'Peonies, roses and foliage spilling in from the edges.',
+        'Islamic' => 'Opening with the Bismillah, geometry and a mihrab arch.',
+        'Minimalist' => 'Almost bare: one sprig, small type, an ocean of space.',
+        'Creative' => 'Magazine, film, polaroid and postcard — for something different.',
     ],
 
     'sidebar_couple' => [
@@ -564,6 +605,8 @@ return [
     ],
 
     'sidebar_admin' => [
+        'muzik_kad' => 'Card music',
+        'kad_nfc' => 'NFC cards',
         'ringkasan' => 'Overview',
         'analitik' => 'Analytics',
         'marketplace' => 'Marketplace',
