@@ -11,3 +11,10 @@ layouts/dashboard is the web-app shell for all three roles: a full-height sideba
 layouts/auth is for signing in and up: logo, decoration, no header/footer, page-shell "auth". x-auth-card (noindex) wraps it for login, register, password and phone pages. /login and /register ask pengantin or vendor first (AuthAudience, ?as=); the choice is wording and where "daftar" leads — never a gate, since the account decides which dashboard a sign-in lands on. Google is left off the vendor form because it signs newcomers up as couples. /vendor/register uses layouts/auth directly and stays indexable — it is also the page vendors find from Google.
 
 Covered by PageSwapNavigationTest and Auth/AuthRoleChooserTest.
+
+## The preloader is for the first arrival in a tab only
+An inline script in layouts/app.blade.php head reads sessionStorage "neekah:arrived" before the first paint and puts .nk-arrived on <html>; app.js sets the flag once a page is up. CSS then hides #nk-preloader:not(.nkc-card), so a visitor already in this tab never sees the curtain again, and never a flash of it. Running before paint is the whole point: doing this from app.js would show it and then snatch it away.
+
+The invitation keeps its own curtain (.nkc-card) on every arrival. It carries the couple's names and is part of the card, not a loading state.
+
+The CSP allows inline script ('unsafe-inline'), so no nonce is needed today; adding one means covering this tag as well as the ld+json in seo/tags.blade.php.

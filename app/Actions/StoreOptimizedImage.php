@@ -86,8 +86,17 @@ class StoreOptimizedImage
     }
 
     /**
-     * The thumbnail's URL, or the full image's while an image uploaded before
-     * thumbnails existed has not been through neekah:optimize-images yet.
+     * The thumbnail's URL.
+     *
+     * This asks the disk nothing. storeContents writes the thumbnail beside
+     * every image it stores, and neekah:optimize-images backfills the ones
+     * uploaded before thumbnails existed, so the file is there.
+     *
+     * The check that used to be here cost a stat() on a local disk and was
+     * invisible. On an object store it is an HTTPS round trip per image, and
+     * the marketplace listing alone draws thirty-five of them before it can
+     * send a single byte of HTML. Run the backfill before pointing the disk at
+     * a bucket; anything it reports as failed is an image that would 404 here.
      */
     public static function thumbnailUrl(?string $path): ?string
     {
@@ -95,10 +104,7 @@ class StoreOptimizedImage
             return null;
         }
 
-        $disk = Storage::disk('public');
-        $thumbnail = self::thumbnailPath($path);
-
-        return $disk->url($disk->exists($thumbnail) ? $thumbnail : $path);
+        return Storage::disk('public')->url(self::thumbnailPath($path));
     }
 
     private function decode(string $contents): GdImage

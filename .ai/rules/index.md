@@ -10,7 +10,8 @@ Before planning or editing, find the row whose globs match the file's path and r
 | app/Support/Card/** | .ai/rules/card.md |
 | resources/js/components/card/** | .ai/rules/components-card.md |
 | resources/js/components/** | .ai/rules/components.md |
-| app/Http/Controllers/**, app/Http/Controllers/SitemapController.php | .ai/rules/controllers.md |
+| config/filesystems.php | .ai/rules/config.md |
+| app/Http/Controllers/**, app/Http/Controllers/SitemapController.php, app/Http/Controllers/SiteTemplatePreviewController.php | .ai/rules/controllers.md |
 | resources/css/app.css | .ai/rules/css.md |
 | app/Http/Controllers/Customer/**, app/Http/Controllers/Customer/WeddingTaskController.php | .ai/rules/customer.md |
 | app/Enums/UserSegment.php | .ai/rules/enums.md |
@@ -21,7 +22,7 @@ Before planning or editing, find the row whose globs match the file's path and r
 | lang/** | .ai/rules/lang.md |
 | resources/views/components/layouts/** | .ai/rules/layouts.md |
 | database/migrations/** | .ai/rules/migrations.md |
-| app/Models/WeddingGuest.php, app/Models/Vendor.php, app/Models/Post.php, app/Models/Review.php | .ai/rules/models.md |
+| app/Models/WeddingGuest.php, app/Models/Vendor.php, app/Models/Post.php, app/Models/Review.php, app/Models/Setting.php | .ai/rules/models.md |
 | app/Notifications/** | .ai/rules/notifications.md |
 | routes/** | .ai/rules/routes.md |
 | app/Rules/** | .ai/rules/rules.md |

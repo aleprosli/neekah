@@ -3,8 +3,12 @@
 namespace App\Console\Commands;
 
 use App\Actions\StoreOptimizedImage;
+use App\Models\Category;
+use App\Models\Package;
+use App\Models\Payment;
 use App\Models\PortfolioItem;
 use App\Models\Post;
+use App\Models\ReviewPhoto;
 use App\Models\Vendor;
 use App\Models\WeddingSite;
 use App\Models\WeddingSitePhoto;
@@ -27,11 +31,16 @@ class OptimizeImages extends Command
      */
     private const COLUMNS = [
         [Vendor::class, 'cover_image', false],
+        [Vendor::class, 'logo', false],
         [PortfolioItem::class, 'path', false],
         [WeddingSite::class, 'cover_image', false],
         [WeddingSite::class, 'gift_qr_image', true],
         [WeddingSitePhoto::class, 'path', false],
         [Post::class, 'cover_image', false],
+        [Category::class, 'image', false],
+        [Package::class, 'image', false],
+        [ReviewPhoto::class, 'path', false],
+        [Payment::class, 'receipt_image', false],
     ];
 
     /**

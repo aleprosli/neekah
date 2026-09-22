@@ -32,11 +32,15 @@ class Setting extends Model
     /**
      * Every stored setting, read once and cached until the next save.
      *
+     * Through memo(), so the twenty-odd callers in a single page render cost
+     * one read of the underlying store rather than twenty. On the database
+     * store each of those was a separate round trip to MySQL.
+     *
      * @return array<string, mixed>
      */
     public static function values(): array
     {
-        return Cache::rememberForever(self::CACHE_KEY, fn (): array => static::query()->pluck('value', 'key')->all());
+        return Cache::memo()->rememberForever(self::CACHE_KEY, fn (): array => static::query()->pluck('value', 'key')->all());
     }
 
     /**
@@ -48,6 +52,8 @@ class Setting extends Model
             static::query()->updateOrCreate(['key' => $key], ['value' => $value]);
         }
 
-        Cache::forget(self::CACHE_KEY);
+        // Through memo() as well, so the value this request already read is
+        // dropped along with the one in the underlying store.
+        Cache::memo()->forget(self::CACHE_KEY);
     }
 }

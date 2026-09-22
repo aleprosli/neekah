@@ -149,7 +149,7 @@ it('keeps a lossless image as png so a qr code still scans', function () {
     expect(getimagesizefromstring(Storage::disk('public')->get($path))['mime'])->toBe('image/png');
 });
 
-it('shows listing thumbnails, and the full image for uploads that have none yet', function () {
+it('shows listing thumbnails without asking the disk whether each one is there', function () {
     Storage::fake('public');
     $disk = Storage::disk('public');
     $disk->put('vendors/1/baru.webp', 'x');
@@ -157,10 +157,15 @@ it('shows listing thumbnails, and the full image for uploads that have none yet'
     Vendor::factory()->for(Category::first())->create(['cover_image' => 'vendors/1/baru.webp']);
     Vendor::factory()->for(Category::first())->create(['cover_image' => 'vendors/2/lama.jpg']);
 
+    // The thumbnail path is derived, never looked up. On an object store the
+    // lookup this replaces was an HTTPS round trip for every image on the page,
+    // and the listing draws dozens. neekah:optimize-images is what guarantees
+    // the file is there; see StoreOptimizedImage::thumbnailUrl.
     $this->get(route('vendors.index'))
         ->assertOk()
         ->assertSee($disk->url('vendors/1/baru-thumb.webp'))
-        ->assertSee($disk->url('vendors/2/lama.jpg'));
+        ->assertSee($disk->url('vendors/2/lama-thumb.jpg'))
+        ->assertDontSee($disk->url('vendors/2/lama.jpg'));
 });
 
 it('optimises images uploaded before optimisation existed, and only once', function () {
