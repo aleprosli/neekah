@@ -14,9 +14,10 @@ it('fills each tile with the photo, on a tile tall enough for a portrait', funct
     // landscape box, so the photo was letterboxed over a blurred copy of itself,
     // which the owner read as a broken image (Sep 2026). The tile is tall now
     // and the photo covers it; the lightbox is where a photo is seen whole.
-    $grid = Str::between($component, '<div class="grid h-[26rem]', '</div>');
+    // The first tile only; the lightbox further down still shows a photo whole.
+    $tile = Str::before(Str::after($component, '<div class="grid h-[26rem]'), '</button>');
 
-    expect($grid)
+    expect($tile)
         ->toContain('object-cover')
         ->not->toContain('object-contain')
         ->not->toContain('blur-xl');
@@ -28,10 +29,11 @@ it('fills each tile with the photo, on a tile tall enough for a portrait', funct
 
 it('lets a screen reader hear the photo once, not twice', function () {
     $component = file_get_contents(resource_path('js/components/public/PortfolioGallery.vue'));
-    $grid = Str::between($component, '<div class="grid h-[26rem]', '</button>');
+    // The first tile only: Str::between would run to the lightbox's last button.
+    $tile = Str::before(Str::after($component, '<div class="grid h-[26rem]'), '</button>');
 
     // One image per tile, with the caption as its alt text: no backdrop copy
     // that would have to be hidden from a screen reader.
-    expect(substr_count($grid, '<img'))->toBe(1)
-        ->and($grid)->toContain(':alt="photo.caption || vendorName"');
+    expect(substr_count($tile, '<img'))->toBe(1)
+        ->and($tile)->toContain(':alt="photo.caption || vendorName"');
 });
