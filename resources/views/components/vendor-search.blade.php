@@ -20,11 +20,11 @@
     <x-site.ornament name="corner-peony" class="absolute -top-12 -right-20 size-[18rem] rotate-90 opacity-40 sm:size-[26rem]" color="var(--color-gold-300)" color2="var(--color-brand-100)" />
     <x-site.ornament name="particles" class="absolute inset-0 opacity-30" color="var(--color-gold-400)" />
 
-    <div class="relative mx-auto flex max-w-[1760px] flex-col gap-5 px-4 sm:px-6 md:items-center md:gap-7 md:text-center lg:px-10">
+    <div class="relative mx-auto flex max-w-[1760px] flex-col items-center gap-5 px-4 text-center sm:px-6 md:gap-7 lg:px-10">
         <div class="max-w-2xl">
             <p class="font-script text-2xl text-brand-600 sm:text-3xl">{{ __('pages.landing.script_eyebrow') }}</p>
             <h1 class="mt-1 font-display text-2xl font-semibold tracking-tight sm:text-3xl md:text-4xl">{{ __('marketplace.heading') }}</h1>
-            <x-site.ornament name="divider-floral" class="mt-3 h-5 w-36 md:mx-auto" color="var(--color-gold-500)" color2="var(--color-gold-300)" />
+            <x-site.ornament name="divider-floral" class="mt-3 mx-auto h-5 w-36" color="var(--color-gold-500)" color2="var(--color-gold-300)" />
             <p class="mt-3 text-sm text-ink-muted sm:text-base">{{ __('marketplace.subheading') }}</p>
         </div>
 

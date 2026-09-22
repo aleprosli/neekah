@@ -3,7 +3,7 @@
 return [
 
     'heading' => 'Find your wedding vendors',
-    'subheading' => 'Verified vendors, clear prices, and everything you need in one place.',
+    'subheading' => 'Verified vendors, clear prices, and you deal with them direct.',
 
     'search' => [
         'label' => 'Search',

@@ -3,7 +3,7 @@
 return [
 
     'heading' => 'Cari vendor majlis anda',
-    'subheading' => 'Vendor disahkan, harga jelas, booking dan bayaran selamat melalui Neekah.',
+    'subheading' => 'Vendor disahkan, harga jelas, dan anda berurusan terus dengan vendor pilihan anda.',
 
     'search' => [
         'label' => 'Cari',
