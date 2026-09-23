@@ -126,7 +126,7 @@ return [
         'verified' => 'Verified',
         'trusted' => 'Trusted',
         'top' => 'Top',
-        'recommended' => 'Recommended',
+        'recommended' => 'Elite',
     ],
 
     'violation_action' => [

@@ -66,7 +66,7 @@
 
                 {{-- Vendor identity --}}
                 <div class="flex items-center gap-4 py-6">
-                    <x-vendor-avatar :vendor="$vendor" class="size-12 text-lg" />
+                    <x-vendor-ranked-avatar :vendor="$vendor" />
                     <div class="min-w-0">
                         <p class="font-semibold">{{ __('pages.profile.run_by', ['name' => $vendor->name]) }}</p>
                         <p class="text-sm text-ink-muted">@if ($vendor->tier === VendorTier::Recommended)🏆 @endif{{ $vendor->tier->label() }} Vendor · Response rate {{ $vendor->responseRateLabel() }}</p>

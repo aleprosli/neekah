@@ -455,7 +455,7 @@ return [
         'majlis_selesai_count' => ':count majlis selesai',
         'perlu_enquiry_untuk_diukur' => 'Perlu sekurang-kurangnya :count enquiry untuk diukur',
         'enquiry_yang_anda_balas' => 'Enquiry yang anda balas',
-        'recommended_needs_clean' => 'Recommended Vendor juga memerlukan rekod bersih tanpa pelanggaran disahkan dalam tempoh 6 bulan.',
+        'recommended_needs_clean' => 'Elite Vendor juga memerlukan rekod bersih tanpa pelanggaran disahkan dalam tempoh 6 bulan.',
         'belum_cukup_review_untuk_menunjukkan' => 'Belum cukup review untuk menunjukkan aliran.',
         'pendapatan_mengikut_bulan' => 'Pendapatan mengikut bulan',
         'majlis_selesai' => 'Majlis selesai',

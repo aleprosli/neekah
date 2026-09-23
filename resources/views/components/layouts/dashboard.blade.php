@@ -64,6 +64,12 @@
                     </div>
                 @endif
 
+                @isset($sidebar)
+                    <div class="relative shrink-0">
+                        {{ $sidebar }}
+                    </div>
+                @endisset
+
                 <nav class="no-scrollbar relative flex-1 overflow-y-auto px-4 pt-4 pb-6">
                     @foreach ($nav as $group)
                         <div @class(['mt-5' => ! $loop->first])>

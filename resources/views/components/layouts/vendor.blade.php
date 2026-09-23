@@ -31,6 +31,12 @@
 @endphp
 
 <x-layouts.dashboard :title="$title" :nav="$nav" :context="$context" :heading="$heading" :subheading="$subheading">
+    @if ($vendor)
+        <x-slot:sidebar>
+            <x-vendor-ranking-sidebar :vendor="$vendor" />
+        </x-slot:sidebar>
+    @endif
+
     @isset($actions)
         <x-slot:actions>{{ $actions }}</x-slot:actions>
     @endisset

@@ -455,7 +455,7 @@ return [
         'majlis_selesai_count' => ':count weddings completed',
         'perlu_enquiry_untuk_diukur' => 'Needs at least :count enquiries before it can be measured',
         'enquiry_yang_anda_balas' => 'Enquiries you replied to',
-        'recommended_needs_clean' => 'Recommended Vendor also needs a clean record: no upheld violation in the last 6 months.',
+        'recommended_needs_clean' => 'Elite Vendor also needs a clean record: no upheld violation in the last 6 months.',
         'belum_cukup_review_untuk_menunjukkan' => 'Not enough reviews to show a trend yet.',
         'pendapatan_mengikut_bulan' => 'Earnings by month',
         'majlis_selesai' => 'Weddings completed',

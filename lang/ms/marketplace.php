@@ -53,7 +53,7 @@ return [
     'demo' => 'Data demo',
 
     'card' => [
-        'recommended' => 'Disyorkan',
+        'recommended' => 'Elite',
         'top' => 'Vendor terbaik',
         'new' => 'Baru',
         'from' => 'Dari',

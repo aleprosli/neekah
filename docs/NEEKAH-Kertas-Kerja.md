@@ -33,7 +33,7 @@
 15. Vendor Policy
 16. Vendor Point System
 17. Vendor Ranking
-18. Recommended Vendor Algorithm
+18. Elite Vendor Algorithm
 19. Vendor Violation System
 
 **Bahagian D — Operasi & Perniagaan**
@@ -346,9 +346,9 @@ Platform mempunyai **Vendor Performance Point**.
 | **VERIFIED VENDOR** | Vendor telah disahkan oleh platform. |
 | **TRUSTED VENDOR** | Mempunyai rekod transaksi dan review yang baik. |
 | **TOP VENDOR** | Mempunyai prestasi tinggi. |
-| 🏆 **RECOMMENDED VENDOR** | Rating tinggi, banyak completed bookings, completion rate tinggi, response rate tinggi, rekod payment platform baik, tiada pelanggaran serius. |
+| 🏆 **ELITE VENDOR** | Rating tinggi, banyak completed bookings, completion rate tinggi, response rate tinggi, rekod payment platform baik, tiada pelanggaran serius. |
 
-## 18. Recommended Vendor Algorithm
+## 18. Elite Vendor Algorithm
 
 Ranking **tidak bergantung kepada rating sahaja**.
 
@@ -484,7 +484,7 @@ Tidak dicadangkan membina semua feature sekaligus.
 - Vendor comparison
 - Notifications
 - Vendor point system
-- Recommended Vendor
+- Elite Vendor
 
 ### Phase 3 — Ekosistem
 

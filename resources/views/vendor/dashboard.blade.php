@@ -6,6 +6,8 @@
         <a href="{{ route('vendor.bookings.create') }}" class="rounded-full bg-brand-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-700">+ {{ __('pages.dash.rekod_booking') }}</a>
     </x-slot:actions>
 
+    <x-vendor-ranking :vendor="$vendor" />
+
     {{-- resources/js/components/vendor/VendorOnboarding.vue --}}
     <div
         class="mb-8"

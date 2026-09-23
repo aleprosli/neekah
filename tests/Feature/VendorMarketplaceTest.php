@@ -295,6 +295,22 @@ it('draws the category illustration on each vendor card', function () {
         ->assertDontSee($this->catering->icon, escape: false);
 });
 
+it('shows every vendor rank on the top left of its profile card', function () {
+    foreach (VendorTier::cases() as $tier) {
+        Vendor::factory()->for($this->photography)->tier($tier)->create([
+            'name' => $tier->label().' Studio',
+        ]);
+    }
+
+    $response = $this->get(route('vendors.index'))->assertOk();
+
+    foreach (VendorTier::cases() as $tier) {
+        $response->assertSee('data-vendor-tier="'.$tier->value.'"', false)
+            ->assertSee($tier->label().' Studio');
+    }
+
+});
+
 it('falls back to the category emoji when no illustration exists', function () {
     Category::where('slug', 'photography')->update(['slug' => 'sewa-kereta', 'icon' => '🚗']);
 

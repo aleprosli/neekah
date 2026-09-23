@@ -1,6 +1,6 @@
 @props(['vendor', 'comparable' => false])
 
-@php use App\Actions\StoreOptimizedImage; use App\Enums\VendorTier; @endphp
+@php use App\Actions\StoreOptimizedImage; @endphp
 
 <div class="group relative flex flex-col gap-1">
     <a href="{{ route('vendors.show', $vendor) }}" class="flex flex-col gap-1">
@@ -8,11 +8,7 @@
             @if ($vendor->cover_image)
                 <img src="{{ StoreOptimizedImage::thumbnailUrl($vendor->cover_image) }}" alt="{{ $vendor->category->name }} {{ $vendor->name }}" loading="lazy" decoding="async" class="absolute inset-0 size-full object-cover">
             @endif
-            @if ($vendor->tier === VendorTier::Recommended)
-                <span class="absolute top-3 left-3 rounded-full bg-gold-300 px-2.5 py-1 text-xs font-semibold text-brand-900 shadow-sm">🏆 {{ __('marketplace.card.recommended') }}</span>
-            @elseif ($vendor->tier === VendorTier::Top)
-                <span class="absolute top-3 left-3 rounded-full bg-white/95 px-2.5 py-1 text-xs font-semibold text-ink shadow-sm">{{ __('marketplace.card.top') }}</span>
-            @endif
+            <x-vendor-tier-badge :tier="$vendor->tier" class="absolute top-3 left-3" />
             <span class="absolute inset-x-0 bottom-0 h-1/3 bg-linear-to-t from-black/35 to-transparent"></span>
             <span class="absolute bottom-3 left-3 flex size-10 items-center justify-center rounded-full bg-white text-xl shadow-sm" aria-hidden="true"><x-category-icon class="size-6" :category="$vendor->category" /></span>
         </div>

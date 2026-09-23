@@ -38,6 +38,39 @@ it('walks a new vendor through what is missing and what each photo is for', func
         });
 });
 
+it('shows the vendor rank and points before onboarding', function () {
+    $vendor = Vendor::factory()->for(Category::first())->create([
+        'tier' => VendorTier::Top,
+        'points_total' => 342,
+    ]);
+
+    $this->actingAs($vendor->user)
+        ->get(route('vendor.dashboard'))
+        ->assertOk()
+        ->assertSeeInOrder(['data-vendor-ranking-sidebar', __('pages.sidebar_vendor.ringkasan')], false)
+        ->assertSeeInOrder(['data-vendor-ranking', 'data-vue="vendor-onboarding"'], false)
+        ->assertSee('data-vendor-rank-track', false)
+        ->assertSee('data-current-vendor-rank', false)
+        ->assertSee('Rank 4 · Top')
+        ->assertSee('342')
+        ->assertSee('img/vendor-ranks/new.png', false)
+        ->assertSee('img/vendor-ranks/verified.png', false)
+        ->assertSee('img/vendor-ranks/trusted.png', false)
+        ->assertSee('img/vendor-ranks/top.png', false)
+        ->assertSee('img/vendor-ranks/elite.png', false)
+        ->assertSee('Elite');
+
+    foreach (['new', 'verified', 'trusted', 'top', 'elite'] as $rank) {
+        $path = public_path('img/vendor-ranks/'.$rank.'.png');
+        $contents = file_get_contents($path);
+        $hasTransparency = in_array(ord($contents[25]), [4, 6], true) || str_contains($contents, 'tRNS');
+
+        expect(file_exists($path))->toBeTrue()
+            ->and(getimagesize($path)['mime'])->toBe('image/png')
+            ->and($hasTransparency)->toBeTrue();
+    }
+});
+
 it('registers a vendor as pending and logs the owner in', function () {
     $category = Category::first();
 

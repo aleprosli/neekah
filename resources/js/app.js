@@ -167,6 +167,25 @@ window.addEventListener('resize', updateScrollers);
 window.addEventListener('load', updateScrollers);
 window.addEventListener('neekah:navigated', updateScrollers);
 
+const centerCurrentVendorRank = () => {
+    if (!window.matchMedia('(max-width: 639px)').matches) {
+        return;
+    }
+
+    document.querySelectorAll('[data-vendor-rank-track]').forEach((track) => {
+        const currentRank = track.querySelector('[data-current-vendor-rank]');
+        if (!currentRank) {
+            return;
+        }
+
+        track.scrollLeft = currentRank.offsetLeft - (track.clientWidth - currentRank.offsetWidth) / 2;
+    });
+};
+
+centerCurrentVendorRank();
+window.addEventListener('load', centerCurrentVendorRank);
+window.addEventListener('neekah:navigated', centerCurrentVendorRank);
+
 document.addEventListener(
     'scroll',
     (event) => {

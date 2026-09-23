@@ -237,7 +237,7 @@
                     <p class="text-brand-100">{{ __('pages.landing.tiada_komisen_tiada_yuran_lengkapkan') }}</p>
 
                     <ul class="mt-2 flex flex-wrap items-center gap-2 text-sm">
-                        @foreach (['New', 'Verified', 'Trusted', 'Top', 'Recommended'] as $tier)
+                        @foreach (['New', 'Verified', 'Trusted', 'Top', 'Elite'] as $tier)
                             <li class="rounded-full border border-gold-400/50 bg-brand-800 px-3 py-1 font-medium">{{ $tier }}</li>
                             @unless ($loop->last)
                                 <li class="text-gold-400" aria-hidden="true">→</li>

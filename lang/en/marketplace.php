@@ -51,7 +51,7 @@ return [
     'demo' => 'Demo data',
 
     'card' => [
-        'recommended' => 'Recommended',
+        'recommended' => 'Elite',
         'top' => 'Top vendor',
         'new' => 'New',
         'from' => 'From',
