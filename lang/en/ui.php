@@ -177,6 +177,35 @@ return [
         'simpan' => 'Save',
     ],
 
+    'countdown' => [
+        'menuju_hari_bahagia' => 'Counting down to the big day',
+        'hari_ini' => 'Today is your big day!',
+        'hari' => 'Days',
+        'jam' => 'Hours',
+        'minit' => 'Mins',
+        'saat' => 'Secs',
+    ],
+
+    'playlist' => [
+        'tambah_lagu' => 'Add a song',
+        'momen' => 'Moment',
+        'tajuk_lagu' => 'Song title',
+        'contoh_tajuk' => 'e.g. Menamakanmu',
+        'artis' => 'Artist',
+        'nota' => 'Notes',
+        'contoh_nota' => 'e.g. start from the chorus',
+        'tambah' => 'Add',
+        'belum_ada_lagu' => 'No songs for this moment yet.',
+        'padam_lagu_ini' => 'Delete this song?',
+        'padam' => 'Delete',
+        'cadangan_lagu' => 'Song ideas',
+        'cadangan_hint' => 'Songs couples often choose. Tap one to fill in the form above, then pick its moment.',
+        'cari_lagu' => 'Search a song or artist',
+        'pilih' => 'Use',
+        'tiada_padanan' => 'No matching songs.',
+        'intro' => 'Line up a song for each moment of the day, then share the list with your emcee or DJ.',
+    ],
+
     'timeline' => [
         'contoh_akad_nikah' => 'For example: Akad Nikah',
         'rumah_pengantin_dewan' => 'Bride\'s house / hall',

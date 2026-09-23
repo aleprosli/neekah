@@ -67,6 +67,8 @@ return [
         'timeline_added' => 'Aktiviti ditambah ke timeline.',
         'timeline_updated' => 'Aktiviti dikemas kini.',
         'timeline_deleted' => 'Aktiviti dipadam.',
+        'song_added' => 'Lagu ditambah ke playlist.',
+        'song_deleted' => 'Lagu dipadam dari playlist.',
         'guest_added' => 'Tetamu ditambah ke senarai.',
         'guest_updated' => 'Maklumat tetamu dikemas kini.',
         'guest_deleted' => 'Tetamu dipadam dari senarai.',

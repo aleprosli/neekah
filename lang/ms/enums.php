@@ -151,6 +151,16 @@ return [
         'other' => 'Lain-lain',
     ],
 
+    'song_moment' => [
+        'akad' => 'Akad Nikah',
+        'entrance' => 'Entrance Pengantin',
+        'makan_beradab' => 'Makan Beradab',
+        'potong_kek' => 'Potong Kek',
+        'first_walk' => 'First Walk',
+        'latar' => 'Lagu Latar Majlis',
+        'ending' => 'Penutup Majlis',
+    ],
+
     'wedding_role' => [
         'owner' => 'Pemilik majlis',
         'partner' => 'Pasangan',

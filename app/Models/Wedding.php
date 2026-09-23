@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Carbon;
 
 #[Fillable(['user_id', 'title', 'event_date', 'city', 'state', 'budget', 'notes'])]
 class Wedding extends Model
@@ -102,6 +103,17 @@ class Wedding extends Model
         return $this->hasOne(WeddingSite::class);
     }
 
+    /**
+     * The moment the day begins, for the countdown: the start time the couple
+     * set on their card when there is one, midnight otherwise.
+     */
+    public function startsAt(): Carbon
+    {
+        $time = $this->site?->starts_at ? Carbon::parse($this->site->starts_at)->format('H:i:s') : '00:00:00';
+
+        return $this->event_date->copy()->setTimeFromTimeString($time);
+    }
+
     public function guests(): HasMany
     {
         return $this->hasMany(WeddingGuest::class)->orderBy('name');
@@ -110,5 +122,10 @@ class Wedding extends Model
     public function timelineItems(): HasMany
     {
         return $this->hasMany(WeddingTimelineItem::class)->orderBy('starts_at');
+    }
+
+    public function songs(): HasMany
+    {
+        return $this->hasMany(WeddingSong::class)->orderBy('id');
     }
 }

@@ -67,6 +67,8 @@ return [
         'timeline_added' => 'The activity has been added to the timeline.',
         'timeline_updated' => 'The activity has been updated.',
         'timeline_deleted' => 'The activity has been deleted.',
+        'song_added' => 'Song added to the playlist.',
+        'song_deleted' => 'Song removed from the playlist.',
         'guest_added' => 'The guest has been added to the list.',
         'guest_updated' => 'The guest details have been updated.',
         'guest_deleted' => 'The guest has been removed from the list.',

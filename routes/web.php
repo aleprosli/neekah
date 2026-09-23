@@ -190,6 +190,10 @@ $site = function (): void {
         Route::put('/weddings/{wedding}/timeline/{item}', [CustomerArea\WeddingTimelineController::class, 'update'])->name('weddings.timeline.update');
         Route::delete('/weddings/{wedding}/timeline/{item}', [CustomerArea\WeddingTimelineController::class, 'destroy'])->name('weddings.timeline.destroy');
 
+        Route::get('/playlist', [CustomerArea\WeddingSongController::class, 'index'])->middleware('wedding')->name('playlist.index');
+        Route::post('/weddings/{wedding}/songs', [CustomerArea\WeddingSongController::class, 'store'])->name('weddings.songs.store');
+        Route::delete('/weddings/{wedding}/songs/{song}', [CustomerArea\WeddingSongController::class, 'destroy'])->name('weddings.songs.destroy');
+
         Route::get('/kad', [CustomerArea\WeddingSiteController::class, 'edit'])->middleware('wedding')->name('site.edit');
         Route::get('/kad/preview', [CustomerArea\WeddingSiteController::class, 'preview'])->middleware('wedding')->name('site.preview');
         Route::get('/kad/alamat', [CustomerArea\WeddingSiteController::class, 'checkSubdomain'])->middleware(['wedding', 'throttle:60,1'])->name('site.subdomain');

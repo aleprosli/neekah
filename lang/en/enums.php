@@ -151,6 +151,16 @@ return [
         'other' => 'Other',
     ],
 
+    'song_moment' => [
+        'akad' => 'Akad Nikah',
+        'entrance' => 'Couple\'s Entrance',
+        'makan_beradab' => 'Makan Beradab',
+        'potong_kek' => 'Cake Cutting',
+        'first_walk' => 'First Walk',
+        'latar' => 'Background Music',
+        'ending' => 'Closing',
+    ],
+
     'wedding_role' => [
         'owner' => 'Wedding owner',
         'partner' => 'Partner',

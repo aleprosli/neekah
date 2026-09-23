@@ -1,5 +1,12 @@
 <x-layouts.customer :title="__('pages.dash.majlis_saya')" :heading="$wedding?->title ?? __('pages.dash.majlis_saya')" :subheading="$wedding ? $wedding->event_date->translatedFormat('l, j F Y').' · '.$wedding->city.', '.$wedding->state : __('pages.dash.cipta_wedding_project_sub')">
     <x-slot:actions>
+        @if ($wedding && ! $wedding->event_date->isPast())
+            {{-- resources/js/components/customer/WeddingCountdown.vue; the day count is what shows before it mounts. --}}
+            <div class="w-full" data-vue="wedding-countdown" data-props="@vueProps(['target' => $wedding->startsAt()->toIso8601String()])">
+                <p class="rounded-2xl border border-gold-300/70 bg-surface-raised px-5 py-3 text-center font-display text-xl font-semibold text-brand-700">{{ __('pages.sidebar_couple.hari_lagi', ['count' => (int) today()->diffInDays($wedding->event_date)]) }}</p>
+            </div>
+        @endif
+
         {{-- On a phone the buttons get a fixed shape instead of wrapping
              wherever they land: the digital card on a row of its own, first,
              and the rest in two even columns. From sm up it is one row. --}}

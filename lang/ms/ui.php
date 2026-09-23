@@ -177,6 +177,35 @@ return [
         'simpan' => 'Simpan',
     ],
 
+    'countdown' => [
+        'menuju_hari_bahagia' => 'Menuju hari bahagia',
+        'hari_ini' => 'Hari ini hari bahagia anda!',
+        'hari' => 'Hari',
+        'jam' => 'Jam',
+        'minit' => 'Minit',
+        'saat' => 'Saat',
+    ],
+
+    'playlist' => [
+        'tambah_lagu' => 'Tambah lagu',
+        'momen' => 'Momen',
+        'tajuk_lagu' => 'Tajuk lagu',
+        'contoh_tajuk' => 'Contoh: Menamakanmu',
+        'artis' => 'Artis',
+        'nota' => 'Nota',
+        'contoh_nota' => 'Contoh: mula dari korus',
+        'tambah' => 'Tambah',
+        'belum_ada_lagu' => 'Belum ada lagu untuk momen ini.',
+        'padam_lagu_ini' => 'Padam lagu ini?',
+        'padam' => 'Padam',
+        'cadangan_lagu' => 'Cadangan lagu',
+        'cadangan_hint' => 'Lagu yang selalu dipilih pasangan. Tekan satu untuk isi borang di atas, kemudian pilih momennya.',
+        'cari_lagu' => 'Cari lagu atau artis',
+        'pilih' => 'Pilih',
+        'tiada_padanan' => 'Tiada lagu yang sepadan.',
+        'intro' => 'Susun lagu untuk setiap momen majlis, kemudian kongsi senarai ini dengan emcee atau DJ anda.',
+    ],
+
     'timeline' => [
         'contoh_akad_nikah' => 'Contoh: Akad Nikah',
         'rumah_pengantin_dewan' => 'Rumah pengantin / dewan',

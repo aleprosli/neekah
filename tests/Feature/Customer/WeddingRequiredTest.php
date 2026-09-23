@@ -10,7 +10,7 @@ beforeEach(function () {
     $this->seed(SiteTemplateSeeder::class);
 });
 
-$planningTools = ['checklist.index', 'guests.index', 'timeline.index', 'budget.index', 'site.edit', 'site.preview', 'site.subdomain'];
+$planningTools = ['checklist.index', 'guests.index', 'timeline.index', 'playlist.index', 'budget.index', 'site.edit', 'site.preview', 'site.subdomain'];
 
 it('sends a couple without a wedding to the create form instead of a 404', function (string $name) {
     $this->actingAs(User::factory()->create())

@@ -16,6 +16,7 @@
             $item(__('pages.sidebar_couple.checklist'), 'check', 'checklist.index', 'checklist.*', $outstandingTasks),
             $item(__('pages.sidebar_couple.timeline'), 'calendar', 'timeline.index', 'timeline.*'),
             $item(__('pages.sidebar_couple.bajet'), 'wallet', 'budget.index', 'budget.*'),
+            $item(__('pages.sidebar_couple.playlist'), 'music', 'playlist.index', 'playlist.*'),
         ]],
         ['label' => __('pages.sidebar_couple.tetamu'), 'items' => [
             $item(__('pages.sidebar_couple.senarai_tetamu'), 'users', 'guests.index', 'guests.*'),
@@ -39,6 +40,8 @@
                 default => __('pages.sidebar_couple.selamat_pengantin_baru'),
             },
             'wedding' => true,
+            // Only while there is something to count down to.
+            'countdown' => $daysLeft >= 0 ? $wedding->startsAt()->toIso8601String() : null,
         ]
         : ['title' => __('pages.sidebar_couple.perancang_majlis'), 'detail' => __('pages.sidebar_couple.cipta_majlis_anda_untuk'), 'wedding' => true];
 @endphp
