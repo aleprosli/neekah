@@ -12,7 +12,7 @@
  * The card opens from a sealed cover. That is the Malay card it is imitating: you
  * are handed something closed and you open it.
  */
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
+import { computed, defineAsyncComponent, onBeforeUnmount, onMounted, ref } from 'vue';
 import CardClosing from './CardClosing.vue';
 import CardContacts from './CardContacts.vue';
 import CardCountdown from './CardCountdown.vue';
@@ -23,6 +23,8 @@ import CardLocation from './CardLocation.vue';
 import CardRsvp from './CardRsvp.vue';
 import CardScene from './CardScene.vue';
 import CardWishes from './CardWishes.vue';
+
+const CardMotionView = defineAsyncComponent(() => import('./CardMotionView.vue'));
 
 const props = defineProps({
     canvases: { type: Array, default: () => [] },
@@ -35,6 +37,7 @@ const props = defineProps({
     guest: { type: Object, default: null },
     labels: { type: Object, default: () => ({}) },
     preview: { type: Boolean, default: false },
+    experience: { type: String, default: 'scroll' },
     /** A cover-only tile in the gallery: no gate, no music, no sections. */
     thumbnail: { type: Boolean, default: false },
     csrf: { type: String, default: null },
@@ -57,7 +60,10 @@ const playing = ref(false);
 const audio = ref(null);
 const column = ref(null);
 
-const gated = computed(() => sealed.value);
+const motion = computed(() => props.experience === 'motion' && !props.thumbnail);
+const gated = computed(() => !motion.value && sealed.value);
+const widgetBackground = computed(() => props.canvases
+    .find((scene) => scene.key === 'event')?.layers.find((layer) => layer.widgetBackground)?.src ?? null);
 
 /**
  * What each section is handed. Only the RSVP form posts anything, so only it is
@@ -105,7 +111,7 @@ const toggleMusic = async () => {
 let observer = null;
 
 onMounted(() => {
-    if (props.thumbnail || !('IntersectionObserver' in window)) return;
+    if (props.thumbnail || motion.value || !('IntersectionObserver' in window)) return;
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
     observer = new IntersectionObserver(
@@ -128,8 +134,36 @@ onBeforeUnmount(() => observer?.disconnect());
 </script>
 
 <template>
-    <div class="nkc" :class="{ 'nkc-is-preview': preview, 'nkc-is-thumb': thumbnail, 'nkc-is-gated': gated }" :style="vars">
-        <div ref="column" class="nkc-column">
+    <div class="nkc" :class="{ 'nkc-is-preview': preview, 'nkc-is-thumb': thumbnail, 'nkc-is-gated': gated, 'nkc-is-motion': motion, 'nkc-has-widget-artwork': widgetBackground }" :style="{ ...vars, '--nkc-widget-artwork': widgetBackground ? `url('${widgetBackground}')` : undefined }">
+        <CardMotionView
+            v-if="motion"
+            :canvases="canvases"
+            :widgets="widgets"
+            :content="content"
+            :photos="photos"
+            :gate="gate"
+            :labels="labels"
+            :preview="preview"
+            :auto-open="!music"
+            :csrf="csrf"
+            @opened="openCard"
+        >
+            <template #music>
+                <button
+                    v-if="music"
+                    type="button"
+                    class="nkc-motion-music"
+                    :aria-label="playing ? labels.music_off : labels.music_on"
+                    @click="toggleMusic()"
+                >
+                    <svg v-if="!playing" class="nkc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 18V6l10-2v12" /><circle cx="6" cy="18" r="3" /><circle cx="16" cy="16" r="3" />
+                    </svg>
+                    <span v-else class="nkc-bars" aria-hidden="true"><i /><i /><i /></span>
+                </button>
+            </template>
+        </CardMotionView>
+        <div v-else ref="column" class="nkc-column">
             <CardScene
                 v-for="(scene, index) in canvases"
                 :key="scene.key"
@@ -167,7 +201,7 @@ onBeforeUnmount(() => observer?.disconnect());
 
         <template v-if="music && !thumbnail">
             <audio ref="audio" :src="music.url" loop preload="none" />
-            <div class="nkc-music-wrap">
+            <div v-if="!motion" class="nkc-music-wrap">
                 <button
                     type="button"
                     class="nkc-music"

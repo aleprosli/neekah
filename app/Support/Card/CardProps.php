@@ -28,6 +28,7 @@ class CardProps
 
         return [
             'preview' => $preview,
+            'experience' => $template->experience === 'motion' ? 'motion' : 'scroll',
             'canvases' => $template->canvases(),
             'widgets' => CardWidgetData::forSite($site, $preview, $guest),
             'content' => self::content($site, $guest),
@@ -35,7 +36,7 @@ class CardProps
             'palette' => $palette,
             'fonts' => $fonts,
             'vars' => self::cssVariables($palette, $fonts),
-            'music' => self::music($site),
+            'music' => self::music($site, $template),
             'gate' => [
                 // The card opens from a sealed cover, unless we are showing it inside
                 // the editor, where a gate would hide the thing being edited.
@@ -43,6 +44,12 @@ class CardProps
                 'label' => __('card.open'),
                 'names' => $site->shortName('groom').' & '.$site->shortName('bride'),
                 'initials' => $site->initials(),
+                'seal' => match ($template->slug) {
+                    'taman-bulan', 'melur-purnama', 'taman-zaitun', 'gerbang-wisteria' => '/img/layers/taman-bulan-wax-seal.webp',
+                    'lili-kasih', 'kasih-sutera', 'mihrab-kasih' => '/img/layers/lili-wax-seal.webp',
+                    default => null,
+                },
+                'texture' => in_array($template->slug, ['lili-kasih', 'kasih-sutera'], true) ? '/img/layers/lili-gate-paper.webp' : null,
             ],
             'guest' => $guest,
             // A card ships no translation dictionary (see App\Support\Translations),
@@ -133,13 +140,25 @@ class CardProps
     /**
      * @return array{url: string, title: string}|null
      */
-    protected static function music(WeddingSite $site): ?array
+    protected static function music(WeddingSite $site, SiteTemplate $template): ?array
     {
-        if (! $site->music_enabled || ! $site->musicTrack) {
+        if (! $site->music_enabled) {
             return null;
         }
 
-        return ['url' => $site->musicTrack->url(), 'title' => $site->musicTrack->label()];
+        if ($site->musicTrack) {
+            return ['url' => $site->musicTrack->url(), 'title' => $site->musicTrack->label()];
+        }
+
+        if (in_array($template->slug, ['sutera-zaitun', 'taman-bulan', 'melur-purnama', 'taman-zaitun', 'gerbang-wisteria'], true)) {
+            return ['url' => asset('sutera-zaitun-music.mp3'), 'title' => 'Wedding Harp — Francisco Alvear'];
+        }
+
+        if (in_array($template->slug, ['lili-kasih', 'kasih-sutera', 'mihrab-kasih'], true)) {
+            return ['url' => asset('lili-kasih-music.mp3'), 'title' => 'Satu Shaf'];
+        }
+
+        return null;
     }
 
     /**

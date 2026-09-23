@@ -21,7 +21,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 #[Fillable([
     'slug', 'name', 'style', 'category', 'description', 'is_premium',
-    'palette', 'fonts', 'scenes', 'photo_slots', 'sort_order', 'is_active',
+    'palette', 'fonts', 'scenes', 'photo_slots', 'experience', 'sort_order', 'is_active',
 ])]
 class SiteTemplate extends Model
 {
@@ -180,6 +180,7 @@ class SiteTemplate extends Model
             'fonts' => Fonts::roles($definition['fonts']),
             'scenes' => $scenes,
             'photo_slots' => SceneComposer::photoSlots($scenes),
+            'experience' => $definition['experience'] ?? 'scroll',
             'sort_order' => $definition['n'],
             'is_active' => true,
         ];

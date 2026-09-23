@@ -46,7 +46,7 @@ class LayerSchema
             'image' => [
                 'src' => null, 'bind' => null, 'shape' => 'rect', 'radius' => 24,
                 'zoom' => 100, 'fx' => 50, 'fy' => 50, 'fit' => 'cover', 'tile' => 0,
-                'border' => null, 'placeholder' => false,
+                'border' => null, 'placeholder' => false, 'motion' => false, 'widgetBackground' => false, 'widgetForeground' => false, 'widgetAnimation' => false,
             ],
             'ornament' => ['src' => null, 'color' => '#c9a45c', 'color2' => null, 'angle' => 135, 'tile' => 0],
             'shape' => ['fill' => '#ffffff', 'fill2' => null, 'angle' => 160, 'kind' => 'rect', 'radius' => 0, 'border' => null],
@@ -98,6 +98,10 @@ class LayerSchema
             ],
             'image' => [
                 'src' => self::asset($raw['src'] ?? null),
+                'motion' => (bool) ($raw['motion'] ?? false),
+                'widgetBackground' => (bool) ($raw['widgetBackground'] ?? false),
+                'widgetForeground' => (bool) ($raw['widgetForeground'] ?? false),
+                'widgetAnimation' => (bool) ($raw['widgetAnimation'] ?? false),
                 'bind' => is_string($raw['bind'] ?? null) && preg_match('/^[a-z_]+_image$/', $raw['bind']) ? $raw['bind'] : null,
                 'shape' => in_array($raw['shape'] ?? '', self::SHAPES, true) ? $raw['shape'] : 'rect',
                 'radius' => self::num($raw['radius'] ?? 24, 0, 400),
@@ -131,7 +135,7 @@ class LayerSchema
      */
     public static function asset(mixed $src): ?string
     {
-        return is_string($src) && preg_match('#^/img/layers/[a-z0-9_\-]+(/[a-z0-9_\-]+)*\.(svg|png|webp|jpg)$#', $src) ? $src : null;
+        return is_string($src) && preg_match('#^/img/layers/[a-z0-9_\-]+(/[a-z0-9_\-]+)*\.(svg|png|webp|jpg|gif)$#', $src) ? $src : null;
     }
 
     /**

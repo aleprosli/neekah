@@ -5,7 +5,7 @@ return [
     'landing' => [
         'script_eyebrow' => 'Every wedding errand',
         'hero_note' => 'Couples and vendors deal directly. Neekah is free for both.',
-        'covers_caption' => 'Three of fifty invitation designs',
+        'covers_caption' => 'Three of sixty invitation designs',
         'covers_link' => 'See every design',
         'cara_ia_berjalan' => 'How it works',
         'direct_title' => 'Book and pay the vendor directly',
@@ -511,7 +511,7 @@ return [
         'vendor_catalogue' => 'Vendors · without prices they do not show up in search',
         'vendor_response' => 'Vendors · the response rate drives their ranking',
         'feature_launch' => 'Everyone · an outline for you to fill in',
-        'card_designs' => 'Couples · the fifty layered card designs',
+        'card_designs' => 'Couples · the sixty layered card designs',
         'couple_start' => 'Couples · signed up but never started',
         'guest_links' => 'Couples · send the card by each guest\'s own link',
         'maintenance' => 'Everyone · fill in the date and time before sending',

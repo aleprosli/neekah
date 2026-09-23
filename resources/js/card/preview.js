@@ -175,7 +175,7 @@ export const buildPreviewProps = (design, form, extras = {}) => {
         vars: previewVariables(palette, fonts, fontKinds(extras.fontOptions)),
         labels,
         gate: { enabled: false },
-        music: null,
+        music: extras.music ?? null,
         // The headings are the card's own words, the same ones the public card
         // prints — the editor's section list uses longer labels of its own.
         widgets: (form.widgets ?? []).map((key) => ({

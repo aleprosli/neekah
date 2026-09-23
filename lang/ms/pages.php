@@ -5,7 +5,7 @@ return [
     'landing' => [
         'script_eyebrow' => 'Semua urusan majlis',
         'hero_note' => 'Pengantin & vendor berurusan terus. Neekah percuma untuk kedua-duanya.',
-        'covers_caption' => 'Tiga daripada 50 reka bentuk kad jemputan',
+        'covers_caption' => 'Tiga daripada 60 reka bentuk kad jemputan',
         'covers_link' => 'Lihat semua reka bentuk',
         'cara_ia_berjalan' => 'Cara ia berjalan',
         'direct_title' => 'Tempahan dan bayaran terus kepada vendor',
@@ -511,7 +511,7 @@ return [
         'vendor_catalogue' => 'Vendor · tanpa harga, mereka tidak muncul dalam carian',
         'vendor_response' => 'Vendor · kadar respons menentukan kedudukan',
         'feature_launch' => 'Semua · rangka kosong untuk anda isi',
-        'card_designs' => 'Pengantin · 50 reka bentuk kad berlapis',
+        'card_designs' => 'Pengantin · 60 reka bentuk kad berlapis',
         'couple_start' => 'Pengantin · yang mendaftar tetapi belum mula',
         'guest_links' => 'Pengantin · hantar kad ikut pautan setiap tetamu',
         'maintenance' => 'Semua · isi tarikh dan masa sebelum hantar',
