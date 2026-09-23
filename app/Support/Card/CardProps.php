@@ -45,7 +45,7 @@ class CardProps
                 'names' => $site->shortName('groom').' & '.$site->shortName('bride'),
                 'initials' => $site->initials(),
                 'seal' => match ($template->slug) {
-                    'taman-bulan', 'melur-purnama', 'taman-zaitun', 'gerbang-wisteria' => '/img/layers/taman-bulan-wax-seal.webp',
+                    'taman-bulan', 'melur-purnama', 'taman-zaitun', 'gerbang-wisteria', 'taman-embun' => '/img/layers/taman-bulan-wax-seal.webp',
                     'lili-kasih', 'kasih-sutera', 'mihrab-kasih' => '/img/layers/lili-wax-seal.webp',
                     default => null,
                 },
@@ -150,7 +150,7 @@ class CardProps
             return ['url' => $site->musicTrack->url(), 'title' => $site->musicTrack->label()];
         }
 
-        if (in_array($template->slug, ['sutera-zaitun', 'taman-bulan', 'melur-purnama', 'taman-zaitun', 'gerbang-wisteria'], true)) {
+        if (in_array($template->slug, ['sutera-zaitun', 'taman-bulan', 'melur-purnama', 'taman-zaitun', 'gerbang-wisteria', 'taman-embun'], true)) {
             return ['url' => asset('sutera-zaitun-music.mp3'), 'title' => 'Wedding Harp — Francisco Alvear'];
         }
 

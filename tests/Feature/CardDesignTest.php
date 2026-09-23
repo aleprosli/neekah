@@ -201,6 +201,38 @@ it('composes Taman Bulan with a consistent night scene and butterflies ahead of 
     }
 });
 
+it('composes Taman Embun as a layered dawn garden with animated foreground artwork', function () {
+    $design = SiteTemplate::where('slug', 'taman-embun')->sole();
+    $props = CardProps::forSample($design, SampleCard::site($design));
+
+    expect($design->experience)->toBe('motion')
+        ->and($props['music'])->toBe([
+            'url' => asset('sutera-zaitun-music.mp3'),
+            'title' => 'Wedding Harp — Francisco Alvear',
+        ])
+        ->and($props['gate']['seal'])->toBe('/img/layers/taman-bulan-wax-seal.webp');
+
+    foreach ($design->canvases() as $canvas) {
+        $images = collect($canvas['layers'])->where('type', 'image')->values();
+
+        expect($images->first()['src'])->toBe('/img/layers/taman-embun-garden.webp')
+            ->and($images->first()['widgetBackground'])->toBeTrue()
+            ->and($images->get($images->count() - 2)['src'])->toBe('/img/layers/taman-embun-arch.webp')
+            ->and($images->get($images->count() - 2)['motion'])->toBeTrue()
+            ->and($images->get($images->count() - 2)['widgetForeground'])->toBeTrue()
+            ->and($images->last()['src'])->toBe('/img/layers/lili-flying-butterflies.gif')
+            ->and($images->last()['widgetAnimation'])->toBeTrue();
+    }
+
+    foreach (['taman-embun-garden.webp', 'taman-embun-arch.webp'] as $asset) {
+        $path = public_path('img/layers/'.$asset);
+
+        expect(file_exists($path))->toBeTrue()
+            ->and(filesize($path))->toBeLessThan(310_000)
+            ->and(getimagesize($path)['mime'])->toBe('image/webp');
+    }
+});
+
 it('starts the Taman Bulan sample with the bundled instrumental and allows music to be disabled', function () {
     $design = SiteTemplate::where('slug', 'taman-bulan')->sole();
     $sample = SampleCard::site($design);

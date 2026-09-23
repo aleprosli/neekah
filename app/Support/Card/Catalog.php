@@ -92,6 +92,7 @@ class Catalog
         'mihrab-kasih' => 'Ilustrasi pengantin di dalam mihrab gading berukir, dikelilingi bunga ungu dan marun.',
         'taman-zaitun' => 'Kertas sage berdedaun, plak renda zaitun dan jambangan bunga marun di sudut.',
         'gerbang-wisteria' => 'Gerbang melur dan wisteria di atas kertas gading, dengan rama-rama di hadapan.',
+        'taman-embun' => 'Taman subuh berbalam dengan astaka gading, air terjun dan gerbang bunga yang bergerak lembut.',
     ];
 
     /**
@@ -402,6 +403,9 @@ class Catalog
             self::d(69, 'Gerbang Wisteria', 'Floral', 'Romantic', false, 'A jasmine and wisteria gateway on ivory paper, with butterflies in the foreground.',
                 ['#F7F0E3', '#EFE4D3', '#4A3F55', '#3E3358', '#8C6A2F', '#7E6BA3', '#F7F0E3', '#4A3F55', '#3E3358', '#7C7285'], ['Playfair Display', 'Great Vibes', 'Lora', 'Montserrat'],
                 'gerbang_wisteria', 'gerbang_wisteria', 'gerbang_wisteria', 'solid', ['experience' => 'motion']),
+            self::d(70, 'Taman Embun', 'Floral', 'Cinematic', true, 'A pearl-dawn garden with an ivory pavilion, a waterfall and a softly drifting floral arch.',
+                ['#F5EBDD', '#E9DDD2', '#4C3A3C', '#67424D', '#A77B55', '#B89AB0', '#FBF4EA', '#4C3A3C', '#67424D', '#7C6969'], ['Playfair Display', 'Great Vibes', $CG, 'Montserrat'],
+                'taman_embun', 'taman_embun', 'taman_embun', 'solid', ['experience' => 'motion']),
         ];
     }
 }

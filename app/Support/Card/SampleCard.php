@@ -50,7 +50,7 @@ class SampleCard
             ],
             'rsvp_enabled' => true,
             'wishes_enabled' => true,
-            'music_enabled' => in_array($template->slug, ['sutera-zaitun', 'lili-kasih', 'taman-bulan', 'kasih-sutera', 'melur-purnama', 'mihrab-kasih', 'taman-zaitun', 'gerbang-wisteria'], true),
+            'music_enabled' => in_array($template->slug, ['sutera-zaitun', 'lili-kasih', 'taman-bulan', 'kasih-sutera', 'melur-purnama', 'mihrab-kasih', 'taman-zaitun', 'gerbang-wisteria', 'taman-embun'], true),
             'closing_note' => 'Kehadiran dan doa restu daripada tuan/puan amatlah kami hargai.',
         ]);
     }

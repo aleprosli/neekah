@@ -721,4 +721,75 @@ trait Artwork
 
         return $layers;
     }
+
+    /**
+     * @return array<string, mixed>
+     */
+    protected function embunImage(string $asset, string $name, bool $motion = false, bool $widgetBackground = false, bool $widgetForeground = false): array
+    {
+        return $this->L('image', $name, [
+            'src' => '/img/layers/taman-embun-'.$asset.'.webp',
+            'x' => 0, 'y' => 0, 'w' => self::WIDTH, 'h' => self::HEIGHT,
+            'shape' => 'rect', 'fit' => 'cover', 'motion' => $motion,
+            'widgetBackground' => $widgetBackground, 'widgetForeground' => $widgetForeground,
+            'locked' => true, 'editable' => false,
+        ]);
+    }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    protected function cover_taman_embun(): array
+    {
+        $layers = [$this->embunImage('garden', 'Pearl dawn garden', widgetBackground: true)];
+        $layers[] = $this->t('WALIMATUL URUS', 220, 315, 640, 65, ['f' => 'n', 's' => 28, 'c' => 'acc', 'ls' => .32]);
+        $layers[] = $this->t('Di taman sebuah janji', 190, 405, 700, 85, ['f' => 'r', 's' => 42, 'c' => 'ink', 'it' => true]);
+        $layers[] = $this->t('{{groom_short}}', 180, 515, 720, 150, ['f' => 's', 's' => 116, 'c' => 'head']);
+        $layers[] = $this->t('&', 440, 655, 200, 95, ['f' => 'd', 's' => 76, 'c' => 'acc']);
+        $layers[] = $this->t('{{bride_short}}', 180, 745, 720, 150, ['f' => 's', 's' => 116, 'c' => 'head']);
+        $layers[] = $this->rule(420, 945, 240, ['c' => 'acc', 'op' => 75]);
+        $layers[] = $this->t('{{wedding_date}}', 205, 1000, 670, 80, ['f' => 'r', 's' => 42, 'c' => 'ink', 'ls' => .12, 'up' => true]);
+        $layers[] = $this->embunImage('arch', 'Blush floral arch', true, widgetForeground: true);
+        $layers[] = $this->tamanButterflies();
+
+        return $layers;
+    }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    protected function inv_taman_embun(): array
+    {
+        $layers = [$this->embunImage('garden', 'Pearl dawn garden', widgetBackground: true)];
+        $layers[] = $this->t('بِسْمِ ٱللَّٰهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ', 210, 300, 660, 95, ['f' => 'r', 's' => 48, 'c' => 'head']);
+        $layers[] = $this->eyebrow(445, 'acc', 'JEMPUTAN PERKAHWINAN', 220, 640);
+        $layers[] = $this->t('Dengan penuh kesyukuran, kami menjemput', 220, 550, 640, 105, ['f' => 'r', 's' => 36, 'c' => 'ink', 'it' => true, 'lh' => 1.3]);
+        $layers[] = $this->t('{{groom_short}} & {{bride_short}}', 190, 690, 700, 220, ['f' => 's', 's' => 93, 'c' => 'head', 'lh' => 1.08]);
+        $layers[] = $this->rule(420, 950, 240, ['c' => 'acc', 'op' => 75]);
+        $layers[] = $this->t('{{wedding_message}}', 235, 1030, 610, 380, ['f' => 'r', 's' => 34, 'c' => 'ink', 'lh' => 1.4, 'va' => 'top', 'name' => 'Invitation message']);
+        $layers[] = $this->embunImage('arch', 'Blush floral arch', true, widgetForeground: true);
+        $layers[] = $this->tamanButterflies();
+
+        return $layers;
+    }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    protected function evt_taman_embun(): array
+    {
+        $layers = [$this->embunImage('garden', 'Pearl dawn garden', widgetBackground: true)];
+        $layers[] = $this->eyebrow(335, 'acc', 'BUTIRAN MAJLIS', 220, 640);
+        $layers[] = $this->t('Hari Bahagia Kami', 190, 445, 700, 135, ['f' => 'd', 's' => 75, 'c' => 'head']);
+        $layers[] = $this->rule(420, 625, 240, ['c' => 'acc', 'op' => 75]);
+        $layers[] = $this->t('{{date_full}}', 215, 700, 650, 130, ['f' => 'r', 's' => 54, 'c' => 'ink', 'lh' => 1.2]);
+        $layers[] = $this->t('{{time_12}} – {{end_time_12}}', 235, 845, 610, 70, ['f' => 'n', 's' => 31, 'c' => 'acc', 'ls' => .1]);
+        $layers[] = $this->t('{{venue_name}}', 210, 965, 660, 155, ['f' => 'd', 's' => 58, 'c' => 'head', 'lh' => 1.15]);
+        $layers[] = $this->t('{{venue_address}}', 245, 1135, 590, 250, ['f' => 'r', 's' => 33, 'c' => 'ink', 'lh' => 1.35, 'va' => 'top']);
+        $layers[] = $this->t('Kehadiran anda menyempurnakan hari kami', 250, 1435, 580, 100, ['f' => 'r', 's' => 31, 'c' => 'mut', 'it' => true]);
+        $layers[] = $this->embunImage('arch', 'Blush floral arch', true, widgetForeground: true);
+        $layers[] = $this->tamanButterflies();
+
+        return $layers;
+    }
 }
