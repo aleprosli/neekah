@@ -1,4 +1,4 @@
-@props(['vendor', 'comparable' => false])
+@props(['vendor', 'comparable' => false, 'sponsored' => false])
 
 @php use App\Actions\StoreOptimizedImage; use App\Enums\VendorTier; @endphp
 
@@ -17,9 +17,14 @@
             <span class="absolute bottom-3 left-3 flex size-10 items-center justify-center rounded-full bg-white text-xl shadow-sm" aria-hidden="true"><x-category-icon class="size-6" :category="$vendor->category" /></span>
         </div>
 
-        <p class="mt-2 truncate text-[11px] font-semibold tracking-wide text-brand-600 uppercase">{{ $vendor->category->name }} · {{ $vendor->state }}</p>
+        <p class="mt-2 truncate text-[11px] font-semibold tracking-wide text-brand-600 uppercase">@if ($sponsored)<span class="text-ink-muted">{{ __('marketplace.sponsored.label') }} · </span>@endif{{ $vendor->category->name }} · {{ $vendor->state }}</p>
         <div class="flex items-start justify-between gap-2">
-            <h3 class="truncate text-sm font-semibold sm:text-[15px]">{{ $vendor->name }}</h3>
+            <h3 class="flex min-w-0 items-center gap-1.5 text-sm font-semibold sm:text-[15px]">
+                <span class="truncate">{{ $vendor->name }}</span>
+                @if ($vendor->isPro())
+                    <x-vendors.pro-badge />
+                @endif
+            </h3>
             <span class="flex shrink-0 items-center gap-1 text-sm">
                 <svg class="size-3.5 text-gold-500" viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 2.9 6.6 7.1.7-5.3 4.8 1.6 7L12 17.5 5.7 21l1.6-7L2 9.3l7.1-.7Z"/></svg>
                 @if ($vendor->reviews_count)

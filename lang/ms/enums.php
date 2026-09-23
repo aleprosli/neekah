@@ -184,4 +184,15 @@ return [
         'custom' => 'Pilih pengguna satu per satu, atau taip alamat emel sendiri.',
     ],
 
+    'vendor_plan' => [
+        'monthly' => 'Bulanan',
+        'yearly' => 'Tahunan',
+    ],
+
+    'subscription_status' => [
+        'pending' => 'Belum dibayar',
+        'paid' => 'Dibayar',
+        'failed' => 'Gagal',
+    ],
+
 ];

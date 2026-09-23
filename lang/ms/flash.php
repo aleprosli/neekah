@@ -21,6 +21,8 @@ return [
     ],
 
     'admin' => [
+        'pro_activated' => 'Pro untuk :vendor aktif sehingga :date.',
+        'pro_settings_saved' => 'Tetapan Pro disimpan.',
         'card_music_added' => 'Trek muzik ditambah.',
         'card_music_updated' => 'Trek muzik dikemas kini.',
         'card_music_deleted' => 'Trek muzik dibuang.',
@@ -102,6 +104,7 @@ return [
     ],
 
     'vendor' => [
+        'pro_checkout_failed' => 'Pautan bayaran tidak dapat dibuat sekarang. Sila cuba sebentar lagi.',
         'registered' => 'Pendaftaran diterima. Lengkapkan profil anda sementara admin menyemak permohonan.',
         'converted' => 'Akaun anda kini akaun vendor. Lengkapkan profil anda sementara admin menyemak permohonan.',
         'convert_has_activity' => 'Akaun ini sudah ada majlis, tempahan atau enquiry, jadi tidak boleh ditukar sendiri. Sila hubungi admin Neekah.',

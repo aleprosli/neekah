@@ -7,13 +7,16 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\UpdateContactSettingsRequest;
 use App\Http\Requests\UpdateImageSettingsRequest;
 use App\Http\Requests\UpdatePaymentSettingsRequest;
+use App\Http\Requests\UpdateProSettingsRequest;
 use App\Http\Requests\UpdateSeoSettingsRequest;
 use App\Http\Requests\UpdateTelegramSettingsRequest;
 use App\Http\Requests\UpdateTurnstileSettingsRequest;
 use App\Support\ContactSettings;
+use App\Support\Herepay\PaymentLinkGateway;
 use App\Support\ImageSettings;
 use App\Support\Locales;
 use App\Support\PaymentSettings;
+use App\Support\ProSettings;
 use App\Support\Seo;
 use App\Support\SeoSettings;
 use App\Support\TelegramSettings;
@@ -24,7 +27,7 @@ use Illuminate\Http\RedirectResponse;
 
 class SettingController extends Controller
 {
-    public function edit(ContactSettings $contact, SeoSettings $seo, TurnstileSettings $turnstile, TelegramSettings $telegram, ImageSettings $images, PaymentSettings $payments): View
+    public function edit(ContactSettings $contact, SeoSettings $seo, TurnstileSettings $turnstile, TelegramSettings $telegram, ImageSettings $images, PaymentSettings $payments, ProSettings $pro, PaymentLinkGateway $gateway): View
     {
         return view('admin.settings.edit', [
             'props' => VueProps::for([
@@ -34,6 +37,7 @@ class SettingController extends Controller
                     $this->turnstileSection($turnstile->all(), $turnstile->isEnabled()),
                     $this->telegramSection($telegram->all(), $telegram->isEnabled()),
                     $this->paymentSection($payments),
+                    $this->proSection($pro, $gateway),
                     $this->imageSection($images),
                 ],
             ]),
@@ -244,6 +248,41 @@ class SettingController extends Controller
     }
 
     /**
+     * Neekah Pro: the price of each plan and how many sponsored slots sit
+     * above the listing. The badge says whether a vendor can actually pay,
+     * which also needs the Herepay keys in .env.
+     *
+     * @return array<string, mixed>
+     */
+    private function proSection(ProSettings $pro, PaymentLinkGateway $gateway): array
+    {
+        $values = $pro->all();
+        $open = $pro->isEnabled() && $gateway->isConfigured();
+
+        return [
+            'id' => 'pro',
+            'icon' => '⭐',
+            'label' => __('props.admin.pro'),
+            'title' => __('props.admin.pro_title'),
+            'description' => __('props.admin.pro_description'),
+            'action' => route('admin.settings.pro'),
+            'submit' => __('props.admin.pro_submit'),
+            'columns' => true,
+            'badge' => [
+                'active' => $open,
+                'label' => $open ? __('props.admin.pro_checkout_open') : __('props.admin.pro_checkout_closed'),
+            ],
+            'note' => $gateway->isConfigured() ? null : __('props.admin.pro_gateway_missing'),
+            'fields' => [
+                ['name' => 'enabled', 'label' => __('props.admin.pro_enabled'), 'type' => 'checkbox', 'value' => $values['enabled'], 'wide' => true, 'help' => __('props.admin.pro_enabled_help')],
+                ['name' => 'monthly_price', 'label' => __('fields.pro_monthly_price'), 'type' => 'number', 'value' => $values['monthly_price'], 'min' => 1, 'required' => true],
+                ['name' => 'yearly_price', 'label' => __('fields.pro_yearly_price'), 'type' => 'number', 'value' => $values['yearly_price'], 'min' => 1, 'required' => true],
+                ['name' => 'sponsored_slots', 'label' => __('fields.pro_sponsored_slots'), 'type' => 'number', 'value' => $values['sponsored_slots'], 'min' => 0, 'max' => ProSettings::MAX_SPONSORED_SLOTS, 'required' => true, 'help' => __('props.admin.pro_slots_help')],
+            ],
+        ];
+    }
+
+    /**
      * @return array<string, mixed>
      */
     private function imageSection(ImageSettings $images): array
@@ -306,6 +345,13 @@ class SettingController extends Controller
         $payments->save($request->settings());
 
         return $this->saved(__('props.admin.payments_saved'));
+    }
+
+    public function updatePro(UpdateProSettingsRequest $request, ProSettings $pro): RedirectResponse
+    {
+        $pro->save($request->settings());
+
+        return $this->saved(__('flash.admin.pro_settings_saved'));
     }
 
     public function update(UpdateImageSettingsRequest $request, ImageSettings $images): RedirectResponse

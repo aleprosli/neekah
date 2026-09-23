@@ -12,9 +12,9 @@ it('shows every settings section on one page', function () {
         ->assertOk()
         ->viewData('props')['sections'];
 
-    expect(collect($sections)->pluck('id')->all())->toBe(['perhubungan', 'seo', 'keselamatan', 'telegram', 'bayaran', 'gambar'])
+    expect(collect($sections)->pluck('id')->all())->toBe(['perhubungan', 'seo', 'keselamatan', 'telegram', 'bayaran', 'pro', 'gambar'])
         // Each section posts on its own, so saving one cannot disturb another.
-        ->and(collect($sections)->pluck('action')->unique())->toHaveCount(6)
+        ->and(collect($sections)->pluck('action')->unique())->toHaveCount(7)
         // A saved secret is never sent back to the browser.
         ->and(collect(collect($sections)->firstWhere('id', 'keselamatan')['fields'])->firstWhere('name', 'secret_key')['value'])
         ->toBe('');

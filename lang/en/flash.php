@@ -21,6 +21,8 @@ return [
     ],
 
     'admin' => [
+        'pro_activated' => 'Pro for :vendor is active until :date.',
+        'pro_settings_saved' => 'Pro settings saved.',
         'card_music_added' => 'Music track added.',
         'card_music_updated' => 'Music track updated.',
         'card_music_deleted' => 'Music track removed.',
@@ -102,6 +104,7 @@ return [
     ],
 
     'vendor' => [
+        'pro_checkout_failed' => 'We could not create a payment link just now. Please try again shortly.',
         'registered' => 'Your registration has been received. Complete your profile while an admin reviews it.',
         'converted' => 'Your account is now a vendor account. Complete your profile while an admin reviews it.',
         'convert_has_activity' => 'This account already has a wedding, bookings or enquiries, so it cannot be converted on its own. Please contact a Neekah admin.',

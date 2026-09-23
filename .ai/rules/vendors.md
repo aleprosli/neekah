@@ -19,3 +19,6 @@ Vendor social links live in vendors.social_links (JSON) and pass through App\Sup
 Owner, 20 Sep 2026: booking through Neekah is switched off until it is automated. config('neekah.bookings_enabled') (default false, NEEKAH_BOOKINGS_ENABLED) governs it: vendors/show renders the contact card (WhatsApp for signed-in visitors, login prompt otherwise) and an open enquiry form, and Customer\BookingController::store answers 404. Switching it on brings the booking card back — the markup and the flow are still there, and vendors keep recording their own bookings.
 
 The completed-bookings stat ("0 majlis selesai") is gone from the summary line and the highlights, because it reads as a dead marketplace while nothing can be booked. The anchor is #hubungi now, not #tempah; compare.blade.php links to it. Covered by VendorMarketplaceTest, which asserts both states of the flag.
+
+## Vendor contact taps go through counting routes
+The WhatsApp button links to vendors.contact.whatsapp (auth-only, counts whatsapp_clicks, then redirects to Vendor::whatsappUrl), so the page still never contains wa.me. The tel: link keeps its href and carries data-track-phone + data-track-token; resources/js/contact-beacon.js sends a beacon to vendors.contact.phone. Taps and profile views by the vendor themselves, admins and bots are not counted.

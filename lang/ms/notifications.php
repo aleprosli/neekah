@@ -157,4 +157,21 @@ return [
         'expires' => 'Pautan ini sah selama :days hari. Jika anda tidak mengenali jemputan ini, abaikan emel ini.',
     ],
 
+    'pro_activated' => [
+        'title' => 'Neekah Pro aktif',
+        'body' => 'Pro anda aktif sehingga :date.',
+        'subject' => 'Resit Neekah Pro',
+        'thanks' => 'Terima kasih! :vendor kini vendor Pro di Neekah.',
+        'receipt' => 'Rujukan :reference · Pelan :plan · RM:amount',
+        'until' => 'Pro anda aktif sehingga :date.',
+    ],
+
+    'pro_expiring' => [
+        'title' => 'Neekah Pro tamat dalam :days hari',
+        'body' => 'Pro anda akan tamat pada :date.',
+        'subject' => '{1} Neekah Pro tamat esok|[2,*] Neekah Pro tamat dalam :days hari',
+        'renew' => 'Bayar semula untuk kekalkan slot Ditaja, analitik dan lencana Pro. Baki masa anda tidak hilang, tempoh baharu disambung selepasnya.',
+        'action' => 'Sambung Pro',
+    ],
+
 ];

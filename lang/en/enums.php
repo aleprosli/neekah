@@ -184,4 +184,15 @@ return [
         'custom' => 'Pick users one by one, or type an email address yourself.',
     ],
 
+    'vendor_plan' => [
+        'monthly' => 'Monthly',
+        'yearly' => 'Yearly',
+    ],
+
+    'subscription_status' => [
+        'pending' => 'Unpaid',
+        'paid' => 'Paid',
+        'failed' => 'Failed',
+    ],
+
 ];

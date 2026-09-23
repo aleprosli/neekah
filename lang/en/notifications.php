@@ -157,4 +157,21 @@ return [
         'expires' => 'This link is valid for :days days. If you do not recognise this invitation, ignore this email.',
     ],
 
+    'pro_activated' => [
+        'title' => 'Neekah Pro is active',
+        'body' => 'Your Pro plan runs until :date.',
+        'subject' => 'Your Neekah Pro receipt',
+        'thanks' => 'Thank you! :vendor is now a Pro vendor on Neekah.',
+        'receipt' => 'Reference :reference · :plan plan · RM:amount',
+        'until' => 'Your Pro plan runs until :date.',
+    ],
+
+    'pro_expiring' => [
+        'title' => 'Neekah Pro ends in :days days',
+        'body' => 'Your Pro plan ends on :date.',
+        'subject' => '{1} Neekah Pro ends tomorrow|[2,*] Neekah Pro ends in :days days',
+        'renew' => 'Pay again to keep your sponsored slot, analytics and Pro badge. You lose none of the time left; the new period starts after it.',
+        'action' => 'Renew Pro',
+    ],
+
 ];

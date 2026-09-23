@@ -20,6 +20,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 
@@ -28,6 +29,7 @@ use Illuminate\Support\Collection;
     'phone', 'whatsapp', 'social_links', 'price_from', 'price_unit', 'cover_image', 'logo', 'cover_tone',
     'status', 'tier', 'rating_avg', 'reviews_count', 'completed_bookings_count',
     'response_rate', 'completion_rate', 'score', 'points_total', 'tier_locked', 'penalty_points', 'violations_count', 'approved_at',
+    'pro_until',
 ])]
 class Vendor extends Model
 {
@@ -50,6 +52,7 @@ class Vendor extends Model
             'score' => 'decimal:2',
             'tier_locked' => 'boolean',
             'approved_at' => 'datetime',
+            'pro_until' => 'datetime',
         ];
     }
 
@@ -200,6 +203,49 @@ class Vendor extends Model
         return $this->hasMany(VendorPoint::class);
     }
 
+    public function subscriptions(): HasMany
+    {
+        return $this->hasMany(VendorSubscription::class)->latest();
+    }
+
+    public function dailyStats(): HasMany
+    {
+        return $this->hasMany(VendorDailyStat::class)->orderBy('date');
+    }
+
+    /**
+     * Whether the vendor has a paid Pro plan running. Pro buys the sponsored
+     * slot, the analytics and the badge; it never touches the tier, the score
+     * or where the vendor sits in the ordinary listing.
+     */
+    public function isPro(): bool
+    {
+        return $this->pro_until !== null && $this->pro_until->isFuture();
+    }
+
+    /**
+     * Add one to today's counter: a profile view, or a tap on WhatsApp or the
+     * phone number.
+     */
+    public function recordStat(string $counter): void
+    {
+        if (! in_array($counter, VendorDailyStat::COUNTERS, true)) {
+            return;
+        }
+
+        $date = today()->toDateString();
+
+        // Two visitors on the same second both try to start the day's row; the
+        // loser reads the winner's rather than failing the page.
+        try {
+            $today = $this->dailyStats()->firstOrCreate(['date' => $date]);
+        } catch (QueryException) {
+            $today = $this->dailyStats()->where('date', $date)->firstOrFail();
+        }
+
+        $today->increment($counter);
+    }
+
     /**
      * The business logo, if the vendor uploaded one. Everywhere it is shown
      * falls back to the initial in a tinted circle, which is what a vendor
@@ -324,6 +370,12 @@ class Vendor extends Model
                 });
             }
         });
+    }
+
+    #[Scope]
+    protected function pro(Builder $query): Builder
+    {
+        return $query->where('pro_until', '>', now());
     }
 
     #[Scope]

@@ -115,6 +115,16 @@ return [
     ],
 
     'admin' => [
+        'pro' => 'Pro',
+        'pro_title' => 'Neekah Pro',
+        'pro_description' => 'The paid vendor plan: a sponsored slot above search, profile analytics and a Pro badge. Tiers and ranking are unaffected.',
+        'pro_submit' => 'Save Pro settings',
+        'pro_checkout_open' => 'Vendors can pay',
+        'pro_checkout_closed' => 'Checkout closed',
+        'pro_gateway_missing' => 'The Herepay keys are not in .env yet (HEREPAY_BASE_URL, HEREPAY_API_KEY, HEREPAY_SECRET), so checkout stays closed. Manual payments can be recorded on each vendor\'s page.',
+        'pro_enabled' => 'Open Pro checkout to vendors',
+        'pro_enabled_help' => 'Only stops new purchases. Vendors who already paid stay Pro until their end date.',
+        'pro_slots_help' => '0 hides the sponsored row entirely.',
         'waktu_operasi_bahasa' => 'Opening hours · :language',
         'isnin_jumaat_9_pagi_6_en' => 'Monday – Friday, 9am – 6pm',
         'upload_server_warning' => 'This server accepts only <strong>:sizeMB</strong> per upload, so the limit below is not used in full. Raise <code class="font-mono">upload_max_filesize</code> and <code class="font-mono">post_max_size</code> in php.ini (and <code class="font-mono">client_max_body_size</code> on nginx), then restart PHP.',

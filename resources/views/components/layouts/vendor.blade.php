@@ -23,6 +23,7 @@
         ]],
         ['label' => __('pages.sidebar_vendor.prestasi'), 'items' => [
             $item(__('pages.dash.point_ranking'), 'trophy', 'vendor.points.index', 'vendor.points.*'),
+            $item(__('pages.sidebar_vendor.pro'), 'crown', 'vendor.pro.index', 'vendor.pro.*'),
         ]],
     ];
     $context = $vendor

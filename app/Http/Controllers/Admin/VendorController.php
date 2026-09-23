@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\SubscriptionStatus;
 use App\Enums\VendorStatus;
 use App\Enums\VendorTier;
 use App\Http\Controllers\Controller;
@@ -278,6 +279,8 @@ class VendorController extends Controller
 
         return view('admin.vendors.show', [
             'vendor' => $vendor,
+            // Unpaid checkouts are abandoned carts; the history is what was paid.
+            'subscriptions' => $vendor->subscriptions()->with('addedBy')->where('status', '!=', SubscriptionStatus::Pending)->limit(20)->get(),
             'props' => VueProps::for([
                 'vendor' => [
                     'status' => $vendor->status->label(),

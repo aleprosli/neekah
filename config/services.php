@@ -48,6 +48,13 @@ return [
         'measurement_id' => env('GOOGLE_ANALYTICS_ID'),
     ],
 
+    // Neekah Pro checkout. Empty keys leave the checkout switched off.
+    'herepay' => [
+        'base_url' => env('HEREPAY_BASE_URL'),
+        'api_key' => env('HEREPAY_API_KEY'),
+        'secret' => env('HEREPAY_SECRET'),
+    ],
+
     'turnstile' => [
         'site_key' => env('TURNSTILE_SITE_KEY'),
         'secret_key' => env('TURNSTILE_SECRET_KEY'),

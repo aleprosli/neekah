@@ -132,4 +132,9 @@ return [
     'nama_pendek_perempuan' => 'nama pendek pengantin perempuan',
     'nama_pendek_lelaki' => 'nama pendek pengantin lelaki',
     'fail_audio' => 'fail audio',
+
+    'pro_monthly_price' => 'harga bulanan (RM)',
+    'pro_yearly_price' => 'harga tahunan (RM)',
+    'pro_sponsored_slots' => 'bilangan slot Ditaja',
+
 ];

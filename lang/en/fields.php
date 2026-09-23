@@ -132,4 +132,9 @@ return [
     'nama_pendek_perempuan' => "bride's short name",
     'nama_pendek_lelaki' => "groom's short name",
     'fail_audio' => 'audio file',
+
+    'pro_monthly_price' => 'monthly price (RM)',
+    'pro_yearly_price' => 'yearly price (RM)',
+    'pro_sponsored_slots' => 'number of sponsored slots',
+
 ];

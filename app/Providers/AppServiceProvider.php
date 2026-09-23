@@ -4,6 +4,8 @@ namespace App\Providers;
 
 use App\Models\User;
 use App\Routing\LocalisedUrlGenerator;
+use App\Support\Herepay\HerepayClient;
+use App\Support\Herepay\PaymentLinkGateway;
 use App\Support\Seo;
 use Illuminate\Auth\Middleware\RedirectIfAuthenticated;
 use Illuminate\Http\Request;
@@ -23,6 +25,7 @@ class AppServiceProvider extends ServiceProvider
         // One description of the current page, shared by the layout and by
         // whichever controller knows what the page actually is.
         $this->app->scoped(Seo::class);
+        $this->app->bind(PaymentLinkGateway::class, HerepayClient::class);
 
         // route() has to answer with the page in the language being served.
         $this->app->extend('url', function (UrlGenerator $url, $app): LocalisedUrlGenerator {

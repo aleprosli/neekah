@@ -115,6 +115,16 @@ return [
     ],
 
     'admin' => [
+        'pro' => 'Pro',
+        'pro_title' => 'Neekah Pro',
+        'pro_description' => 'Pelan berbayar vendor: slot Ditaja di atas carian, analitik profil dan lencana Pro. Tier dan ranking tidak terjejas.',
+        'pro_submit' => 'Simpan tetapan Pro',
+        'pro_checkout_open' => 'Vendor boleh bayar',
+        'pro_checkout_closed' => 'Checkout ditutup',
+        'pro_gateway_missing' => 'Kunci Herepay belum diisi dalam .env (HEREPAY_BASE_URL, HEREPAY_API_KEY, HEREPAY_SECRET), jadi checkout belum dibuka. Bayaran manual boleh direkod di halaman setiap vendor.',
+        'pro_enabled' => 'Buka checkout Pro kepada vendor',
+        'pro_enabled_help' => 'Hanya menghentikan pembelian baharu. Vendor yang sudah bayar kekal Pro sehingga tarikh tamat.',
+        'pro_slots_help' => '0 menyembunyikan baris Ditaja sepenuhnya.',
         'waktu_operasi_bahasa' => 'Waktu operasi · :language',
         'isnin_jumaat_9_pagi_6_en' => 'Monday – Friday, 9am – 6pm',
         'upload_server_warning' => 'Server ini hanya menerima <strong>:sizeMB</strong> setiap muat naik, jadi had di bawah tidak digunakan sepenuhnya. Naikkan <code class="font-mono">upload_max_filesize</code> dan <code class="font-mono">post_max_size</code> dalam php.ini (serta <code class="font-mono">client_max_body_size</code> pada nginx), kemudian mulakan semula PHP.',

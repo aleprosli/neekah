@@ -10,6 +10,7 @@ use App\Models\Booking;
 use App\Models\Payment;
 use App\Models\Vendor;
 use App\Support\ImageSettings;
+use App\Support\VendorAnalytics;
 use App\Support\VueProps;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
@@ -41,6 +42,7 @@ class DashboardController extends Controller
 
         return view('vendor.dashboard', [
             'vendor' => $vendor,
+            'reach' => (new VendorAnalytics($vendor))->totals(VendorAnalytics::TEASER_DAYS),
             'onboarding' => $this->onboarding($vendor),
             'props' => VueProps::for([
                 'stats' => [

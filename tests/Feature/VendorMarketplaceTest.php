@@ -261,7 +261,9 @@ it('shows the vendor\'s WhatsApp and phone only to a signed-in visitor', functio
     $this->actingAs(User::factory()->create())
         ->get(route('vendors.show', $vendor))
         ->assertSee('WhatsApp vendor')
-        ->assertSee('https://wa.me/60123456789', false)
+        // Through the redirect that counts the tap for the vendor's analytics;
+        // VendorReachTest follows it on to wa.me.
+        ->assertSee(route('vendors.contact.whatsapp', $vendor), false)
         ->assertSee('012-345 6789');
 });
 

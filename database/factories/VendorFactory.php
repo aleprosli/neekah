@@ -74,6 +74,11 @@ class VendorFactory extends Factory
         return $this->state(fn () => ['status' => VendorStatus::Suspended]);
     }
 
+    public function pro(): static
+    {
+        return $this->state(fn () => ['pro_until' => now()->addMonth()]);
+    }
+
     public function tier(VendorTier $tier): static
     {
         return $this->state(fn () => ['tier' => $tier]);

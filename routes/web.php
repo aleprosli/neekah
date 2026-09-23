@@ -13,6 +13,7 @@ use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\Customer as CustomerArea;
 use App\Http\Controllers\Customer\BookingController;
 use App\Http\Controllers\Customer\PaymentController;
+use App\Http\Controllers\HerepayWebhookController;
 use App\Http\Controllers\InvitationAcceptanceController;
 use App\Http\Controllers\InvitationPreviewController;
 use App\Http\Controllers\LandingController;
@@ -25,6 +26,7 @@ use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\SiteTemplatePreviewController;
 use App\Http\Controllers\Vendor as VendorArea;
 use App\Http\Controllers\VendorComparisonController;
+use App\Http\Controllers\VendorContactController;
 use App\Http\Controllers\VendorController;
 use App\Http\Controllers\VendorReviewController;
 use App\Support\Locales;
@@ -134,6 +136,9 @@ $site = function (): void {
         Route::post('/reviews/{review}/reply', [VendorArea\ReviewController::class, 'reply'])->name('reviews.reply');
         Route::post('/reviews/{review}/report', [VendorArea\ReviewController::class, 'report'])->name('reviews.report');
         Route::get('/points', [VendorArea\PointController::class, 'index'])->name('points.index');
+        Route::get('/pro', [VendorArea\ProController::class, 'index'])->name('pro.index');
+        Route::post('/pro/checkout', [VendorArea\ProController::class, 'checkout'])->middleware('throttle:10,1')->name('pro.checkout');
+        Route::get('/pro/selesai', [VendorArea\ProController::class, 'done'])->name('pro.done');
         Route::get('/enquiries', [VendorArea\EnquiryController::class, 'index'])->name('enquiries.index');
         Route::get('/enquiries/{enquiry}', [VendorArea\EnquiryController::class, 'show'])->name('enquiries.show');
         Route::put('/enquiries/{enquiry}', [VendorArea\EnquiryController::class, 'update'])->name('enquiries.update');
@@ -207,6 +212,16 @@ $site = function (): void {
         Route::get('/enquiries/{enquiry}', [CustomerArea\EnquiryController::class, 'show'])->name('enquiries.show');
         Route::post('/vendors/{vendor}/enquiries', [CustomerArea\EnquiryController::class, 'store'])->name('vendors.enquiries.store');
 
+        // Signed-in only, like the number itself. WhatsApp goes through a
+        // redirect that counts the tap; a tel: link cannot, so the page reports
+        // that one with a beacon.
+        Route::get('/vendors/{vendor}/whatsapp', [VendorContactController::class, 'whatsapp'])
+            ->middleware('throttle:30,1')
+            ->name('vendors.contact.whatsapp');
+        Route::post('/vendors/{vendor}/telefon', [VendorContactController::class, 'phone'])
+            ->middleware('throttle:30,1')
+            ->name('vendors.contact.phone');
+
         Route::get('/vendors/{vendor}/report', [ReportVendorController::class, 'create'])->name('vendors.report.create');
         Route::post('/vendors/{vendor}/report', [ReportVendorController::class, 'store'])->name('vendors.report.store');
     });
@@ -221,6 +236,7 @@ $site = function (): void {
         Route::post('/vendors/status', [AdminArea\VendorApprovalController::class, 'bulk'])->name('vendors.bulk-status');
         Route::post('/vendors/{vendor}/status', [AdminArea\VendorApprovalController::class, 'store'])->name('vendors.status');
         Route::put('/vendors/{vendor}/tier', [AdminArea\VendorTierController::class, 'update'])->name('vendors.tier');
+        Route::post('/vendors/{vendor}/pro', [AdminArea\VendorProController::class, 'store'])->name('vendors.pro');
         Route::get('/reviews', [AdminArea\ReviewController::class, 'index'])->name('reviews.index');
         Route::get('/reviews/data', [AdminArea\ReviewController::class, 'data'])->name('reviews.data');
         Route::post('/reviews', [AdminArea\ReviewController::class, 'store'])->name('reviews.store');
@@ -280,6 +296,7 @@ $site = function (): void {
         Route::put('/settings/telegram', [AdminArea\SettingController::class, 'updateTelegram'])->name('settings.telegram');
         Route::put('/settings/turnstile', [AdminArea\SettingController::class, 'updateTurnstile'])->name('settings.turnstile');
         Route::put('/settings/payments', [AdminArea\SettingController::class, 'updatePayments'])->name('settings.payments');
+        Route::put('/settings/pro', [AdminArea\SettingController::class, 'updatePro'])->name('settings.pro');
     });
 
 };
@@ -290,6 +307,12 @@ foreach (Locales::codes() as $locale) {
         ->middleware('locale:'.$locale)
         ->group($site);
 }
+
+// Herepay calls this server to server. Once, outside the language sets, and
+// outside CSRF (bootstrap/app.php): the signature is what it is checked by.
+Route::post('/webhooks/herepay', HerepayWebhookController::class)
+    ->middleware('throttle:60,1')
+    ->name('webhooks.herepay');
 
 // One sitemap for the whole site, which lists both languages itself.
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->middleware('locale')->name('sitemap.index');

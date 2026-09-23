@@ -51,6 +51,8 @@ return [
     'demo' => 'Demo data',
 
     'card' => [
+        'pro' => 'Pro',
+        'pro_title' => 'Neekah Pro vendor',
         'recommended' => 'Recommended',
         'top' => 'Top vendor',
         'new' => 'New',
@@ -71,6 +73,12 @@ return [
         'clear' => 'Clear',
         'open' => 'Compare',
         'limit' => 'Four vendors at most.',
+    ],
+
+    'sponsored' => [
+        'heading' => 'Sponsored',
+        'note' => 'Pro vendors matching your search. The list below is ordered by performance, not payment.',
+        'label' => 'Sponsored',
     ],
 
 ];

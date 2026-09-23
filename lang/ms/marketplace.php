@@ -53,6 +53,8 @@ return [
     'demo' => 'Data demo',
 
     'card' => [
+        'pro' => 'Pro',
+        'pro_title' => 'Vendor Neekah Pro',
         'recommended' => 'Disyorkan',
         'top' => 'Vendor terbaik',
         'new' => 'Baru',
@@ -73,6 +75,12 @@ return [
         'clear' => 'Kosongkan',
         'open' => 'Banding',
         'limit' => 'Maksimum 4 vendor sahaja.',
+    ],
+
+    'sponsored' => [
+        'heading' => 'Ditaja',
+        'note' => 'Vendor Pro yang sepadan dengan carian anda. Senarai di bawah disusun mengikut prestasi, bukan bayaran.',
+        'label' => 'Ditaja',
     ],
 
 ];

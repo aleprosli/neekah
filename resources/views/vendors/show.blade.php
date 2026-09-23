@@ -68,7 +68,7 @@
                 <div class="flex items-center gap-4 py-6">
                     <x-vendor-avatar :vendor="$vendor" class="size-12 text-lg" />
                     <div class="min-w-0">
-                        <p class="font-semibold">{{ __('pages.profile.run_by', ['name' => $vendor->name]) }}</p>
+                        <p class="flex items-center gap-2 font-semibold">{{ __('pages.profile.run_by', ['name' => $vendor->name]) }}@if ($vendor->isPro())<x-vendors.pro-badge />@endif</p>
                         <p class="text-sm text-ink-muted">@if ($vendor->tier === VendorTier::Recommended)🏆 @endif{{ $vendor->tier->label() }} Vendor · Response rate {{ $vendor->responseRateLabel() }}</p>
                     </div>
                 </div>
@@ -274,13 +274,13 @@
                         @auth
                             {{-- The vendor's own number is only ever rendered for a signed-in
                                  visitor, so it cannot be scraped from the public markup. --}}
-                            @if ($whatsapp = $vendor->whatsappUrl('Hai '.$vendor->name.', saya jumpa anda di Neekah. Boleh saya tanya tentang pakej untuk majlis saya?'))
-                                <a href="{{ $whatsapp }}" target="_blank" rel="noopener" class="flex items-center justify-center gap-2 rounded-full border border-brand-600 py-3.5 text-sm font-semibold text-brand-700 transition hover:bg-brand-50">
+                            @if ($vendor->whatsappUrl())
+                                <a href="{{ route('vendors.contact.whatsapp', $vendor) }}" target="_blank" rel="noopener" class="flex items-center justify-center gap-2 rounded-full border border-brand-600 py-3.5 text-sm font-semibold text-brand-700 transition hover:bg-brand-50">
                                     <span aria-hidden="true">💬</span>{{ __('pages.profile.whatsapp_vendor') }}</a>
                             @endif
 
                             @if ($vendor->phone)
-                                <p class="text-center text-sm text-ink-muted">{{ __('pages.profile.atau_hubungi_terus_di') }}<a href="tel:{{ preg_replace('/[^0-9+]/', '', $vendor->phone) }}" class="font-medium text-ink underline underline-offset-4">{{ $vendor->phone }}</a>
+                                <p class="text-center text-sm text-ink-muted">{{ __('pages.profile.atau_hubungi_terus_di') }}<a href="tel:{{ preg_replace('/[^0-9+]/', '', $vendor->phone) }}" data-track-phone="{{ route('vendors.contact.phone', $vendor) }}" data-track-token="{{ csrf_token() }}" class="font-medium text-ink underline underline-offset-4">{{ $vendor->phone }}</a>
                                 </p>
                             @endif
                         @else
@@ -300,13 +300,13 @@
                         @auth
                             {{-- The vendor's own number is only ever rendered for a signed-in
                                  visitor, so it cannot be scraped from the public markup. --}}
-                            @if ($whatsapp = $vendor->whatsappUrl('Hai '.$vendor->name.', saya jumpa anda di Neekah. Boleh saya tanya tentang pakej untuk majlis saya?'))
-                                <a href="{{ $whatsapp }}" target="_blank" rel="noopener" class="flex items-center justify-center gap-2 rounded-full bg-brand-600 py-3.5 text-sm font-semibold text-white transition hover:bg-brand-700">
+                            @if ($vendor->whatsappUrl())
+                                <a href="{{ route('vendors.contact.whatsapp', $vendor) }}" target="_blank" rel="noopener" class="flex items-center justify-center gap-2 rounded-full bg-brand-600 py-3.5 text-sm font-semibold text-white transition hover:bg-brand-700">
                                     <span aria-hidden="true">💬</span>{{ __('pages.profile.whatsapp_vendor_2') }}</a>
                             @endif
 
                             @if ($vendor->phone)
-                                <p class="text-center text-sm text-ink-muted">{{ __('pages.profile.atau_hubungi_terus_di_2') }}<a href="tel:{{ preg_replace('/[^0-9+]/', '', $vendor->phone) }}" class="font-medium text-ink underline underline-offset-4">{{ $vendor->phone }}</a>
+                                <p class="text-center text-sm text-ink-muted">{{ __('pages.profile.atau_hubungi_terus_di_2') }}<a href="tel:{{ preg_replace('/[^0-9+]/', '', $vendor->phone) }}" data-track-phone="{{ route('vendors.contact.phone', $vendor) }}" data-track-token="{{ csrf_token() }}" class="font-medium text-ink underline underline-offset-4">{{ $vendor->phone }}</a>
                                 </p>
                             @endif
                         @else

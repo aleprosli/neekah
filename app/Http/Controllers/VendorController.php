@@ -12,6 +12,7 @@ use App\Models\User;
 use App\Models\Vendor;
 use App\Support\ContactSettings;
 use App\Support\ContentVersion;
+use App\Support\ProSettings;
 use App\Support\Seo;
 use App\Support\SeoSettings;
 use App\Support\States;
@@ -35,6 +36,12 @@ class VendorController extends Controller
 
     /** Other vendors suggested at the foot of a profile. */
     private const RELATED_VENDORS = 3;
+
+    /** Seconds a sponsored row is held before the next vendors take their turn. */
+    private const SPONSORED_TTL = 300;
+
+    /** User agents that fetch a page without a person reading it. */
+    private const NOT_A_VISITOR = ['bot', 'crawler', 'spider', 'facebookexternalhit', 'whatsapp', 'preview', 'lighthouse', 'headless'];
 
     /**
      * The orders the list can be put in. A method rather than a constant: the
@@ -75,11 +82,18 @@ class VendorController extends Controller
         $activeCategory = $filters['category'] ? $categories->firstWhere('slug', $filters['category']) : null;
 
         $vendors = $this->listing($filters, $activeCategory, $request);
+        $sponsored = $this->sponsored($filters, $activeCategory, $request);
+
+        // Shown once, in the row that is labelled as paid.
+        if ($sponsored->isNotEmpty()) {
+            $vendors->setCollection($vendors->getCollection()->reject(fn (Vendor $vendor): bool => $sponsored->contains('id', $vendor->id))->values());
+        }
 
         $this->describeListing($seo, $request, $activeCategory, $filters);
 
         return view('vendors.index', [
             'vendors' => $vendors,
+            'sponsored' => $sponsored,
             'filters' => $filters,
             'categories' => $categories,
             'activeCategory' => $activeCategory,
@@ -88,7 +102,7 @@ class VendorController extends Controller
             'tiers' => VendorTier::cases(),
             'sorts' => self::sorts(),
             'activeFilterCount' => count(array_filter([$filters['state'], $filters['min_price'], $filters['max_price'], $filters['min_rating'], $filters['tier']], fn ($value) => $value !== null)),
-            'helpUrl' => $vendors->isEmpty() ? $this->helpUrl($activeCategory, $filters) : null,
+            'helpUrl' => $vendors->isEmpty() && $sponsored->isEmpty() ? $this->helpUrl($activeCategory, $filters) : null,
         ]);
     }
 
@@ -145,16 +159,7 @@ class VendorController extends Controller
             'marketplace:list:'.$key.':'.ContentVersion::global(),
             ContentVersion::TTL,
             function () use ($filters, $activeCategory): array {
-                $paginator = Vendor::query()
-                    ->approved()
-                    ->with('category')
-                    ->when($filters['q'], fn (Builder $query, string $keyword) => $query->matching($keyword))
-                    ->when($activeCategory, fn (Builder $query, Category $category) => $query->inCategory($category))
-                    ->when($filters['state'], fn (Builder $query, string $state) => $query->servingState($state))
-                    ->when($filters['min_price'] !== null, fn (Builder $query) => $query->where('price_from', '>=', $filters['min_price']))
-                    ->when($filters['max_price'] !== null, fn (Builder $query) => $query->where('price_from', '<=', $filters['max_price']))
-                    ->when($filters['min_rating'] !== null, fn (Builder $query) => $query->where('rating_avg', '>=', $filters['min_rating']))
-                    ->when($filters['tier'], fn (Builder $query, string $tier) => $query->where('tier', $tier))
+                $paginator = self::filtered($filters, $activeCategory)
                     ->tap(fn (Builder $query) => match ($filters['sort']) {
                         'rating' => $query->orderByDesc('rating_avg')->orderByDesc('reviews_count'),
                         'price_asc' => $query->orderBy('price_from'),
@@ -179,6 +184,59 @@ class VendorController extends Controller
             $page,
             ['path' => Paginator::resolveCurrentPath(), 'pageName' => 'page'],
         ))->withQueryString();
+    }
+
+    /**
+     * Approved vendors matching the visitor's filters, before any ordering.
+     * The listing and the sponsored row both start here, so a sponsored vendor
+     * always answers the search it is shown above.
+     *
+     * @param  array<string, mixed>  $filters
+     * @return Builder<Vendor>
+     */
+    private static function filtered(array $filters, ?Category $activeCategory): Builder
+    {
+        return Vendor::query()
+            ->approved()
+            ->with('category')
+            ->when($filters['q'], fn (Builder $query, string $keyword) => $query->matching($keyword))
+            ->when($activeCategory, fn (Builder $query, Category $category) => $query->inCategory($category))
+            ->when($filters['state'], fn (Builder $query, string $state) => $query->servingState($state))
+            ->when($filters['min_price'] !== null, fn (Builder $query) => $query->where('price_from', '>=', $filters['min_price']))
+            ->when($filters['max_price'] !== null, fn (Builder $query) => $query->where('price_from', '<=', $filters['max_price']))
+            ->when($filters['min_rating'] !== null, fn (Builder $query) => $query->where('rating_avg', '>=', $filters['min_rating']))
+            ->when($filters['tier'], fn (Builder $query, string $tier) => $query->where('tier', $tier));
+    }
+
+    /**
+     * The Ditaja row above the listing: Pro vendors who match the search, a
+     * few at a time, taking turns.
+     *
+     * Only on the first page of the default order. Someone who asked for the
+     * cheapest, or the best rated, gets exactly that with nothing paid above
+     * it, and the ordinary listing below never moves for money.
+     *
+     * Cached for a few minutes rather than against the version alone, so the
+     * turn comes round and an expired plan drops out without anything saving.
+     *
+     * @param  array<string, mixed>  $filters
+     * @return Collection<int, Vendor>
+     */
+    private function sponsored(array $filters, ?Category $activeCategory, Request $request): Collection
+    {
+        $slots = app(ProSettings::class)->sponsoredSlots();
+
+        if ($slots === 0 || $filters['sort'] !== 'recommended' || $request->integer('page', 1) > 1) {
+            return collect();
+        }
+
+        $rows = Cache::remember(
+            'marketplace:sponsored:'.md5(serialize([$filters, $slots])).':'.ContentVersion::global(),
+            self::SPONSORED_TTL,
+            fn (): array => self::vendorRows(self::filtered($filters, $activeCategory)->pro()->inRandomOrder()->limit($slots)->get()),
+        );
+
+        return self::hydrateVendors($rows);
     }
 
     /**
@@ -228,6 +286,8 @@ class VendorController extends Controller
 
         $related = $this->related($vendor);
 
+        $this->countView($request, $vendor);
+
         $description = $vendor->tagline ?: Str::of((string) $vendor->description)->squish()->value();
 
         $seo->title(__('seo.marketplace.vendor_title', ['name' => $vendor->name, 'category' => $vendor->category->name, 'city' => $vendor->city]))
@@ -274,6 +334,28 @@ class VendorController extends Controller
             'related' => $related,
             'defaultEventDate' => $request->user()?->weddings()->latest('event_date')->first()?->event_date->toDateString(),
         ]);
+    }
+
+    /**
+     * One view for the vendor's analytics. Once per visitor per session, so a
+     * couple flicking between photos is one look, not ten; and never the vendor
+     * themselves, an admin, or a crawler.
+     */
+    private function countView(Request $request, Vendor $vendor): void
+    {
+        $user = $request->user();
+
+        if ($user?->isAdmin() || ($user && $user->getKey() === $vendor->user_id)
+            || Str::contains(Str::lower((string) $request->userAgent()), self::NOT_A_VISITOR)) {
+            return;
+        }
+
+        $key = 'vendor-viewed.'.$vendor->getKey();
+
+        if ($request->hasSession() && ! $request->session()->has($key)) {
+            $request->session()->put($key, true);
+            $vendor->recordStat('profile_views');
+        }
     }
 
     /**

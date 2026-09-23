@@ -6,6 +6,7 @@ use App\Models\Category;
 use App\Models\Vendor;
 use App\Support\Card\SampleCard;
 use App\Support\ContactSettings;
+use App\Support\ProSettings;
 use App\Support\Seo;
 use Illuminate\Contracts\View\View;
 
@@ -71,7 +72,8 @@ class LandingController extends Controller
     /**
      * What a vendor gets from being listed. Only what is true today: no
      * commission and no payment through Neekah, so nothing here is about
-     * bookings recorded or payments made on the platform.
+     * bookings recorded or payments made on the platform. Pro is an optional
+     * extra on top of a listing that stays free.
      *
      * @return array<int, string>
      */
@@ -83,6 +85,8 @@ class LandingController extends Controller
             __('pages.landing.benefits.packages'),
             __('pages.landing.benefits.calendar'),
             __('pages.landing.benefits.enquiries'),
+            // Only once a vendor can actually buy it.
+            ...(app(ProSettings::class)->isEnabled() ? [__('pages.landing.benefits.pro')] : []),
         ];
     }
 }

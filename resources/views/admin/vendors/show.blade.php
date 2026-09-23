@@ -14,4 +14,6 @@
 
     {{-- resources/js/components/admin/AdminVendorDetail.vue --}}
     <div data-vue="admin-vendor-detail" data-props="@vueProps($props)"></div>
+
+    @include('admin.vendors.partials.pro')
 </x-layouts.admin>
