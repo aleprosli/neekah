@@ -70,7 +70,7 @@ Camera: **push** = slow push-in · **pan** = lateral move · **macro** = tight c
 | 1.7 | 0:20–0:32 | **Chat mock-up** (phone frame, centred; desktop blurs behind) | Bubbles arrive one by one — script below | phone slides in from right, slow push as the chat grows | top: **12:45 PM** → bottom: **12:53 PM** | message pop per bubble |
 | 1.8 | 0:32–0:36 | Chat holds on the last bubble | 12:45 and 12:53 highlight; phone steps back | pull back | **8 minit. Deal.** then **Terus antara anda dan vendor. Neekah tidak mengambil komisen dan tidak memegang bayaran anda.** *(profile.highlight_contact_detail)* | soft confirm tone |
 
-**Chat script for 1.7** — rebuilt from the real conversation, trimmed to 12 seconds. Left = couple ("Anda"), right = Quenno .co 🍦.
+**Chat script for 1.7** — rebuilt from the real conversation, trimmed to 12 seconds. Shown from the couple's phone: their messages on the right in green, Quenno .co 🍦 on the left in white. (The source screenshot is from Quenno's phone, so the sides are flipped.)
 
 | Time | Side | Bubble |
 | --- | --- | --- |
