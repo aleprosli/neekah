@@ -92,6 +92,17 @@ it('translates the marketplace, not just the navigation', function () {
         ->assertDontSee('Semua filter');
 });
 
+it('asks a guest to log in before an enquiry in the language of the page', function () {
+    $vendor = Vendor::factory()->create();
+
+    $this->get(URL::routeIn('ms', 'vendors.show', [$vendor]))->assertOk()
+        ->assertSee('untuk menghantar enquiry kepada vendor ini.');
+
+    $this->get(URL::routeIn('en', 'vendors.show', [$vendor]))->assertOk()
+        ->assertSee('to send this vendor an enquiry.')
+        ->assertDontSee('untuk menghantar enquiry');
+});
+
 it('counts vendors correctly in a language with no plural form', function () {
     Vendor::factory()->count(3)->create();
 

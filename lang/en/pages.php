@@ -388,6 +388,7 @@ return [
         'tanya_tentang_tarikh_pakej_atau' => 'Ask about dates, packages or prices. The vendor answers you directly.',
         'hantar_enquiry_2' => 'Send enquiry',
         'log_masuk' => 'Log in',
+        'untuk_menghantar_enquiry' => 'to send this vendor an enquiry.',
         'ada_masalah_dengan_vendor_ini' => 'A problem with this vendor?',
         'laporkan_vendor' => 'Report the vendor',
         'hubungi_vendor' => 'Contact the vendor',

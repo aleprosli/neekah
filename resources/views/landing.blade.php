@@ -1,15 +1,13 @@
 <x-layouts.app :title="__('pages.landing.semua_urusan_majlis_satu_platform')">
     <x-site.header />
 
-    {{-- The page wears the florals of the invitation cards themselves
-         (public/img/layers, drawn through <x-site.ornament>), so what a couple
-         sees here is the stationery they will be holding later. --}}
+    {{-- A light watercolor botanical keeps the page bridal without competing
+         with the real invitation designs shown in the hero. --}}
     <main class="bg-ivory">
         {{-- Hero --}}
         <section class="relative overflow-hidden">
-            <x-site.ornament name="corner-peony" class="absolute -top-16 -left-16 size-[22rem] opacity-60 sm:size-[30rem] lg:size-[36rem]" color="var(--color-brand-200)" color2="var(--color-brand-100)" />
-            <x-site.ornament name="corner-peony" class="absolute -right-20 -bottom-24 size-[22rem] rotate-180 opacity-50 sm:size-[30rem] lg:size-[36rem]" color="var(--color-gold-300)" color2="var(--color-brand-100)" />
-            <x-site.ornament name="particles" class="absolute inset-0 opacity-40" color="var(--color-gold-400)" />
+            <img src="{{ asset('img/decor/botanical-corner.webp') }}" alt="" class="absolute -bottom-24 -left-28 w-96 opacity-25 sm:w-[34rem] lg:w-[40rem]" decoding="async">
+            <img src="{{ asset('img/decor/botanical-corner.webp') }}" alt="" class="absolute -top-32 -right-36 w-96 scale-x-[-1] opacity-10 sm:w-[32rem]" decoding="async">
 
             <div class="relative mx-auto grid max-w-7xl items-center gap-14 px-4 pt-28 pb-16 sm:px-6 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] lg:px-8 lg:pt-36 lg:pb-24">
                 <div class="flex min-w-0 flex-col gap-6">
@@ -99,7 +97,7 @@
 
         {{-- Features --}}
         <section id="ciri" class="relative overflow-hidden">
-            <x-site.ornament name="leaf-sprig" class="absolute top-10 -right-6 h-72 w-48 opacity-30 sm:h-96 sm:w-64" color="var(--color-brand-200)" />
+            <img src="{{ asset('img/decor/botanical-corner.webp') }}" alt="" class="absolute top-8 -right-28 w-80 scale-x-[-1] opacity-10 sm:w-[28rem]" loading="lazy" decoding="async">
 
             <div class="relative mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
                 <div class="max-w-2xl">
@@ -125,7 +123,7 @@
 
         {{-- Marketplace preview --}}
         <section id="marketplace" class="relative overflow-hidden bg-ivory-deep">
-            <x-site.ornament name="garland" class="absolute -top-2 left-1/2 h-14 w-[36rem] max-w-full -translate-x-1/2 opacity-50" color="var(--color-gold-400)" color2="var(--color-brand-300)" />
+            <img src="{{ asset('img/decor/botanical-corner.webp') }}" alt="" class="absolute -top-28 left-1/2 w-80 -translate-x-1/2 rotate-45 opacity-[0.06]" loading="lazy" decoding="async">
 
             <div class="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
                 <div class="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
@@ -186,8 +184,8 @@
         <section class="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
             <div class="relative overflow-hidden rounded-3xl border border-gold-300 bg-surface-raised p-8 sm:p-12 lg:p-16">
                 <span class="pointer-events-none absolute inset-3 rounded-[1.25rem] border border-gold-300/70" aria-hidden="true"></span>
-                <x-site.ornament name="corner-rose" class="absolute -top-8 -left-8 size-40 opacity-50 sm:size-56" color="var(--color-brand-300)" color2="var(--color-brand-100)" />
-                <x-site.ornament name="corner-rose" class="absolute -right-8 -bottom-8 size-40 rotate-180 opacity-50 sm:size-56" color="var(--color-brand-300)" color2="var(--color-gold-300)" />
+                <img src="{{ asset('img/decor/botanical-corner.webp') }}" alt="" class="absolute -top-20 -left-24 w-72 opacity-15 sm:w-96" loading="lazy" decoding="async">
+                <img src="{{ asset('img/decor/botanical-corner.webp') }}" alt="" class="absolute -right-24 -bottom-20 w-72 rotate-180 opacity-15 sm:w-96" loading="lazy" decoding="async">
 
                 <div class="relative grid gap-10 lg:grid-cols-2">
                     <div class="flex flex-col gap-4">
@@ -227,8 +225,8 @@
 
         {{-- For vendors --}}
         <section id="vendor" class="relative overflow-hidden bg-brand-900 text-white">
-            <x-site.ornament name="corner-filigree" class="absolute -top-6 -left-6 size-48 opacity-40 sm:size-64" color="var(--color-gold-400)" color2="var(--color-gold-600)" />
-            <x-site.ornament name="corner-filigree" class="absolute -right-6 -bottom-6 size-48 rotate-180 opacity-40 sm:size-64" color="var(--color-gold-400)" color2="var(--color-gold-600)" />
+            <img src="{{ asset('img/decor/songket-cempaka-corner.webp') }}" alt="" class="absolute -top-8 -left-20 w-80 opacity-20 sm:w-[28rem]" loading="lazy" decoding="async">
+            <img src="{{ asset('img/decor/songket-cempaka-corner.webp') }}" alt="" class="absolute -right-20 -bottom-8 w-80 rotate-180 opacity-15 sm:w-[28rem]" loading="lazy" decoding="async">
 
             <div class="relative mx-auto grid max-w-7xl gap-12 px-4 py-20 sm:px-6 lg:grid-cols-2 lg:px-8">
                 <div class="flex flex-col gap-5">
@@ -267,8 +265,8 @@
         {{-- CTA --}}
         <section id="cta" class="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
             <div class="relative overflow-hidden rounded-3xl border border-gold-300 bg-surface-raised px-6 py-16 text-center sm:px-12">
-                <x-site.ornament name="cluster-peony" class="absolute -bottom-16 -left-16 size-64 opacity-40 sm:size-80" color="var(--color-brand-200)" color2="var(--color-brand-100)" />
-                <x-site.ornament name="cluster-peony" class="absolute -top-16 -right-16 size-64 opacity-40 sm:size-80" color="var(--color-gold-300)" color2="var(--color-brand-100)" />
+                <img src="{{ asset('img/decor/botanical-corner.webp') }}" alt="" class="absolute -bottom-28 -left-24 w-80 opacity-15 sm:w-96" loading="lazy" decoding="async">
+                <img src="{{ asset('img/decor/botanical-corner.webp') }}" alt="" class="absolute -top-28 -right-24 w-80 scale-x-[-1] opacity-10 sm:w-96" loading="lazy" decoding="async">
 
                 <div class="relative">
                     <x-site.ornament name="divider-floral" class="mx-auto h-6 w-44" color="var(--color-gold-500)" color2="var(--color-gold-300)" />

@@ -46,7 +46,10 @@ it('draws its icons as line art rather than emoji', function () {
     // An emoji is drawn by whichever operating system opens the page, at its own
     // weight, so a row of them never reads as one set.
     expect($html)->not->toContain('🔎')->not->toContain('📋')->not->toContain('🏆')->not->toContain('💍')
-        ->and($html)->toContain('img/layers/corner-peony.svg')
+        ->and($html)->toContain('img/decor/botanical-corner.webp')
+        ->and($html)->toContain('img/decor/songket-cempaka-corner.webp')
+        ->and($html)->not->toContain('img/layers/corner-peony.svg')
+        ->and($html)->not->toContain('img/layers/corner-filigree.svg')
         ->and($html)->not->toContain('data-icon-missing');
 });
 
