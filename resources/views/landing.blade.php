@@ -207,14 +207,21 @@
                         </div>
                     </div>
 
-                    <ol class="relative flex flex-col gap-0 text-sm">
-                        <span class="absolute top-4 bottom-4 left-[0.9rem] w-px bg-gold-300" aria-hidden="true"></span>
+                    <ol class="grid content-center gap-3 text-sm sm:grid-cols-2">
                         @foreach (__('pages.landing.stages') as $index => $stage)
-                            <li class="relative flex items-center gap-4 py-3">
-                                <span class="relative z-10 flex size-7 shrink-0 items-center justify-center rounded-full border border-gold-500 bg-surface-raised font-display text-xs font-semibold text-brand-700">{{ $index + 1 }}</span>
-                                <span class="font-medium">{{ $stage }}</span>
+                            <li @class([
+                                'group relative flex min-h-24 items-center gap-4 overflow-hidden rounded-2xl border p-4 transition hover:-translate-y-0.5 hover:shadow-md',
+                                'border-line bg-surface-raised hover:border-gold-400' => ! $loop->last,
+                                'border-brand-800 bg-brand-900 text-white sm:col-span-2' => $loop->last,
+                            ])>
+                                <span @class([
+                                    'flex size-10 shrink-0 items-center justify-center rounded-full border font-display text-sm font-semibold',
+                                    'border-gold-400 bg-brand-50 text-brand-700' => ! $loop->last,
+                                    'border-gold-400/70 bg-brand-800 text-gold-300' => $loop->last,
+                                ])>{{ str_pad((string) ($index + 1), 2, '0', STR_PAD_LEFT) }}</span>
+                                <span class="font-display text-base font-semibold">{{ $stage }}</span>
                                 @if ($loop->last)
-                                    <x-site.ornament name="heart" class="ml-auto size-5" color="var(--color-brand-500)" />
+                                    <x-site.ornament name="heart" class="ml-auto size-6" color="var(--color-gold-300)" />
                                 @endif
                             </li>
                         @endforeach
@@ -234,11 +241,13 @@
                     <h2 class="font-display text-3xl font-semibold tracking-tight sm:text-4xl">{{ __('pages.landing.senarai_percuma_pengantin_hubungi_anda') }}</h2>
                     <p class="text-brand-100">{{ __('pages.landing.tiada_komisen_tiada_yuran_lengkapkan') }}</p>
 
-                    <ul class="mt-2 flex flex-wrap items-center gap-2 text-sm">
-                        @foreach (['New', 'Verified', 'Trusted', 'Top', 'Elite'] as $tier)
-                            <li class="rounded-full border border-gold-400/50 bg-brand-800 px-3 py-1 font-medium">{{ $tier }}</li>
+                    <ul class="mt-2 flex items-center justify-between pb-2">
+                        @foreach (['New' => 'new', 'Verified' => 'verified', 'Trusted' => 'trusted', 'Top' => 'top', 'Elite' => 'elite'] as $tier => $file)
+                            <li>
+                                <img src="{{ asset('img/vendor-ranks/web/'.$file.'.webp') }}" alt="{{ $tier }} vendor rank" class="size-12 object-contain sm:size-16" width="64" height="64" loading="lazy" decoding="async">
+                            </li>
                             @unless ($loop->last)
-                                <li class="text-gold-400" aria-hidden="true">→</li>
+                                <li class="text-xs text-gold-400 sm:text-sm" aria-hidden="true">→</li>
                             @endunless
                         @endforeach
                     </ul>

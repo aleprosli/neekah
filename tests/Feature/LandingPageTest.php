@@ -53,6 +53,14 @@ it('draws its icons as line art rather than emoji', function () {
         ->and($html)->not->toContain('data-icon-missing');
 });
 
+it('shows the real vendor rank badges from new through elite', function () {
+    $response = $this->get(route('landing'))->assertOk();
+
+    foreach (['new', 'verified', 'trusted', 'top', 'elite'] as $rank) {
+        $response->assertSee('img/vendor-ranks/web/'.$rank.'.webp', false);
+    }
+});
+
 it('promises nothing the platform does not do while it takes no payment', function () {
     // Neekah is a network for now: no commission, no payment, no booking
     // recorded on the platform. The page used to promise all three.
