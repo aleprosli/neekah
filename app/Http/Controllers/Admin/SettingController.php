@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Enums\PaymentMethod;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\UpdateBoostSettingsRequest;
 use App\Http\Requests\UpdateCameraSettingsRequest;
 use App\Http\Requests\UpdateContactSettingsRequest;
 use App\Http\Requests\UpdateHerepaySettingsRequest;
@@ -14,6 +15,7 @@ use App\Http\Requests\UpdateProSettingsRequest;
 use App\Http\Requests\UpdateSeoSettingsRequest;
 use App\Http\Requests\UpdateTelegramSettingsRequest;
 use App\Http\Requests\UpdateTurnstileSettingsRequest;
+use App\Support\BoostSettings;
 use App\Support\CameraSettings;
 use App\Support\ContactSettings;
 use App\Support\Herepay\HerepayClient;
@@ -44,18 +46,18 @@ class SettingController extends Controller
     public const MENU = [
         'laman' => ['perhubungan', 'seo', 'gambar'],
         'sistem' => ['keselamatan', 'telegram'],
-        'wang' => ['pro', 'tempahan', 'kamera', 'bayaran'],
+        'wang' => ['pro', 'boost', 'tempahan', 'kamera', 'bayaran'],
     ];
 
     /** Every page, in menu order; the first is the default. */
-    public const SECTIONS = ['perhubungan', 'seo', 'gambar', 'keselamatan', 'telegram', 'pro', 'tempahan', 'kamera', 'bayaran'];
+    public const SECTIONS = ['perhubungan', 'seo', 'gambar', 'keselamatan', 'telegram', 'pro', 'boost', 'tempahan', 'kamera', 'bayaran'];
 
     /**
      * One page at a time, with the menu of the others. A page can hold more
      * than one form (Neekah Pro holds the plan and the gateway that takes its
      * payments); each form still posts on its own and comes back here.
      */
-    public function edit(ContactSettings $contact, SeoSettings $seo, TurnstileSettings $turnstile, TelegramSettings $telegram, ImageSettings $images, PaymentSettings $payments, ProSettings $pro, HerepaySettings $herepay, HerepayClient $herepayClient, OnlineBookingSettings $onlineBooking, CameraSettings $camera, string $section = self::SECTIONS[0]): View
+    public function edit(ContactSettings $contact, SeoSettings $seo, TurnstileSettings $turnstile, TelegramSettings $telegram, ImageSettings $images, PaymentSettings $payments, ProSettings $pro, HerepaySettings $herepay, HerepayClient $herepayClient, OnlineBookingSettings $onlineBooking, CameraSettings $camera, BoostSettings $boost, string $section = self::SECTIONS[0]): View
     {
         $pages = [
             'perhubungan' => [$this->contactSection($contact->all())],
@@ -64,6 +66,7 @@ class SettingController extends Controller
             'keselamatan' => [$this->turnstileSection($turnstile->all(), $turnstile->isEnabled())],
             'telegram' => [$this->telegramSection($telegram->all(), $telegram->isEnabled())],
             'pro' => [$this->proSection($pro, $herepayClient), $this->herepaySection($herepay, $herepayClient)],
+            'boost' => [$this->boostSection($boost, $herepayClient)],
             'tempahan' => [$this->onlineBookingSection($onlineBooking)],
             'kamera' => [$this->cameraSection($camera, $herepayClient)],
             'bayaran' => [$this->paymentSection($payments)],
@@ -337,6 +340,55 @@ class SettingController extends Controller
      *
      * @return array<string, mixed>
      */
+    /**
+     * Boost tokens: the welcome gift, Pro's monthly tokens, the longest boost
+     * and the packs sold. The switch opens buying only; tokens held can
+     * always be spent.
+     *
+     * @return array<string, mixed>
+     */
+    private function boostSection(BoostSettings $settings, PaymentLinkGateway $gateway): array
+    {
+        $values = $settings->all();
+        $open = $settings->isEnabled() && $gateway->isConfigured();
+        $number = fn (string $key, ?string $help = null): array => [
+            'name' => $key,
+            'label' => Str::ucfirst(__('fields.boost_'.$key)),
+            'type' => 'number',
+            'value' => $values[$key],
+            'min' => UpdateBoostSettingsRequest::NUMBERS[$key][0],
+            'max' => UpdateBoostSettingsRequest::NUMBERS[$key][1],
+            'required' => true,
+            'help' => $help,
+        ];
+
+        return [
+            'id' => 'boost',
+            'icon' => '🚀',
+            'label' => __('props.admin.boost_label'),
+            'title' => __('props.admin.boost_title'),
+            'description' => __('props.admin.boost_description'),
+            'action' => route('admin.settings.boost'),
+            'submit' => __('props.admin.boost_submit'),
+            'columns' => true,
+            'badge' => [
+                'active' => $open,
+                'label' => $open ? __('props.admin.pro_checkout_open') : __('props.admin.pro_checkout_closed'),
+            ],
+            'note' => $gateway->isConfigured() ? null : __('props.admin.boost_gateway_missing'),
+            'fields' => [
+                ['name' => 'enabled', 'label' => __('props.admin.boost_enabled'), 'type' => 'checkbox', 'value' => $values['enabled'], 'wide' => true, 'help' => __('props.admin.boost_enabled_help')],
+                $number('welcome_tokens', __('props.admin.boost_welcome_help')),
+                $number('pro_monthly_tokens', __('props.admin.boost_pro_help')),
+                $number('max_days'),
+                $number('small_tokens'),
+                $number('small_price'),
+                $number('large_tokens'),
+                $number('large_price'),
+            ],
+        ];
+    }
+
     private function cameraSection(CameraSettings $settings, PaymentLinkGateway $gateway): array
     {
         $values = $settings->all();
@@ -420,8 +472,7 @@ class SettingController extends Controller
     }
 
     /**
-     * Neekah Pro: the price of each plan and how many sponsored slots sit
-     * above the listing. The badge says whether a vendor can actually pay,
+     * Neekah Pro: the price of each plan. The badge says whether a vendor can actually pay,
      * which also needs the Herepay keys in .env.
      *
      * @return array<string, mixed>
@@ -449,7 +500,6 @@ class SettingController extends Controller
                 ['name' => 'enabled', 'label' => __('props.admin.pro_enabled'), 'type' => 'checkbox', 'value' => $values['enabled'], 'wide' => true, 'help' => __('props.admin.pro_enabled_help')],
                 ['name' => 'monthly_price', 'label' => Str::ucfirst(__('fields.pro_monthly_price')), 'type' => 'number', 'value' => $values['monthly_price'], 'min' => 1, 'required' => true],
                 ['name' => 'yearly_price', 'label' => Str::ucfirst(__('fields.pro_yearly_price')), 'type' => 'number', 'value' => $values['yearly_price'], 'min' => 1, 'required' => true],
-                ['name' => 'sponsored_slots', 'label' => Str::ucfirst(__('fields.pro_sponsored_slots')), 'type' => 'number', 'value' => $values['sponsored_slots'], 'min' => 0, 'max' => ProSettings::MAX_SPONSORED_SLOTS, 'required' => true, 'help' => __('props.admin.pro_slots_help')],
             ],
         ];
     }
@@ -531,6 +581,13 @@ class SettingController extends Controller
         $herepay->save($request->settings());
 
         return $this->saved(__('flash.admin.herepay_saved'));
+    }
+
+    public function updateBoost(UpdateBoostSettingsRequest $request, BoostSettings $settings): RedirectResponse
+    {
+        $settings->save($request->settings());
+
+        return $this->saved(__('flash.admin.boost_saved'));
     }
 
     public function updateCamera(UpdateCameraSettingsRequest $request, CameraSettings $settings): RedirectResponse

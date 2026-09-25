@@ -41,6 +41,7 @@
         ]),
         $group(__('pages.sidebar_vendor.prestasi'), [
             $feature(App\Enums\VendorFeature::Points, __('pages.dash.point_ranking')),
+            $feature(App\Enums\VendorFeature::Boost, __('pages.sidebar_vendor.boost')),
             $item(__('pages.sidebar_vendor.pro'), 'crown', 'vendor.pro.index', 'vendor.pro.*'),
         ]),
     ]));

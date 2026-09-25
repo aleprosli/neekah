@@ -1,4 +1,4 @@
-@props(['vendor', 'comparable' => false, 'sponsored' => false])
+@props(['vendor', 'comparable' => false, 'promoted' => false])
 
 @php use App\Actions\StoreOptimizedImage; use App\Enums\VendorTier; @endphp
 
@@ -13,11 +13,14 @@
             @elseif ($vendor->tier === VendorTier::Top)
                 <span class="absolute top-3 left-3 rounded-full bg-white/95 px-2.5 py-1 text-xs font-semibold text-ink shadow-sm">{{ __('marketplace.card.top') }}</span>
             @endif
+            @if ($vendor->trending_at)
+                <span class="absolute {{ in_array($vendor->tier, [VendorTier::Recommended, VendorTier::Top], true) ? 'top-11' : 'top-3' }} left-3 rounded-full bg-brand-600/95 px-2.5 py-1 text-xs font-semibold text-white shadow-sm">🔥 {{ __('marketplace.card.trending') }}</span>
+            @endif
             <span class="absolute inset-x-0 bottom-0 h-1/3 bg-linear-to-t from-black/35 to-transparent"></span>
             <span class="absolute bottom-3 left-3 flex size-10 items-center justify-center rounded-full bg-white text-xl shadow-sm" aria-hidden="true"><x-category-icon class="size-6" :category="$vendor->category" /></span>
         </div>
 
-        <p class="mt-2 truncate text-[11px] font-semibold tracking-wide text-brand-600 uppercase">@if ($sponsored)<span class="text-ink-muted">{{ __('marketplace.sponsored.label') }} · </span>@endif{{ $vendor->category->name }} · {{ $vendor->state }}</p>
+        <p class="mt-2 truncate text-[11px] font-semibold tracking-wide text-brand-600 uppercase">@if ($promoted)<span class="text-ink-muted">{{ __('marketplace.card.promoted') }} · </span>@endif{{ $vendor->category->name }} · {{ $vendor->state }}</p>
         <div class="flex items-start justify-between gap-2">
             <h3 class="flex min-w-0 items-center gap-1.5 text-sm font-semibold sm:text-[15px]">
                 <span class="truncate">{{ $vendor->name }}</span>

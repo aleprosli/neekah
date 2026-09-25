@@ -33,7 +33,7 @@ use Illuminate\Support\Collection;
     'phone', 'whatsapp', 'social_links', 'price_from', 'price_unit', 'cover_image', 'logo', 'cover_tone',
     'status', 'tier', 'rating_avg', 'reviews_count', 'completed_bookings_count',
     'response_rate', 'completion_rate', 'score', 'points_total', 'tier_locked', 'penalty_points', 'violations_count', 'approved_at',
-    'pro_until', 'feature_overrides',
+    'pro_until', 'feature_overrides', 'views_30d', 'trending_at',
 ])]
 class Vendor extends Model
 {
@@ -58,6 +58,9 @@ class Vendor extends Model
             'approved_at' => 'datetime',
             'pro_until' => 'datetime',
             'feature_overrides' => 'array',
+            'views_30d' => 'integer',
+            'trending_at' => 'datetime',
+            'boost_tokens' => 'integer',
         ];
     }
 
@@ -84,6 +87,16 @@ class Vendor extends Model
      *
      * @return BelongsToMany<Category, $this>
      */
+    public function boosts(): HasMany
+    {
+        return $this->hasMany(VendorBoost::class);
+    }
+
+    public function boostEntries(): HasMany
+    {
+        return $this->hasMany(VendorBoostEntry::class);
+    }
+
     public function categories(): BelongsToMany
     {
         return $this->belongsToMany(Category::class)->orderBy('sort_order')->orderBy('name');
@@ -233,9 +246,9 @@ class Vendor extends Model
     }
 
     /**
-     * Whether the vendor has a paid Pro plan running. Pro buys the sponsored
-     * slot, the analytics and the badge; it never touches the tier, the score
-     * or where the vendor sits in the ordinary listing.
+     * Whether the vendor has a paid Pro plan running. Pro buys online
+     * booking, monthly boost tokens, the analytics and the badge; it never
+     * touches the tier or the score.
      */
     public function isPro(): bool
     {
@@ -427,6 +440,26 @@ class Vendor extends Model
                 });
             }
         });
+    }
+
+    /**
+     * The "Disyorkan" order with boosted vendors first: those with a boost
+     * running in this category, or in any category when the list is not
+     * narrowed to one. Selects `boosted` so the card can say so.
+     */
+    #[Scope]
+    protected function boostedFirst(Builder $query, ?Category $category = null): Builder
+    {
+        $running = VendorBoost::query()
+            ->selectRaw('1')
+            ->whereColumn('vendor_boosts.vendor_id', 'vendors.id')
+            ->where('vendor_boosts.starts_at', '<=', now())
+            ->where('vendor_boosts.ends_at', '>', now())
+            ->when($category, fn (Builder $boosts, Category $category) => $boosts->where('vendor_boosts.category_id', $category->getKey()));
+
+        return $query->select('vendors.*')
+            ->selectRaw('exists('.$running->toSql().') as boosted', $running->getBindings())
+            ->orderByDesc('boosted');
     }
 
     #[Scope]

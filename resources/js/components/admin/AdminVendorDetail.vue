@@ -11,6 +11,7 @@ const props = defineProps({
     portfolio: { type: Array, required: true },
     statusActions: { type: Array, required: true },
     tiers: { type: Array, required: true },
+    boost: { type: Object, default: null },
     csrf: { type: String, required: true },
     errors: { type: Object, default: () => ({}) },
 });
@@ -95,6 +96,29 @@ const tier = ref(props.vendor.tier);
                 <button type="submit" class="rounded-full bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700">{{ $t('admin_vendor.simpan_ranking') }}</button>
 
                 <p class="text-xs text-ink-muted">{{ $t('admin_vendor.vendor_score_rating_30_booking') }}</p>
+            </form>
+
+            <!-- Boost tokens: give some (a promotion) or take some back. -->
+            <form v-if="boost" :action="boost.url" method="POST" class="flex flex-col gap-3 rounded-2xl border border-line bg-surface-raised p-5">
+                <input type="hidden" name="_token" :value="csrf">
+                <div class="flex items-baseline justify-between gap-2">
+                    <h2 class="text-sm font-semibold">{{ $t('admin_vendor.boost_title') }}</h2>
+                    <span class="text-sm font-semibold">{{ $t('admin_vendor.boost_balance', { count: boost.balance }) }}</span>
+                </div>
+                <ul v-if="boost.running.length" class="flex flex-col gap-1 text-xs text-ink-muted">
+                    <li v-for="item in boost.running" :key="item.id">🚀 {{ item.category }} · {{ item.ends }}</li>
+                </ul>
+                <label class="flex flex-col gap-1.5">
+                    <span class="text-sm font-medium">{{ $t('admin_vendor.boost_change') }}</span>
+                    <input type="number" name="change" required :min="-boost.max" :max="boost.max" step="1" class="rounded-xl border border-line bg-surface px-4 py-2.5 text-sm focus:border-brand-400 focus:outline-none">
+                    <span class="text-xs text-ink-muted">{{ $t('admin_vendor.boost_change_hint') }}</span>
+                    <span v-if="errors.change || errors.tokens" class="text-xs text-brand-700">{{ errors.change || errors.tokens }}</span>
+                </label>
+                <label class="flex flex-col gap-1.5">
+                    <span class="text-sm font-medium">{{ $t('admin_vendor.boost_note') }}</span>
+                    <input type="text" name="note" maxlength="255" class="rounded-xl border border-line bg-surface px-4 py-2.5 text-sm focus:border-brand-400 focus:outline-none">
+                </label>
+                <button type="submit" class="rounded-full bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700">{{ $t('admin_vendor.boost_save') }}</button>
             </form>
         </aside>
     </div>

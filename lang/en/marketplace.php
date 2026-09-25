@@ -45,12 +45,15 @@ return [
         'price_asc' => 'Price: low to high',
         'price_desc' => 'Price: high to low',
         'reviews' => 'Most reviewed',
+        'popular' => 'Most viewed',
     ],
 
     'count' => '{0} No vendors|{1} :count vendor|[2,*] :count vendors',
     'demo' => 'Demo data',
 
     'card' => [
+        'promoted' => 'Promoted',
+        'trending' => 'Trending',
         'pro' => 'Pro',
         'pro_title' => 'Neekah Pro vendor',
         'recommended' => 'Recommended',
@@ -73,12 +76,6 @@ return [
         'clear' => 'Clear',
         'open' => 'Compare',
         'limit' => 'Four vendors at most.',
-    ],
-
-    'sponsored' => [
-        'heading' => 'Sponsored',
-        'note' => 'Pro vendors matching your search. The list below is ordered by performance, not payment.',
-        'label' => 'Sponsored',
     ],
 
 ];

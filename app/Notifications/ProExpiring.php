@@ -11,7 +11,7 @@ use Illuminate\Notifications\Notification;
 
 /**
  * FPX has no auto-debit, so a vendor has to be told before Pro runs out or the
- * sponsored slot simply disappears one morning.
+ * online booking and the monthly boost tokens simply stop one morning.
  */
 class ProExpiring extends Notification implements ShouldQueue
 {

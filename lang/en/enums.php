@@ -2,7 +2,17 @@
 
 return [
 
+    'boost_token_reason' => [
+        'welcome' => 'Welcome gift',
+        'pro_monthly' => 'Pro monthly tokens',
+        'purchase' => 'Token purchase',
+        'admin' => 'Admin adjustment',
+        'spend' => 'Category boost',
+        'refund' => 'Refund',
+    ],
+
     'vendor_feature' => [
+        'boost' => 'Boost',
         'online_booking' => 'Online booking',
         'packages' => 'Packages',
         'portfolio' => 'Portfolio',
@@ -14,6 +24,7 @@ return [
     ],
 
     'vendor_feature_desc' => [
+        'boost' => 'Spend tokens to lift your profile to the top of your category.',
         'online_booking' => 'Couples book a date and pay the deposit right on the vendor page.',
         'packages' => 'Manage the packages and prices shown on the public page.',
         'portfolio' => 'Upload and arrange portfolio photos.',

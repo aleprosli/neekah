@@ -21,6 +21,8 @@ return [
     ],
 
     'admin' => [
+        'boost_tokens_changed' => 'Boost tokens for :vendor updated. Balance: :balance.',
+        'boost_saved' => 'Boost settings saved.',
         'camera_saved' => 'Kamera Majlis settings saved.',
         'online_booking_saved' => 'Online booking settings saved.',
         'category_added' => 'Category added.',
@@ -125,6 +127,8 @@ return [
     ],
 
     'vendor' => [
+        'boost_started' => 'Your :category boost runs until :date.',
+        'boost_checkout_failed' => 'The payment link could not be opened. Please try again shortly.',
         'ical_connected' => 'Google Calendar connected. :count busy dates imported.',
         'ical_synced' => 'Synced. :count busy dates from Google Calendar.',
         'ical_disconnected' => 'Google Calendar disconnected. Imported dates have been reopened.',

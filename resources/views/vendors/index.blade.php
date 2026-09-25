@@ -169,7 +169,7 @@
             </div>
         </div>
 
-        @if ($vendors->isEmpty() && $sponsored->isEmpty())
+        @if ($vendors->isEmpty())
             {{-- Neekah is a network first: when the list has nobody, the team
                  can still pass the request on to vendors who are not listed. --}}
             <div class="flex flex-col items-center gap-3 py-24 text-center">
@@ -192,25 +192,9 @@
         @else
             <h1 class="sr-only">{{ $activeCategory?->name ?? __('pages.dash.semua_vendor') }}</h1>
 
-            @if ($sponsored->isNotEmpty())
-                {{-- Paid placement, always named as such. The ordinary list below
-                     is ordered by what vendors earned and never by this. --}}
-                <section class="mb-10 rounded-3xl border border-gold-300/60 bg-gold-300/10 p-4 sm:p-6" aria-labelledby="ditaja">
-                    <div class="mb-4 flex flex-wrap items-baseline justify-between gap-2">
-                        <h2 id="ditaja" class="text-sm font-semibold tracking-wide uppercase">{{ __('marketplace.sponsored.heading') }}</h2>
-                        <p class="text-xs text-ink-muted">{{ __('marketplace.sponsored.note') }}</p>
-                    </div>
-                    <ul class="grid grid-cols-2 gap-x-3 gap-y-8 sm:gap-x-6 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
-                        @foreach ($sponsored as $vendor)
-                            <li><x-vendor-card :vendor="$vendor" comparable sponsored /></li>
-                        @endforeach
-                    </ul>
-                </section>
-            @endif
-
             <ul class="grid grid-cols-2 gap-x-3 gap-y-8 sm:gap-x-6 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
                 @foreach ($vendors as $vendor)
-                    <li><x-vendor-card :vendor="$vendor" comparable /></li>
+                    <li><x-vendor-card :vendor="$vendor" comparable :promoted="(bool) $vendor->boosted" /></li>
                 @endforeach
             </ul>
 

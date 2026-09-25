@@ -20,6 +20,7 @@ enum VendorFeature: string
     case Reviews = 'reviews';
     case Points = 'points';
     case OnlineBooking = 'online_booking';
+    case Boost = 'boost';
 
     /**
      * What a plan opens until an admin says otherwise. Everything is open to
@@ -52,6 +53,7 @@ enum VendorFeature: string
             self::Reviews => 'star',
             self::Points => 'trophy',
             self::OnlineBooking => 'calendar',
+            self::Boost => 'rocket',
         };
     }
 
@@ -67,6 +69,7 @@ enum VendorFeature: string
             self::Reviews => 'vendor.reviews.index',
             self::Points => 'vendor.points.index',
             self::OnlineBooking => 'vendor.booking-settings.edit',
+            self::Boost => 'vendor.boost.index',
         };
     }
 
@@ -82,6 +85,7 @@ enum VendorFeature: string
             self::Reviews => 'vendor.reviews.*',
             self::Points => 'vendor.points.*',
             self::OnlineBooking => 'vendor.booking-settings.*',
+            self::Boost => 'vendor.boost.*',
         };
     }
 }

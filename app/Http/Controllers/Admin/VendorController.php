@@ -325,6 +325,7 @@ class VendorController extends Controller
                 'tiers' => collect(VendorTier::cases())
                     ->map(fn (VendorTier $case): array => ['value' => $case->value, 'label' => $case->label()])
                     ->all(),
+                'boost' => VendorBoostController::card($vendor),
             ]),
         ]);
     }

@@ -56,7 +56,7 @@ return [
             'packages' => 'Packages, prices and portfolio on show',
             'calendar' => 'A calendar of the dates you are booked',
             'enquiries' => 'Every enquiry in one place',
-            'pro' => 'Optional Neekah Pro: a sponsored slot and profile analytics',
+            'pro' => 'Optional Neekah Pro: monthly boost tokens and profile analytics',
         ],
         'headline_tail' => 'and deal with them directly.',
         'mock_date' => '20 December 2026 · Alor Setar',
@@ -672,7 +672,7 @@ return [
         'unlock_enquiries' => 'Enquiries from couples, right in your dashboard.',
         'unlock_reviews' => 'Customer reviews, and replying to them.',
         'unlock_ranking' => 'Vendor points and ranking: move up the tiers as you perform.',
-        'unlock_pro' => 'Neekah Pro: Sponsored slots, full analytics and the Pro badge.',
+        'unlock_pro' => 'Neekah Pro: monthly boost tokens, full analytics and the Pro badge.',
         'unlock_note' => 'All of this opens only after the admin approves your application. Complete your profile first so the review goes faster.',
         'help_call_label' => 'Call the admin',
         'help_email_label' => 'Email us',
@@ -707,6 +707,7 @@ return [
     ],
 
     'sidebar_vendor' => [
+        'boost' => 'Boost',
         'tempahan_online' => 'Online booking',
         'pro' => 'Neekah Pro',
         'ringkasan' => 'Overview',
@@ -794,9 +795,9 @@ return [
                 'title' => 'Online booking with deposit',
                 'body' => 'Couples pick an open date on your calendar and pay the deposit straight into your account (Herepay or bank transfer). Bookings confirm automatically; you set the days, capacity and deposit.',
             ],
-            'sponsored' => [
-                'title' => 'A sponsored slot above search',
-                'body' => 'Your profile appears in the Sponsored row above the vendor list when couples search your category and state. Slots rotate between Pro vendors.',
+            'boost' => [
+                'title' => 'Boost tokens every month',
+                'body' => 'Every month you get free boost tokens. One token lifts your profile to the top of the Recommended list in a category you choose, for a day.',
             ],
             'analytics' => [
                 'title' => 'Profile analytics',
@@ -807,7 +808,7 @@ return [
                 'body' => 'A Pro badge on your card and profile, so couples know you take your business seriously.',
             ],
         ],
-        'fair_note' => 'Tiers (Verified to Recommended) and the ordinary list order stay based on performance. Pro cannot buy them.',
+        'fair_note' => 'Tiers (Verified to Recommended) and the score stay based on performance. A boost only lifts the Recommended order while it runs, and your card is labelled Promoted.',
         'analytics_heading_pro' => 'Last 28 days',
         'analytics_heading_free' => 'Last 7 days',
         'analytics_teaser' => 'Upgrade to Pro to see the daily chart for 28 days.',
@@ -987,5 +988,19 @@ return [
         'purge_title' => 'Delete the Kamera Majlis album of :wedding now?',
         'purge_message' => ':count photos and videos are deleted for good, and the guest link closes. The purchase records stay.',
         'purge_confirm' => 'Yes, delete the album',
+    ],
+
+    'boost' => [
+        'title' => 'Boost',
+        'subheading' => 'Lift your profile to the top of the Recommended list in your category. 1 token = 1 day.',
+        'herepay_title' => ':count Neekah boost tokens for :vendor',
+        'herepay_description' => 'Reference :reference',
+        'done_paid_title' => 'Tokens added',
+        'done_paid_body' => ':count boost tokens were added to your balance.',
+        'done_waiting_title' => 'Waiting for payment confirmation',
+        'done_waiting_body' => 'Your tokens arrive as soon as Herepay confirms the payment. This page refreshes on its own.',
+        'done_failed_title' => 'The payment did not go through',
+        'done_failed_body' => 'Nothing was charged for :count tokens. Try again from the Boost page.',
+        'back' => 'Back to Boost',
     ],
 ];

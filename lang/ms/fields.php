@@ -136,7 +136,6 @@ return [
 
     'pro_monthly_price' => 'harga bulanan (RM)',
     'pro_yearly_price' => 'harga tahunan (RM)',
-    'pro_sponsored_slots' => 'bilangan slot Ditaja',
 
     'terma_deposit' => 'terma deposit',
     'jenis_deposit' => 'jenis deposit',
@@ -164,4 +163,11 @@ return [
     'camera_album_title' => 'nama album',
     'camera_welcome' => 'ucapan untuk tetamu',
     'camera_passcode' => 'kata laluan',
+    'boost_welcome_tokens' => 'token selamat datang',
+    'boost_pro_monthly_tokens' => 'token bulanan Pro',
+    'boost_max_days' => 'hari maksimum satu boost',
+    'boost_small_tokens' => 'token pek kecil',
+    'boost_small_price' => 'harga pek kecil (RM)',
+    'boost_large_tokens' => 'token pek besar',
+    'boost_large_price' => 'harga pek besar (RM)',
 ];

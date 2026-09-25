@@ -21,6 +21,8 @@ return [
     ],
 
     'admin' => [
+        'boost_tokens_changed' => 'Token boost :vendor dikemas kini. Baki: :balance.',
+        'boost_saved' => 'Tetapan boost disimpan.',
         'camera_saved' => 'Tetapan Kamera Majlis disimpan.',
         'online_booking_saved' => 'Tetapan tempahan online disimpan.',
         'category_added' => 'Kategori ditambah.',
@@ -125,6 +127,8 @@ return [
     ],
 
     'vendor' => [
+        'boost_started' => 'Boost :category aktif sehingga :date.',
+        'boost_checkout_failed' => 'Pautan bayaran tidak dapat dibuka. Cuba sebentar lagi.',
         'ical_connected' => 'Google Calendar disambung. :count tarikh sibuk diimport.',
         'ical_synced' => 'Disegerakkan. :count tarikh sibuk daripada Google Calendar.',
         'ical_disconnected' => 'Google Calendar diputuskan. Tarikh yang diimport telah dibuka semula.',
