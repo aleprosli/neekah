@@ -686,27 +686,10 @@ return [
         'review_again' => 'Review my profile',
     ],
 
-    'vendor_features' => [
-        'title' => 'Vendor features',
-        'subheading' => 'Choose which parts of the vendor dashboard each plan opens.',
-        'feature' => 'Feature',
-        'plan_basic' => 'Basic',
-        'plan_pro' => 'Pro',
-        'always_open' => 'Overview, Profile, the Neekah Pro page and Account are always open to every vendor.',
-        'overridden' => ':count vendors have their own exceptions, which override these settings.',
-        'save' => 'Save vendor features',
-        'vendor_heading' => 'Features for this vendor',
-        'vendor_plan' => 'Current plan: :plan',
-        'edit_plans' => 'Edit what each plan opens',
-        'open' => 'open',
-        'closed' => 'closed',
-        'follow_plan' => 'Follow the plan (:state)',
-        'always_open_option' => 'Always open',
-        'always_closed_option' => 'Always closed',
-        'save_vendor' => 'Save this vendor\'s features',
-    ],
-
     'sidebar_vendor' => [
+        'kalendar_tempahan' => 'Calendar & bookings',
+        'langganan_pro' => 'Pro subscription',
+        'upgrade_pro' => 'Upgrade to Pro',
         'boost' => 'Boost',
         'tempahan_online' => 'Online booking',
         'pro' => 'Neekah Pro',
@@ -726,7 +709,6 @@ return [
 
     'sidebar_admin' => [
         'kamera' => 'Kamera Majlis',
-        'ciri_vendor' => 'Vendor features',
         'muzik_kad' => 'Card music',
         'kad_nfc' => 'NFC cards',
         'ringkasan' => 'Overview',
@@ -792,8 +774,16 @@ return [
         'until' => 'until :date',
         'benefits' => [
             'booking' => [
-                'title' => 'Online booking with deposit',
-                'body' => 'Couples pick an open date on your calendar and pay the deposit straight into your account (Herepay or bank transfer). Bookings confirm automatically; you set the days, capacity and deposit.',
+                'title' => 'Calendar & online booking',
+                'body' => 'Block dates, sync Google Calendar, and let couples book an open date and pay the deposit straight to you.',
+            ],
+            'enquiries' => [
+                'title' => 'Enquiries and bookings',
+                'body' => 'Read and answer couples\' enquiries, record bookings and take payments in one place.',
+            ],
+            'ranking' => [
+                'title' => 'Points & ranking',
+                'body' => 'See your points, score and tier, and what moves them.',
             ],
             'boost' => [
                 'title' => 'Boost tokens every month',
@@ -1002,5 +992,14 @@ return [
         'done_failed_title' => 'The payment did not go through',
         'done_failed_body' => 'Nothing was charged for :count tokens. Try again from the Boost page.',
         'back' => 'Back to Boost',
+    ],
+
+    'calendar' => [
+        'title' => 'Calendar & bookings',
+        'subheading' => 'Your dates, online booking and deposits in one place.',
+    ],
+    'enquiries_locked' => [
+        'subheading' => 'Couples can send you enquiries.',
+        'waiting' => ':count enquiries are waiting for you.',
     ],
 ];

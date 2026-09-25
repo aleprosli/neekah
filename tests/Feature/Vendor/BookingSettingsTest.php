@@ -32,12 +32,12 @@ function bookingRules(array $overrides = []): array
 it('sends a basic vendor to the Pro page instead of the booking settings', function () {
     $basic = Vendor::factory()->for(Category::first())->create();
 
-    $this->actingAs($basic->user)->get(route('vendor.booking-settings.edit'))->assertRedirect(route('vendor.pro.index'));
+    $this->actingAs($basic->user)->get(route('vendor.availability.index'))->assertRedirect(route('vendor.pro.index'));
     $this->actingAs($basic->user)->put(route('vendor.booking-settings.update'), bookingRules())->assertForbidden();
 });
 
 it('saves the rules, and saving counts as confirming the calendar', function () {
-    $this->actingAs($this->vendor->user)->get(route('vendor.booking-settings.edit'))->assertOk();
+    $this->actingAs($this->vendor->user)->get(route('vendor.availability.index'))->assertOk();
     $this->actingAs($this->vendor->user)->put(route('vendor.booking-settings.update'), bookingRules())->assertSessionHasNoErrors();
 
     $settings = $this->vendor->bookingSettings()->sole();
@@ -71,7 +71,7 @@ it('keeps Herepay keys only once Herepay accepts them, encrypted and never shown
     expect($settings->hasHerepay())->toBeTrue()
         ->and(DB::table('vendor_booking_settings')->value('herepay_secret_key'))->not->toContain('sk_live_vendor_123');
 
-    $this->actingAs($this->vendor->user)->get(route('vendor.booking-settings.edit'))
+    $this->actingAs($this->vendor->user)->get(route('vendor.availability.index'))
         ->assertDontSee('sk_live_vendor_123')
         ->assertDontSee('pk_live_vendor_456');
 
@@ -110,4 +110,15 @@ it('reminds a vendor a week after confirming, before online booking pauses, and 
 
     Notification::assertSentToTimes($this->vendor->user, CalendarReminder::class, 3);
     Notification::assertNotSentTo($basic->user, CalendarReminder::class);
+});
+
+it('shows the calendar, the booking rules, the deposit and Google Calendar on one page', function () {
+    $props = $this->actingAs($this->vendor->user)->get(route('vendor.availability.index'))->assertOk()->viewData('props');
+
+    expect(array_keys($props))->toContain('status', 'calendar', 'rules', 'deposit', 'ical')
+        ->and($props['rules']['url'])->toBe(route('vendor.booking-settings.update'))
+        ->and($props['calendar']['storeUrl'])->toBe(route('vendor.availability.store'));
+
+    // Links to the old settings page land on its tab.
+    $this->actingAs($this->vendor->user)->get('/vendor/tempahan-online')->assertRedirect('/vendor/availability?tab=tempahan');
 });

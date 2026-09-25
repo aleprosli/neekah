@@ -12,9 +12,9 @@ class EnsureVendorHasFeature
     /**
      * Usage: ->middleware('vendor.feature:bookings').
      *
-     * A closed feature is closed on the server too, not only in the sidebar.
-     * Opening one is answered with the Pro page when Pro would open it, or the
-     * dashboard otherwise; a write to it is refused.
+     * A Pro feature is locked on the server too, not only in the sidebar.
+     * Opening one on Basic is answered with the Pro page; a write to it is
+     * refused.
      */
     public function handle(Request $request, Closure $next, string $feature): Response
     {
@@ -29,8 +29,6 @@ class EnsureVendorHasFeature
 
         abort_unless($request->isMethod('GET') && ! $request->expectsJson(), 403);
 
-        return $vendor?->unlocksWithPro($feature)
-            ? redirect()->route('vendor.pro.index')->with('status', __('flash.vendor.feature_needs_pro', ['feature' => $feature->label()]))
-            : redirect()->route('vendor.dashboard')->with('status', __('flash.vendor.feature_closed', ['feature' => $feature->label()]));
+        return redirect()->route('vendor.pro.index')->with('status', __('flash.vendor.feature_needs_pro', ['feature' => $feature->label()]));
     }
 }

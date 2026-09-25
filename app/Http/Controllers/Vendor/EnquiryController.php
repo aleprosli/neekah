@@ -5,9 +5,11 @@ namespace App\Http\Controllers\Vendor;
 use App\Actions\AwardVendorPoints;
 use App\Enums\EnquiryStatus;
 use App\Enums\PointReason;
+use App\Enums\VendorFeature;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ReplyEnquiryRequest;
 use App\Models\Enquiry;
+use App\Models\Vendor;
 use App\Notifications\EnquiryReplied;
 use App\Support\VueProps;
 use Illuminate\Contracts\View\View;
@@ -19,7 +21,13 @@ class EnquiryController extends Controller
 {
     public function index(Request $request): View
     {
-        $enquiries = $request->user()->vendor->enquiries()
+        $vendor = $request->user()->vendor;
+
+        if (! $vendor->hasFeature(VendorFeature::Enquiries)) {
+            return $this->locked($vendor);
+        }
+
+        $enquiries = $vendor->enquiries()
             ->with(['user', 'package'])
             ->orderByRaw("case when status = 'open' then 0 else 1 end")
             ->latest()
@@ -37,6 +45,28 @@ class EnquiryController extends Controller
         ]));
 
         return view('vendor.enquiries.index', ['enquiries' => $enquiries]);
+    }
+
+    /**
+     * Basic: enquiries still arrive, so no couple is turned away, but only
+     * how many and when shows here. Who wrote and what they asked is Pro.
+     */
+    private function locked(Vendor $vendor): View
+    {
+        $open = $vendor->enquiries()->where('status', EnquiryStatus::Open);
+
+        return view('vendor.enquiries.locked', [
+            'props' => VueProps::for([
+                'waiting' => $open->clone()->count(),
+                'total' => $vendor->enquiries()->count(),
+                'recent' => $open->clone()->latest()->limit(5)->get()->map(fn (Enquiry $enquiry): array => [
+                    'id' => $enquiry->id,
+                    'received' => $enquiry->created_at->diffForHumans(),
+                    'event_date' => $enquiry->event_date?->translatedFormat('j M Y'),
+                ])->values(),
+                'proUrl' => route('vendor.pro.index'),
+            ]),
+        ]);
     }
 
     public function show(Enquiry $enquiry): View

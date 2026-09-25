@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'pro_locked' => 'Dikunci, perlu Neekah Pro',
 
     'find_vendors' => 'Cari Vendor',
     'how_it_works' => 'Cara Ia Berfungsi',

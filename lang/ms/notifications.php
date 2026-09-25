@@ -26,6 +26,9 @@ return [
     ],
 
     'enquiry_received' => [
+        'locked_title' => 'Ada enquiry baharu untuk anda',
+        'locked_body' => 'Seorang pengantin menghantar enquiry. Naik taraf ke Neekah Pro untuk membaca dan membalasnya.',
+        'locked_action' => 'Naik taraf ke Pro',
         'title' => 'Enquiry baharu daripada :name',
         'body' => 'Balas dalam 24 jam untuk mengekalkan response rate anda.',
         'subject' => 'Enquiry baharu daripada :name',

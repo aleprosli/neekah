@@ -3,11 +3,13 @@
 namespace App\Enums;
 
 /**
- * The parts of the vendor area an admin can open or close, per plan (Admin →
- * Ciri vendor) and per vendor (the vendor's admin page).
+ * The parts of the vendor area, each open to every vendor or only on Neekah
+ * Pro. Fixed by the owner (26 Sep 2026): Basic gets what builds the public
+ * profile (packages, portfolio, reviews) and boosting; Pro adds the calendar
+ * with online booking, bookings, enquiries and points & ranking.
  *
  * The overview, the business profile, the Pro page and the account are not
- * here: every vendor always has them, and the Pro page is where a closed
+ * here: every vendor always has them, and the Pro page is where a locked
  * feature is bought.
  */
 enum VendorFeature: string
@@ -22,13 +24,21 @@ enum VendorFeature: string
     case OnlineBooking = 'online_booking';
     case Boost = 'boost';
 
-    /**
-     * What a plan opens until an admin says otherwise. Everything is open to
-     * both, except online booking, which is what Neekah Pro is sold on.
-     */
-    public function openByDefault(string $plan): bool
+    /** Whether only a Neekah Pro vendor can use it. */
+    public function requiresPro(): bool
     {
-        return $this !== self::OnlineBooking || $plan === 'pro';
+        return in_array($this, [self::Calendar, self::Bookings, self::Enquiries, self::Points, self::OnlineBooking], true);
+    }
+
+    /**
+     * The features in the order the sidebar lists them, Basic first. Online
+     * booking has no page of its own: it lives on the calendar page.
+     *
+     * @return array<int, self>
+     */
+    public static function menu(): array
+    {
+        return [self::Packages, self::Portfolio, self::Reviews, self::Boost, self::Calendar, self::Bookings, self::Enquiries, self::Points];
     }
 
     public function label(): string
@@ -68,7 +78,7 @@ enum VendorFeature: string
             self::Enquiries => 'vendor.enquiries.index',
             self::Reviews => 'vendor.reviews.index',
             self::Points => 'vendor.points.index',
-            self::OnlineBooking => 'vendor.booking-settings.edit',
+            self::OnlineBooking => 'vendor.availability.index',
             self::Boost => 'vendor.boost.index',
         };
     }
@@ -84,7 +94,7 @@ enum VendorFeature: string
             self::Enquiries => 'vendor.enquiries.*',
             self::Reviews => 'vendor.reviews.*',
             self::Points => 'vendor.points.*',
-            self::OnlineBooking => 'vendor.booking-settings.*',
+            self::OnlineBooking => 'vendor.availability.*',
             self::Boost => 'vendor.boost.*',
         };
     }
