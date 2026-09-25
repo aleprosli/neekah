@@ -9,6 +9,7 @@
         default => route('dashboard'),
     };
     $onAccount = App\Support\Locales::routeIs('account.*');
+    $hasSidebar = $nav !== [];
 @endphp
 
 {{-- The web-app shell every signed-in role works in: a sidebar that runs the
@@ -25,10 +26,14 @@
 
      On a phone the sidebar is a drawer. It opens through the checkbox below,
      so it needs no JavaScript, and it sits inside the swapped region so every
-     navigation closes it again. --}}
+     navigation closes it again.
+
+     An empty `nav` drops the sidebar altogether (a vendor still waiting for
+     approval has one page), and the account and log-out move to the top bar. --}}
 <x-layouts.app :title="$title" shell="dashboard">
     <div class="min-h-screen bg-ivory">
         <div data-nav-region>
+            @if ($hasSidebar)
             <input type="checkbox" id="dashboard-drawer" class="peer sr-only" aria-hidden="true" tabindex="-1">
 
             <label for="dashboard-drawer" class="fixed inset-0 z-40 hidden bg-brand-900/30 backdrop-blur-[2px] peer-checked:block lg:hidden" aria-label="Tutup menu"></label>
@@ -108,13 +113,20 @@
                     </div>
                 </div>
             </aside>
+            @endif
         </div>
 
-        <div class="flex min-h-screen flex-col lg:pl-[17rem]">
+        <div @class(['flex min-h-screen flex-col', 'lg:pl-[17rem]' => $hasSidebar])>
             <header class="sticky top-0 z-30 flex h-16 shrink-0 items-center gap-3 border-b border-gold-300/40 bg-ivory/85 px-4 backdrop-blur-md sm:px-6 lg:px-10">
-                <label for="dashboard-drawer" class="-ml-1 flex size-9 cursor-pointer items-center justify-center rounded-full text-ink-muted hover:bg-brand-50 lg:hidden" aria-label="{{ __('nav.open_menu') }}">
-                    <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
-                </label>
+                @if ($hasSidebar)
+                    <label for="dashboard-drawer" class="-ml-1 flex size-9 cursor-pointer items-center justify-center rounded-full text-ink-muted hover:bg-brand-50 lg:hidden" aria-label="{{ __('nav.open_menu') }}">
+                        <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+                    </label>
+                @else
+                    <a href="{{ $home }}" class="shrink-0" aria-label="{{ config('app.name') }}">
+                        <x-brand.lockup class="h-7 w-auto object-contain" />
+                    </a>
+                @endif
 
                 {{-- Where you are: the wedding and its countdown, the business
                      and its status, or simply the admin panel and today. --}}
@@ -141,6 +153,13 @@
                     </a>
                     <x-site.language-switcher />
                     <x-notification-bell />
+                    @unless ($hasSidebar)
+                        <a href="{{ route('account.edit') }}" class="hidden rounded-full px-3 py-2 text-sm font-medium text-ink-muted transition hover:bg-brand-50 hover:text-brand-700 sm:block">{{ __('nav.account') }}</a>
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button type="submit" class="rounded-full px-3 py-2 text-sm font-medium text-ink-muted transition hover:bg-brand-50 hover:text-brand-700">{{ __('nav.logout') }}</button>
+                        </form>
+                    @endunless
                 </div>
             </header>
 

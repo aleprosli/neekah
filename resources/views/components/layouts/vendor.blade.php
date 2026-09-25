@@ -6,7 +6,9 @@
     $item = fn (string $label, string $icon, string $route, string $pattern, ?int $badge = null): array => [
         'label' => $label, 'icon' => $icon, 'href' => route($route), 'active' => App\Support\Locales::routeIs($pattern), 'badge' => $badge ?: null,
     ];
-    $nav = [
+    // Waiting for approval there is nothing to navigate to: the dashboard is
+    // the setup guide, and the layout drops the sidebar entirely.
+    $nav = $vendor?->isAwaitingApproval() ? [] : [
         ['label' => null, 'items' => [
             $item(__('pages.sidebar_vendor.ringkasan'), 'chart', 'vendor.dashboard', 'vendor.dashboard'),
         ]],
@@ -36,7 +38,7 @@
         <x-slot:actions>{{ $actions }}</x-slot:actions>
     @endisset
 
-    @if ($vendor && ! $vendor->isApproved())
+    @if ($vendor && ! $vendor->isApproved() && ! $vendor->isAwaitingApproval())
         <div class="mb-6 rounded-2xl border border-amber-200 bg-amber-50 px-5 py-4 text-sm text-amber-900">
             <p class="font-semibold">Status: {{ $vendor->status->label() }}</p>
             <p class="mt-1">{{ __('props.vendor_onboarding.belum_dipaparkan') }}</p>

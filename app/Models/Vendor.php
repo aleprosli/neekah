@@ -25,7 +25,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 
 #[Fillable([
-    'user_id', 'category_id', 'name', 'slug', 'tagline', 'description', 'city', 'state', 'service_states',
+    'user_id', 'category_id', 'name', 'slug', 'tagline', 'description', 'city', 'district', 'state', 'service_states',
     'phone', 'whatsapp', 'social_links', 'price_from', 'price_unit', 'cover_image', 'logo', 'cover_tone',
     'status', 'tier', 'rating_avg', 'reviews_count', 'completed_bookings_count',
     'response_rate', 'completion_rate', 'score', 'points_total', 'tier_locked', 'penalty_points', 'violations_count', 'approved_at',
@@ -409,6 +409,15 @@ class Vendor extends Model
     public function isApproved(): bool
     {
         return $this->status === VendorStatus::Approved;
+    }
+
+    /**
+     * Still waiting for an admin to look at the application. Until then the
+     * vendor area is only the setup guide on the dashboard.
+     */
+    public function isAwaitingApproval(): bool
+    {
+        return $this->status === VendorStatus::Pending;
     }
 
     public function isRecommended(): bool

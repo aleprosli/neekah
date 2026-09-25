@@ -17,6 +17,7 @@ return [
     'arahan_bayaran' => 'arahan bayaran',
     'bajet' => 'bajet',
     'balasan' => 'balasan',
+    'daerah' => 'daerah',
     'bandar' => 'bandar',
     'bilangan_jemputan' => 'bilangan jemputan',
     'bilangan_orang' => 'bilangan orang',

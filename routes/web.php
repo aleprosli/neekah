@@ -112,36 +112,44 @@ $site = function (): void {
 
     Route::middleware(['auth', 'role:vendor'])->prefix('vendor')->name('vendor.')->group(function (): void {
         Route::get('/', VendorArea\DashboardController::class)->name('dashboard');
-        Route::get('/profile', [VendorArea\ProfileController::class, 'edit'])->name('profile.edit');
-        Route::put('/profile', [VendorArea\ProfileController::class, 'update'])->name('profile.update');
-        Route::resource('packages', VendorArea\PackageController::class)->except('show');
-        Route::get('/portfolio', [VendorArea\PortfolioItemController::class, 'index'])->name('portfolio.index');
+        Route::put('/persediaan/profil', [VendorArea\SetupController::class, 'profile'])->name('setup.profile');
+        Route::post('/persediaan/gambar-utama', [VendorArea\SetupController::class, 'cover'])->name('setup.cover');
+        Route::put('/persediaan/harga', [VendorArea\SetupController::class, 'price'])->name('setup.price');
+        Route::post('/packages', [VendorArea\PackageController::class, 'store'])->name('packages.store');
+        Route::delete('/packages/{package}', [VendorArea\PackageController::class, 'destroy'])->name('packages.destroy');
         Route::post('/portfolio', [VendorArea\PortfolioItemController::class, 'store'])->name('portfolio.store');
-        Route::put('/portfolio/order', [VendorArea\PortfolioItemController::class, 'reorder'])->name('portfolio.reorder');
         Route::delete('/portfolio/{item}', [VendorArea\PortfolioItemController::class, 'destroy'])->name('portfolio.destroy');
-        Route::get('/availability', [VendorArea\UnavailableDateController::class, 'index'])->name('availability.index');
-        Route::post('/availability', [VendorArea\UnavailableDateController::class, 'store'])->name('availability.store');
-        Route::delete('/availability/{date}', [VendorArea\UnavailableDateController::class, 'destroy'])->name('availability.destroy');
-        Route::get('/bookings', [VendorArea\BookingController::class, 'index'])->name('bookings.index');
-        Route::get('/bookings/data', [VendorArea\BookingController::class, 'data'])->name('bookings.data');
-        Route::get('/bookings/create', [VendorArea\BookingController::class, 'create'])->name('bookings.create');
-        Route::post('/bookings', [VendorArea\BookingController::class, 'store'])->name('bookings.store');
-        Route::get('/bookings/{booking}', [VendorArea\BookingController::class, 'show'])->name('bookings.show');
-        Route::post('/bookings/{booking}/complete', [VendorArea\BookingCompletionController::class, 'store'])->name('bookings.complete');
-        Route::post('/bookings/{booking}/payments/{payment}/verify', [VendorArea\PaymentVerificationController::class, 'store'])->name('bookings.payments.verify')->scopeBindings();
-        Route::delete('/bookings/{booking}/payments/{payment}/verify', [VendorArea\PaymentVerificationController::class, 'destroy'])->name('bookings.payments.reject')->scopeBindings();
-        Route::get('/reviews', [VendorArea\ReviewController::class, 'index'])->name('reviews.index');
-        Route::post('/reviews', [VendorArea\ReviewController::class, 'store'])->name('reviews.store');
-        Route::delete('/reviews/{review}', [VendorArea\ReviewController::class, 'destroy'])->name('reviews.destroy');
-        Route::post('/reviews/{review}/reply', [VendorArea\ReviewController::class, 'reply'])->name('reviews.reply');
-        Route::post('/reviews/{review}/report', [VendorArea\ReviewController::class, 'report'])->name('reviews.report');
-        Route::get('/points', [VendorArea\PointController::class, 'index'])->name('points.index');
-        Route::get('/pro', [VendorArea\ProController::class, 'index'])->name('pro.index');
-        Route::post('/pro/checkout', [VendorArea\ProController::class, 'checkout'])->middleware('throttle:10,1')->name('pro.checkout');
-        Route::get('/pro/selesai', [VendorArea\ProController::class, 'done'])->name('pro.done');
-        Route::get('/enquiries', [VendorArea\EnquiryController::class, 'index'])->name('enquiries.index');
-        Route::get('/enquiries/{enquiry}', [VendorArea\EnquiryController::class, 'show'])->name('enquiries.show');
-        Route::put('/enquiries/{enquiry}', [VendorArea\EnquiryController::class, 'update'])->name('enquiries.update');
+
+        Route::middleware('vendor.approved')->group(function (): void {
+            Route::get('/profile', [VendorArea\ProfileController::class, 'edit'])->name('profile.edit');
+            Route::put('/profile', [VendorArea\ProfileController::class, 'update'])->name('profile.update');
+            Route::resource('packages', VendorArea\PackageController::class)->except('show', 'store', 'destroy');
+            Route::get('/portfolio', [VendorArea\PortfolioItemController::class, 'index'])->name('portfolio.index');
+            Route::put('/portfolio/order', [VendorArea\PortfolioItemController::class, 'reorder'])->name('portfolio.reorder');
+            Route::get('/availability', [VendorArea\UnavailableDateController::class, 'index'])->name('availability.index');
+            Route::post('/availability', [VendorArea\UnavailableDateController::class, 'store'])->name('availability.store');
+            Route::delete('/availability/{date}', [VendorArea\UnavailableDateController::class, 'destroy'])->name('availability.destroy');
+            Route::get('/bookings', [VendorArea\BookingController::class, 'index'])->name('bookings.index');
+            Route::get('/bookings/data', [VendorArea\BookingController::class, 'data'])->name('bookings.data');
+            Route::get('/bookings/create', [VendorArea\BookingController::class, 'create'])->name('bookings.create');
+            Route::post('/bookings', [VendorArea\BookingController::class, 'store'])->name('bookings.store');
+            Route::get('/bookings/{booking}', [VendorArea\BookingController::class, 'show'])->name('bookings.show');
+            Route::post('/bookings/{booking}/complete', [VendorArea\BookingCompletionController::class, 'store'])->name('bookings.complete');
+            Route::post('/bookings/{booking}/payments/{payment}/verify', [VendorArea\PaymentVerificationController::class, 'store'])->name('bookings.payments.verify')->scopeBindings();
+            Route::delete('/bookings/{booking}/payments/{payment}/verify', [VendorArea\PaymentVerificationController::class, 'destroy'])->name('bookings.payments.reject')->scopeBindings();
+            Route::get('/reviews', [VendorArea\ReviewController::class, 'index'])->name('reviews.index');
+            Route::post('/reviews', [VendorArea\ReviewController::class, 'store'])->name('reviews.store');
+            Route::delete('/reviews/{review}', [VendorArea\ReviewController::class, 'destroy'])->name('reviews.destroy');
+            Route::post('/reviews/{review}/reply', [VendorArea\ReviewController::class, 'reply'])->name('reviews.reply');
+            Route::post('/reviews/{review}/report', [VendorArea\ReviewController::class, 'report'])->name('reviews.report');
+            Route::get('/points', [VendorArea\PointController::class, 'index'])->name('points.index');
+            Route::get('/pro', [VendorArea\ProController::class, 'index'])->name('pro.index');
+            Route::post('/pro/checkout', [VendorArea\ProController::class, 'checkout'])->middleware('throttle:10,1')->name('pro.checkout');
+            Route::get('/pro/selesai', [VendorArea\ProController::class, 'done'])->name('pro.done');
+            Route::get('/enquiries', [VendorArea\EnquiryController::class, 'index'])->name('enquiries.index');
+            Route::get('/enquiries/{enquiry}', [VendorArea\EnquiryController::class, 'show'])->name('enquiries.show');
+            Route::put('/enquiries/{enquiry}', [VendorArea\EnquiryController::class, 'update'])->name('enquiries.update');
+        });
     });
 
     Route::middleware('auth')->group(function (): void {

@@ -281,6 +281,7 @@ class UserController extends Controller
                     'loginUrl' => route('login'),
                     'categories' => Category::active()->ordered()->get(['id', 'name', 'icon']),
                     'states' => States::options(),
+                    'districts' => States::districtOptions(),
                     'old' => ['phone' => $user->phone, ...old()],
                     'account' => ['name' => $user->name, 'email' => $user->email],
                 ]) : null,

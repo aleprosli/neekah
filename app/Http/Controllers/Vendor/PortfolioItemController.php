@@ -72,7 +72,7 @@ class PortfolioItemController extends Controller
 
         return $this->redirectOrJson(
             $request,
-            route('vendor.portfolio.index'),
+            $this->vendorReturnUrl($request, 'vendor.portfolio.index', 'portfolio'),
             count($request->file('images')).' gambar dimuat naik.',
         );
     }
@@ -84,6 +84,6 @@ class PortfolioItemController extends Controller
         $storeImage->delete($item->path);
         $item->delete();
 
-        return redirect()->route('vendor.portfolio.index')->with('status', __('flash.vendor.photo_deleted'));
+        return redirect()->to($this->vendorReturnUrl($request, 'vendor.portfolio.index', 'portfolio'))->with('status', __('flash.vendor.photo_deleted'));
     }
 }

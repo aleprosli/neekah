@@ -25,4 +25,16 @@ abstract class Controller
             ? response()->json(['redirect' => $url])
             : redirect()->to($url);
     }
+
+    /**
+     * Where a vendor lands after changing their catalogue. One still waiting
+     * for approval works only from the setup cards on the dashboard, so the
+     * page they came from is the dashboard, not the full editor.
+     */
+    protected function vendorReturnUrl(Request $request, string $route, string $section): string
+    {
+        return $request->user()->vendor->isAwaitingApproval()
+            ? route('vendor.dashboard').'#'.$section
+            : route($route);
+    }
 }

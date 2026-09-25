@@ -1,6 +1,7 @@
 ---
 paths:
   - app/Http/Controllers/Vendor/ReviewController.php
+  - 'app/Http/Controllers/Vendor/**'
 ---
 
 # Vendor
@@ -13,3 +14,6 @@ The label is not optional. Review::sourceLabel() prints "Ditambah oleh vendor" f
 These are open reviews, so they cannot move rating_avg, points or tier — a test asserts three five-star vendor-added reviews change none of them. A vendor may delete only rows where added_by is their own id (ReviewPolicy::deleteOwnAddition); everything a customer wrote stays, and admins moderate all of it as before.
 
 isVendorAdded() reads $this->vendor, so any list rendering sourceLabel() must have that relation set — VendorController::show uses setRelation on the vendor already in hand rather than loading it per row.
+
+## A pending vendor only has the setup page on the dashboard
+Owner, 25 Sep 2026: while a vendor is VendorStatus::Pending (Vendor::isAwaitingApproval()) the vendor area is one page. DashboardController renders vendor/setup.blade.php (a guide plus one card per onboarding step, each saving in place), layouts/vendor passes an empty nav so layouts/dashboard drops the sidebar, and every other vendor route sits behind the `vendor.approved` middleware, which redirects to the dashboard. Pending vendors cannot record bookings. Only these routes stay open: setup.profile/cover/price (SetupController, one error bag per card), plus packages/portfolio store and destroy, which send a pending vendor back through Controller::vendorReturnUrl() to dashboard#card. A new vendor route goes inside the vendor.approved group unless a setup card needs it. Rejected/suspended vendors keep the old behaviour. Unavailable dates are not an onboarding step any more (owner, 25 Sep 2026: couples WhatsApp vendors and book directly, so most vendors never filled them in); the Kalendar page stays for approved vendors only. Covered by VendorAwaitingApprovalTest.

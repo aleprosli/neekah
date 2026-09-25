@@ -84,6 +84,12 @@ return [
         'submit' => 'Hantar laporan',
     ],
 
+    'areas' => [
+        'jajahan' => 'Jajahan',
+        'daerah' => 'Daerah',
+        'kawasan' => 'Kawasan',
+    ],
+
     'vendor_signup' => [
         'abc_wedding_photography' => 'ABC Wedding Photography',
         'alor_setar' => 'Alor Setar',
@@ -107,6 +113,12 @@ return [
         'password' => 'Kata laluan',
         'confirm_password' => 'Sahkan kata laluan',
         'have_account' => 'Sudah ada akaun?',
+        'category_help' => 'Pilih satu kategori utama sahaja. Kategori lain yang anda tawarkan boleh ditambah dalam Profil selepas akaun diluluskan.',
+        'state_help' => 'Negeri pangkalan anda. Negeri lain yang anda cover boleh ditambah dalam Profil kemudian.',
+        'district' => 'Daerah',
+        'district_placeholder' => 'Pilih :area',
+        'district_pick_state' => 'Pilih negeri dahulu',
+        'city_help' => 'Bandar atau kawasan yang pengantin kenal, cth Sungai Petani.',
     ],
 
     'account' => [

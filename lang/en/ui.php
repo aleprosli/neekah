@@ -84,6 +84,12 @@ return [
         'submit' => 'Send report',
     ],
 
+    'areas' => [
+        'jajahan' => 'District',
+        'daerah' => 'District',
+        'kawasan' => 'Area',
+    ],
+
     'vendor_signup' => [
         'abc_wedding_photography' => 'ABC Wedding Photography',
         'alor_setar' => 'Alor Setar',
@@ -107,6 +113,12 @@ return [
         'password' => 'Password',
         'confirm_password' => 'Confirm password',
         'have_account' => 'Already have an account?',
+        'category_help' => 'Pick one main category only. Other categories you offer can be added in your Profile once your account is approved.',
+        'state_help' => 'Where your business is based. Other states you cover can be added in your Profile later.',
+        'district' => 'District',
+        'district_placeholder' => 'Choose a :area',
+        'district_pick_state' => 'Choose a state first',
+        'city_help' => 'The town couples know you by, e.g. Sungai Petani.',
     ],
 
     'account' => [

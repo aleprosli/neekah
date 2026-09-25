@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Vendor;
 use App\Enums\BookingStatus;
 use App\Enums\EnquiryStatus;
 use App\Enums\PaymentStatus;
+use App\Enums\PriceUnit;
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
 use App\Models\Payment;
@@ -20,6 +21,10 @@ class DashboardController extends Controller
     public function __invoke(Request $request): View
     {
         $vendor = $request->user()->vendor;
+
+        if ($vendor->isAwaitingApproval()) {
+            return $this->setup($vendor);
+        }
 
         $stats = [
             'upcoming' => $vendor->bookings()->where('status', BookingStatus::Confirmed)->whereDate('event_date', '>=', today())->count(),
@@ -62,6 +67,25 @@ class DashboardController extends Controller
                     'status_tone' => $booking->status->tone(),
                 ])->values(),
             ]),
+        ]);
+    }
+
+    /**
+     * Before approval the dashboard is the whole vendor area: a short guide to
+     * what happens next and one card per missing piece, each saving in place.
+     */
+    private function setup(Vendor $vendor, ImageSettings $images = new ImageSettings): View
+    {
+        $steps = collect($this->onboarding($vendor))->keyBy('key');
+
+        return view('vendor.setup', [
+            'vendor' => $vendor,
+            'steps' => $steps,
+            'doneCount' => $steps->where('done', true)->count(),
+            'portfolio' => $vendor->portfolioItems()->orderBy('sort_order')->get(),
+            'packages' => $vendor->packages()->orderBy('sort_order')->get(),
+            'priceUnits' => PriceUnit::cases(),
+            'imageHint' => $images->uploadHint(),
         ]);
     }
 
@@ -129,15 +153,6 @@ class DashboardController extends Controller
                 'action' => __('props.vendor_onboarding.harga_action'),
                 'href' => route('vendor.profile.edit'),
                 'done' => (float) $vendor->price_from > 0,
-            ],
-            [
-                'key' => 'kalendar',
-                'label' => __('props.vendor.tarikh_tidak_tersedia'),
-                'why' => __('props.vendor_onboarding.kalendar_why'),
-                'specs' => [__('props.vendor_onboarding.kalendar_spec_1')],
-                'action' => __('props.vendor_onboarding.kalendar_action'),
-                'href' => route('vendor.availability.index'),
-                'done' => $vendor->unavailableDates()->exists(),
             ],
         ];
     }

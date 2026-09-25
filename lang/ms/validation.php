@@ -165,6 +165,7 @@ return [
     'unique' => ':attribute ini sudah digunakan.',
     'uploaded' => 'Medan :attribute gagal dimuat naik.',
     'uppercase' => 'Medan :attribute mesti huruf besar.',
+    'phone' => 'Medan :attribute mesti nombor telefon yang sah untuk negara yang dipilih.',
     'url' => 'Medan :attribute mesti alamat URL yang sah.',
     'ulid' => 'Medan :attribute mesti ULID yang sah.',
     'uuid' => 'Medan :attribute mesti UUID yang sah.',

@@ -53,7 +53,7 @@ class PackageController extends Controller
 
         $this->syncPriceFrom($request);
 
-        return $this->redirectOrJson($request, route('vendor.packages.index'), 'Pakej ditambah.');
+        return $this->redirectOrJson($request, $this->vendorReturnUrl($request, 'vendor.packages.index', 'pakej'), 'Pakej ditambah.');
     }
 
     public function edit(Package $package, ImageSettings $images): View
@@ -120,7 +120,7 @@ class PackageController extends Controller
         $package->delete();
         $this->syncPriceFrom($request);
 
-        return redirect()->route('vendor.packages.index')->with('status', __('flash.vendor.package_deleted'));
+        return redirect()->to($this->vendorReturnUrl($request, 'vendor.packages.index', 'pakej'))->with('status', __('flash.vendor.package_deleted'));
     }
 
     /**

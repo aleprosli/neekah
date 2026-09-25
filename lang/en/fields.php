@@ -17,6 +17,7 @@ return [
     'arahan_bayaran' => 'payment instructions',
     'bajet' => 'budget',
     'balasan' => 'reply',
+    'daerah' => 'district',
     'bandar' => 'town',
     'bilangan_jemputan' => 'number invited',
     'bilangan_orang' => 'number of people',
