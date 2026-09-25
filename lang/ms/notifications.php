@@ -226,4 +226,16 @@ return [
         'title' => 'ZIP Kamera Majlis anda sedia',
         'body' => 'Muat turun semua gambar dan video sebelum album dipadam pada :date.',
     ],
+
+    'camera_retention' => [
+        'after_event_title' => 'Terima kasih kerana guna Kamera Majlis',
+        'after_event_body' => 'Tetamu berkongsi :count gambar dan video. Muat turun ZIP sebelum album dipadam pada :date.',
+        'expiring_7_title' => 'Album Kamera Majlis dipadam dalam 7 hari',
+        'expiring_7_body' => 'Semua gambar dan video akan dipadam pada :date. Muat turun ZIP sekarang.',
+        'expiring_1_title' => 'Album Kamera Majlis dipadam esok',
+        'expiring_1_body' => 'Ini peringatan terakhir: semua gambar dan video akan dipadam pada :date.',
+        'purged_title' => 'Album Kamera Majlis telah dipadam',
+        'purged_body' => 'Tempoh simpanan sudah tamat dan semua gambar serta video telah dipadam dari Neekah.',
+        'action' => 'Buka Kamera Majlis',
+    ],
 ];

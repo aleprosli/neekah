@@ -7,6 +7,7 @@ use App\Actions\DeleteCameraMedia;
 use App\Actions\ReserveCameraUpload;
 use App\Enums\CameraMediaStatus;
 use App\Enums\CameraMediaType;
+use App\Jobs\SendTelegramAlert;
 use App\Models\CameraAlbum;
 use App\Models\CameraMedia;
 use App\Support\Camera\CameraGuest;
@@ -194,6 +195,7 @@ class CameraGuestController extends Controller
             'thumb' => $media->thumbnailUrl() ?? $media->url(),
             'by' => $media->uploader_name,
             'delete_url' => $this->mayDelete($media, $device) ? route('camera.media.destroy', [$album, $media]) : null,
+            'report_url' => $media->device_hash === $device ? null : route('camera.media.report', [$album, $media]),
         ])->values();
 
         return response()->json([
@@ -212,6 +214,32 @@ class CameraGuestController extends Controller
         $delete->handle($media);
 
         return response()->json(['deleted' => true]);
+    }
+
+    /**
+     * A guest flags something in the album that should not be there. It
+     * waits on the admin page and the admin chat hears about it at once;
+     * nothing is hidden until an admin looks, so one guest cannot empty an
+     * album by reporting it.
+     */
+    public function report(Request $request, CameraAlbum $album, CameraMedia $media): JsonResponse
+    {
+        $this->ensureEntered($request, $album);
+        abort_unless($media->camera_album_id === $album->id && $media->status === CameraMediaStatus::Ready, 404);
+        $reason = $request->validate(['reason' => ['nullable', 'string', 'max:300']])['reason'] ?? null;
+
+        if ($media->reported_at === null) {
+            $media->update(['reported_at' => now(), 'report_reason' => filled($reason) ? trim(strip_tags($reason)) : null]);
+
+            SendTelegramAlert::about('🚩 <b>Kamera Majlis file reported</b>', [
+                'Wedding' => $album->wedding->title,
+                'Reason' => $media->report_reason,
+                'File' => $media->url(),
+                'Review' => route('admin.camera.index'),
+            ]);
+        }
+
+        return response()->json(['reported' => true]);
     }
 
     /**

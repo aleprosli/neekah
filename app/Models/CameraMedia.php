@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Storage;
 
 #[Fillable([
     'camera_album_id', 'type', 'status', 'incoming_path', 'path', 'poster_path', 'bytes', 'declared_bytes',
-    'mime', 'width', 'height', 'duration_seconds', 'uploader_name', 'device_hash',
+    'mime', 'width', 'height', 'duration_seconds', 'uploader_name', 'device_hash', 'reported_at', 'report_reason',
 ])]
 class CameraMedia extends Model
 {
@@ -31,6 +31,7 @@ class CameraMedia extends Model
             'status' => CameraMediaStatus::class,
             'bytes' => 'integer',
             'declared_bytes' => 'integer',
+            'reported_at' => 'datetime',
         ];
     }
 

@@ -4,6 +4,7 @@ namespace App\Actions;
 
 use App\Enums\CameraMediaStatus;
 use App\Enums\CameraMediaType;
+use App\Jobs\PurgeCdnUrls;
 use App\Models\CameraAlbum;
 use App\Models\CameraMedia;
 use Illuminate\Support\Facades\DB;
@@ -11,7 +12,7 @@ use Illuminate\Support\Facades\Storage;
 
 /**
  * Take a photo or video out of the album: its files (and thumbnail) from
- * storage, its share of the album's counters, and the row.
+ * storage and the CDN, its share of the album's counters, and the row.
  */
 class DeleteCameraMedia
 {
@@ -20,6 +21,7 @@ class DeleteCameraMedia
     public function handle(CameraMedia $media): void
     {
         $disk = Storage::disk('public');
+        PurgeCdnUrls::for([$media->url(), $media->thumbnailUrl()]);
 
         if ($media->type === CameraMediaType::Photo) {
             $this->images->delete($media->path);

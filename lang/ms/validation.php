@@ -190,6 +190,7 @@ return [
         'camera_slow_down' => 'Terlalu banyak muat naik dari telefon ini. Cuba lagi sebentar.',
         'camera_limit_reached' => 'Album ini sudah penuh (:count gambar).',
         'camera_passcode_wrong' => 'Kata laluan tidak betul.',
+        'camera_no_wedding' => 'Tiada majlis ditemui untuk emel ini.',
         'camera_passcode_throttled' => 'Terlalu banyak cubaan. Cuba lagi dalam :minutes minit.',
         'pax_needs_fixed_deposit' => 'Harga anda dikira setiap pax, jadi deposit mesti jumlah tetap (RM).',
         'online_booking_closed' => 'Vendor ini tidak menerima tempahan online sekarang.',

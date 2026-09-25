@@ -181,7 +181,9 @@ it('sends files straight to R2 on a presigned address when the media disk is a b
     $target = CameraUploadTarget::for($media);
 
     expect($target['url'])->toContain('X-Amz-Signature')->toContain('r2.cloudflarestorage.com')
-        ->and($target['headers']['Content-Type'])->toBe('image/jpeg');
+        ->and($target['headers']['Content-Type'])->toBe('image/jpeg')
+        // Albums are deleted after the event, so the CDN keeps a file a day, not a year.
+        ->and($target['headers']['Cache-Control'])->toBe(CameraAlbum::CACHE_CONTROL);
 });
 
 it('still takes a photo from a phone without JavaScript', function () {

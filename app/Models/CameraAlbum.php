@@ -32,6 +32,13 @@ class CameraAlbum extends Model
     use HasFactory;
 
     /**
+     * How long the CDN and browsers may keep an album file. A day, not the
+     * media disk's immutable year: albums are deleted after the event, and a
+     * guest's deleted photo must not linger at the edge.
+     */
+    public const CACHE_CONTROL = 'public, max-age=86400';
+
+    /**
      * @return array<string, string>
      */
     protected function casts(): array
@@ -82,6 +89,12 @@ class CameraAlbum extends Model
     public function media(): HasMany
     {
         return $this->hasMany(CameraMedia::class);
+    }
+
+    /** What the wedding paid for this album, new and upgrades alike. */
+    public function purchases(): HasMany
+    {
+        return $this->hasMany(CameraPurchase::class, 'wedding_id', 'wedding_id');
     }
 
     public function readyMedia(): HasMany

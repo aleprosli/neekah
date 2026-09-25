@@ -35,12 +35,14 @@ class StoreOptimizedImage
 
     /**
      * $maxDimension and $quality override the admin's image settings for this
-     * call only. Kamera Majlis uses them (its tiers keep photos at their own
-     * size); every other caller leaves them null.
+     * call only, and $cacheControl the disk's year-long immutable header.
+     * Kamera Majlis uses them (its tiers keep photos at their own size, and
+     * its files are deleted after the event, so the CDN must not keep them a
+     * year); every other caller leaves them null.
      *
      * @return string The stored path on the public disk.
      */
-    public function storeContents(string $contents, string $directory, bool $lossless = false, ?int $maxDimension = null, ?int $quality = null): string
+    public function storeContents(string $contents, string $directory, bool $lossless = false, ?int $maxDimension = null, ?int $quality = null, ?string $cacheControl = null): string
     {
         $this->allowMemoryForDecoding();
         $this->quality = $quality;
@@ -57,8 +59,9 @@ class StoreOptimizedImage
         // comes back as false. Ignoring that returned a path for a file that was
         // never written, and the caller saved it: a wedding card pointing at a
         // 404, with nothing anywhere saying the upload had failed.
-        $stored = $disk->put($path, $this->encode($this->resize($image, $largest, $largest), $extension))
-            && $disk->put($thumbnail, $this->encode($this->resize($image, $this->settings->thumbnailWidth(), PHP_INT_MAX), $extension));
+        $options = $cacheControl ? ['CacheControl' => $cacheControl] : [];
+        $stored = $disk->put($path, $this->encode($this->resize($image, $largest, $largest), $extension), $options)
+            && $disk->put($thumbnail, $this->encode($this->resize($image, $this->settings->thumbnailWidth(), PHP_INT_MAX), $extension), $options);
 
         if (! $stored) {
             // Whichever half landed is of no use on its own.

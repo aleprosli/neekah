@@ -724,6 +724,7 @@ return [
     ],
 
     'sidebar_admin' => [
+        'kamera' => 'Kamera Majlis',
         'ciri_vendor' => 'Ciri vendor',
         'muzik_kad' => 'Muzik kad',
         'kad_nfc' => 'Kad NFC',
@@ -962,5 +963,27 @@ return [
         'guest_title' => 'Kamera Majlis · :wedding',
         'guest_intro' => 'Album ini sedia. Tidak lama lagi anda boleh ambil dan kongsi gambar di sini.',
         'guest_closed' => 'Album ini sudah ditutup.',
+    ],
+
+    'admin_camera' => [
+        'title' => 'Kamera Majlis',
+        'subheading' => 'Setiap album tetamu, apa yang disimpan dan sehingga bila, serta laporan tetamu.',
+        'col_wedding' => 'Majlis',
+        'col_tier' => 'Pakej',
+        'col_media' => 'Gambar / video',
+        'col_storage' => 'Storan',
+        'col_paid' => 'Dibayar',
+        'col_expires' => 'Dipadam pada',
+        'col_state' => 'Status',
+        'stat_active' => 'Album aktif',
+        'stat_media' => 'Gambar & video disimpan',
+        'stat_storage' => 'Storan digunakan',
+        'stat_revenue' => 'Jualan Kamera Majlis',
+        'media_count' => ':photos gambar · :videos video',
+        'state_expiring' => 'Menunggu dipadam',
+        'purge' => 'Padam album',
+        'purge_title' => 'Padam album Kamera Majlis :wedding sekarang?',
+        'purge_message' => ':count gambar dan video dipadam untuk selamanya, dan pautan tetamu ditutup. Rekod pembelian kekal.',
+        'purge_confirm' => 'Ya, padam album',
     ],
 ];

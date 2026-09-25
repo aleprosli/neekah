@@ -42,7 +42,7 @@ class ProcessCameraMedia implements ShouldQueue
     {
         $media = $this->media->fresh(['album']);
 
-        if (! $media || $media->status !== CameraMediaStatus::Processing) {
+        if (! $media || $media->status !== CameraMediaStatus::Processing || $media->album->purged_at) {
             return;
         }
 
@@ -52,7 +52,7 @@ class ProcessCameraMedia implements ShouldQueue
 
         if ($media->type === CameraMediaType::Photo) {
             $limits = $album->limits();
-            $path = $images->storeContents((string) $disk->get($media->incoming_path), $directory, maxDimension: $limits->photoPixels, quality: $limits->photoQuality);
+            $path = $images->storeContents((string) $disk->get($media->incoming_path), $directory, maxDimension: $limits->photoPixels, quality: $limits->photoQuality, cacheControl: CameraAlbum::CACHE_CONTROL);
             $bytes = (int) $disk->size($path) + (int) $disk->size(StoreOptimizedImage::thumbnailPath($path));
             $size = @getimagesizefromstring((string) $disk->get($path)) ?: [null, null];
             $disk->delete($media->incoming_path);
@@ -127,7 +127,7 @@ class ProcessCameraMedia implements ShouldQueue
             $result = Process::timeout(240)->run([$ffmpeg, '-y', '-i', $source, '-map_metadata', '-1', '-c', 'copy', $target]);
 
             if ($result->successful() && filesize($target) > 0) {
-                $disk->writeStream($path, fopen($target, 'r'));
+                $disk->writeStream($path, fopen($target, 'r'), ['CacheControl' => CameraAlbum::CACHE_CONTROL]);
                 $disk->delete($incoming);
             } else {
                 $disk->move($incoming, $path);

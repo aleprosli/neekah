@@ -4,6 +4,7 @@ paths:
   - app/Actions/StoreOptimizedImage.php
   - app/Actions/ImportVendorIcal.php
   - app/Actions/ActivateCameraAlbum.php
+  - app/Actions/PurgeCameraAlbum.php
 ---
 
 # Actions
@@ -41,3 +42,6 @@ Owner, 26 Sep 2026: a Pro vendor pastes their Google Calendar secret iCal addres
 
 ## Kamera Majlis is paid to Neekah; ActivateCameraAlbum is the only activation
 Owner, 26 Sep 2026: couples buy Kamera Majlis (Basic RM29: 500 HD photos, no video; Pro RM99: full quality, video ≤100 MB and ≤3 min, "unlimited" with a fair-use alert; all in CameraSettings, Admin → Tetapan → Wang → Kamera Majlis). It is paid on Neekah's OWN Herepay account (HerepayCameraClient reuses HerepayClient::isConfigured and HerepayCredentials::neekah), callback POST /webhooks/herepay/kamera. ActivateCameraAlbum is the only thing that marks a CameraPurchase paid: idempotent under a lock, creates the wedding's album (one per wedding, 12-char unambiguous token = the QR address /k/{token}), only ever raises the tier, keeps the token, and sets expires_at = event_date + retention_days (never sooner than 3 days from now). Moving the wedding's event_date moves expires_at (Wedding::booted; query the album fresh, the relation may be cached null). Upgrade Basic→Pro costs the price difference; a tier already owned is refused. /kamera carries the `wedding` middleware. "Yuran platform: Percuma" stays true: this is a Neekah product, not a commission. Covered by CameraPurchaseTest.
+
+## Kamera Majlis files live under camera/{id}/ and are purged, never the album row
+Every album file (photos, thumbnails, video posters, incoming uploads, ZIP exports) is stored under camera/{album id}/ on the public disk, so PurgeCameraAlbum deletes that directory. It removes the media rows, zeroes the counters and sets purged_at, but keeps the album and its purchases as the record. Buying again clears purged_at. It is called by neekah:camera-retention (daily 09:00, when expires_at passes), by the admin takedown, and by DeleteUserAccount. A new camera file kind must go under camera/{id}/ or it outlives the album. Album files are stored with CameraAlbum::CACHE_CONTROL (one day), not the disk's immutable year, and deletes queue PurgeCdnUrls. That job does nothing unless CLOUDFLARE_ZONE_ID and CLOUDFLARE_PURGE_TOKEN are set. Covered by CameraRetentionTest.

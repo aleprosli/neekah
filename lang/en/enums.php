@@ -110,6 +110,12 @@ return [
         'pax' => 'pax',
     ],
 
+    'camera_album_filter' => [
+        'active' => 'Active',
+        'reported' => 'Reported',
+        'purged' => 'Ended',
+    ],
+
     'review_filter' => [
         'reported' => 'Reported by vendor',
         'hidden' => 'Hidden',

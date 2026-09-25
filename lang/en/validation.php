@@ -190,6 +190,7 @@ return [
         'camera_slow_down' => 'Too many uploads from this phone. Try again shortly.',
         'camera_limit_reached' => 'This album is full (:count photos).',
         'camera_passcode_wrong' => 'That passcode is not right.',
+        'camera_no_wedding' => 'No wedding was found for this email.',
         'camera_passcode_throttled' => 'Too many tries. Try again in :minutes minutes.',
         'pax_needs_fixed_deposit' => 'Your price is per pax, so the deposit must be a fixed amount (RM).',
         'online_booking_closed' => 'This vendor is not taking online bookings right now.',

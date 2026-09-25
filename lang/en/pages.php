@@ -724,6 +724,7 @@ return [
     ],
 
     'sidebar_admin' => [
+        'kamera' => 'Kamera Majlis',
         'ciri_vendor' => 'Vendor features',
         'muzik_kad' => 'Card music',
         'kad_nfc' => 'NFC cards',
@@ -962,5 +963,27 @@ return [
         'guest_title' => 'Kamera Majlis · :wedding',
         'guest_intro' => 'This album is ready. Soon you can take and share photos here.',
         'guest_closed' => 'This album is closed.',
+    ],
+
+    'admin_camera' => [
+        'title' => 'Kamera Majlis',
+        'subheading' => 'Every guest album, what it holds and until when, and what guests reported.',
+        'col_wedding' => 'Wedding',
+        'col_tier' => 'Package',
+        'col_media' => 'Photos / videos',
+        'col_storage' => 'Storage',
+        'col_paid' => 'Paid',
+        'col_expires' => 'Deleted on',
+        'col_state' => 'Status',
+        'stat_active' => 'Active albums',
+        'stat_media' => 'Photos & videos kept',
+        'stat_storage' => 'Storage used',
+        'stat_revenue' => 'Kamera Majlis sales',
+        'media_count' => ':photos photos · :videos videos',
+        'state_expiring' => 'Waiting to be deleted',
+        'purge' => 'Delete album',
+        'purge_title' => 'Delete the Kamera Majlis album of :wedding now?',
+        'purge_message' => ':count photos and videos are deleted for good, and the guest link closes. The purchase records stay.',
+        'purge_confirm' => 'Yes, delete the album',
     ],
 ];

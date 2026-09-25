@@ -2,6 +2,7 @@
 
 namespace App\Support\Camera;
 
+use App\Models\CameraAlbum;
 use App\Models\CameraMedia;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
@@ -28,6 +29,7 @@ class CameraUploadTarget
         if (config('filesystems.disks.public.driver') === 's3') {
             ['url' => $url, 'headers' => $headers] = $disk->temporaryUploadUrl($media->incoming_path, now()->addMinutes(self::MINUTES), [
                 'ContentType' => $media->mime,
+                'CacheControl' => CameraAlbum::CACHE_CONTROL,
             ]);
 
             return [
@@ -36,6 +38,7 @@ class CameraUploadTarget
                 'headers' => collect($headers)->map(fn (mixed $value): string => is_array($value) ? implode(',', $value) : (string) $value)
                     ->except(['Host', 'host'])
                     ->put('Content-Type', (string) $media->mime)
+                    ->put('Cache-Control', CameraAlbum::CACHE_CONTROL)
                     ->all(),
             ];
         }

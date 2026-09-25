@@ -88,6 +88,23 @@ const remove = async (item) => {
     viewing.value = null;
 };
 
+/** Reporting what should not be in the album: an optional reason, then a thank-you. */
+const reporting = ref(false);
+const reportReason = ref('');
+const reportSent = ref(false);
+const openViewer = (media) => {
+    viewing.value = media;
+    reporting.value = false;
+    reportReason.value = '';
+    reportSent.value = false;
+};
+const report = async () => {
+    await postJson(viewing.value.report_url, { reason: reportReason.value });
+    viewing.value.report_url = null;
+    reporting.value = false;
+    reportSent.value = true;
+};
+
 const accept = computed(() => (limits.allows_video ? 'image/*,video/*' : 'image/*'));
 const remaining = computed(() => (limits.max_photos === null ? null : Math.max(0, limits.max_photos - photos.value)));
 const busy = computed(() => items.value.some((item) => !['done', 'failed'].includes(item.state)));
@@ -172,7 +189,7 @@ onMounted(() => props.entered && props.album.active && loadGallery(true));
                 <p v-if="!gallery.length && !loading" class="rounded-2xl bg-surface-muted p-6 text-center text-sm text-ink-muted">{{ $t('camera.empty') }}</p>
                 <ul class="grid grid-cols-3 gap-1.5">
                     <li v-for="media in gallery" :key="media.id" class="relative min-w-0">
-                        <button type="button" class="block w-full" @click="viewing = media">
+                        <button type="button" class="block w-full" @click="openViewer(media)">
                             <img v-if="media.type === 'photo'" :src="media.thumb" alt="" loading="lazy" class="aspect-square w-full rounded-lg object-cover">
                             <span v-else class="flex aspect-square w-full items-center justify-center rounded-lg bg-ink/80 text-2xl text-white" aria-hidden="true">▶</span>
                         </button>
@@ -187,10 +204,16 @@ onMounted(() => props.entered && props.album.active && loadGallery(true));
             <div class="flex items-center justify-between gap-3 p-4 text-sm text-white">
                 <span class="truncate">{{ viewing.by || '' }}</span>
                 <div class="flex shrink-0 gap-2">
+                    <button v-if="viewing.report_url && !reporting" type="button" class="rounded-full border border-white/40 px-3 py-1" @click="reporting = true">{{ $t('camera.report') }}</button>
                     <button v-if="viewing.delete_url" type="button" class="rounded-full border border-white/40 px-3 py-1" @click="remove(viewing)">{{ confirming ? $t('camera.confirm_delete') : $t('camera.delete') }}</button>
                     <button type="button" class="rounded-full border border-white/40 px-3 py-1" :aria-label="$t('camera.close')" @click="viewing = null">✕</button>
                 </div>
             </div>
+            <form v-if="reporting" class="flex gap-2 px-4 pb-3" @submit.prevent="report">
+                <input v-model="reportReason" maxlength="300" :placeholder="$t('camera.report_reason')" class="min-w-0 flex-1 rounded-full border border-white/30 bg-white/10 px-4 py-2 text-sm text-white placeholder:text-white/60 focus:outline-none">
+                <button type="submit" class="shrink-0 rounded-full bg-white px-4 py-2 text-sm font-semibold text-ink">{{ $t('camera.report_send') }}</button>
+            </form>
+            <p v-if="reportSent" class="px-4 pb-3 text-sm text-white/80">{{ $t('camera.reported') }}</p>
             <div class="flex min-h-0 flex-1 items-center justify-center p-2">
                 <img v-if="viewing.type === 'photo'" :src="viewing.url" alt="" class="max-h-full max-w-full object-contain">
                 <video v-else :src="viewing.url" controls playsinline class="max-h-full max-w-full"></video>

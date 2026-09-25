@@ -86,6 +86,7 @@ $site = function (): void {
     Route::post('/k/{album}/muat-naik-biasa', [CameraGuestController::class, 'fallbackUpload'])->middleware('throttle:30,1')->name('camera.upload.fallback');
     Route::get('/k/{album}/galeri', [CameraGuestController::class, 'gallery'])->middleware('throttle:120,1')->name('camera.gallery');
     Route::delete('/k/{album}/media/{media}', [CameraGuestController::class, 'destroy'])->middleware('throttle:60,1')->name('camera.media.destroy');
+    Route::post('/k/{album}/media/{media}/lapor', [CameraGuestController::class, 'report'])->middleware('throttle:10,60')->name('camera.media.report');
     Route::get('/vendors/{vendor}/ketersediaan', VendorAvailabilityController::class)->middleware('throttle:60,1')->name('vendors.availability');
     // Open to everyone, signed in or not, so the throttle is what stands between
     // a profile and someone with a script.
@@ -319,6 +320,12 @@ $site = function (): void {
         Route::put('/vendors/{vendor}/tier', [AdminArea\VendorTierController::class, 'update'])->name('vendors.tier');
         Route::post('/vendors/{vendor}/pro', [AdminArea\VendorProController::class, 'store'])->name('vendors.pro');
         Route::put('/vendors/{vendor}/features', [AdminArea\VendorFeatureOverrideController::class, 'update'])->name('vendors.features');
+        Route::get('/kamera', [AdminArea\CameraController::class, 'index'])->name('camera.index');
+        Route::get('/kamera/data', [AdminArea\CameraController::class, 'data'])->name('camera.data');
+        Route::post('/kamera', [AdminArea\CameraController::class, 'store'])->name('camera.store');
+        Route::delete('/kamera/media/{media}', [AdminArea\CameraController::class, 'destroyMedia'])->name('camera.media.destroy');
+        Route::post('/kamera/media/{media}/abaikan', [AdminArea\CameraController::class, 'dismissReport'])->name('camera.media.dismiss');
+        Route::delete('/kamera/{album}', [AdminArea\CameraController::class, 'destroy'])->name('camera.destroy');
         Route::get('/reviews', [AdminArea\ReviewController::class, 'index'])->name('reviews.index');
         Route::get('/reviews/data', [AdminArea\ReviewController::class, 'data'])->name('reviews.data');
         Route::post('/reviews', [AdminArea\ReviewController::class, 'store'])->name('reviews.store');

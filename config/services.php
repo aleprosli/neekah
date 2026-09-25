@@ -61,6 +61,11 @@ return [
 
     // Optional. When set, Kamera Majlis strips the metadata (a phone's GPS
     // location included) from guests' videos before keeping them.
+    'cloudflare' => [
+        'zone_id' => env('CLOUDFLARE_ZONE_ID'),
+        'api_token' => env('CLOUDFLARE_PURGE_TOKEN'),
+    ],
+
     'ffmpeg' => [
         'path' => env('FFMPEG_BINARY'),
     ],

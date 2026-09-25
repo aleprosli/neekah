@@ -49,6 +49,13 @@ class BuildCameraExport implements ShouldBeUnique, ShouldQueue
     public function handle(): void
     {
         $album = $this->album->fresh(['wedding.members']);
+
+        if ($album->purged_at) {
+            Cache::forget(self::buildingKey($album));
+
+            return;
+        }
+
         $disk = Storage::disk('public');
         $local = storage_path('app/private/camera-exports/'.$album->id);
         @mkdir($local, 0775, true);
