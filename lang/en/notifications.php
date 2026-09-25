@@ -26,6 +26,9 @@ return [
     ],
 
     'enquiry_received' => [
+        'locked_title' => 'You have a new enquiry',
+        'locked_body' => 'A couple sent you an enquiry. Upgrade to Neekah Pro to read and answer it.',
+        'locked_action' => 'Upgrade to Pro',
         'title' => 'New enquiry from :name',
         'body' => 'Reply within 24 hours to keep your response rate up.',
         'subject' => 'New enquiry from :name',
@@ -175,7 +178,7 @@ return [
         'title' => 'Neekah Pro ends in :days days',
         'body' => 'Your Pro plan ends on :date.',
         'subject' => '{1} Neekah Pro ends tomorrow|[2,*] Neekah Pro ends in :days days',
-        'renew' => 'Pay again to keep your sponsored slot, analytics and Pro badge. You lose none of the time left; the new period starts after it.',
+        'renew' => 'Pay again to keep online booking, monthly boost tokens, analytics and the Pro badge. You lose none of the time left; the new period starts after it.',
         'action' => 'Renew Pro',
     ],
 
@@ -237,5 +240,20 @@ return [
         'purged_title' => 'Your Kamera Majlis album has been deleted',
         'purged_body' => 'Its storage period has ended and every photo and video has been deleted from Neekah.',
         'action' => 'Open Kamera Majlis',
+    ],
+
+    'boost_tokens' => [
+        'title' => ':count boost tokens landed in your account',
+        'welcome' => 'Welcome to Neekah! Here are some boost tokens on us. Balance: :balance tokens.',
+        'pro_monthly' => 'Your Neekah Pro monthly boost tokens are in. Balance: :balance tokens.',
+        'purchase' => 'Thank you for your purchase. Balance: :balance tokens.',
+        'admin' => 'The Neekah team added boost tokens for you. Balance: :balance tokens.',
+        'how' => 'One token lifts your profile to the top of the Recommended list in a category you choose, for a day.',
+        'action' => 'Use boost tokens',
+    ],
+    'boost_ending' => [
+        'title' => 'Your :category boost ends tomorrow',
+        'body' => 'Your boost ends on :date. Add days to stay at the top.',
+        'action' => 'Extend the boost',
     ],
 ];

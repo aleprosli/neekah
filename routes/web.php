@@ -15,6 +15,7 @@ use App\Http\Controllers\Customer as CustomerArea;
 use App\Http\Controllers\Customer\BookingController;
 use App\Http\Controllers\Customer\PaymentController;
 use App\Http\Controllers\HerepayBookingWebhookController;
+use App\Http\Controllers\HerepayBoostWebhookController;
 use App\Http\Controllers\HerepayCameraWebhookController;
 use App\Http\Controllers\HerepayWebhookController;
 use App\Http\Controllers\InvitationAcceptanceController;
@@ -152,8 +153,8 @@ $site = function (): void {
             Route::post('/pro/checkout', [VendorArea\ProController::class, 'checkout'])->middleware('throttle:10,1')->name('pro.checkout');
             Route::get('/pro/selesai', [VendorArea\ProController::class, 'done'])->name('pro.done');
 
-            // Each feature is opened per plan under Admin → Ciri vendor, and
-            // per vendor on the vendor's admin page (VendorFeature).
+            // Each feature is open to every vendor or only on Pro
+            // (VendorFeature::requiresPro).
             Route::middleware('vendor.feature:packages')->group(function (): void {
                 Route::resource('packages', VendorArea\PackageController::class)->except('show', 'store', 'destroy');
             });
@@ -162,7 +163,7 @@ $site = function (): void {
                 Route::put('/portfolio/order', [VendorArea\PortfolioItemController::class, 'reorder'])->name('portfolio.reorder');
             });
             Route::middleware('vendor.feature:calendar')->group(function (): void {
-                Route::get('/availability', [VendorArea\UnavailableDateController::class, 'index'])->name('availability.index');
+                Route::get('/availability', [VendorArea\CalendarController::class, 'index'])->name('availability.index');
                 Route::post('/availability', [VendorArea\UnavailableDateController::class, 'store'])->name('availability.store');
                 Route::delete('/availability/{date}', [VendorArea\UnavailableDateController::class, 'destroy'])->name('availability.destroy');
             });
@@ -188,8 +189,15 @@ $site = function (): void {
             Route::middleware('vendor.feature:points')->group(function (): void {
                 Route::get('/points', [VendorArea\PointController::class, 'index'])->name('points.index');
             });
+            Route::middleware('vendor.feature:boost')->group(function (): void {
+                Route::get('/boost', [VendorArea\BoostController::class, 'index'])->name('boost.index');
+                Route::post('/boost', [VendorArea\BoostController::class, 'store'])->middleware('throttle:20,1')->name('boost.store');
+                Route::post('/boost/beli', [VendorArea\BoostController::class, 'checkout'])->middleware('throttle:10,1')->name('boost.checkout');
+                Route::get('/boost/selesai', [VendorArea\BoostController::class, 'done'])->name('boost.done');
+            });
             Route::middleware('vendor.feature:online_booking')->group(function (): void {
-                Route::get('/tempahan-online', [VendorArea\BookingSettingsController::class, 'edit'])->name('booking-settings.edit');
+                // The settings moved onto the calendar page; old links still land there.
+                Route::redirect('/tempahan-online', '/vendor/availability?tab=tempahan')->name('booking-settings.edit');
                 Route::put('/tempahan-online', [VendorArea\BookingSettingsController::class, 'update'])->name('booking-settings.update');
                 Route::put('/tempahan-online/herepay', [VendorArea\BookingSettingsController::class, 'connect'])->middleware('throttle:5,1')->name('booking-settings.herepay.connect');
                 Route::delete('/tempahan-online/herepay', [VendorArea\BookingSettingsController::class, 'disconnect'])->name('booking-settings.herepay.disconnect');
@@ -198,8 +206,10 @@ $site = function (): void {
                 Route::post('/tempahan-online/ical/segerak', [VendorArea\BookingSettingsController::class, 'syncIcal'])->middleware('throttle:10,1')->name('booking-settings.ical.sync');
                 Route::delete('/tempahan-online/ical', [VendorArea\BookingSettingsController::class, 'disconnectIcal'])->name('booking-settings.ical.disconnect');
             });
+            // Open to Basic too: it shows how many enquiries are waiting,
+            // locked, as the reason to take Pro.
+            Route::get('/enquiries', [VendorArea\EnquiryController::class, 'index'])->name('enquiries.index');
             Route::middleware('vendor.feature:enquiries')->group(function (): void {
-                Route::get('/enquiries', [VendorArea\EnquiryController::class, 'index'])->name('enquiries.index');
                 Route::get('/enquiries/{enquiry}', [VendorArea\EnquiryController::class, 'show'])->name('enquiries.show');
                 Route::put('/enquiries/{enquiry}', [VendorArea\EnquiryController::class, 'update'])->name('enquiries.update');
             });
@@ -309,8 +319,6 @@ $site = function (): void {
     Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function (): void {
         Route::get('/', AdminArea\DashboardController::class)->name('dashboard');
         Route::get('/analytics', AdminArea\AnalyticsController::class)->name('analytics');
-        Route::get('/vendor-features', [AdminArea\VendorFeatureController::class, 'index'])->name('vendor-features.index');
-        Route::put('/vendor-features', [AdminArea\VendorFeatureController::class, 'update'])->name('vendor-features.update');
         Route::get('/vendors', [AdminArea\VendorController::class, 'index'])->name('vendors.index');
         Route::get('/vendors/data', [AdminArea\VendorController::class, 'data'])->name('vendors.data');
         Route::get('/vendors/export', [AdminArea\VendorController::class, 'export'])->name('vendors.export');
@@ -319,7 +327,8 @@ $site = function (): void {
         Route::post('/vendors/{vendor}/status', [AdminArea\VendorApprovalController::class, 'store'])->name('vendors.status');
         Route::put('/vendors/{vendor}/tier', [AdminArea\VendorTierController::class, 'update'])->name('vendors.tier');
         Route::post('/vendors/{vendor}/pro', [AdminArea\VendorProController::class, 'store'])->name('vendors.pro');
-        Route::put('/vendors/{vendor}/features', [AdminArea\VendorFeatureOverrideController::class, 'update'])->name('vendors.features');
+        Route::delete('/vendors/{vendor}/pro', [AdminArea\VendorProController::class, 'destroy'])->name('vendors.pro.end');
+        Route::post('/vendors/{vendor}/boost', [AdminArea\VendorBoostController::class, 'store'])->name('vendors.boost');
         Route::put('/users/{user}/kamera', [AdminArea\CameraController::class, 'updateForUser'])->name('users.camera');
         Route::get('/kamera', [AdminArea\CameraController::class, 'index'])->name('camera.index');
         Route::get('/kamera/data', [AdminArea\CameraController::class, 'data'])->name('camera.data');
@@ -392,6 +401,7 @@ $site = function (): void {
         Route::put('/settings/herepay', [AdminArea\SettingController::class, 'updateHerepay'])->name('settings.herepay');
         Route::put('/settings/tempahan-online', [AdminArea\SettingController::class, 'updateOnlineBooking'])->name('settings.online-booking');
         Route::put('/settings/kamera', [AdminArea\SettingController::class, 'updateCamera'])->name('settings.camera');
+        Route::put('/settings/boost', [AdminArea\SettingController::class, 'updateBoost'])->name('settings.boost');
     });
 
 };
@@ -415,6 +425,11 @@ Route::post('/webhooks/herepay', HerepayWebhookController::class)
 Route::post('/webhooks/herepay/kamera', HerepayCameraWebhookController::class)
     ->middleware('throttle:60,1')
     ->name('webhooks.herepay.camera');
+
+// A boost token pack, on Neekah's own Herepay account.
+Route::post('/webhooks/herepay/boost', HerepayBoostWebhookController::class)
+    ->middleware('throttle:60,1')
+    ->name('webhooks.herepay.boost');
 
 Route::post('/webhooks/herepay/tempahan', HerepayBookingWebhookController::class)
     ->middleware('throttle:60,1')

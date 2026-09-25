@@ -56,7 +56,7 @@ return [
             'packages' => 'Pakej, harga dan portfolio dipaparkan',
             'calendar' => 'Kalendar tarikh yang sudah penuh',
             'enquiries' => 'Enquiry pengantin dalam satu tempat',
-            'pro' => 'Pilihan Neekah Pro: slot Ditaja dan analitik profil',
+            'pro' => 'Pilihan Neekah Pro: token boost bulanan dan analitik profil',
         ],
         'headline_tail' => 'terus berurusan dengan mereka.',
         'mock_date' => '20 Disember 2026 · Alor Setar',
@@ -672,7 +672,7 @@ return [
         'unlock_enquiries' => 'Enquiry daripada pengantin, terus di dashboard anda.',
         'unlock_reviews' => 'Review pelanggan, dan balas review tersebut.',
         'unlock_ranking' => 'Point dan ranking vendor: naik tahap seiring prestasi anda.',
-        'unlock_pro' => 'Neekah Pro: slot Ditaja, analitik penuh dan lencana Pro.',
+        'unlock_pro' => 'Neekah Pro: token boost bulanan, analitik penuh dan lencana Pro.',
         'unlock_note' => 'Semua ini hanya dibuka selepas admin meluluskan permohonan anda. Lengkapkan profil dahulu supaya semakan lebih cepat.',
         'help_call_label' => 'Telefon admin',
         'help_email_label' => 'Emel kami',
@@ -686,27 +686,11 @@ return [
         'review_again' => 'Semak semula profil',
     ],
 
-    'vendor_features' => [
-        'title' => 'Ciri vendor',
-        'subheading' => 'Pilih bahagian dashboard vendor yang dibuka untuk setiap pelan.',
-        'feature' => 'Ciri',
-        'plan_basic' => 'Basic',
-        'plan_pro' => 'Pro',
-        'always_open' => 'Ringkasan, Profil, halaman Neekah Pro dan Akaun sentiasa dibuka untuk semua vendor.',
-        'overridden' => ':count vendor ada pengecualian sendiri, yang mengatasi tetapan di sini.',
-        'save' => 'Simpan ciri vendor',
-        'vendor_heading' => 'Ciri untuk vendor ini',
-        'vendor_plan' => 'Pelan semasa: :plan',
-        'edit_plans' => 'Ubah ciri setiap pelan',
-        'open' => 'dibuka',
-        'closed' => 'ditutup',
-        'follow_plan' => 'Ikut pelan (:state)',
-        'always_open_option' => 'Sentiasa buka',
-        'always_closed_option' => 'Sentiasa tutup',
-        'save_vendor' => 'Simpan ciri vendor ini',
-    ],
-
     'sidebar_vendor' => [
+        'kalendar_tempahan' => 'Kalendar & tempahan',
+        'langganan_pro' => 'Langganan Pro',
+        'upgrade_pro' => 'Naik taraf ke Pro',
+        'boost' => 'Boost',
         'tempahan_online' => 'Tempahan online',
         'pro' => 'Neekah Pro',
         'ringkasan' => 'Ringkasan',
@@ -725,7 +709,6 @@ return [
 
     'sidebar_admin' => [
         'kamera' => 'Kamera Majlis',
-        'ciri_vendor' => 'Ciri vendor',
         'muzik_kad' => 'Muzik kad',
         'kad_nfc' => 'Kad NFC',
         'ringkasan' => 'Ringkasan',
@@ -791,12 +774,20 @@ return [
         'until' => 'hingga :date',
         'benefits' => [
             'booking' => [
-                'title' => 'Tempahan online dengan deposit',
-                'body' => 'Pengantin pilih tarikh kosong di kalendar anda dan bayar deposit terus ke akaun anda (Herepay atau pindahan bank). Tempahan disahkan automatik; anda tetapkan hari, kapasiti dan deposit.',
+                'title' => 'Kalendar & tempahan online',
+                'body' => 'Tutup tarikh, sync Google Calendar, dan biar pengantin tempah tarikh kosong serta bayar deposit terus ke akaun anda.',
             ],
-            'sponsored' => [
-                'title' => 'Slot Ditaja di atas carian',
-                'body' => 'Profil anda muncul dalam baris Ditaja di atas senarai vendor apabila pasangan mencari kategori dan negeri anda. Slot bergilir antara vendor Pro.',
+            'enquiries' => [
+                'title' => 'Enquiry dan tempahan',
+                'body' => 'Baca dan balas enquiry pengantin, rekod tempahan dan terima bayaran di satu tempat.',
+            ],
+            'ranking' => [
+                'title' => 'Point & ranking',
+                'body' => 'Lihat point, skor dan tahap anda, dan apa yang menaikkannya.',
+            ],
+            'boost' => [
+                'title' => 'Token boost setiap bulan',
+                'body' => 'Setiap bulan anda terima token boost percuma. Satu token menaikkan profil anda ke atas senarai Disyorkan dalam kategori pilihan anda selama sehari.',
             ],
             'analytics' => [
                 'title' => 'Analitik profil',
@@ -807,7 +798,7 @@ return [
                 'body' => 'Lencana Pro pada kad dan profil anda, supaya pasangan tahu anda serius dengan perniagaan anda.',
             ],
         ],
-        'fair_note' => 'Tier (Verified hingga Recommended) dan susunan senarai biasa tetap berdasarkan prestasi. Pro tidak boleh membelinya.',
+        'fair_note' => 'Tier (Verified hingga Recommended) dan skor tetap berdasarkan prestasi. Boost hanya menaikkan susunan Disyorkan sepanjang tempoh boost, dan kad anda dilabel Dipromosi.',
         'analytics_heading_pro' => 'Analitik 28 hari',
         'analytics_heading_free' => '7 hari lepas',
         'analytics_teaser' => 'Naik taraf ke Pro untuk melihat graf harian 28 hari.',
@@ -987,5 +978,28 @@ return [
         'purge_title' => 'Padam album Kamera Majlis :wedding sekarang?',
         'purge_message' => ':count gambar dan video dipadam untuk selamanya, dan pautan tetamu ditutup. Rekod pembelian kekal.',
         'purge_confirm' => 'Ya, padam album',
+    ],
+
+    'boost' => [
+        'title' => 'Boost',
+        'subheading' => 'Naikkan profil anda ke atas senarai Disyorkan dalam kategori anda. 1 token = 1 hari.',
+        'herepay_title' => ':count token boost Neekah untuk :vendor',
+        'herepay_description' => 'Rujukan :reference',
+        'done_paid_title' => 'Token sudah masuk',
+        'done_paid_body' => ':count token boost ditambah ke baki anda.',
+        'done_waiting_title' => 'Menunggu pengesahan bayaran',
+        'done_waiting_body' => 'Token akan masuk sebaik Herepay mengesahkan bayaran anda. Halaman ini akan dikemas kini sendiri.',
+        'done_failed_title' => 'Bayaran tidak berjaya',
+        'done_failed_body' => 'Tiada caj dibuat untuk :count token. Cuba lagi dari halaman Boost.',
+        'back' => 'Kembali ke Boost',
+    ],
+
+    'calendar' => [
+        'title' => 'Kalendar & tempahan',
+        'subheading' => 'Tarikh anda, tempahan online dan deposit di satu tempat.',
+    ],
+    'enquiries_locked' => [
+        'subheading' => 'Pengantin boleh menghantar enquiry kepada anda.',
+        'waiting' => ':count enquiry menunggu anda.',
     ],
 ];

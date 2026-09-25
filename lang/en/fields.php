@@ -136,7 +136,6 @@ return [
 
     'pro_monthly_price' => 'monthly price (RM)',
     'pro_yearly_price' => 'yearly price (RM)',
-    'pro_sponsored_slots' => 'number of sponsored slots',
 
     'terma_deposit' => 'deposit terms',
     'jenis_deposit' => 'deposit type',
@@ -164,4 +163,11 @@ return [
     'camera_album_title' => 'album name',
     'camera_welcome' => 'note for guests',
     'camera_passcode' => 'passcode',
+    'boost_welcome_tokens' => 'welcome tokens',
+    'boost_pro_monthly_tokens' => 'Pro monthly tokens',
+    'boost_max_days' => 'longest boost in days',
+    'boost_small_tokens' => 'small pack tokens',
+    'boost_small_price' => 'small pack price (RM)',
+    'boost_large_tokens' => 'large pack tokens',
+    'boost_large_price' => 'large pack price (RM)',
 ];

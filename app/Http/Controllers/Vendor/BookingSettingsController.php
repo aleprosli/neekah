@@ -3,48 +3,24 @@
 namespace App\Http\Controllers\Vendor;
 
 use App\Actions\ImportVendorIcal;
-use App\Enums\DepositType;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ConnectHerepayRequest;
 use App\Http\Requests\UpdateBookingSettingsRequest;
-use App\Models\VendorBookingSetting;
 use App\Models\VendorUnavailableDate;
 use App\Support\Herepay\DepositGateway;
-use App\Support\Herepay\HerepayClient;
 use App\Support\Herepay\HerepayCredentials;
-use App\Support\OnlineBookingSettings;
-use App\Support\VendorAvailability;
-use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use RuntimeException;
 
 /**
- * A Pro vendor's online booking: whether it is live and why not, the rules
- * couples book under, and where the deposit goes (their own Herepay account,
- * or a transfer to their bank). The Herepay keys are written, never shown.
+ * What the online booking forms on the calendar page (CalendarController)
+ * post to: the rules couples book under, where the deposit goes (their own
+ * Herepay account, or a transfer to their bank) and the Google Calendar.
+ * The Herepay keys are written, never shown.
  */
 class BookingSettingsController extends Controller
 {
-    public function edit(Request $request, HerepayClient $herepay, OnlineBookingSettings $site): View
-    {
-        $vendor = $request->user()->vendor;
-        $availability = VendorAvailability::for($vendor);
-        $settings = $availability->settings();
-
-        return view('vendor.booking-settings.edit', [
-            'vendor' => $vendor,
-            'settings' => $settings,
-            'state' => $availability->onlineState(),
-            'channel' => $availability->paymentChannel(),
-            'depositTypes' => DepositType::cases(),
-            'weekdays' => VendorBookingSetting::ALL_WEEKDAYS,
-            'environment' => $herepay->environment(),
-            'freshDays' => $site->calendarFreshDays(),
-            'examplePrice' => (float) ($vendor->packages()->where('is_active', true)->min('price') ?? 3000),
-        ]);
-    }
-
     public function update(UpdateBookingSettingsRequest $request): RedirectResponse
     {
         $vendor = $request->user()->vendor;

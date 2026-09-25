@@ -64,28 +64,32 @@
 
                 <nav class="no-scrollbar relative flex-1 overflow-y-auto px-4 pt-4 pb-6">
                     @foreach ($nav as $group)
-                        <div @class(['mt-5' => ! $loop->first])>
-                            @if ($group['label'])
-                                <p class="mb-1.5 px-3 font-display text-[13px] text-gold-600 italic">{{ $group['label'] }}</p>
-                            @endif
-                            <ul class="flex flex-col gap-0.5">
-                                @foreach ($group['items'] as $item)
-                                    <li>
-                                        <a href="{{ $item['href'] }}" @class([
-                                            'group flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition',
-                                            'bg-surface-raised text-brand-700 shadow-sm shadow-brand-900/5 ring-1 ring-brand-100 [&_svg]:text-brand-600' => $item['active'],
-                                            'text-ink-muted hover:bg-surface-raised/70 hover:text-ink' => ! $item['active'],
-                                        ]) @if ($item['active']) aria-current="page" @endif>
-                                            <x-nav-icon :name="$item['icon']" />
-                                            <span class="min-w-0 flex-1 truncate">{{ $item['label'] }}</span>
-                                            @if (! empty($item['badge']))
-                                                <span class="rounded-full bg-brand-600 px-1.5 py-px text-[11px] font-semibold text-white">{{ $item['badge'] }}</span>
-                                            @endif
-                                        </a>
-                                    </li>
-                                @endforeach
-                            </ul>
-                        </div>
+                        @if (! empty($group['key']))
+                            {{-- A group that folds away. nav-groups.js remembers
+                                 the choice; the one holding this page stays open. --}}
+                            <details data-nav-group="{{ $group['key'] }}" open @class(['group/nav', 'mt-5' => ! $loop->first])>
+                                <summary class="mb-1.5 flex cursor-pointer list-none items-center gap-2 rounded-lg px-3 py-1 transition hover:bg-surface-raised/60 [&::-webkit-details-marker]:hidden">
+                                    <span class="font-display text-[13px] text-gold-600 italic">{{ $group['label'] }}</span>
+                                    @if (! empty($group['tag']))
+                                        <span class="rounded-full bg-gold-300/40 px-1.5 py-px text-[10px] font-semibold tracking-wide text-brand-900 uppercase">{{ $group['tag'] }}</span>
+                                    @endif
+                                    <svg class="ml-auto size-3.5 text-ink-muted transition group-open/nav:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+                                </summary>
+                                <x-dashboard.nav-items :items="$group['items']" />
+                                @if (! empty($group['footer']))
+                                    <a href="{{ $group['footer']['href'] }}" class="mx-3 mt-2 flex items-center justify-center gap-1.5 rounded-xl border border-gold-300/70 bg-gold-300/15 px-3 py-2 text-xs font-semibold text-brand-800 transition hover:bg-gold-300/30">
+                                        <x-nav-icon name="crown" class="size-3.5" />{{ $group['footer']['label'] }}
+                                    </a>
+                                @endif
+                            </details>
+                        @else
+                            <div @class(['mt-5' => ! $loop->first])>
+                                @if ($group['label'])
+                                    <p class="mb-1.5 px-3 font-display text-[13px] text-gold-600 italic">{{ $group['label'] }}</p>
+                                @endif
+                                <x-dashboard.nav-items :items="$group['items']" />
+                            </div>
+                        @endif
                     @endforeach
                 </nav>
 

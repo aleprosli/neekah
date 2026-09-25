@@ -8,6 +8,7 @@ Before planning or editing, find the row whose globs match the file's path and r
 | app/Http/Controllers/Admin/**, app/Http/Controllers/Admin/SettingController.php | .ai/rules/admin.md |
 | app/** | .ai/rules/app.md |
 | app/Support/Card/** | .ai/rules/card.md |
+| app/Console/Commands/UpdateVendorPopularity.php | .ai/rules/commands.md |
 | resources/js/components/card/** | .ai/rules/components-card.md |
 | resources/js/components/customer/CameraPrintDesigner.vue | .ai/rules/components-customer.md |
 | resources/js/components/** | .ai/rules/components.md |

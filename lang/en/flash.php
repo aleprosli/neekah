@@ -21,6 +21,9 @@ return [
     ],
 
     'admin' => [
+        'pro_ended' => 'Pro for :vendor has ended. The vendor is on Basic now.',
+        'boost_tokens_changed' => 'Boost tokens for :vendor updated. Balance: :balance.',
+        'boost_saved' => 'Boost settings saved.',
         'camera_saved' => 'Kamera Majlis settings saved.',
         'online_booking_saved' => 'Online booking settings saved.',
         'category_added' => 'Category added.',
@@ -28,8 +31,6 @@ return [
         'contact_saved' => 'Contact details saved.',
         'turnstile_saved' => 'Turnstile settings saved.',
         'telegram_saved' => 'Telegram settings saved.',
-        'vendor_features_saved' => 'Vendor features saved.',
-        'vendor_overrides_saved' => 'Features for :vendor saved.',
         'herepay_saved' => 'Herepay settings saved.',
         'pro_activated' => 'Pro for :vendor is active until :date.',
         'camera_activated' => 'Kamera Majlis :tier for :wedding is active.',
@@ -125,6 +126,8 @@ return [
     ],
 
     'vendor' => [
+        'boost_started' => 'Your :category boost runs until :date.',
+        'boost_checkout_failed' => 'The payment link could not be opened. Please try again shortly.',
         'ical_connected' => 'Google Calendar connected. :count busy dates imported.',
         'ical_synced' => 'Synced. :count busy dates from Google Calendar.',
         'ical_disconnected' => 'Google Calendar disconnected. Imported dates have been reopened.',
@@ -140,7 +143,6 @@ return [
         'package_added' => 'Package added.',
         'package_updated' => 'Package updated.',
         'feature_needs_pro' => ':feature is open to Neekah Pro vendors. Upgrade to use it.',
-        'feature_closed' => ':feature is not open for your account.',
         'pro_checkout_failed' => 'We could not create a payment link just now. Please try again shortly.',
         'registered' => 'Your registration has been received. Complete your profile while an admin reviews it.',
         'converted' => 'Your account is now a vendor account. Complete your profile while an admin reviews it.',

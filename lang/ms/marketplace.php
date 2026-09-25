@@ -45,6 +45,7 @@ return [
         'price_asc' => 'Harga: rendah ke tinggi',
         'price_desc' => 'Harga: tinggi ke rendah',
         'reviews' => 'Paling banyak review',
+        'popular' => 'Paling ramai dilihat',
     ],
 
     // One form, no choices: Laravel has no plural rule for Malay and would
@@ -53,6 +54,8 @@ return [
     'demo' => 'Data demo',
 
     'card' => [
+        'promoted' => 'Dipromosi',
+        'trending' => 'Trending',
         'pro' => 'Pro',
         'pro_title' => 'Vendor Neekah Pro',
         'recommended' => 'Disyorkan',
@@ -75,12 +78,6 @@ return [
         'clear' => 'Kosongkan',
         'open' => 'Banding',
         'limit' => 'Maksimum 4 vendor sahaja.',
-    ],
-
-    'sponsored' => [
-        'heading' => 'Ditaja',
-        'note' => 'Vendor Pro yang sepadan dengan carian anda. Senarai di bawah disusun mengikut prestasi, bukan bayaran.',
-        'label' => 'Ditaja',
     ],
 
 ];

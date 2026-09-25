@@ -35,6 +35,8 @@
         'user' => '<circle cx="12" cy="8" r="3.5"/><path d="M5 20a7 7 0 0 1 14 0"/>',
         'search' => '<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>',
         'music' => '<path d="M9 18V6l10-2v12"/><circle cx="6" cy="18" r="3"/><circle cx="16" cy="16" r="3"/>',
+        'rocket' => '<path d="M5 15c-1 1-1.5 3.5-1.5 5.5 2 0 4.5-.5 5.5-1.5"/><path d="M9 15 5.5 11.5 8 9h5l5-5c1.5 0 2 .5 2 2l-5 5v5l-2.5 2.5L9 15Z"/><circle cx="15" cy="9" r="1"/>',
+        'lock' => '<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>',
         'tag' => '<path d="M11 3H4v7l10 10 7-7L11 3Z"/><path d="M7.5 7.5h.01"/>',
     ];
 @endphp

@@ -2,11 +2,21 @@
 
 return [
 
+    'boost_token_reason' => [
+        'welcome' => 'Hadiah selamat datang',
+        'pro_monthly' => 'Token bulanan Pro',
+        'purchase' => 'Pembelian token',
+        'admin' => 'Pelarasan admin',
+        'spend' => 'Boost kategori',
+        'refund' => 'Pemulangan',
+    ],
+
     'vendor_feature' => [
+        'boost' => 'Boost',
         'online_booking' => 'Tempahan online',
         'packages' => 'Pakej',
         'portfolio' => 'Portfolio',
-        'calendar' => 'Kalendar',
+        'calendar' => 'Kalendar & tempahan online',
         'bookings' => 'Tempahan',
         'enquiries' => 'Enquiry',
         'reviews' => 'Review',
@@ -14,10 +24,11 @@ return [
     ],
 
     'vendor_feature_desc' => [
+        'boost' => 'Guna token untuk naikkan profil ke atas kategori anda.',
         'online_booking' => 'Pengantin tempah tarikh dan bayar deposit terus di halaman vendor.',
         'packages' => 'Urus pakej dan harga yang dipaparkan di halaman awam.',
         'portfolio' => 'Muat naik dan susun gambar portfolio.',
-        'calendar' => 'Tutup tarikh yang sudah penuh.',
+        'calendar' => 'Tutup tarikh, terima tempahan online dengan deposit dan sync Google Calendar.',
         'bookings' => 'Rekod dan urus tempahan pelanggan.',
         'enquiries' => 'Terima dan balas enquiry daripada pengantin.',
         'reviews' => 'Lihat, balas dan laporkan review pelanggan.',

@@ -2,11 +2,21 @@
 
 return [
 
+    'boost_token_reason' => [
+        'welcome' => 'Welcome gift',
+        'pro_monthly' => 'Pro monthly tokens',
+        'purchase' => 'Token purchase',
+        'admin' => 'Admin adjustment',
+        'spend' => 'Category boost',
+        'refund' => 'Refund',
+    ],
+
     'vendor_feature' => [
+        'boost' => 'Boost',
         'online_booking' => 'Online booking',
         'packages' => 'Packages',
         'portfolio' => 'Portfolio',
-        'calendar' => 'Calendar',
+        'calendar' => 'Calendar & online booking',
         'bookings' => 'Bookings',
         'enquiries' => 'Enquiries',
         'reviews' => 'Reviews',
@@ -14,10 +24,11 @@ return [
     ],
 
     'vendor_feature_desc' => [
+        'boost' => 'Spend tokens to lift your profile to the top of your category.',
         'online_booking' => 'Couples book a date and pay the deposit right on the vendor page.',
         'packages' => 'Manage the packages and prices shown on the public page.',
         'portfolio' => 'Upload and arrange portfolio photos.',
-        'calendar' => 'Close off dates that are already booked.',
+        'calendar' => 'Block dates, take online bookings with a deposit and sync Google Calendar.',
         'bookings' => 'Record and manage customer bookings.',
         'enquiries' => 'Receive and reply to enquiries from couples.',
         'reviews' => 'See, reply to and report customer reviews.',

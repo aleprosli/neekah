@@ -22,7 +22,7 @@
 
         {{-- What Pro gives, next to what stays free. --}}
         <section class="grid gap-4 sm:grid-cols-2">
-            @foreach (['booking', 'sponsored', 'analytics', 'badge'] as $benefit)
+            @foreach (['booking', 'enquiries', 'ranking', 'boost', 'analytics', 'badge'] as $benefit)
                 <div class="flex flex-col gap-2 rounded-2xl border border-line bg-surface-raised p-5">
                     <h2 class="font-semibold">{{ __('pages.pro.benefits.'.$benefit.'.title') }}</h2>
                     <p class="text-sm text-ink-muted">{{ __('pages.pro.benefits.'.$benefit.'.body') }}</p>

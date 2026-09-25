@@ -13,7 +13,6 @@ use App\Support\PhoneNumber;
 use App\Support\SocialLinks;
 use App\Support\States;
 use App\Support\VendorAvailability;
-use App\Support\VendorFeatureSettings;
 use Database\Factories\VendorFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Scope;
@@ -33,7 +32,7 @@ use Illuminate\Support\Collection;
     'phone', 'whatsapp', 'social_links', 'price_from', 'price_unit', 'cover_image', 'logo', 'cover_tone',
     'status', 'tier', 'rating_avg', 'reviews_count', 'completed_bookings_count',
     'response_rate', 'completion_rate', 'score', 'points_total', 'tier_locked', 'penalty_points', 'violations_count', 'approved_at',
-    'pro_until', 'feature_overrides',
+    'pro_until', 'views_30d', 'trending_at',
 ])]
 class Vendor extends Model
 {
@@ -57,7 +56,9 @@ class Vendor extends Model
             'tier_locked' => 'boolean',
             'approved_at' => 'datetime',
             'pro_until' => 'datetime',
-            'feature_overrides' => 'array',
+            'views_30d' => 'integer',
+            'trending_at' => 'datetime',
+            'boost_tokens' => 'integer',
         ];
     }
 
@@ -84,6 +85,16 @@ class Vendor extends Model
      *
      * @return BelongsToMany<Category, $this>
      */
+    public function boosts(): HasMany
+    {
+        return $this->hasMany(VendorBoost::class);
+    }
+
+    public function boostEntries(): HasMany
+    {
+        return $this->hasMany(VendorBoostEntry::class);
+    }
+
     public function categories(): BelongsToMany
     {
         return $this->belongsToMany(Category::class)->orderBy('sort_order')->orderBy('name');
@@ -233,51 +244,22 @@ class Vendor extends Model
     }
 
     /**
-     * Whether the vendor has a paid Pro plan running. Pro buys the sponsored
-     * slot, the analytics and the badge; it never touches the tier, the score
-     * or where the vendor sits in the ordinary listing.
+     * Whether the vendor has a paid Pro plan running. Pro buys online
+     * booking, monthly boost tokens, the analytics and the badge; it never
+     * touches the tier or the score.
      */
     public function isPro(): bool
     {
         return $this->pro_until !== null && $this->pro_until->isFuture();
     }
 
-    /** The plan whose features apply: "pro" while Pro is running, "basic" otherwise. */
-    public function featurePlan(): string
-    {
-        return $this->isPro() ? VendorFeatureSettings::PRO : VendorFeatureSettings::BASIC;
-    }
-
     /**
-     * An admin's exception for this vendor alone: true or false, or null when
-     * the feature follows the plan.
-     */
-    public function featureOverride(VendorFeature $feature): ?bool
-    {
-        $override = $this->feature_overrides[$feature->value] ?? null;
-
-        return is_bool($override) ? $override : null;
-    }
-
-    /**
-     * Whether this vendor can use a part of the vendor area: their own override
-     * if an admin set one, else what their plan opens.
+     * Whether this vendor can use a part of the vendor area: everything
+     * Basic has, plus the Pro features while Pro is running.
      */
     public function hasFeature(VendorFeature $feature): bool
     {
-        return $this->featureOverride($feature)
-            ?? app(VendorFeatureSettings::class)->allows($this->featurePlan(), $feature);
-    }
-
-    /**
-     * Closed for this vendor but open on Pro, so the sidebar can offer it as
-     * a reason to upgrade instead of hiding it.
-     */
-    public function unlocksWithPro(VendorFeature $feature): bool
-    {
-        return ! $this->isPro()
-            && $this->featureOverride($feature) === null
-            && app(VendorFeatureSettings::class)->allows(VendorFeatureSettings::PRO, $feature);
+        return ! $feature->requiresPro() || $this->isPro();
     }
 
     /**
@@ -427,6 +409,26 @@ class Vendor extends Model
                 });
             }
         });
+    }
+
+    /**
+     * The "Disyorkan" order with boosted vendors first: those with a boost
+     * running in this category, or in any category when the list is not
+     * narrowed to one. Selects `boosted` so the card can say so.
+     */
+    #[Scope]
+    protected function boostedFirst(Builder $query, ?Category $category = null): Builder
+    {
+        $running = VendorBoost::query()
+            ->selectRaw('1')
+            ->whereColumn('vendor_boosts.vendor_id', 'vendors.id')
+            ->where('vendor_boosts.starts_at', '<=', now())
+            ->where('vendor_boosts.ends_at', '>', now())
+            ->when($category, fn (Builder $boosts, Category $category) => $boosts->where('vendor_boosts.category_id', $category->getKey()));
+
+        return $query->select('vendors.*')
+            ->selectRaw('exists('.$running->toSql().') as boosted', $running->getBindings())
+            ->orderByDesc('boosted');
     }
 
     #[Scope]

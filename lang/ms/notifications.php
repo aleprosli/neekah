@@ -26,6 +26,9 @@ return [
     ],
 
     'enquiry_received' => [
+        'locked_title' => 'Ada enquiry baharu untuk anda',
+        'locked_body' => 'Seorang pengantin menghantar enquiry. Naik taraf ke Neekah Pro untuk membaca dan membalasnya.',
+        'locked_action' => 'Naik taraf ke Pro',
         'title' => 'Enquiry baharu daripada :name',
         'body' => 'Balas dalam 24 jam untuk mengekalkan response rate anda.',
         'subject' => 'Enquiry baharu daripada :name',
@@ -175,7 +178,7 @@ return [
         'title' => 'Neekah Pro tamat dalam :days hari',
         'body' => 'Pro anda akan tamat pada :date.',
         'subject' => '{1} Neekah Pro tamat esok|[2,*] Neekah Pro tamat dalam :days hari',
-        'renew' => 'Bayar semula untuk kekalkan slot Ditaja, analitik dan lencana Pro. Baki masa anda tidak hilang, tempoh baharu disambung selepasnya.',
+        'renew' => 'Bayar semula untuk kekalkan tempahan online, token boost bulanan, analitik dan lencana Pro. Baki masa anda tidak hilang, tempoh baharu disambung selepasnya.',
         'action' => 'Sambung Pro',
     ],
 
@@ -237,5 +240,20 @@ return [
         'purged_title' => 'Album Kamera Majlis telah dipadam',
         'purged_body' => 'Tempoh simpanan sudah tamat dan semua gambar serta video telah dipadam dari Neekah.',
         'action' => 'Buka Kamera Majlis',
+    ],
+
+    'boost_tokens' => [
+        'title' => ':count token boost masuk ke akaun anda',
+        'welcome' => 'Selamat datang ke Neekah! Ini hadiah token boost untuk anda. Baki: :balance token.',
+        'pro_monthly' => 'Token boost bulanan Neekah Pro anda sudah masuk. Baki: :balance token.',
+        'purchase' => 'Terima kasih atas pembelian anda. Baki: :balance token.',
+        'admin' => 'Admin Neekah menambah token boost untuk anda. Baki: :balance token.',
+        'how' => 'Satu token menaikkan profil anda ke atas senarai Disyorkan dalam kategori pilihan anda selama sehari.',
+        'action' => 'Guna token boost',
+    ],
+    'boost_ending' => [
+        'title' => 'Boost :category tamat esok',
+        'body' => 'Boost anda tamat pada :date. Tambah hari jika mahu kekal di atas.',
+        'action' => 'Sambung boost',
     ],
 ];

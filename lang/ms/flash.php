@@ -21,6 +21,9 @@ return [
     ],
 
     'admin' => [
+        'pro_ended' => 'Pro untuk :vendor ditamatkan. Vendor kini di pelan Basic.',
+        'boost_tokens_changed' => 'Token boost :vendor dikemas kini. Baki: :balance.',
+        'boost_saved' => 'Tetapan boost disimpan.',
         'camera_saved' => 'Tetapan Kamera Majlis disimpan.',
         'online_booking_saved' => 'Tetapan tempahan online disimpan.',
         'category_added' => 'Kategori ditambah.',
@@ -28,8 +31,6 @@ return [
         'contact_saved' => 'Maklumat perhubungan disimpan.',
         'turnstile_saved' => 'Tetapan Turnstile disimpan.',
         'telegram_saved' => 'Tetapan Telegram disimpan.',
-        'vendor_features_saved' => 'Ciri vendor disimpan.',
-        'vendor_overrides_saved' => 'Ciri untuk :vendor disimpan.',
         'herepay_saved' => 'Tetapan Herepay disimpan.',
         'pro_activated' => 'Pro untuk :vendor aktif sehingga :date.',
         'camera_activated' => 'Kamera Majlis :tier untuk :wedding sudah aktif.',
@@ -125,6 +126,8 @@ return [
     ],
 
     'vendor' => [
+        'boost_started' => 'Boost :category aktif sehingga :date.',
+        'boost_checkout_failed' => 'Pautan bayaran tidak dapat dibuka. Cuba sebentar lagi.',
         'ical_connected' => 'Google Calendar disambung. :count tarikh sibuk diimport.',
         'ical_synced' => 'Disegerakkan. :count tarikh sibuk daripada Google Calendar.',
         'ical_disconnected' => 'Google Calendar diputuskan. Tarikh yang diimport telah dibuka semula.',
@@ -140,7 +143,6 @@ return [
         'package_added' => 'Pakej ditambah.',
         'package_updated' => 'Pakej dikemas kini.',
         'feature_needs_pro' => ':feature dibuka untuk vendor Neekah Pro. Naik taraf untuk menggunakannya.',
-        'feature_closed' => ':feature tidak dibuka untuk akaun anda.',
         'pro_checkout_failed' => 'Pautan bayaran tidak dapat dibuat sekarang. Sila cuba sebentar lagi.',
         'registered' => 'Pendaftaran diterima. Lengkapkan profil anda sementara admin menyemak permohonan.',
         'converted' => 'Akaun anda kini akaun vendor. Lengkapkan profil anda sementara admin menyemak permohonan.',

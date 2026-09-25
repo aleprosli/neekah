@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'pro_locked' => 'Locked, needs Neekah Pro',
 
     'find_vendors' => 'Find Vendors',
     'how_it_works' => 'How It Works',
