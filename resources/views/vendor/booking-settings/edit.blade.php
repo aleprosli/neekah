@@ -96,6 +96,45 @@
             <div><button type="submit" class="rounded-full bg-brand-600 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700">{{ __('pages.booking_settings.save') }}</button></div>
         </form>
 
+        {{-- Google Calendar: busy days come in on their own every hour. --}}
+        <section class="{{ $card }}">
+            <div>
+                <h2 class="font-display text-lg font-semibold">{{ __('pages.booking_settings.ical_title') }}</h2>
+                <p class="mt-1 text-sm text-ink-muted">{{ __('pages.booking_settings.ical_intro') }}</p>
+            </div>
+
+            @if ($settings->ical_url)
+                <div class="flex flex-col gap-3 rounded-xl bg-sky-50 p-4 text-sm">
+                    <p class="font-semibold break-all text-sky-900">{{ $settings->maskedIcalUrl() }}</p>
+                    <p class="text-sky-900/80">
+                        @if ($settings->ical_error)
+                            {{ __('pages.booking_settings.ical_last_error', ['error' => __('pages.booking_settings.ical_errors.'.$settings->ical_error)]) }}
+                        @elseif ($settings->ical_synced_at)
+                            {{ __('pages.booking_settings.ical_synced_ago', ['ago' => $settings->ical_synced_at->diffForHumans()]) }}
+                        @endif
+                    </p>
+                    <div class="flex flex-wrap gap-2">
+                        <form method="POST" action="{{ route('vendor.booking-settings.ical.sync') }}">
+                            @csrf
+                            <button type="submit" class="rounded-full bg-brand-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-700">{{ __('pages.booking_settings.ical_sync_now') }}</button>
+                        </form>
+                        <form method="POST" action="{{ route('vendor.booking-settings.ical.disconnect') }}">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="rounded-full border border-sky-300 bg-surface-raised px-4 py-2 text-sm font-medium transition hover:border-brand-400">{{ __('pages.booking_settings.ical_disconnect') }}</button>
+                        </form>
+                    </div>
+                </div>
+            @endif
+
+            <form method="POST" action="{{ route('vendor.booking-settings.ical.connect') }}" class="flex flex-col gap-3">
+                @csrf
+                @method('PUT')
+                <x-form.field :label="$settings->ical_url ? __('pages.booking_settings.ical_replace') : ucfirst(__('fields.ical_url'))" name="ical_url" type="url" placeholder="https://calendar.google.com/calendar/ical/…/basic.ics" :help="__('pages.booking_settings.ical_help')" required />
+                <div><button type="submit" class="rounded-full border border-brand-600 px-5 py-2.5 text-sm font-semibold text-brand-700 transition hover:bg-brand-50">{{ __('pages.booking_settings.ical_connect') }}</button></div>
+            </form>
+        </section>
+
         {{-- Where the deposit goes. --}}
         <section class="{{ $card }}">
             <div>

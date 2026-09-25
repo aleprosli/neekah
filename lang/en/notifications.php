@@ -208,4 +208,10 @@ return [
         'title' => 'Deposit receipt :reference is waiting for you',
         'body' => 'The couple recorded a :amount deposit two days ago. Check your account and confirm (or reject) it so the booking is not left hanging.',
     ],
+
+    'ical_failed' => [
+        'title' => 'Your Google Calendar could not be imported',
+        'body' => 'The last few imports failed (:reason). Dates already imported stay closed, but new bookings in your calendar are not reaching Neekah.',
+        'action' => 'Check settings',
+    ],
 ];

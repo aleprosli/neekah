@@ -180,6 +180,9 @@ $site = function (): void {
                 Route::put('/tempahan-online/herepay', [VendorArea\BookingSettingsController::class, 'connect'])->middleware('throttle:5,1')->name('booking-settings.herepay.connect');
                 Route::delete('/tempahan-online/herepay', [VendorArea\BookingSettingsController::class, 'disconnect'])->name('booking-settings.herepay.disconnect');
                 Route::post('/tempahan-online/kalendar', [VendorArea\BookingSettingsController::class, 'confirmCalendar'])->name('booking-settings.calendar');
+                Route::put('/tempahan-online/ical', [VendorArea\BookingSettingsController::class, 'connectIcal'])->middleware('throttle:10,1')->name('booking-settings.ical.connect');
+                Route::post('/tempahan-online/ical/segerak', [VendorArea\BookingSettingsController::class, 'syncIcal'])->middleware('throttle:10,1')->name('booking-settings.ical.sync');
+                Route::delete('/tempahan-online/ical', [VendorArea\BookingSettingsController::class, 'disconnectIcal'])->name('booking-settings.ical.disconnect');
             });
             Route::middleware('vendor.feature:enquiries')->group(function (): void {
                 Route::get('/enquiries', [VendorArea\EnquiryController::class, 'index'])->name('enquiries.index');

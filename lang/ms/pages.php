@@ -889,6 +889,21 @@ return [
     ],
 
     'booking_settings' => [
+        'ical_title' => 'Sync Google Calendar',
+        'ical_intro' => 'Tampal alamat rahsia iCal Google Calendar anda. Setiap jam, hari yang sibuk dalam kalendar itu ditutup di Neekah secara automatik, dan kalendar dikira terkini.',
+        'ical_help' => 'Google Calendar → Tetapan → pilih kalendar → "Alamat rahsia dalam format iCal".',
+        'ical_connect' => 'Sambung kalendar',
+        'ical_replace' => 'Tukar alamat iCal',
+        'ical_sync_now' => 'Segerakkan sekarang',
+        'ical_disconnect' => 'Putuskan',
+        'ical_synced_ago' => 'Disegerakkan :ago.',
+        'ical_last_error' => 'Import terakhir gagal: :error',
+        'ical_errors' => [
+            'ical_url_refused' => 'Alamat ini tidak dibenarkan. Gunakan alamat https Google Calendar.',
+            'ical_unreachable' => 'Kalendar tidak dapat dibuka. Semak alamat rahsia iCal anda.',
+            'ical_too_large' => 'Kalendar terlalu besar untuk diimport.',
+            'ical_unreadable' => 'Alamat ini bukan kalendar iCal yang sah.',
+        ],
         'title' => 'Tempahan online',
         'subheading' => 'Pengantin tempah tarikh dan bayar deposit terus kepada anda.',
         'calendar_confirmed_ago' => 'Kalendar disahkan :ago. Sahkan semula sekurang-kurangnya setiap :days hari supaya tempahan online kekal dibuka.',

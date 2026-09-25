@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers\Vendor;
 
+use App\Actions\ImportVendorIcal;
 use App\Enums\DepositType;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ConnectHerepayRequest;
 use App\Http\Requests\UpdateBookingSettingsRequest;
 use App\Models\VendorBookingSetting;
+use App\Models\VendorUnavailableDate;
 use App\Support\Herepay\DepositGateway;
 use App\Support\Herepay\HerepayClient;
 use App\Support\Herepay\HerepayCredentials;
@@ -15,6 +17,7 @@ use App\Support\VendorAvailability;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use RuntimeException;
 
 /**
  * A Pro vendor's online booking: whether it is live and why not, the rules
@@ -92,5 +95,58 @@ class BookingSettingsController extends Controller
         $request->user()->vendor->bookingSettings()->updateOrCreate([], ['calendar_confirmed_at' => now()]);
 
         return back()->with('status', __('flash.vendor.calendar_confirmed'));
+    }
+
+    /**
+     * Link the vendor's Google Calendar. It is imported straight away, so a
+     * wrong address is caught here rather than an hour later.
+     */
+    public function connectIcal(Request $request, ImportVendorIcal $import): RedirectResponse
+    {
+        $validated = $request->validate(
+            ['ical_url' => ['required', 'string', 'max:2048', 'url:https']],
+            attributes: ['ical_url' => __('fields.ical_url')],
+        );
+
+        $settings = $request->user()->vendor->bookingSettings()->firstOrCreate();
+        $previous = $settings->ical_url;
+        $settings->update(['ical_url' => trim($validated['ical_url'])]);
+
+        try {
+            $count = $import->handle($settings);
+        } catch (RuntimeException $exception) {
+            $settings->update(['ical_url' => $previous]);
+
+            return back()->withErrors(['ical_url' => __('pages.booking_settings.ical_errors.'.$exception->getMessage())]);
+        }
+
+        return back()->with('status', __('flash.vendor.ical_connected', ['count' => $count]));
+    }
+
+    public function syncIcal(Request $request, ImportVendorIcal $import): RedirectResponse
+    {
+        $settings = $request->user()->vendor->bookingSettings;
+        abort_if(blank($settings?->ical_url), 404);
+
+        try {
+            $count = $import->handle($settings);
+        } catch (RuntimeException $exception) {
+            $settings->update(['ical_error' => $exception->getMessage()]);
+
+            return back()->withErrors(['ical_url' => __('pages.booking_settings.ical_errors.'.$exception->getMessage())]);
+        }
+
+        return back()->with('status', __('flash.vendor.ical_synced', ['count' => $count]));
+    }
+
+    /** Unlink the calendar and reopen the days it had closed; days closed by hand stay. */
+    public function disconnectIcal(Request $request): RedirectResponse
+    {
+        $vendor = $request->user()->vendor;
+
+        $vendor->bookingSettings?->update(['ical_url' => null, 'ical_synced_at' => null, 'ical_error' => null, 'ical_failures' => 0]);
+        $vendor->unavailableDates()->where('source', VendorUnavailableDate::SOURCE_ICAL)->delete();
+
+        return back()->with('status', __('flash.vendor.ical_disconnected'));
     }
 }

@@ -151,4 +151,5 @@ return [
     'slot_ditempah' => 'slot ditempah',
     'tempoh_pegang' => 'tempoh pegang (jam)',
     'tempoh_sah_kalendar' => 'tempoh sah kalendar (hari)',
+    'ical_url' => 'alamat iCal',
 ];

@@ -115,6 +115,9 @@ return [
     ],
 
     'vendor' => [
+        'ical_connected' => 'Google Calendar connected. :count busy dates imported.',
+        'ical_synced' => 'Synced. :count busy dates from Google Calendar.',
+        'ical_disconnected' => 'Google Calendar disconnected. Imported dates have been reopened.',
         'booking_cancelled' => 'Booking :reference cancelled. The couple has been told.',
         'payment_refunded' => ':amount recorded as refunded.',
         'booking_settings_saved' => 'Booking rules saved.',

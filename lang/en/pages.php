@@ -889,6 +889,21 @@ return [
     ],
 
     'booking_settings' => [
+        'ical_title' => 'Sync Google Calendar',
+        'ical_intro' => 'Paste your Google Calendar\'s secret iCal address. Every hour, the busy days in it are closed on Neekah automatically, and your calendar counts as up to date.',
+        'ical_help' => 'Google Calendar → Settings → pick the calendar → "Secret address in iCal format".',
+        'ical_connect' => 'Connect calendar',
+        'ical_replace' => 'Change the iCal address',
+        'ical_sync_now' => 'Sync now',
+        'ical_disconnect' => 'Disconnect',
+        'ical_synced_ago' => 'Synced :ago.',
+        'ical_last_error' => 'The last import failed: :error',
+        'ical_errors' => [
+            'ical_url_refused' => 'This address is not allowed. Use a Google Calendar https address.',
+            'ical_unreachable' => 'The calendar could not be opened. Check your secret iCal address.',
+            'ical_too_large' => 'The calendar is too large to import.',
+            'ical_unreadable' => 'This address is not a valid iCal calendar.',
+        ],
         'title' => 'Online booking',
         'subheading' => 'Couples book a date and pay the deposit straight to you.',
         'calendar_confirmed_ago' => 'Calendar confirmed :ago. Confirm it again at least every :days days to keep online booking open.',

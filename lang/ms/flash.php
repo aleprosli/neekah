@@ -115,6 +115,9 @@ return [
     ],
 
     'vendor' => [
+        'ical_connected' => 'Google Calendar disambung. :count tarikh sibuk diimport.',
+        'ical_synced' => 'Disegerakkan. :count tarikh sibuk daripada Google Calendar.',
+        'ical_disconnected' => 'Google Calendar diputuskan. Tarikh yang diimport telah dibuka semula.',
         'booking_cancelled' => 'Tempahan :reference dibatalkan. Pengantin telah dimaklumkan.',
         'payment_refunded' => ':amount direkodkan sebagai sudah dipulangkan.',
         'booking_settings_saved' => 'Peraturan tempahan disimpan.',

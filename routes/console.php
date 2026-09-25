@@ -11,3 +11,4 @@ Artisan::command('inspire', function () {
 Schedule::command('neekah:pro-reminders')->dailyAt('09:00');
 Schedule::command('neekah:expire-booking-holds')->everyFifteenMinutes()->withoutOverlapping();
 Schedule::command('neekah:calendar-reminders')->dailyAt('09:00');
+Schedule::command('neekah:sync-ical')->hourly()->withoutOverlapping();

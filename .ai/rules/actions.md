@@ -2,6 +2,7 @@
 paths:
   - app/Actions/SeedWeddingChecklist.php
   - app/Actions/StoreOptimizedImage.php
+  - app/Actions/ImportVendorIcal.php
 ---
 
 # Actions
@@ -33,3 +34,6 @@ Changing the admin thumbnail width therefore cannot redraw thumbnails where they
 refreshThumbnail copies the image itself byte for byte and only re-encodes the thumbnail. The stored image has already been through the encoder once; running it again would cost a generation of quality for a file nobody asked to change.
 
 Changing the width alone does nothing to existing images - the plain command skips anything that already has a thumbnail. Change the setting, then run with --thumbnails. Note quality is global: lowering it to shrink thumbnails also recompresses full-size portfolio photos.
+
+## Google Calendar import: guarded fetch, KL dates, only its own rows
+Owner, 26 Sep 2026: a Pro vendor pastes their Google Calendar secret iCal address (vendor_booking_settings.ical_url, encrypted); ImportVendorIcal runs on connect (address kept only if it imports), on "Segerakkan sekarang", and hourly via neekah:sync-ical → SyncVendorIcal (ShouldBeUnique per vendor, random delay). Fetch goes through IcalUrlGuard: https on 443 only, every resolved IP must be public, and the connection is pinned to the checked IP (CURLOPT_RESOLVE), no redirects, 2 MB cap. Parsing uses sabre/vobject expand() (RRULE/EXDATE): all-day DTEND is exclusive; timed events come back in UTC and must be converted to Asia/Kuala_Lumpur before taking the date; TRANSPARENT and CANCELLED are skipped. Rows are source=ical; each import replaces only those (match by date in PHP — SQLite stores date columns with a time, and Collection::except() did not drop Y-m-d keys) and never touches manual rows. With max_per_day > 1 each event takes a slot. A failure keeps old rows, records ical_error, and IcalSyncFailed goes to the vendor once on the 3rd failure in a row. A successful import within 24h counts as a confirmed calendar (VendorBookingSetting::calendarIsFresh). Covered by IcalImportTest.

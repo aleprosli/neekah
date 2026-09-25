@@ -208,4 +208,10 @@ return [
         'title' => 'Resit deposit :reference menunggu anda',
         'body' => 'Pengantin telah merekod deposit :amount dua hari lalu. Semak akaun anda dan sahkan (atau tolak) supaya tempahan tidak tergantung.',
     ],
+
+    'ical_failed' => [
+        'title' => 'Google Calendar anda tidak dapat diimport',
+        'body' => 'Beberapa import terakhir gagal (:reason). Tarikh yang sudah diimport kekal ditutup, tetapi tempahan baru di kalendar anda tidak masuk ke Neekah.',
+        'action' => 'Semak tetapan',
+    ],
 ];

@@ -151,4 +151,5 @@ return [
     'slot_ditempah' => 'places taken',
     'tempoh_pegang' => 'hold time (hours)',
     'tempoh_sah_kalendar' => 'calendar valid for (days)',
+    'ical_url' => 'iCal address',
 ];
