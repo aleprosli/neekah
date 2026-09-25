@@ -277,6 +277,13 @@ $site = function (): void {
             Route::get('/kamera', [CustomerArea\CameraController::class, 'index'])->middleware('wedding')->name('camera.index');
             Route::post('/weddings/{wedding}/kamera/checkout', [CustomerArea\CameraController::class, 'checkout'])->middleware('throttle:10,1')->name('camera.checkout');
             Route::get('/kamera/bayaran-selesai', [CustomerArea\CameraController::class, 'done'])->name('camera.done');
+            Route::put('/weddings/{wedding}/kamera', [CustomerArea\CameraController::class, 'update'])->name('camera.update');
+            Route::post('/weddings/{wedding}/kamera/pautan', [CustomerArea\CameraController::class, 'rotate'])->name('camera.rotate');
+            Route::put('/weddings/{wedding}/kamera/reka-bentuk', [CustomerArea\CameraController::class, 'design'])->name('camera.design');
+            Route::get('/weddings/{wedding}/kamera/media', [CustomerArea\CameraController::class, 'media'])->name('camera.media');
+            Route::post('/weddings/{wedding}/kamera/media/padam', [CustomerArea\CameraController::class, 'destroyMedia'])->name('camera.media.bulk');
+            Route::post('/weddings/{wedding}/kamera/zip', [CustomerArea\CameraController::class, 'export'])->middleware('throttle:5,1')->name('camera.export');
+            Route::get('/weddings/{wedding}/kamera/zip/{part}', [CustomerArea\CameraController::class, 'downloadExport'])->whereNumber('part')->name('camera.export.download');
             Route::put('/weddings/{wedding}/budget', [CustomerArea\WeddingBudgetController::class, 'update'])->name('weddings.budget.update');
 
             Route::get('/enquiries', [CustomerArea\EnquiryController::class, 'index'])->name('enquiries.index');

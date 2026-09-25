@@ -9,6 +9,7 @@ Before planning or editing, find the row whose globs match the file's path and r
 | app/** | .ai/rules/app.md |
 | app/Support/Card/** | .ai/rules/card.md |
 | resources/js/components/card/** | .ai/rules/components-card.md |
+| resources/js/components/customer/CameraPrintDesigner.vue | .ai/rules/components-customer.md |
 | resources/js/components/** | .ai/rules/components.md |
 | config/filesystems.php | .ai/rules/config.md |
 | app/Http/Controllers/**, app/Http/Controllers/SitemapController.php, app/Http/Controllers/SiteTemplatePreviewController.php, app/Http/Controllers/CameraGuestController.php | .ai/rules/controllers.md |

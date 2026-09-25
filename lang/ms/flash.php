@@ -69,6 +69,9 @@ return [
     ],
 
     'couple' => [
+        'camera_saved' => 'Tetapan album disimpan.',
+        'camera_link_rotated' => 'Pautan baharu sedia. Pautan dan QR lama tidak lagi berfungsi.',
+        'camera_export_queued' => 'ZIP sedang disediakan. Kami akan emel anda bila siap.',
         'camera_checkout_failed' => 'Pautan bayaran tidak dapat dibuat sekarang. Sila cuba sebentar lagi.',
         'camera_already_owned' => 'Album anda sudah ada pakej ini.',
         'deposit_link_failed' => 'Pautan bayaran tidak dapat dibuat sekarang. Tarikh anda masih dipegang; cuba bayar semula sebentar lagi.',

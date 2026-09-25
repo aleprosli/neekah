@@ -221,4 +221,9 @@ return [
         'receipt' => 'Receipt :reference · RM:amount',
         'action' => 'Open Kamera Majlis',
     ],
+
+    'camera_export' => [
+        'title' => 'Your Kamera Majlis ZIP is ready',
+        'body' => 'Download every photo and video before the album is deleted on :date.',
+    ],
 ];

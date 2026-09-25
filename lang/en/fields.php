@@ -161,4 +161,7 @@ return [
     'camera_pro_video_max_seconds' => 'Pro video length (seconds)',
     'camera_retention_days' => 'kept after the event (days)',
     'camera_pro_fair_use_gb' => 'Pro fair-use alert (GB)',
+    'camera_album_title' => 'album name',
+    'camera_welcome' => 'note for guests',
+    'camera_passcode' => 'passcode',
 ];

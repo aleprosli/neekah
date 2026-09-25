@@ -4,7 +4,9 @@
  * album, the album's link and usage once they do, and an upgrade to Pro.
  * Buying is an ordinary form post to the checkout, which sends them to pay.
  */
-import { computed, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
+import UiConfirm from '../ui/UiConfirm.vue';
+import CameraPrintDesigner from './CameraPrintDesigner.vue';
 import { t } from '../../i18n.js';
 
 const props = defineProps({
@@ -17,6 +19,71 @@ const props = defineProps({
     csrf: { type: String, required: true },
     errors: { type: Object, default: () => ({}) },
 });
+
+// The couple's album grid: a page at a time, filterable, with a select mode
+// for deleting many at once.
+const media = ref([]);
+const next = ref(null);
+const loadingMedia = ref(false);
+const filter = ref('');
+const selecting = ref(false);
+const selected = ref(new Set());
+const confirmDelete = ref(false);
+const viewing = ref(null);
+
+const request = async (url, options = {}) => {
+    const response = await fetch(url, {
+        credentials: 'same-origin',
+        ...options,
+        headers: { Accept: 'application/json', 'Content-Type': 'application/json', 'X-CSRF-TOKEN': props.csrf, 'X-Requested-With': 'XMLHttpRequest', ...(options.headers ?? {}) },
+    });
+
+    return response.json();
+};
+
+const loadMedia = async (reset = false) => {
+    if (!props.album || loadingMedia.value) return;
+    loadingMedia.value = true;
+
+    try {
+        const url = new URL(props.album.urls.media, window.location.origin);
+        if (filter.value) url.searchParams.set('type', filter.value);
+        if (!reset && next.value) url.searchParams.set('before', next.value);
+        const data = await request(url);
+        media.value = reset ? data.items : [...media.value, ...data.items];
+        next.value = data.next;
+    } finally {
+        loadingMedia.value = false;
+    }
+};
+
+const setFilter = (value) => {
+    filter.value = value;
+    loadMedia(true);
+};
+
+const toggle = (item) => {
+    const set = new Set(selected.value);
+    set.has(item.id) ? set.delete(item.id) : set.add(item.id);
+    selected.value = set;
+};
+
+const deleteSelected = async () => {
+    if (!confirmDelete.value) {
+        confirmDelete.value = true;
+        setTimeout(() => (confirmDelete.value = false), 4000);
+        return;
+    }
+
+    confirmDelete.value = false;
+    const ids = [...selected.value];
+    await request(props.album.urls.bulk, { method: 'POST', body: JSON.stringify({ ids }) });
+    media.value = media.value.filter((item) => !selected.value.has(item.id));
+    selected.value = new Set();
+    selecting.value = false;
+};
+
+onMounted(() => loadMedia(true));
 
 const ringgit = (amount) => `RM${Number(amount).toLocaleString('en-MY', { maximumFractionDigits: 2 })}`;
 const gigabytes = (bytes) => (bytes / 1024 ** 3).toFixed(bytes < 1024 ** 3 ? 2 : 1);
@@ -92,9 +159,118 @@ const whatsappUrl = computed(() => (props.album ? `https://wa.me/?text=${encodeU
                         <a :href="whatsappUrl" target="_blank" rel="noopener" class="flex-1 rounded-full bg-emerald-600 px-5 py-2.5 text-center text-sm font-semibold text-white transition hover:bg-emerald-700 sm:flex-none">WhatsApp</a>
                     </div>
                 </div>
-                <p class="text-xs text-ink-muted">{{ $t('camera.qr_coming') }}</p>
+                <UiConfirm
+                    class="self-start"
+                    :action="album.urls.rotate"
+                    :csrf="csrf"
+                    :title="$t('camera.rotate_title')"
+                    :message="$t('camera.rotate_message')"
+                    :confirm-label="$t('camera.rotate_confirm')"
+                    :label="$t('camera.rotate')"
+                    tone="brand"
+                />
             </div>
         </section>
+
+        <CameraPrintDesigner v-if="album" :print="album.print" :save-url="album.urls.design" :csrf="csrf" />
+
+        <!-- What guests see and whether they can add to it. -->
+        <form v-if="album" :action="album.urls.update" method="POST" class="flex flex-col gap-4 rounded-2xl border border-line bg-surface-raised p-5 sm:p-6">
+            <input type="hidden" name="_token" :value="csrf">
+            <input type="hidden" name="_method" value="PUT">
+            <h2 class="font-display text-lg font-semibold">{{ $t('camera.settings') }}</h2>
+
+            <div class="grid gap-4 sm:grid-cols-2">
+                <label class="flex min-w-0 flex-col gap-1.5">
+                    <span class="text-sm font-medium">{{ $t('camera.album_title') }}</span>
+                    <input name="title" :value="album.title" maxlength="120" :placeholder="$t('camera.album_title_placeholder')" class="rounded-xl border border-line bg-surface px-4 py-2.5 text-sm focus:border-brand-400 focus:outline-none">
+                </label>
+                <label class="flex min-w-0 flex-col gap-1.5">
+                    <span class="text-sm font-medium">{{ album.restricted ? $t('camera.passcode_change') : $t('camera.passcode_set') }}</span>
+                    <input name="passcode" type="text" minlength="4" maxlength="32" autocomplete="off" :placeholder="album.restricted ? $t('camera.passcode_keep') : $t('camera.passcode_none')" class="rounded-xl border border-line bg-surface px-4 py-2.5 text-sm focus:border-brand-400 focus:outline-none">
+                    <span v-if="errors.passcode" class="text-xs text-brand-700">{{ errors.passcode }}</span>
+                </label>
+            </div>
+
+            <label class="flex flex-col gap-1.5">
+                <span class="text-sm font-medium">{{ $t('camera.welcome') }}</span>
+                <textarea name="welcome_message" rows="2" maxlength="300" :placeholder="$t('camera.welcome_placeholder')" class="rounded-xl border border-line bg-surface px-4 py-2.5 text-sm focus:border-brand-400 focus:outline-none">{{ album.welcome_message }}</textarea>
+            </label>
+
+            <div class="flex flex-col gap-3">
+                <label class="flex items-start gap-3">
+                    <input type="hidden" name="guests_can_view" value="0">
+                    <input type="checkbox" name="guests_can_view" value="1" :checked="album.guests_can_view" class="mt-1 accent-brand-600">
+                    <span><span class="block text-sm font-medium">{{ $t('camera.guests_can_view') }}</span><span class="block text-xs text-ink-muted">{{ $t('camera.guests_can_view_help') }}</span></span>
+                </label>
+                <label class="flex items-start gap-3">
+                    <input type="hidden" name="uploads_open" value="0">
+                    <input type="checkbox" name="uploads_open" value="1" :checked="album.uploads_open" class="mt-1 accent-brand-600">
+                    <span><span class="block text-sm font-medium">{{ $t('camera.uploads_open') }}</span><span class="block text-xs text-ink-muted">{{ $t('camera.uploads_open_help') }}</span></span>
+                </label>
+                <label v-if="album.restricted" class="flex items-start gap-3">
+                    <input type="checkbox" name="remove_passcode" value="1" class="mt-1 accent-brand-600">
+                    <span class="text-sm font-medium">{{ $t('camera.remove_passcode') }}</span>
+                </label>
+            </div>
+
+            <div><button type="submit" class="rounded-full bg-brand-600 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700">{{ $t('camera.save') }}</button></div>
+        </form>
+
+        <!-- Everything guests shared. -->
+        <section v-if="album" class="flex flex-col gap-4 rounded-2xl border border-line bg-surface-raised p-5 sm:p-6">
+            <div class="flex flex-wrap items-center justify-between gap-3">
+                <h2 class="font-display text-lg font-semibold">{{ $t('camera.gallery') }}</h2>
+                <div class="flex flex-wrap gap-2">
+                    <button v-for="option in ['', 'photo', 'video']" :key="option" type="button" :class="['rounded-full border px-3 py-1.5 text-xs font-medium', filter === option ? 'border-brand-500 bg-brand-50 text-brand-800' : 'border-line text-ink-muted']" @click="setFilter(option)">{{ $t(`camera.filter_${option || 'all'}`) }}</button>
+                    <button type="button" class="rounded-full border border-line px-3 py-1.5 text-xs font-medium" @click="selecting = !selecting; selected = new Set()">{{ selecting ? $t('camera.done_selecting') : $t('camera.select') }}</button>
+                </div>
+            </div>
+
+            <div v-if="selecting && selected.size" class="flex items-center justify-between gap-3 rounded-xl bg-brand-50 px-4 py-3 text-sm">
+                <span>{{ $t('camera.selected', { count: selected.size }) }}</span>
+                <button type="button" class="rounded-full bg-brand-600 px-4 py-2 text-xs font-semibold text-white" @click="deleteSelected">{{ confirmDelete ? $t('camera.confirm_delete_many', { count: selected.size }) : $t('camera.delete_selected') }}</button>
+            </div>
+
+            <p v-if="!media.length && !loadingMedia" class="rounded-xl bg-surface-muted p-6 text-center text-sm text-ink-muted">{{ $t('camera.gallery_empty') }}</p>
+            <ul class="grid grid-cols-3 gap-1.5 sm:grid-cols-5 lg:grid-cols-6">
+                <li v-for="item in media" :key="item.id" class="relative min-w-0">
+                    <button type="button" class="block w-full" @click="selecting ? toggle(item) : (viewing = item)">
+                        <img v-if="item.type === 'photo'" :src="item.thumb" alt="" loading="lazy" :class="['aspect-square w-full rounded-lg object-cover', selected.has(item.id) ? 'opacity-60 ring-4 ring-brand-500' : '']">
+                        <span v-else :class="['flex aspect-square w-full items-center justify-center rounded-lg bg-ink/80 text-2xl text-white', selected.has(item.id) ? 'ring-4 ring-brand-500' : '']" aria-hidden="true">▶</span>
+                    </button>
+                    <span v-if="selecting" :class="['pointer-events-none absolute top-1.5 right-1.5 flex size-5 items-center justify-center rounded-full border-2 border-white text-xs text-white', selected.has(item.id) ? 'bg-brand-600' : 'bg-black/30']">{{ selected.has(item.id) ? '✓' : '' }}</span>
+                </li>
+            </ul>
+            <button v-if="next" type="button" class="self-center rounded-full border border-line px-5 py-2 text-sm font-medium" :disabled="loadingMedia" @click="loadMedia()">{{ $t('camera.more') }}</button>
+        </section>
+
+        <!-- Keep everything before it is deleted. -->
+        <section v-if="album" class="flex flex-col gap-3 rounded-2xl border border-line bg-surface-raised p-5 sm:p-6">
+            <h2 class="font-display text-lg font-semibold">{{ $t('camera.download_title') }}</h2>
+            <p class="text-sm text-ink-muted">{{ $t('camera.download_body', { date: album.expires }) }}</p>
+            <p v-if="album.export.building" class="text-sm font-medium text-amber-800">{{ $t('camera.export_building') }}</p>
+            <ul v-else-if="album.export.parts.length" class="flex flex-wrap gap-2">
+                <li v-for="(url, at) in album.export.parts" :key="url"><a :href="url" class="inline-flex rounded-full border border-line px-4 py-2 text-sm font-medium hover:border-brand-400">{{ $t('camera.download_part', { part: at + 1, total: album.export.parts.length }) }}</a></li>
+            </ul>
+            <form :action="album.urls.export" method="POST">
+                <input type="hidden" name="_token" :value="csrf">
+                <button type="submit" class="rounded-full bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700 disabled:opacity-50" :disabled="album.export.building">{{ album.export.parts.length ? $t('camera.export_again') : $t('camera.export') }}</button>
+            </form>
+            <p v-if="album.export.at" class="text-xs text-ink-muted">{{ $t('camera.export_at', { at: album.export.at }) }}</p>
+        </section>
+
+        <!-- One item, full screen. -->
+        <div v-if="viewing" class="fixed inset-0 z-50 flex flex-col bg-black/95" @click.self="viewing = null">
+            <div class="flex items-center justify-between gap-3 p-4 text-sm text-white">
+                <span class="truncate">{{ viewing.by || '' }} · {{ viewing.at }}</span>
+                <button type="button" class="rounded-full border border-white/40 px-3 py-1" @click="viewing = null">✕</button>
+            </div>
+            <div class="flex min-h-0 flex-1 items-center justify-center p-2">
+                <img v-if="viewing.type === 'photo'" :src="viewing.url" alt="" class="max-h-full max-w-full object-contain">
+                <video v-else :src="viewing.url" controls playsinline class="max-h-full max-w-full"></video>
+            </div>
+        </div>
 
         <!-- The tiers: to buy, or to upgrade to. -->
         <section class="flex flex-col gap-4">

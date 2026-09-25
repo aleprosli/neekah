@@ -221,4 +221,9 @@ return [
         'receipt' => 'Resit :reference · RM:amount',
         'action' => 'Buka Kamera Majlis',
     ],
+
+    'camera_export' => [
+        'title' => 'ZIP Kamera Majlis anda sedia',
+        'body' => 'Muat turun semua gambar dan video sebelum album dipadam pada :date.',
+    ],
 ];

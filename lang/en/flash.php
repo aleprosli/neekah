@@ -69,6 +69,9 @@ return [
     ],
 
     'couple' => [
+        'camera_saved' => 'Album settings saved.',
+        'camera_link_rotated' => 'A new link is ready. The old link and QR no longer work.',
+        'camera_export_queued' => 'The ZIP is being prepared. We will email you when it is ready.',
         'camera_checkout_failed' => 'The payment link could not be created right now. Please try again shortly.',
         'camera_already_owned' => 'Your album already has this plan.',
         'deposit_link_failed' => 'The payment link could not be created right now. Your date is still on hold; try paying again in a moment.',

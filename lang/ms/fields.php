@@ -161,4 +161,7 @@ return [
     'camera_pro_video_max_seconds' => 'panjang video Pro (saat)',
     'camera_retention_days' => 'disimpan selepas majlis (hari)',
     'camera_pro_fair_use_gb' => 'amaran guna berlebihan Pro (GB)',
+    'camera_album_title' => 'nama album',
+    'camera_welcome' => 'ucapan untuk tetamu',
+    'camera_passcode' => 'kata laluan',
 ];
