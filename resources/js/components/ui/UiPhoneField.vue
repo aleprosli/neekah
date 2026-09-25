@@ -63,7 +63,7 @@ onBeforeUnmount(() => iti?.destroy());
 <template>
     <!-- A div, not a label: a label would hand its clicks to the country button. -->
     <div class="flex flex-col gap-1.5">
-        <label :for="id" class="text-sm font-medium">{{ label }}</label>
+        <label :for="id" class="text-sm font-medium first-letter:uppercase">{{ label }}</label>
         <input
             :id="id"
             ref="input"

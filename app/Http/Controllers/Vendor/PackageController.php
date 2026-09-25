@@ -53,7 +53,7 @@ class PackageController extends Controller
 
         $this->syncPriceFrom($request);
 
-        return $this->redirectOrJson($request, $this->vendorReturnUrl($request, 'vendor.packages.index', 'pakej'), 'Pakej ditambah.');
+        return $this->redirectOrJson($request, $this->vendorReturnUrl($request, 'vendor.packages.index', 'pakej'), __('flash.vendor.package_added'));
     }
 
     public function edit(Package $package, ImageSettings $images): View
@@ -109,7 +109,7 @@ class PackageController extends Controller
 
         $this->syncPriceFrom($request);
 
-        return $this->redirectOrJson($request, route('vendor.packages.index'), 'Pakej dikemas kini.');
+        return $this->redirectOrJson($request, route('vendor.packages.index'), __('flash.vendor.package_updated'));
     }
 
     public function destroy(Request $request, Package $package, StoreOptimizedImage $storeImage): RedirectResponse

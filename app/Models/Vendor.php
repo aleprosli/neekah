@@ -5,12 +5,14 @@ namespace App\Models;
 use App\Actions\StoreOptimizedImage;
 use App\Enums\BookingStatus;
 use App\Enums\PriceUnit;
+use App\Enums\VendorFeature;
 use App\Enums\VendorStatus;
 use App\Enums\VendorTier;
 use App\Support\ContentVersion;
 use App\Support\PhoneNumber;
 use App\Support\SocialLinks;
 use App\Support\States;
+use App\Support\VendorFeatureSettings;
 use Database\Factories\VendorFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Scope;
@@ -29,7 +31,7 @@ use Illuminate\Support\Collection;
     'phone', 'whatsapp', 'social_links', 'price_from', 'price_unit', 'cover_image', 'logo', 'cover_tone',
     'status', 'tier', 'rating_avg', 'reviews_count', 'completed_bookings_count',
     'response_rate', 'completion_rate', 'score', 'points_total', 'tier_locked', 'penalty_points', 'violations_count', 'approved_at',
-    'pro_until',
+    'pro_until', 'feature_overrides',
 ])]
 class Vendor extends Model
 {
@@ -53,6 +55,7 @@ class Vendor extends Model
             'tier_locked' => 'boolean',
             'approved_at' => 'datetime',
             'pro_until' => 'datetime',
+            'feature_overrides' => 'array',
         ];
     }
 
@@ -221,6 +224,44 @@ class Vendor extends Model
     public function isPro(): bool
     {
         return $this->pro_until !== null && $this->pro_until->isFuture();
+    }
+
+    /** The plan whose features apply: "pro" while Pro is running, "basic" otherwise. */
+    public function featurePlan(): string
+    {
+        return $this->isPro() ? VendorFeatureSettings::PRO : VendorFeatureSettings::BASIC;
+    }
+
+    /**
+     * An admin's exception for this vendor alone: true or false, or null when
+     * the feature follows the plan.
+     */
+    public function featureOverride(VendorFeature $feature): ?bool
+    {
+        $override = $this->feature_overrides[$feature->value] ?? null;
+
+        return is_bool($override) ? $override : null;
+    }
+
+    /**
+     * Whether this vendor can use a part of the vendor area: their own override
+     * if an admin set one, else what their plan opens.
+     */
+    public function hasFeature(VendorFeature $feature): bool
+    {
+        return $this->featureOverride($feature)
+            ?? app(VendorFeatureSettings::class)->allows($this->featurePlan(), $feature);
+    }
+
+    /**
+     * Closed for this vendor but open on Pro, so the sidebar can offer it as
+     * a reason to upgrade instead of hiding it.
+     */
+    public function unlocksWithPro(VendorFeature $feature): bool
+    {
+        return ! $this->isPro()
+            && $this->featureOverride($feature) === null
+            && app(VendorFeatureSettings::class)->allows(VendorFeatureSettings::PRO, $feature);
     }
 
     /**

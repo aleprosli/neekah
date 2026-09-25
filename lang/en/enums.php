@@ -2,6 +2,26 @@
 
 return [
 
+    'vendor_feature' => [
+        'packages' => 'Packages',
+        'portfolio' => 'Portfolio',
+        'calendar' => 'Calendar',
+        'bookings' => 'Bookings',
+        'enquiries' => 'Enquiries',
+        'reviews' => 'Reviews',
+        'points' => 'Points & ranking',
+    ],
+
+    'vendor_feature_desc' => [
+        'packages' => 'Manage the packages and prices shown on the public page.',
+        'portfolio' => 'Upload and arrange portfolio photos.',
+        'calendar' => 'Close off dates that are already booked.',
+        'bookings' => 'Record and manage customer bookings.',
+        'enquiries' => 'Receive and reply to enquiries from couples.',
+        'reviews' => 'See, reply to and report customer reviews.',
+        'points' => 'See points, tier and ranking position.',
+    ],
+
     'announcement_audience' => [
         'everyone' => 'Everyone',
         'customers' => 'Couples only',

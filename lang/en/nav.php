@@ -28,4 +28,5 @@ return [
     'language' => 'Language',
 
     'switch_to' => 'Switch to :language',
+    'close_menu' => 'Close menu',
 ];

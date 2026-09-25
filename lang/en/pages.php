@@ -159,6 +159,7 @@ return [
     ],
 
     'dash' => [
+        'violation_reported' => ':type · reported :date',
         'statistik_kad' => 'Card insights',
         'statistik_kad_jemputan' => 'Invitation card insights',
         'siapa_membuka_kad_anda' => 'Who is opening your card, and who has replied.',
@@ -264,7 +265,6 @@ return [
         'edit_majlis' => 'Edit wedding',
         'saya_vendor' => 'I am a vendor',
         'cari_vendor' => 'Find vendors',
-        'enquiry' => 'Enquiries',
         'tempahan_saya' => 'My bookings',
         'tempahan_saya_2' => 'My bookings',
         'semua_booking_dan_bayaran_anda' => 'Every booking and payment of yours is recorded here.',
@@ -282,11 +282,8 @@ return [
         'artikel_yang_tersiar_muncul_di' => 'Published articles appear at neekah.my/blog and in the sitemap for Google.',
         'tulis_artikel' => 'Write an article',
         'anda_akan_melihat_neekah_persis' => 'You will see Neekah exactly as this user does. Payments are disabled, and this is recorded in the system log.',
-        'profil_vendor' => 'Vendor profile',
         'impersonate' => 'Impersonate',
-        'pengumuman' => 'Announcement',
         'kembali' => 'Back',
-        'laporan_vendor' => 'Vendor report',
     ],
 
     'reviews' => [
@@ -335,6 +332,7 @@ return [
     ],
 
     'profile' => [
+        'to_send_enquiry' => 'to send this vendor an enquiry.',
         'whatsapp_greeting' => 'Hi :name, I found you on Neekah. Could I ask about your packages for my wedding?',
         'highlight_contact' => 'Deal with the vendor directly',
         'highlight_contact_detail' => 'Send an enquiry or WhatsApp them yourself. Neekah takes no commission and holds none of your money.',
@@ -687,6 +685,26 @@ return [
         'review_again' => 'Review my profile',
     ],
 
+    'vendor_features' => [
+        'title' => 'Vendor features',
+        'subheading' => 'Choose which parts of the vendor dashboard each plan opens.',
+        'feature' => 'Feature',
+        'plan_basic' => 'Basic',
+        'plan_pro' => 'Pro',
+        'always_open' => 'Overview, Profile, the Neekah Pro page and Account are always open to every vendor.',
+        'overridden' => ':count vendors have their own exceptions, which override these settings.',
+        'save' => 'Save vendor features',
+        'vendor_heading' => 'Features for this vendor',
+        'vendor_plan' => 'Current plan: :plan',
+        'edit_plans' => 'Edit what each plan opens',
+        'open' => 'open',
+        'closed' => 'closed',
+        'follow_plan' => 'Follow the plan (:state)',
+        'always_open_option' => 'Always open',
+        'always_closed_option' => 'Always closed',
+        'save_vendor' => 'Save this vendor\'s features',
+    ],
+
     'sidebar_vendor' => [
         'pro' => 'Neekah Pro',
         'ringkasan' => 'Overview',
@@ -704,6 +722,7 @@ return [
     ],
 
     'sidebar_admin' => [
+        'ciri_vendor' => 'Vendor features',
         'muzik_kad' => 'Card music',
         'kad_nfc' => 'NFC cards',
         'ringkasan' => 'Overview',
@@ -755,6 +774,8 @@ return [
     ],
 
     'pro' => [
+        'herepay_title' => 'Neekah Pro :plan for :vendor',
+        'herepay_description' => 'Neekah reference: :reference',
         'title' => 'Neekah Pro',
         'heading' => 'Neekah Pro',
         'subheading' => 'Get found more easily, and know how many people look at your profile.',

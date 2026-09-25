@@ -5,7 +5,7 @@ Before planning or editing, find the row whose globs match the file's path and r
 | Applies to | Rule file |
 | --- | --- |
 | app/Actions/SeedWeddingChecklist.php, app/Actions/StoreOptimizedImage.php | .ai/rules/actions.md |
-| app/Http/Controllers/Admin/** | .ai/rules/admin.md |
+| app/Http/Controllers/Admin/**, app/Http/Controllers/Admin/SettingController.php | .ai/rules/admin.md |
 | app/** | .ai/rules/app.md |
 | app/Support/Card/** | .ai/rules/card.md |
 | resources/js/components/card/** | .ai/rules/components-card.md |
@@ -14,9 +14,10 @@ Before planning or editing, find the row whose globs match the file's path and r
 | app/Http/Controllers/**, app/Http/Controllers/SitemapController.php, app/Http/Controllers/SiteTemplatePreviewController.php | .ai/rules/controllers.md |
 | resources/css/app.css | .ai/rules/css.md |
 | app/Http/Controllers/Customer/**, app/Http/Controllers/Customer/WeddingTaskController.php | .ai/rules/customer.md |
-| app/Enums/UserSegment.php | .ai/rules/enums.md |
+| app/Enums/UserSegment.php, app/Enums/VendorFeature.php | .ai/rules/enums.md |
 | resources/views/errors/** | .ai/rules/errors.md |
 | ** | .ai/rules/general.md |
+| app/Support/Herepay/** | .ai/rules/herepay.md |
 | app/Jobs/** | .ai/rules/jobs.md |
 | resources/js/**, resources/js/navigation.js | .ai/rules/js.md |
 | lang/** | .ai/rules/lang.md |
@@ -30,7 +31,7 @@ Before planning or editing, find the row whose globs match the file's path and r
 | resources/views/sites/** | .ai/rules/sites.md |
 | app/Support/Seo.php, app/Support/**, app/Support/ImageSettings.php, app/Support/ContentVersion.php | .ai/rules/support.md |
 | tests/** | .ai/rules/tests.md |
-| resources/js/components/ui/DataTable.vue, resources/js/components/ui/UiFlagSelect.vue | .ai/rules/ui.md |
+| resources/js/components/ui/DataTable.vue, resources/js/components/ui/UiFlagSelect.vue, resources/js/components/ui/** | .ai/rules/ui.md |
 | app/Http/Controllers/Vendor/ReviewController.php, app/Http/Controllers/Vendor/** | .ai/rules/vendor.md |
 | resources/views/vendors/** | .ai/rules/vendors.md |
 | resources/views/components/analytics.blade.php | .ai/rules/views-components.md |

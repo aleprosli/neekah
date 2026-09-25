@@ -43,7 +43,8 @@ function fakeProGateway(bool $configured = true): PaymentLinkGateway
             return [
                 'reference' => (string) $request->input('reference'),
                 'gateway_reference' => $request->input('transaction_id'),
-                'paid' => $request->input('status') === 'paid',
+                'status' => (string) $request->input('status'),
+                'amount' => (float) $request->input('amount', VendorSubscription::where('reference', $request->input('reference'))->value('amount')),
             ];
         }
     };

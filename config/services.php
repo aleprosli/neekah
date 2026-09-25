@@ -49,10 +49,14 @@ return [
     ],
 
     // Neekah Pro checkout. Empty keys leave the checkout switched off.
+    // Payment links for Neekah Pro. UAT is https://uat.herepay.org, production
+    // https://app.herepay.org. The secret key authenticates link creation; the
+    // private key verifies the checksum on each callback. Admin → Tetapan →
+    // Gateway bayaran switches it on, and refuses to while either is missing.
     'herepay' => [
         'base_url' => env('HEREPAY_BASE_URL'),
-        'api_key' => env('HEREPAY_API_KEY'),
-        'secret' => env('HEREPAY_SECRET'),
+        'secret_key' => env('HEREPAY_SECRET_KEY'),
+        'private_key' => env('HEREPAY_PRIVATE_KEY'),
     ],
 
     'turnstile' => [

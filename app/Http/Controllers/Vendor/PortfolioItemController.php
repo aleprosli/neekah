@@ -73,7 +73,7 @@ class PortfolioItemController extends Controller
         return $this->redirectOrJson(
             $request,
             $this->vendorReturnUrl($request, 'vendor.portfolio.index', 'portfolio'),
-            count($request->file('images')).' gambar dimuat naik.',
+            __('flash.vendor.photos_uploaded', ['count' => count($request->file('images'))]),
         );
     }
 

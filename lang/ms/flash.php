@@ -21,6 +21,14 @@ return [
     ],
 
     'admin' => [
+        'category_added' => 'Kategori ditambah.',
+        'category_updated' => 'Kategori dikemas kini.',
+        'contact_saved' => 'Maklumat perhubungan disimpan.',
+        'turnstile_saved' => 'Tetapan Turnstile disimpan.',
+        'telegram_saved' => 'Tetapan Telegram disimpan.',
+        'vendor_features_saved' => 'Ciri vendor disimpan.',
+        'vendor_overrides_saved' => 'Ciri untuk :vendor disimpan.',
+        'herepay_saved' => 'Tetapan Herepay disimpan.',
         'pro_activated' => 'Pro untuk :vendor aktif sehingga :date.',
         'pro_settings_saved' => 'Tetapan Pro disimpan.',
         'card_music_added' => 'Trek muzik ditambah.',
@@ -104,6 +112,12 @@ return [
     ],
 
     'vendor' => [
+        'photos_uploaded' => ':count gambar dimuat naik.',
+        'profile_updated' => 'Profil dikemas kini.',
+        'package_added' => 'Pakej ditambah.',
+        'package_updated' => 'Pakej dikemas kini.',
+        'feature_needs_pro' => ':feature dibuka untuk vendor Neekah Pro. Naik taraf untuk menggunakannya.',
+        'feature_closed' => ':feature tidak dibuka untuk akaun anda.',
         'pro_checkout_failed' => 'Pautan bayaran tidak dapat dibuat sekarang. Sila cuba sebentar lagi.',
         'registered' => 'Pendaftaran diterima. Lengkapkan profil anda sementara admin menyemak permohonan.',
         'converted' => 'Akaun anda kini akaun vendor. Lengkapkan profil anda sementara admin menyemak permohonan.',

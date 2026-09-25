@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Enums\PaymentMethod;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\UpdateContactSettingsRequest;
+use App\Http\Requests\UpdateHerepaySettingsRequest;
 use App\Http\Requests\UpdateImageSettingsRequest;
 use App\Http\Requests\UpdatePaymentSettingsRequest;
 use App\Http\Requests\UpdateProSettingsRequest;
@@ -12,7 +13,9 @@ use App\Http\Requests\UpdateSeoSettingsRequest;
 use App\Http\Requests\UpdateTelegramSettingsRequest;
 use App\Http\Requests\UpdateTurnstileSettingsRequest;
 use App\Support\ContactSettings;
+use App\Support\Herepay\HerepayClient;
 use App\Support\Herepay\PaymentLinkGateway;
+use App\Support\HerepaySettings;
 use App\Support\ImageSettings;
 use App\Support\Locales;
 use App\Support\PaymentSettings;
@@ -24,23 +27,60 @@ use App\Support\TurnstileSettings;
 use App\Support\VueProps;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Str;
 
 class SettingController extends Controller
 {
-    public function edit(ContactSettings $contact, SeoSettings $seo, TurnstileSettings $turnstile, TelegramSettings $telegram, ImageSettings $images, PaymentSettings $payments, ProSettings $pro, PaymentLinkGateway $gateway): View
+    /**
+     * The menu: pages grouped by what they are about. Money is split by who
+     * pays whom, because that is the question an admin actually has: Neekah
+     * Pro is vendors paying Neekah (through Neekah's own Herepay account),
+     * booking payments are couples paying vendors.
+     */
+    public const MENU = [
+        'laman' => ['perhubungan', 'seo', 'gambar'],
+        'sistem' => ['keselamatan', 'telegram'],
+        'wang' => ['pro', 'bayaran'],
+    ];
+
+    /** Every page, in menu order; the first is the default. */
+    public const SECTIONS = ['perhubungan', 'seo', 'gambar', 'keselamatan', 'telegram', 'pro', 'bayaran'];
+
+    /**
+     * One page at a time, with the menu of the others. A page can hold more
+     * than one form (Neekah Pro holds the plan and the gateway that takes its
+     * payments); each form still posts on its own and comes back here.
+     */
+    public function edit(ContactSettings $contact, SeoSettings $seo, TurnstileSettings $turnstile, TelegramSettings $telegram, ImageSettings $images, PaymentSettings $payments, ProSettings $pro, HerepaySettings $herepay, HerepayClient $herepayClient, string $section = self::SECTIONS[0]): View
     {
+        $pages = [
+            'perhubungan' => [$this->contactSection($contact->all())],
+            'seo' => [$this->seoSection($seo->all())],
+            'gambar' => [$this->imageSection($images)],
+            'keselamatan' => [$this->turnstileSection($turnstile->all(), $turnstile->isEnabled())],
+            'telegram' => [$this->telegramSection($telegram->all(), $telegram->isEnabled())],
+            'pro' => [$this->proSection($pro, $herepayClient), $this->herepaySection($herepay, $herepayClient)],
+            'bayaran' => [$this->paymentSection($payments)],
+        ];
+
+        abort_unless(isset($pages[$section]), 404);
+
+        $menu = collect(self::MENU)->map(fn (array $ids, string $group): array => [
+            'label' => __('props.admin.settings_group_'.$group),
+            'items' => collect($ids)->map(fn (string $id): array => [
+                'id' => $id,
+                'icon' => $pages[$id][0]['icon'],
+                'label' => $pages[$id][0]['label'],
+                'href' => route('admin.settings.edit', ['section' => $id]),
+                'active' => $id === $section,
+                'badge' => $pages[$id][0]['badge'] ?? null,
+            ])->all(),
+        ])->values();
+
         return view('admin.settings.edit', [
-            'props' => VueProps::for([
-                'sections' => [
-                    $this->contactSection($contact->all()),
-                    $this->seoSection($seo->all()),
-                    $this->turnstileSection($turnstile->all(), $turnstile->isEnabled()),
-                    $this->telegramSection($telegram->all(), $telegram->isEnabled()),
-                    $this->paymentSection($payments),
-                    $this->proSection($pro, $gateway),
-                    $this->imageSection($images),
-                ],
-            ]),
+            'current' => $pages[$section][0],
+            'menu' => $menu,
+            'props' => VueProps::for(['sections' => $pages[$section]]),
         ]);
     }
 
@@ -180,7 +220,7 @@ class SettingController extends Controller
             'description' => __('props.admin.semakan_tanpa_teka_teki_pada'),
             'action' => route('admin.settings.turnstile'),
             'submit' => __('props.admin.simpan_tetapan_turnstile'),
-            'badge' => ['active' => $active, 'label' => $active ? 'Aktif' : 'Tidak aktif'],
+            'badge' => ['active' => $active, 'label' => $active ? __('props.copy.active') : __('props.copy.inactive')],
             'fields' => [
                 ['name' => 'enabled', 'label' => __('props.admin.hidupkan_turnstile'), 'type' => 'checkbox', 'value' => $values['enabled'], 'help' => __('props.admin.hanya_berjalan_apabila_kedua_dua')],
                 ['name' => 'site_key', 'label' => __('props.admin.site_key'), 'value' => $values['site_key'], 'placeholder' => '0x4AAAAAAA...', 'help' => __('props.admin.kunci_awam_dipaparkan_dalam_halaman')],
@@ -203,10 +243,10 @@ class SettingController extends Controller
             'description' => __('props.admin.setiap_pendaftaran_vendor_dan_pengantin'),
             'action' => route('admin.settings.telegram'),
             'submit' => __('props.admin.simpan_tetapan_telegram'),
-            'badge' => ['active' => $active, 'label' => $active ? 'Aktif' : 'Tidak aktif'],
+            'badge' => ['active' => $active, 'label' => $active ? __('props.copy.active') : __('props.copy.inactive')],
             'fields' => [
                 ['name' => 'enabled', 'label' => __('props.admin.hantar_makluman_ke_telegram'), 'type' => 'checkbox', 'value' => $values['enabled'], 'help' => __('props.admin.dihantar_melalui_queue_jadi_pendaftaran')],
-                ['name' => 'bot_token', 'label' => __('props.admin.bot_token'), 'type' => 'password', 'value' => '', 'placeholder' => $values['bot_token'] ? 'Tersimpan — biarkan kosong untuk kekalkan' : '123456:ABC-DEF...', 'help' => __('props.admin.tidak_pernah_dipaparkan_semula_selepas_2')],
+                ['name' => 'bot_token', 'label' => __('props.admin.bot_token'), 'type' => 'password', 'value' => '', 'placeholder' => $values['bot_token'] ? __('props.common.saved_leave_blank') : '123456:ABC-DEF...', 'help' => __('props.admin.tidak_pernah_dipaparkan_semula_selepas_2')],
                 ['name' => 'chat_id', 'label' => __('props.admin.chat_id'), 'value' => $values['chat_id'], 'placeholder' => '-1001234567890', 'help' => __('props.admin.chat_peribadi_admin_atau_kumpulan')],
             ],
         ];
@@ -220,29 +260,71 @@ class SettingController extends Controller
         $values = $payments->all();
         $offered = $payments->offeredMethods();
 
+        // Only a method that actually works is offered here. Gateways for
+        // bookings will belong to each vendor (their own account), not to
+        // Neekah, so they are not switches on this page yet.
         return [
             'id' => 'bayaran',
             'icon' => '💳',
-            'label' => __('props.admin.bayaran'),
-            'title' => __('props.admin.kaedah_bayaran'),
-            'description' => __('props.admin.hidupkan_kaedah_yang_boleh_digunakan'),
+            'label' => __('props.admin.booking_payments_label'),
+            'title' => __('props.admin.booking_payments_title'),
+            'description' => __('props.admin.booking_payments_description'),
             'action' => route('admin.settings.payments'),
             'submit' => __('props.admin.simpan_tetapan_bayaran'),
             'badge' => [
                 'active' => $offered !== [],
-                'label' => $offered === [] ? 'Tiada kaedah bayaran' : __('props.units.active_list', ['list' => collect($offered)->map->label()->join(', ')]),
+                'label' => $offered === [] ? __('props.copy.no_payment_method') : __('props.units.active_list', ['list' => collect($offered)->map->label()->join(', ')]),
             ],
+            'note' => __('props.admin.booking_payments_note'),
             'fields' => [
-                ...collect(PaymentMethod::cases())->map(fn (PaymentMethod $method): array => [
-                    'name' => $method->settingKey(),
-                    'label' => $method->label(),
-                    'type' => 'checkbox',
-                    'value' => $values[$method->settingKey()],
-                    'help' => $method->isIntegrated()
-                        ? $method->description()
-                        : $method->description().__('props.admin.not_integrated'),
-                ])->all(),
+                ...collect(PaymentMethod::cases())
+                    ->filter(fn (PaymentMethod $method): bool => $method->isIntegrated())
+                    ->map(fn (PaymentMethod $method): array => [
+                        'name' => $method->settingKey(),
+                        'label' => $method->label(),
+                        'type' => 'checkbox',
+                        'value' => $values[$method->settingKey()],
+                        'help' => $method->description(),
+                    ])->values()->all(),
                 ['name' => 'instructions', 'label' => __('props.admin.arahan_bayaran_manual'), 'type' => 'textarea', 'rows' => 3, 'value' => $values['instructions'], 'help' => __('props.admin.dipaparkan_kepada_pengantin_di_borang')],
+            ],
+        ];
+    }
+
+    /**
+     * The payment gateway behind Neekah Pro. Only the on/off switch is kept
+     * here; the keys stay in .env, and the note shows which are in place so an
+     * admin knows what is still missing before switching it on.
+     *
+     * @return array<string, mixed>
+     */
+    private function herepaySection(HerepaySettings $settings, HerepayClient $client): array
+    {
+        $missing = $client->missingKeys();
+        $live = $client->isConfigured();
+        $keys = collect(HerepayClient::KEYS)
+            ->map(fn (string $env): string => (in_array($env, $missing, true) ? '✗ ' : '✓ ').'<code>'.e($env).'</code>')
+            ->join('<br>');
+
+        return [
+            'id' => 'gateway',
+            'icon' => '🏦',
+            'label' => __('props.admin.herepay_label'),
+            'title' => __('props.admin.herepay_title'),
+            'description' => __('props.admin.herepay_description'),
+            'action' => route('admin.settings.herepay'),
+            'submit' => __('props.admin.herepay_submit'),
+            'badge' => [
+                'active' => $live,
+                'label' => match (true) {
+                    $live => __('props.admin.herepay_live', ['environment' => $client->environment()]),
+                    $missing !== [] => __('props.admin.herepay_keys_missing'),
+                    default => __('props.admin.herepay_off'),
+                },
+            ],
+            'note' => __('props.admin.herepay_note', ['environment' => e($client->environment() ?? '—')]).'<br>'.$keys,
+            'fields' => [
+                ['name' => 'enabled', 'label' => __('props.admin.herepay_enabled'), 'type' => 'checkbox', 'value' => $settings->isEnabled(), 'help' => __('props.admin.herepay_enabled_help')],
             ],
         ];
     }
@@ -275,9 +357,9 @@ class SettingController extends Controller
             'note' => $gateway->isConfigured() ? null : __('props.admin.pro_gateway_missing'),
             'fields' => [
                 ['name' => 'enabled', 'label' => __('props.admin.pro_enabled'), 'type' => 'checkbox', 'value' => $values['enabled'], 'wide' => true, 'help' => __('props.admin.pro_enabled_help')],
-                ['name' => 'monthly_price', 'label' => __('fields.pro_monthly_price'), 'type' => 'number', 'value' => $values['monthly_price'], 'min' => 1, 'required' => true],
-                ['name' => 'yearly_price', 'label' => __('fields.pro_yearly_price'), 'type' => 'number', 'value' => $values['yearly_price'], 'min' => 1, 'required' => true],
-                ['name' => 'sponsored_slots', 'label' => __('fields.pro_sponsored_slots'), 'type' => 'number', 'value' => $values['sponsored_slots'], 'min' => 0, 'max' => ProSettings::MAX_SPONSORED_SLOTS, 'required' => true, 'help' => __('props.admin.pro_slots_help')],
+                ['name' => 'monthly_price', 'label' => Str::ucfirst(__('fields.pro_monthly_price')), 'type' => 'number', 'value' => $values['monthly_price'], 'min' => 1, 'required' => true],
+                ['name' => 'yearly_price', 'label' => Str::ucfirst(__('fields.pro_yearly_price')), 'type' => 'number', 'value' => $values['yearly_price'], 'min' => 1, 'required' => true],
+                ['name' => 'sponsored_slots', 'label' => Str::ucfirst(__('fields.pro_sponsored_slots')), 'type' => 'number', 'value' => $values['sponsored_slots'], 'min' => 0, 'max' => ProSettings::MAX_SPONSORED_SLOTS, 'required' => true, 'help' => __('props.admin.pro_slots_help')],
             ],
         ];
     }
@@ -316,7 +398,7 @@ class SettingController extends Controller
     {
         $contact->save($request->settings());
 
-        return $this->saved('Maklumat perhubungan disimpan.');
+        return $this->saved(__('flash.admin.contact_saved'));
     }
 
     public function updateSeo(UpdateSeoSettingsRequest $request, SeoSettings $seo): RedirectResponse
@@ -330,14 +412,14 @@ class SettingController extends Controller
     {
         $turnstile->save($request->settings());
 
-        return $this->saved('Tetapan Turnstile disimpan.');
+        return $this->saved(__('flash.admin.turnstile_saved'));
     }
 
     public function updateTelegram(UpdateTelegramSettingsRequest $request, TelegramSettings $telegram): RedirectResponse
     {
         $telegram->save($request->settings());
 
-        return $this->saved('Tetapan Telegram disimpan.');
+        return $this->saved(__('flash.admin.telegram_saved'));
     }
 
     public function updatePayments(UpdatePaymentSettingsRequest $request, PaymentSettings $payments): RedirectResponse
@@ -352,6 +434,13 @@ class SettingController extends Controller
         $pro->save($request->settings());
 
         return $this->saved(__('flash.admin.pro_settings_saved'));
+    }
+
+    public function updateHerepay(UpdateHerepaySettingsRequest $request, HerepaySettings $herepay): RedirectResponse
+    {
+        $herepay->save($request->settings());
+
+        return $this->saved(__('flash.admin.herepay_saved'));
     }
 
     public function update(UpdateImageSettingsRequest $request, ImageSettings $images): RedirectResponse

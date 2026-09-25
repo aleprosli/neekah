@@ -36,7 +36,7 @@
             @if ($hasSidebar)
             <input type="checkbox" id="dashboard-drawer" class="peer sr-only" aria-hidden="true" tabindex="-1">
 
-            <label for="dashboard-drawer" class="fixed inset-0 z-40 hidden bg-brand-900/30 backdrop-blur-[2px] peer-checked:block lg:hidden" aria-label="Tutup menu"></label>
+            <label for="dashboard-drawer" class="fixed inset-0 z-40 hidden bg-brand-900/30 backdrop-blur-[2px] peer-checked:block lg:hidden" aria-label="{{ __('nav.close_menu') }}"></label>
 
             <aside class="fixed inset-y-0 left-0 z-40 flex w-[17rem] -translate-x-full flex-col overflow-hidden border-r border-gold-300/50 bg-surface-raised bg-linear-to-b from-surface-raised via-surface-raised to-brand-50 transition-transform duration-200 peer-checked:translate-x-0 lg:translate-x-0" aria-label="Dashboard">
                 {{-- The brand's two rings, faint, behind the account card. --}}
@@ -51,7 +51,7 @@
                     <a href="{{ $home }}" class="flex min-w-0 items-center" aria-label="{{ config('app.name') }}">
                         <x-brand.lockup class="h-8 max-w-full object-contain" />
                     </a>
-                    <label for="dashboard-drawer" class="-mr-2 flex size-9 cursor-pointer items-center justify-center rounded-full text-ink-muted hover:bg-brand-50 lg:hidden" aria-label="Tutup menu">
+                    <label for="dashboard-drawer" class="-mr-2 flex size-9 cursor-pointer items-center justify-center rounded-full text-ink-muted hover:bg-brand-50 lg:hidden" aria-label="{{ __('nav.close_menu') }}">
                         <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
                     </label>
                 </div>
@@ -107,7 +107,7 @@
                             @csrf
                             <button type="submit" class="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-ink-muted transition hover:bg-brand-50/60 hover:text-brand-700">
                                 <svg class="size-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
-                                Log keluar
+                                {{ __('nav.logout') }}
                             </button>
                         </form>
                     </div>

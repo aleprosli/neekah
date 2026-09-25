@@ -332,7 +332,7 @@
                             <button type="submit" class="rounded-full border border-brand-600 py-2.5 text-sm font-semibold text-brand-700 transition hover:bg-brand-50">{{ __('pages.profile.hantar_enquiry_2') }}</button>
                         </form>
                     @else
-                        <p class="mt-3 text-sm text-ink-muted"><a href="{{ route('login') }}" class="font-medium text-brand-600 underline underline-offset-4">{{ __('pages.profile.log_masuk') }}</a> untuk menghantar enquiry kepada vendor ini.</p>
+                        <p class="mt-3 text-sm text-ink-muted"><a href="{{ route('login') }}" class="font-medium text-brand-600 underline underline-offset-4">{{ __('pages.profile.log_masuk') }}</a> {{ __('pages.profile.to_send_enquiry') }}</p>
                     @endauth
                 </div>
 

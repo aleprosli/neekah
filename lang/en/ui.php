@@ -870,4 +870,16 @@ return [
         'padam_kad' => 'Delete card :uid?',
         'kad_belum_pernah_ditap' => 'This card has never been tapped, so nobody is holding it.',
     ],
+
+    'copy' => [
+        'active' => 'Active',
+        'inactive' => 'Inactive',
+        'reports_waiting' => 'vendor reports waiting for your review.',
+        'changes_count' => ':count changes',
+        'not_saved_yet' => 'not saved yet',
+        'guest_columns' => 'name, phone, side, group, pax',
+        'guest_columns_optional' => 'Every field after the name can be left empty.',
+        'hide_password' => 'Hide password',
+        'show_password' => 'Show password',
+    ],
 ];

@@ -28,4 +28,5 @@ return [
     'language' => 'Bahasa',
 
     'switch_to' => 'Tukar ke :language',
+    'close_menu' => 'Tutup menu',
 ];

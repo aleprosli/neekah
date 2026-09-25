@@ -114,40 +114,66 @@ $site = function (): void {
         Route::get('/', VendorArea\DashboardController::class)->name('dashboard');
         Route::put('/persediaan/profil', [VendorArea\SetupController::class, 'profile'])->name('setup.profile');
         Route::post('/persediaan/gambar-utama', [VendorArea\SetupController::class, 'cover'])->name('setup.cover');
-        Route::post('/packages', [VendorArea\PackageController::class, 'store'])->name('packages.store');
-        Route::delete('/packages/{package}', [VendorArea\PackageController::class, 'destroy'])->name('packages.destroy');
-        Route::post('/portfolio', [VendorArea\PortfolioItemController::class, 'store'])->name('portfolio.store');
-        Route::delete('/portfolio/{item}', [VendorArea\PortfolioItemController::class, 'destroy'])->name('portfolio.destroy');
+
+        // Open to a vendor still waiting for approval too: the setup page uses
+        // them. EnsureVendorHasFeature lets a pending vendor through.
+        Route::middleware('vendor.feature:packages')->group(function (): void {
+            Route::post('/packages', [VendorArea\PackageController::class, 'store'])->name('packages.store');
+            Route::delete('/packages/{package}', [VendorArea\PackageController::class, 'destroy'])->name('packages.destroy');
+        });
+        Route::middleware('vendor.feature:portfolio')->group(function (): void {
+            Route::post('/portfolio', [VendorArea\PortfolioItemController::class, 'store'])->name('portfolio.store');
+            Route::delete('/portfolio/{item}', [VendorArea\PortfolioItemController::class, 'destroy'])->name('portfolio.destroy');
+        });
 
         Route::middleware('vendor.approved')->group(function (): void {
+            // Always open, whatever the plan: the profile, and the Pro page
+            // where a closed feature is bought.
             Route::get('/profile', [VendorArea\ProfileController::class, 'edit'])->name('profile.edit');
             Route::put('/profile', [VendorArea\ProfileController::class, 'update'])->name('profile.update');
-            Route::resource('packages', VendorArea\PackageController::class)->except('show', 'store', 'destroy');
-            Route::get('/portfolio', [VendorArea\PortfolioItemController::class, 'index'])->name('portfolio.index');
-            Route::put('/portfolio/order', [VendorArea\PortfolioItemController::class, 'reorder'])->name('portfolio.reorder');
-            Route::get('/availability', [VendorArea\UnavailableDateController::class, 'index'])->name('availability.index');
-            Route::post('/availability', [VendorArea\UnavailableDateController::class, 'store'])->name('availability.store');
-            Route::delete('/availability/{date}', [VendorArea\UnavailableDateController::class, 'destroy'])->name('availability.destroy');
-            Route::get('/bookings', [VendorArea\BookingController::class, 'index'])->name('bookings.index');
-            Route::get('/bookings/data', [VendorArea\BookingController::class, 'data'])->name('bookings.data');
-            Route::get('/bookings/create', [VendorArea\BookingController::class, 'create'])->name('bookings.create');
-            Route::post('/bookings', [VendorArea\BookingController::class, 'store'])->name('bookings.store');
-            Route::get('/bookings/{booking}', [VendorArea\BookingController::class, 'show'])->name('bookings.show');
-            Route::post('/bookings/{booking}/complete', [VendorArea\BookingCompletionController::class, 'store'])->name('bookings.complete');
-            Route::post('/bookings/{booking}/payments/{payment}/verify', [VendorArea\PaymentVerificationController::class, 'store'])->name('bookings.payments.verify')->scopeBindings();
-            Route::delete('/bookings/{booking}/payments/{payment}/verify', [VendorArea\PaymentVerificationController::class, 'destroy'])->name('bookings.payments.reject')->scopeBindings();
-            Route::get('/reviews', [VendorArea\ReviewController::class, 'index'])->name('reviews.index');
-            Route::post('/reviews', [VendorArea\ReviewController::class, 'store'])->name('reviews.store');
-            Route::delete('/reviews/{review}', [VendorArea\ReviewController::class, 'destroy'])->name('reviews.destroy');
-            Route::post('/reviews/{review}/reply', [VendorArea\ReviewController::class, 'reply'])->name('reviews.reply');
-            Route::post('/reviews/{review}/report', [VendorArea\ReviewController::class, 'report'])->name('reviews.report');
-            Route::get('/points', [VendorArea\PointController::class, 'index'])->name('points.index');
             Route::get('/pro', [VendorArea\ProController::class, 'index'])->name('pro.index');
             Route::post('/pro/checkout', [VendorArea\ProController::class, 'checkout'])->middleware('throttle:10,1')->name('pro.checkout');
             Route::get('/pro/selesai', [VendorArea\ProController::class, 'done'])->name('pro.done');
-            Route::get('/enquiries', [VendorArea\EnquiryController::class, 'index'])->name('enquiries.index');
-            Route::get('/enquiries/{enquiry}', [VendorArea\EnquiryController::class, 'show'])->name('enquiries.show');
-            Route::put('/enquiries/{enquiry}', [VendorArea\EnquiryController::class, 'update'])->name('enquiries.update');
+
+            // Each feature is opened per plan under Admin → Ciri vendor, and
+            // per vendor on the vendor's admin page (VendorFeature).
+            Route::middleware('vendor.feature:packages')->group(function (): void {
+                Route::resource('packages', VendorArea\PackageController::class)->except('show', 'store', 'destroy');
+            });
+            Route::middleware('vendor.feature:portfolio')->group(function (): void {
+                Route::get('/portfolio', [VendorArea\PortfolioItemController::class, 'index'])->name('portfolio.index');
+                Route::put('/portfolio/order', [VendorArea\PortfolioItemController::class, 'reorder'])->name('portfolio.reorder');
+            });
+            Route::middleware('vendor.feature:calendar')->group(function (): void {
+                Route::get('/availability', [VendorArea\UnavailableDateController::class, 'index'])->name('availability.index');
+                Route::post('/availability', [VendorArea\UnavailableDateController::class, 'store'])->name('availability.store');
+                Route::delete('/availability/{date}', [VendorArea\UnavailableDateController::class, 'destroy'])->name('availability.destroy');
+            });
+            Route::middleware('vendor.feature:bookings')->group(function (): void {
+                Route::get('/bookings', [VendorArea\BookingController::class, 'index'])->name('bookings.index');
+                Route::get('/bookings/data', [VendorArea\BookingController::class, 'data'])->name('bookings.data');
+                Route::get('/bookings/create', [VendorArea\BookingController::class, 'create'])->name('bookings.create');
+                Route::post('/bookings', [VendorArea\BookingController::class, 'store'])->name('bookings.store');
+                Route::get('/bookings/{booking}', [VendorArea\BookingController::class, 'show'])->name('bookings.show');
+                Route::post('/bookings/{booking}/complete', [VendorArea\BookingCompletionController::class, 'store'])->name('bookings.complete');
+                Route::post('/bookings/{booking}/payments/{payment}/verify', [VendorArea\PaymentVerificationController::class, 'store'])->name('bookings.payments.verify')->scopeBindings();
+                Route::delete('/bookings/{booking}/payments/{payment}/verify', [VendorArea\PaymentVerificationController::class, 'destroy'])->name('bookings.payments.reject')->scopeBindings();
+            });
+            Route::middleware('vendor.feature:reviews')->group(function (): void {
+                Route::get('/reviews', [VendorArea\ReviewController::class, 'index'])->name('reviews.index');
+                Route::post('/reviews', [VendorArea\ReviewController::class, 'store'])->name('reviews.store');
+                Route::delete('/reviews/{review}', [VendorArea\ReviewController::class, 'destroy'])->name('reviews.destroy');
+                Route::post('/reviews/{review}/reply', [VendorArea\ReviewController::class, 'reply'])->name('reviews.reply');
+                Route::post('/reviews/{review}/report', [VendorArea\ReviewController::class, 'report'])->name('reviews.report');
+            });
+            Route::middleware('vendor.feature:points')->group(function (): void {
+                Route::get('/points', [VendorArea\PointController::class, 'index'])->name('points.index');
+            });
+            Route::middleware('vendor.feature:enquiries')->group(function (): void {
+                Route::get('/enquiries', [VendorArea\EnquiryController::class, 'index'])->name('enquiries.index');
+                Route::get('/enquiries/{enquiry}', [VendorArea\EnquiryController::class, 'show'])->name('enquiries.show');
+                Route::put('/enquiries/{enquiry}', [VendorArea\EnquiryController::class, 'update'])->name('enquiries.update');
+            });
         });
     });
 
@@ -242,6 +268,8 @@ $site = function (): void {
     Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function (): void {
         Route::get('/', AdminArea\DashboardController::class)->name('dashboard');
         Route::get('/analytics', AdminArea\AnalyticsController::class)->name('analytics');
+        Route::get('/vendor-features', [AdminArea\VendorFeatureController::class, 'index'])->name('vendor-features.index');
+        Route::put('/vendor-features', [AdminArea\VendorFeatureController::class, 'update'])->name('vendor-features.update');
         Route::get('/vendors', [AdminArea\VendorController::class, 'index'])->name('vendors.index');
         Route::get('/vendors/data', [AdminArea\VendorController::class, 'data'])->name('vendors.data');
         Route::get('/vendors/export', [AdminArea\VendorController::class, 'export'])->name('vendors.export');
@@ -250,6 +278,7 @@ $site = function (): void {
         Route::post('/vendors/{vendor}/status', [AdminArea\VendorApprovalController::class, 'store'])->name('vendors.status');
         Route::put('/vendors/{vendor}/tier', [AdminArea\VendorTierController::class, 'update'])->name('vendors.tier');
         Route::post('/vendors/{vendor}/pro', [AdminArea\VendorProController::class, 'store'])->name('vendors.pro');
+        Route::put('/vendors/{vendor}/features', [AdminArea\VendorFeatureOverrideController::class, 'update'])->name('vendors.features');
         Route::get('/reviews', [AdminArea\ReviewController::class, 'index'])->name('reviews.index');
         Route::get('/reviews/data', [AdminArea\ReviewController::class, 'data'])->name('reviews.data');
         Route::post('/reviews', [AdminArea\ReviewController::class, 'store'])->name('reviews.store');
@@ -302,7 +331,9 @@ $site = function (): void {
         Route::put('/violations/{violation}', [AdminArea\ViolationController::class, 'update'])->name('violations.update');
         Route::resource('posts', AdminArea\PostController::class)->except('show');
         Route::post('/posts/images', AdminArea\PostImageController::class)->middleware('throttle:30,1')->name('posts.images.store');
-        Route::get('/settings', [AdminArea\SettingController::class, 'edit'])->name('settings.edit');
+        Route::get('/settings/{section?}', [AdminArea\SettingController::class, 'edit'])
+            ->whereIn('section', AdminArea\SettingController::SECTIONS)
+            ->name('settings.edit');
         Route::put('/settings', [AdminArea\SettingController::class, 'update'])->name('settings.update');
         Route::put('/settings/contact', [AdminArea\SettingController::class, 'updateContact'])->name('settings.contact');
         Route::put('/settings/seo', [AdminArea\SettingController::class, 'updateSeo'])->name('settings.seo');
@@ -310,6 +341,7 @@ $site = function (): void {
         Route::put('/settings/turnstile', [AdminArea\SettingController::class, 'updateTurnstile'])->name('settings.turnstile');
         Route::put('/settings/payments', [AdminArea\SettingController::class, 'updatePayments'])->name('settings.payments');
         Route::put('/settings/pro', [AdminArea\SettingController::class, 'updatePro'])->name('settings.pro');
+        Route::put('/settings/herepay', [AdminArea\SettingController::class, 'updateHerepay'])->name('settings.herepay');
     });
 
 };

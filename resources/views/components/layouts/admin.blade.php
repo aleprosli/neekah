@@ -14,6 +14,7 @@
         ]],
         ['label' => __('pages.sidebar_admin.marketplace'), 'items' => [
             $item(__('pages.sidebar_admin.vendor'), 'store', 'admin.vendors.index', 'admin.vendors.*', $pendingVendors),
+            $item(__('pages.sidebar_admin.ciri_vendor'), 'crown', 'admin.vendor-features.index', 'admin.vendor-features.*'),
             $item(__('pages.sidebar_admin.kategori'), 'layers', 'admin.categories.index', 'admin.categories.*'),
             $item(__('pages.sidebar_admin.tempahan'), 'receipt', 'admin.bookings.index', 'admin.bookings.*'),
             $item(__('pages.sidebar_admin.kewangan'), 'wallet', 'admin.transactions.index', 'admin.transactions.*'),

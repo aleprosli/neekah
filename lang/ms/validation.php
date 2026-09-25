@@ -182,6 +182,7 @@ return [
     */
 
     'custom' => [
+        'herepay_keys_missing' => 'Herepay tidak boleh dihidupkan lagi. Isi dahulu dalam .env: :keys.',
         'file_too_large' => 'Fail terlalu besar. Had server ini ialah :sizeMB setiap muat naik.',
 
         'remaining_balance' => 'Baki yang belum direkod hanya RM:amount.',

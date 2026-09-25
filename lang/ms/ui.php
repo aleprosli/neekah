@@ -870,4 +870,16 @@ return [
         'padam_kad' => 'Padam kad :uid?',
         'kad_belum_pernah_ditap' => 'Kad ini belum pernah ditap, jadi tiada siapa memegangnya.',
     ],
+
+    'copy' => [
+        'active' => 'Aktif',
+        'inactive' => 'Tidak aktif',
+        'reports_waiting' => 'laporan vendor menunggu semakan anda.',
+        'changes_count' => ':count perubahan',
+        'not_saved_yet' => 'belum disimpan',
+        'guest_columns' => 'nama, telefon, pihak, kumpulan, pax',
+        'guest_columns_optional' => 'Medan selepas nama boleh dikosongkan.',
+        'hide_password' => 'Sembunyikan kata laluan',
+        'show_password' => 'Tunjukkan kata laluan',
+    ],
 ];

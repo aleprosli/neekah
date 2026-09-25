@@ -21,6 +21,14 @@ return [
     ],
 
     'admin' => [
+        'category_added' => 'Category added.',
+        'category_updated' => 'Category updated.',
+        'contact_saved' => 'Contact details saved.',
+        'turnstile_saved' => 'Turnstile settings saved.',
+        'telegram_saved' => 'Telegram settings saved.',
+        'vendor_features_saved' => 'Vendor features saved.',
+        'vendor_overrides_saved' => 'Features for :vendor saved.',
+        'herepay_saved' => 'Herepay settings saved.',
         'pro_activated' => 'Pro for :vendor is active until :date.',
         'pro_settings_saved' => 'Pro settings saved.',
         'card_music_added' => 'Music track added.',
@@ -104,6 +112,12 @@ return [
     ],
 
     'vendor' => [
+        'photos_uploaded' => ':count photos uploaded.',
+        'profile_updated' => 'Profile updated.',
+        'package_added' => 'Package added.',
+        'package_updated' => 'Package updated.',
+        'feature_needs_pro' => ':feature is open to Neekah Pro vendors. Upgrade to use it.',
+        'feature_closed' => ':feature is not open for your account.',
         'pro_checkout_failed' => 'We could not create a payment link just now. Please try again shortly.',
         'registered' => 'Your registration has been received. Complete your profile while an admin reviews it.',
         'converted' => 'Your account is now a vendor account. Complete your profile while an admin reviews it.',

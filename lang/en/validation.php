@@ -182,6 +182,7 @@ return [
     */
 
     'custom' => [
+        'herepay_keys_missing' => 'Herepay cannot be switched on yet. Fill these in .env first: :keys.',
         'file_too_large' => 'That file is too large. This server accepts :sizeMB per upload.',
 
         'remaining_balance' => 'Only RM:amount is left to record.',

@@ -2,6 +2,26 @@
 
 return [
 
+    'vendor_feature' => [
+        'packages' => 'Pakej',
+        'portfolio' => 'Portfolio',
+        'calendar' => 'Kalendar',
+        'bookings' => 'Tempahan',
+        'enquiries' => 'Enquiry',
+        'reviews' => 'Review',
+        'points' => 'Point & ranking',
+    ],
+
+    'vendor_feature_desc' => [
+        'packages' => 'Urus pakej dan harga yang dipaparkan di halaman awam.',
+        'portfolio' => 'Muat naik dan susun gambar portfolio.',
+        'calendar' => 'Tutup tarikh yang sudah penuh.',
+        'bookings' => 'Rekod dan urus tempahan pelanggan.',
+        'enquiries' => 'Terima dan balas enquiry daripada pengantin.',
+        'reviews' => 'Lihat, balas dan laporkan review pelanggan.',
+        'points' => 'Lihat point, tahap dan kedudukan ranking.',
+    ],
+
     'announcement_audience' => [
         'everyone' => 'Semua pengguna',
         'customers' => 'Pengantin sahaja',

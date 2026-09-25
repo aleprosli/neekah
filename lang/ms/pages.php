@@ -159,6 +159,7 @@ return [
     ],
 
     'dash' => [
+        'violation_reported' => ':type · dilaporkan :date',
         'statistik_kad' => 'Statistik kad',
         'statistik_kad_jemputan' => 'Statistik kad jemputan',
         'siapa_membuka_kad_anda' => 'Siapa membuka kad anda, dan siapa sudah menjawab.',
@@ -264,7 +265,6 @@ return [
         'edit_majlis' => 'Edit majlis',
         'saya_vendor' => 'Saya vendor',
         'cari_vendor' => 'Cari vendor',
-        'enquiry' => 'Enquiry',
         'tempahan_saya' => 'Tempahan saya',
         'tempahan_saya_2' => 'Tempahan saya',
         'semua_booking_dan_bayaran_anda' => 'Semua booking dan bayaran anda direkod di sini.',
@@ -282,11 +282,8 @@ return [
         'artikel_yang_tersiar_muncul_di' => 'Artikel yang tersiar muncul di neekah.my/blog dan dalam sitemap untuk Google.',
         'tulis_artikel' => 'Tulis artikel',
         'anda_akan_melihat_neekah_persis' => 'Anda akan melihat Neekah persis seperti pengguna ini. Pembayaran dimatikan, dan tindakan ini direkod dalam log sistem.',
-        'profil_vendor' => 'Profil vendor',
         'impersonate' => 'Impersonate',
-        'pengumuman' => 'Pengumuman',
         'kembali' => 'Kembali',
-        'laporan_vendor' => 'Laporan vendor',
     ],
 
     'reviews' => [
@@ -335,6 +332,7 @@ return [
     ],
 
     'profile' => [
+        'to_send_enquiry' => 'untuk menghantar enquiry kepada vendor ini.',
         'whatsapp_greeting' => 'Hai :name, saya jumpa anda di Neekah. Boleh saya tanya tentang pakej untuk majlis saya?',
         'highlight_contact' => 'Berhubung terus dengan vendor',
         'highlight_contact_detail' => 'Hantar enquiry atau WhatsApp mereka sendiri. Neekah tidak mengambil komisen dan tidak memegang bayaran anda.',
@@ -687,6 +685,26 @@ return [
         'review_again' => 'Semak semula profil',
     ],
 
+    'vendor_features' => [
+        'title' => 'Ciri vendor',
+        'subheading' => 'Pilih bahagian dashboard vendor yang dibuka untuk setiap pelan.',
+        'feature' => 'Ciri',
+        'plan_basic' => 'Basic',
+        'plan_pro' => 'Pro',
+        'always_open' => 'Ringkasan, Profil, halaman Neekah Pro dan Akaun sentiasa dibuka untuk semua vendor.',
+        'overridden' => ':count vendor ada pengecualian sendiri, yang mengatasi tetapan di sini.',
+        'save' => 'Simpan ciri vendor',
+        'vendor_heading' => 'Ciri untuk vendor ini',
+        'vendor_plan' => 'Pelan semasa: :plan',
+        'edit_plans' => 'Ubah ciri setiap pelan',
+        'open' => 'dibuka',
+        'closed' => 'ditutup',
+        'follow_plan' => 'Ikut pelan (:state)',
+        'always_open_option' => 'Sentiasa buka',
+        'always_closed_option' => 'Sentiasa tutup',
+        'save_vendor' => 'Simpan ciri vendor ini',
+    ],
+
     'sidebar_vendor' => [
         'pro' => 'Neekah Pro',
         'ringkasan' => 'Ringkasan',
@@ -704,6 +722,7 @@ return [
     ],
 
     'sidebar_admin' => [
+        'ciri_vendor' => 'Ciri vendor',
         'muzik_kad' => 'Muzik kad',
         'kad_nfc' => 'Kad NFC',
         'ringkasan' => 'Ringkasan',
@@ -755,6 +774,8 @@ return [
     ],
 
     'pro' => [
+        'herepay_title' => 'Neekah Pro :plan untuk :vendor',
+        'herepay_description' => 'Rujukan Neekah: :reference',
         'title' => 'Neekah Pro',
         'heading' => 'Neekah Pro',
         'subheading' => 'Lebih mudah dijumpai, dan tahu berapa ramai yang melihat profil anda.',

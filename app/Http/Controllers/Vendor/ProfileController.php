@@ -95,6 +95,6 @@ class ProfileController extends Controller
         // save themselves out of the category their card and profile show.
         $vendor->categories()->sync($request->safe()->collect('category_ids')->push($vendor->category_id)->unique()->all());
 
-        return $this->redirectOrJson($request, route('vendor.profile.edit'), 'Profil dikemas kini.');
+        return $this->redirectOrJson($request, route('vendor.profile.edit'), __('flash.vendor.profile_updated'));
     }
 }
