@@ -1045,6 +1045,17 @@ return [
     ],
 
     'admin_camera' => [
+        'user_off' => 'Yes, turn off and delete',
+        'user_off_title' => 'Turn off Kamera Majlis for :wedding?',
+        'user_off_message' => ':count photos and videos are deleted for good and the guest link closes.',
+        'user_card_title' => 'Kamera Majlis',
+        'user_no_wedding' => 'This user has no wedding yet. Kamera Majlis can be activated once one is created.',
+        'user_active' => 'The album is kept until :date. Guest link:',
+        'user_grant' => 'Activate :tier',
+        'user_grant_title' => 'Activate Kamera Majlis :tier for :wedding?',
+        'user_grant_message' => 'Free, recorded as an RM0 purchase by you. The couple gets an email and can share the QR straight away.',
+        'copy' => 'Copy',
+        'copied' => 'Copied',
         'grant_title' => 'Record a manual purchase',
         'grant_hint' => 'For payments outside Herepay (bank transfer, a gift). The album is activated for the wedding of this email.',
         'email' => 'Couple\'s email',

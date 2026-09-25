@@ -966,6 +966,8 @@ return [
     ],
 
     'admin_camera' => [
+        'tier_off' => 'None',
+        'free_note' => 'Activated for free by an admin',
         'title' => 'Kamera Majlis',
         'subheading' => 'Every guest album, what it holds and until when, and what guests reported.',
         'col_wedding' => 'Wedding',

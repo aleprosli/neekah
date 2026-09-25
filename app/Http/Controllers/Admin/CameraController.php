@@ -13,6 +13,7 @@ use App\Models\CameraAlbum;
 use App\Models\CameraMedia;
 use App\Models\CameraPurchase;
 use App\Models\User;
+use App\Models\Wedding;
 use App\Support\TableFilter;
 use App\Support\VueProps;
 use Illuminate\Contracts\View\View;
@@ -33,6 +34,9 @@ class CameraController extends Controller
 {
     /** Reported photos shown at once; the oldest report first. */
     public const REPORTED = 30;
+
+    /** The choice on an account's page that turns Kamera Majlis off. */
+    public const OFF = 'off';
 
     /**
      * Columns for components/ui/DataTable.vue.
@@ -140,8 +144,8 @@ class CameraController extends Controller
             'note' => ['nullable', 'string', 'max:255'],
         ]);
 
-        $wedding = User::query()->where('email', $validated['email'])->first()
-            ?->weddings()->latest('weddings.created_at')->first();
+        $user = User::query()->where('email', $validated['email'])->first();
+        $wedding = $user ? self::weddingOf($user) : null;
 
         if (! $wedding) {
             throw ValidationException::withMessages(['email' => __('validation.custom.camera_no_wedding')]);
@@ -159,6 +163,81 @@ class CameraController extends Controller
             'wedding' => $wedding->title,
             'tier' => $purchase->tier->label(),
         ]));
+    }
+
+    /** The wedding a purchase recorded for this person goes to: their newest. */
+    public static function weddingOf(User $user): ?Wedding
+    {
+        return $user->weddings()->latest('weddings.created_at')->first();
+    }
+
+    /**
+     * The Kamera Majlis setting on an admin's page for one account: which
+     * tier the couple has, switched in one click (free), and the guest link.
+     *
+     * @return array<string, mixed>|null
+     */
+    public static function userCard(User $user): ?array
+    {
+        if (! $user->isCustomer()) {
+            return null;
+        }
+
+        $wedding = self::weddingOf($user);
+        $album = $wedding?->cameraAlbum()->first();
+        $active = $album?->isActive() ? $album : null;
+
+        return [
+            'wedding' => $wedding?->title,
+            'current' => $active?->tier->value ?? self::OFF,
+            'album' => $active ? [
+                'url' => $active->url(),
+                'expires' => $active->expires_at?->translatedFormat('j F Y'),
+                'media' => $active->photos_count + $active->videos_count,
+            ] : null,
+            'update_url' => route('admin.users.camera', $user),
+            'options' => [
+                ['value' => self::OFF, 'label' => __('pages.admin_camera.tier_off')],
+                ...array_map(fn (CameraTier $tier): array => ['value' => $tier->value, 'label' => $tier->label()], CameraTier::cases()),
+            ],
+        ];
+    }
+
+    /**
+     * Set a couple's Kamera Majlis from their account page. Turning it on or
+     * moving up records a free purchase (so it shows, and the couple is
+     * emailed); moving down only changes the tier; off deletes the album.
+     */
+    public function updateForUser(Request $request, User $user, ActivateCameraAlbum $activate, PurgeCameraAlbum $purge): RedirectResponse
+    {
+        $choice = $request->validate(['tier' => ['required', Rule::in([self::OFF, ...array_column(CameraTier::cases(), 'value')])]])['tier'];
+        $wedding = self::weddingOf($user);
+
+        if (! $wedding) {
+            throw ValidationException::withMessages(['tier' => __('validation.custom.camera_no_wedding')]);
+        }
+
+        $album = $wedding->cameraAlbum()->first();
+        $active = $album?->isActive() ? $album : null;
+
+        if ($choice === self::OFF) {
+            if ($active) {
+                $purge->handle($active);
+                Log::warning('Admin turned off a Kamera Majlis album', ['admin_id' => $request->user()->id, 'album_id' => $active->id]);
+            }
+
+            return back()->with('status', __('flash.admin.camera_purged', ['wedding' => $wedding->title]));
+        }
+
+        $tier = CameraTier::from($choice);
+
+        if ($active && $tier->rank() <= $active->tier->rank()) {
+            $active->update(['tier' => $tier]);
+        } else {
+            $activate->recordManually($wedding, $tier, $request->user(), 0, __('pages.admin_camera.free_note'));
+        }
+
+        return back()->with('status', __('flash.admin.camera_activated', ['wedding' => $wedding->title, 'tier' => $tier->label()]));
     }
 
     /** Take an album down now: every file goes, as when its time runs out. */

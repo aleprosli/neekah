@@ -87,3 +87,31 @@ it('deletes a reported file or dismisses the report', function () {
         ->and($fine->fresh()->reported_at)->toBeNull()
         ->and($album->fresh()->photos_count)->toBe(1);
 });
+
+it('sets a couple\'s Kamera Majlis from their account page: on for free, down a tier, and off', function () {
+    $couple = User::factory()->create();
+    $wedding = Wedding::factory()->for($couple)->create();
+    $camera = fn () => $this->actingAs($this->admin)->get(route('admin.users.show', $couple))->assertOk()->viewData('props')['camera'];
+    $set = fn (string $tier) => $this->actingAs($this->admin)->from(route('admin.users.show', $couple))
+        ->put(route('admin.users.camera', $couple), ['tier' => $tier])->assertRedirect(route('admin.users.show', $couple));
+
+    expect($camera()['current'])->toBe('off');
+
+    $set('pro');
+    $album = $wedding->cameraAlbum()->first();
+    expect($camera()['current'])->toBe('pro')
+        ->and($camera()['album']['url'])->toBe($album->url())
+        ->and((float) $wedding->cameraPurchases()->sole()->amount)->toBe(0.0);
+
+    $set('basic');
+    expect($album->fresh()->tier)->toBe(CameraTier::Basic)
+        ->and($wedding->cameraPurchases()->count())->toBe(1);
+
+    Storage::disk('public')->put("camera/{$album->id}/a.webp", 'photo');
+    $set('off');
+    expect($album->fresh()->purged_at)->not->toBeNull()
+        ->and($camera()['current'])->toBe('off')
+        ->and(Storage::disk('public')->allFiles("camera/{$album->id}"))->toBe([]);
+
+    $this->actingAs(User::factory()->create())->put(route('admin.users.camera', $couple), ['tier' => 'pro'])->assertForbidden();
+});

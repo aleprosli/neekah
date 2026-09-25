@@ -966,6 +966,8 @@ return [
     ],
 
     'admin_camera' => [
+        'tier_off' => 'Tiada',
+        'free_note' => 'Diaktifkan percuma oleh admin',
         'title' => 'Kamera Majlis',
         'subheading' => 'Setiap album tetamu, apa yang disimpan dan sehingga bila, serta laporan tetamu.',
         'col_wedding' => 'Majlis',

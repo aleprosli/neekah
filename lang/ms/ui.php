@@ -1045,6 +1045,17 @@ return [
     ],
 
     'admin_camera' => [
+        'user_off' => 'Ya, tutup dan padam',
+        'user_off_title' => 'Tutup Kamera Majlis :wedding?',
+        'user_off_message' => ':count gambar dan video dipadam untuk selamanya dan pautan tetamu ditutup.',
+        'user_card_title' => 'Kamera Majlis',
+        'user_no_wedding' => 'Pengguna ini belum ada majlis. Kamera Majlis boleh diaktifkan selepas majlis dicipta.',
+        'user_active' => 'Album disimpan sehingga :date. Pautan tetamu:',
+        'user_grant' => 'Aktifkan :tier',
+        'user_grant_title' => 'Aktifkan Kamera Majlis :tier untuk :wedding?',
+        'user_grant_message' => 'Percuma, direkod sebagai pembelian RM0 oleh anda. Pengantin menerima emel dan boleh terus berkongsi QR.',
+        'copy' => 'Salin',
+        'copied' => 'Disalin',
         'grant_title' => 'Rekod pembelian manual',
         'grant_hint' => 'Untuk bayaran di luar Herepay (pindahan bank, hadiah). Album diaktifkan untuk majlis milik emel ini.',
         'email' => 'Emel pengantin',

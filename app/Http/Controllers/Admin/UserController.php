@@ -276,6 +276,7 @@ class UserController extends Controller
                     ['label' => __('props.admin.enquiry_review'), 'value' => $user->enquiries_count.' · '.$user->reviews_count],
                 ],
                 'actions' => $this->accountActions($user, $admin),
+                'camera' => CameraController::userCard($user),
                 'vendorForm' => $admin->can('switchToVendor', $user) ? VueProps::for([
                     'action' => route('admin.users.vendor.store', $user),
                     'loginUrl' => route('login'),

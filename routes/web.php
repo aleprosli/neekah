@@ -320,6 +320,7 @@ $site = function (): void {
         Route::put('/vendors/{vendor}/tier', [AdminArea\VendorTierController::class, 'update'])->name('vendors.tier');
         Route::post('/vendors/{vendor}/pro', [AdminArea\VendorProController::class, 'store'])->name('vendors.pro');
         Route::put('/vendors/{vendor}/features', [AdminArea\VendorFeatureOverrideController::class, 'update'])->name('vendors.features');
+        Route::put('/users/{user}/kamera', [AdminArea\CameraController::class, 'updateForUser'])->name('users.camera');
         Route::get('/kamera', [AdminArea\CameraController::class, 'index'])->name('camera.index');
         Route::get('/kamera/data', [AdminArea\CameraController::class, 'data'])->name('camera.data');
         Route::post('/kamera', [AdminArea\CameraController::class, 'store'])->name('camera.store');
