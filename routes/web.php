@@ -199,6 +199,8 @@ $site = function (): void {
                 // The settings moved onto the calendar page; old links still land there.
                 Route::redirect('/tempahan-online', '/vendor/availability?tab=tempahan')->name('booking-settings.edit');
                 Route::put('/tempahan-online', [VendorArea\BookingSettingsController::class, 'update'])->name('booking-settings.update');
+                Route::put('/tempahan-online/status', [VendorArea\BookingSettingsController::class, 'toggle'])->name('booking-settings.toggle');
+                Route::put('/tempahan-online/bank', [VendorArea\BookingSettingsController::class, 'manual'])->name('booking-settings.manual');
                 Route::put('/tempahan-online/herepay', [VendorArea\BookingSettingsController::class, 'connect'])->middleware('throttle:5,1')->name('booking-settings.herepay.connect');
                 Route::delete('/tempahan-online/herepay', [VendorArea\BookingSettingsController::class, 'disconnect'])->name('booking-settings.herepay.disconnect');
                 Route::post('/tempahan-online/kalendar', [VendorArea\BookingSettingsController::class, 'confirmCalendar'])->name('booking-settings.calendar');

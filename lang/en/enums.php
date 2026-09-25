@@ -13,14 +13,14 @@ return [
 
     'vendor_feature' => [
         'boost' => 'Boost',
-        'online_booking' => 'Online booking',
+        'online_booking' => 'Online Booking',
         'packages' => 'Packages',
         'portfolio' => 'Portfolio',
-        'calendar' => 'Calendar & online booking',
+        'calendar' => 'Calendar & Online Booking',
         'bookings' => 'Bookings',
         'enquiries' => 'Enquiries',
         'reviews' => 'Reviews',
-        'points' => 'Points & ranking',
+        'points' => 'Points & Ranking',
     ],
 
     'vendor_feature_desc' => [

@@ -126,6 +126,10 @@ return [
     ],
 
     'vendor' => [
+        'online_needs_payment' => 'Connect Herepay or add your bank details first, so couples have a way to pay the deposit.',
+        'online_on' => 'Online booking is on.',
+        'online_off' => 'Online booking is off.',
+        'bank_details_saved' => 'Bank details saved.',
         'boost_started' => 'Your :category boost runs until :date.',
         'boost_checkout_failed' => 'The payment link could not be opened. Please try again shortly.',
         'ical_connected' => 'Google Calendar connected. :count busy dates imported.',

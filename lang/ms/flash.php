@@ -126,6 +126,10 @@ return [
     ],
 
     'vendor' => [
+        'online_needs_payment' => 'Sambung Herepay atau isi butiran bank dahulu, supaya pengantin ada cara untuk membayar deposit.',
+        'online_on' => 'Tempahan online dihidupkan.',
+        'online_off' => 'Tempahan online dimatikan.',
+        'bank_details_saved' => 'Butiran bank disimpan.',
         'boost_started' => 'Boost :category aktif sehingga :date.',
         'boost_checkout_failed' => 'Pautan bayaran tidak dapat dibuka. Cuba sebentar lagi.',
         'ical_connected' => 'Google Calendar disambung. :count tarikh sibuk diimport.',

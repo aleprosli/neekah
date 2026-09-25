@@ -57,6 +57,10 @@ return [
         'base_url' => env('HEREPAY_BASE_URL'),
         'secret_key' => env('HEREPAY_SECRET_KEY'),
         'private_key' => env('HEREPAY_PRIVATE_KEY'),
+        // Where a vendor opens their own merchant account, and the guide to
+        // their API keys, both linked from the online booking setup.
+        'register_url' => env('HEREPAY_REGISTER_URL', 'https://app.herepay.org/register'),
+        'keys_guide_url' => env('HEREPAY_KEYS_GUIDE_URL', 'https://herepay.readme.io/reference/how-to-get-your-api-key'),
     ],
 
     // Optional. When set, Kamera Majlis strips the metadata (a phone's GPS

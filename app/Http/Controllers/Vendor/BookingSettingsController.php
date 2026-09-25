@@ -9,6 +9,7 @@ use App\Http\Requests\UpdateBookingSettingsRequest;
 use App\Models\VendorUnavailableDate;
 use App\Support\Herepay\DepositGateway;
 use App\Support\Herepay\HerepayCredentials;
+use App\Support\VendorAvailability;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use RuntimeException;
@@ -29,6 +30,41 @@ class BookingSettingsController extends Controller
         $vendor->bookingSettings()->updateOrCreate([], [...$request->settings(), 'calendar_confirmed_at' => now()]);
 
         return back()->with('status', __('flash.vendor.booking_settings_saved'));
+    }
+
+    /**
+     * Turn online booking on or off. Turning it on is refused while couples
+     * would have no way to pay the deposit, so the switch never promises a
+     * form that cannot take a booking.
+     */
+    public function toggle(Request $request): RedirectResponse
+    {
+        $enabled = $request->validate(['enabled' => ['required', 'boolean']])['enabled'];
+        $vendor = $request->user()->vendor;
+
+        if ($enabled && VendorAvailability::for($vendor)->paymentChannel() === null) {
+            return back()->withErrors(['enabled' => __('flash.vendor.online_needs_payment')]);
+        }
+
+        $vendor->bookingSettings()->updateOrCreate([], ['enabled' => (bool) $enabled]);
+
+        return back()->with('status', $enabled ? __('flash.vendor.online_on') : __('flash.vendor.online_off'));
+    }
+
+    /**
+     * The bank details for a transferred deposit: the fallback for a vendor
+     * without Herepay yet.
+     */
+    public function manual(Request $request): RedirectResponse
+    {
+        $validated = $request->validate(
+            ['manual_instructions' => ['nullable', 'string', 'max:1000']],
+            attributes: ['manual_instructions' => __('fields.butiran_bank')],
+        );
+
+        $request->user()->vendor->bookingSettings()->updateOrCreate([], ['manual_instructions' => $validated['manual_instructions'] ?? null]);
+
+        return back()->with('status', __('flash.vendor.bank_details_saved'));
     }
 
     /**
