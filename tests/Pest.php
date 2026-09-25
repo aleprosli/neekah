@@ -1,5 +1,6 @@
 <?php
 
+use App\Support\OnlineBookingSettings;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Testing\TestResponse;
 use Tests\TestCase;
@@ -72,4 +73,13 @@ function cardProps(TestResponse $response): array
 function cardWidgets(TestResponse $response): array
 {
     return collect(cardProps($response)['widgets'])->pluck('key')->all();
+}
+
+/**
+ * Open online booking site-wide, which is off until an admin opens it. Pair it
+ * with Vendor::factory()->takingOnlineBookings().
+ */
+function enableOnlineBooking(array $settings = []): void
+{
+    app(OnlineBookingSettings::class)->save(['enabled' => true, ...$settings]);
 }

@@ -3,6 +3,7 @@
 return [
 
     'vendor_feature' => [
+        'online_booking' => 'Online booking',
         'packages' => 'Packages',
         'portfolio' => 'Portfolio',
         'calendar' => 'Calendar',
@@ -13,6 +14,7 @@ return [
     ],
 
     'vendor_feature_desc' => [
+        'online_booking' => 'Couples book a date and pay the deposit right on the vendor page.',
         'packages' => 'Manage the packages and prices shown on the public page.',
         'portfolio' => 'Upload and arrange portfolio photos.',
         'calendar' => 'Close off dates that are already booked.',
@@ -215,4 +217,45 @@ return [
         'failed' => 'Failed',
     ],
 
+    'booking_source' => [
+        'vendor' => 'Recorded by vendor',
+        'online' => 'Online booking',
+    ],
+
+    'deposit_channel' => [
+        'herepay' => 'Herepay (FPX)',
+        'manual' => 'Bank transfer',
+    ],
+
+    'cancellation_reason' => [
+        'couple' => 'Cancelled by the couple',
+        'vendor' => 'Cancelled by the vendor',
+        'expired' => 'Deposit not paid',
+    ],
+
+    'deposit_type' => [
+        'percent' => 'Percentage of the package price',
+        'fixed' => 'Fixed amount (RM)',
+    ],
+
+    'day_status' => [
+        'open' => 'Available',
+        'full' => 'Full',
+        'closed' => 'Closed',
+        'weekday_off' => 'Not open',
+        'too_soon' => 'Too soon',
+        'too_far' => 'Not open yet',
+        'past' => 'Past',
+    ],
+
+    'online_booking_state' => [
+        'open' => 'Live: couples can book directly',
+        'globally_off' => 'Neekah has not opened online booking yet',
+        'not_approved' => 'Account not approved yet',
+        'feature_off' => 'Online booking is for Neekah Pro vendors',
+        'switched_off' => 'Switched off by you',
+        'no_packages' => 'No active package',
+        'no_payment_path' => 'No way to pay the deposit: connect Herepay or add bank details',
+        'calendar_stale' => 'Paused: confirm your calendar',
+    ],
 ];

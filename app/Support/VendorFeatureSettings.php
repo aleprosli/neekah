@@ -6,8 +6,8 @@ use App\Enums\VendorFeature;
 
 /**
  * Which vendor features each plan opens, set under Admin → Ciri vendor. One
- * row per "vendor_features.<plan>_<feature>". Everything is open by default,
- * so a fresh install behaves as the app did before plans had features.
+ * row per "vendor_features.<plan>_<feature>". Everything is open by default
+ * (VendorFeature::openByDefault), except online booking, which only Pro opens.
  *
  * A vendor's own overrides (vendors.feature_overrides) win over these; see
  * Vendor::hasFeature().
@@ -37,7 +37,7 @@ class VendorFeatureSettings extends SettingGroup
     {
         return collect(self::PLANS)
             ->crossJoin(VendorFeature::cases())
-            ->mapWithKeys(fn (array $pair): array => [self::key($pair[0], $pair[1]) => true])
+            ->mapWithKeys(fn (array $pair): array => [self::key($pair[0], $pair[1]) => $pair[1]->openByDefault($pair[0])])
             ->all();
     }
 

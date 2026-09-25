@@ -37,6 +37,7 @@
             $feature(App\Enums\VendorFeature::Bookings, __('pages.sidebar_vendor.tempahan')),
             $feature(App\Enums\VendorFeature::Enquiries, __('pages.sidebar_vendor.enquiry'), $openEnquiries),
             $feature(App\Enums\VendorFeature::Reviews, __('pages.sidebar_vendor.review')),
+            $feature(App\Enums\VendorFeature::OnlineBooking, __('pages.sidebar_vendor.tempahan_online')),
         ]),
         $group(__('pages.sidebar_vendor.prestasi'), [
             $feature(App\Enums\VendorFeature::Points, __('pages.dash.point_ranking')),

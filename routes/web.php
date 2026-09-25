@@ -13,6 +13,7 @@ use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\Customer as CustomerArea;
 use App\Http\Controllers\Customer\BookingController;
 use App\Http\Controllers\Customer\PaymentController;
+use App\Http\Controllers\HerepayBookingWebhookController;
 use App\Http\Controllers\HerepayWebhookController;
 use App\Http\Controllers\InvitationAcceptanceController;
 use App\Http\Controllers\InvitationPreviewController;
@@ -25,6 +26,7 @@ use App\Http\Controllers\RsvpController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\SiteTemplatePreviewController;
 use App\Http\Controllers\Vendor as VendorArea;
+use App\Http\Controllers\VendorAvailabilityController;
 use App\Http\Controllers\VendorComparisonController;
 use App\Http\Controllers\VendorContactController;
 use App\Http\Controllers\VendorController;
@@ -71,6 +73,7 @@ $site = function (): void {
     Route::get('/', [VendorController::class, 'index'])->name('vendors.index');
     Route::get('/compare', VendorComparisonController::class)->name('vendors.compare');
     Route::get('/vendors/{vendor}', [VendorController::class, 'show'])->name('vendors.show');
+    Route::get('/vendors/{vendor}/ketersediaan', VendorAvailabilityController::class)->middleware('throttle:60,1')->name('vendors.availability');
     // Open to everyone, signed in or not, so the throttle is what stands between
     // a profile and someone with a script.
     Route::post('/vendors/{vendor}/reviews', [VendorReviewController::class, 'store'])
@@ -156,6 +159,8 @@ $site = function (): void {
                 Route::post('/bookings', [VendorArea\BookingController::class, 'store'])->name('bookings.store');
                 Route::get('/bookings/{booking}', [VendorArea\BookingController::class, 'show'])->name('bookings.show');
                 Route::post('/bookings/{booking}/complete', [VendorArea\BookingCompletionController::class, 'store'])->name('bookings.complete');
+                Route::post('/bookings/{booking}/batal', [VendorArea\BookingCancellationController::class, 'store'])->name('bookings.cancel');
+                Route::post('/bookings/{booking}/payments/{payment}/dipulangkan', [VendorArea\BookingCancellationController::class, 'refunded'])->name('bookings.payments.refunded')->scopeBindings();
                 Route::post('/bookings/{booking}/payments/{payment}/verify', [VendorArea\PaymentVerificationController::class, 'store'])->name('bookings.payments.verify')->scopeBindings();
                 Route::delete('/bookings/{booking}/payments/{payment}/verify', [VendorArea\PaymentVerificationController::class, 'destroy'])->name('bookings.payments.reject')->scopeBindings();
             });
@@ -168,6 +173,13 @@ $site = function (): void {
             });
             Route::middleware('vendor.feature:points')->group(function (): void {
                 Route::get('/points', [VendorArea\PointController::class, 'index'])->name('points.index');
+            });
+            Route::middleware('vendor.feature:online_booking')->group(function (): void {
+                Route::get('/tempahan-online', [VendorArea\BookingSettingsController::class, 'edit'])->name('booking-settings.edit');
+                Route::put('/tempahan-online', [VendorArea\BookingSettingsController::class, 'update'])->name('booking-settings.update');
+                Route::put('/tempahan-online/herepay', [VendorArea\BookingSettingsController::class, 'connect'])->middleware('throttle:5,1')->name('booking-settings.herepay.connect');
+                Route::delete('/tempahan-online/herepay', [VendorArea\BookingSettingsController::class, 'disconnect'])->name('booking-settings.herepay.disconnect');
+                Route::post('/tempahan-online/kalendar', [VendorArea\BookingSettingsController::class, 'confirmCalendar'])->name('booking-settings.calendar');
             });
             Route::middleware('vendor.feature:enquiries')->group(function (): void {
                 Route::get('/enquiries', [VendorArea\EnquiryController::class, 'index'])->name('enquiries.index');
@@ -200,6 +212,8 @@ $site = function (): void {
             Route::post('/vendors/{vendor}/bookings', [BookingController::class, 'store'])->name('vendors.bookings.store');
             Route::get('/bookings', [BookingController::class, 'index'])->name('bookings.index');
             Route::post('/bookings/{booking}/cancel', [CustomerArea\BookingCancellationController::class, 'store'])->name('bookings.cancel');
+            Route::post('/bookings/{booking}/deposit', [BookingController::class, 'payDeposit'])->middleware('throttle:10,1')->name('bookings.deposit.pay');
+            Route::get('/tempahan/{booking}/bayaran-selesai', [BookingController::class, 'paymentDone'])->name('bookings.payment.done');
             Route::post('/bookings/{booking}/payments', [PaymentController::class, 'store'])->name('bookings.payments.store');
             Route::delete('/bookings/{booking}/payments/{payment}', [PaymentController::class, 'destroy'])->name('bookings.payments.destroy')->scopeBindings();
             Route::post('/bookings/{booking}/review', [CustomerArea\ReviewController::class, 'store'])->name('bookings.review.store');
@@ -342,6 +356,7 @@ $site = function (): void {
         Route::put('/settings/payments', [AdminArea\SettingController::class, 'updatePayments'])->name('settings.payments');
         Route::put('/settings/pro', [AdminArea\SettingController::class, 'updatePro'])->name('settings.pro');
         Route::put('/settings/herepay', [AdminArea\SettingController::class, 'updateHerepay'])->name('settings.herepay');
+        Route::put('/settings/tempahan-online', [AdminArea\SettingController::class, 'updateOnlineBooking'])->name('settings.online-booking');
     });
 
 };
@@ -358,6 +373,12 @@ foreach (Locales::codes() as $locale) {
 Route::post('/webhooks/herepay', HerepayWebhookController::class)
     ->middleware('throttle:60,1')
     ->name('webhooks.herepay');
+
+// A booking deposit, paid on the vendor's own Herepay account. Its own route,
+// so the route name in the signed callback URL says which kind it is.
+Route::post('/webhooks/herepay/tempahan', HerepayBookingWebhookController::class)
+    ->middleware('throttle:60,1')
+    ->name('webhooks.herepay.booking');
 
 // One sitemap for the whole site, which lists both languages itself.
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->middleware('locale')->name('sitemap.index');

@@ -17,4 +17,5 @@
 
     @include('admin.vendors.partials.pro')
     @include('admin.vendors.partials.features')
+    @include('admin.vendors.partials.booking')
 </x-layouts.admin>

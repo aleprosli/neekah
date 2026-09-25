@@ -19,6 +19,16 @@ enum VendorFeature: string
     case Enquiries = 'enquiries';
     case Reviews = 'reviews';
     case Points = 'points';
+    case OnlineBooking = 'online_booking';
+
+    /**
+     * What a plan opens until an admin says otherwise. Everything is open to
+     * both, except online booking, which is what Neekah Pro is sold on.
+     */
+    public function openByDefault(string $plan): bool
+    {
+        return $this !== self::OnlineBooking || $plan === 'pro';
+    }
 
     public function label(): string
     {
@@ -41,6 +51,7 @@ enum VendorFeature: string
             self::Enquiries => 'chat',
             self::Reviews => 'star',
             self::Points => 'trophy',
+            self::OnlineBooking => 'calendar',
         };
     }
 
@@ -55,6 +66,7 @@ enum VendorFeature: string
             self::Enquiries => 'vendor.enquiries.index',
             self::Reviews => 'vendor.reviews.index',
             self::Points => 'vendor.points.index',
+            self::OnlineBooking => 'vendor.booking-settings.edit',
         };
     }
 
@@ -69,6 +81,7 @@ enum VendorFeature: string
             self::Enquiries => 'vendor.enquiries.*',
             self::Reviews => 'vendor.reviews.*',
             self::Points => 'vendor.points.*',
+            self::OnlineBooking => 'vendor.booking-settings.*',
         };
     }
 }

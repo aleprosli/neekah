@@ -16,10 +16,15 @@ const props = defineProps({
     closed: { type: Array, required: true },
     booked: { type: Array, required: true },
     today: { type: String, required: true },
+    /** Places a day holds; above 1, an outside booking can take just some. */
+    capacity: { type: Number, default: 1 },
+    /** For a vendor taking online bookings: the "my calendar is up to date" button. */
+    confirm: { type: Object, default: null },
     errors: { type: Object, default: () => ({}) },
 });
 
-const form = ref({ from: props.today, to: '', reason: '' });
+const form = ref({ from: props.today, to: '', reason: '', slots: '' });
+const tapped = ref(false);
 const monthOffset = ref(0);
 
 const closedByDate = computed(() => Object.fromEntries(props.closed.map((date) => [date.date, date])));
@@ -56,16 +61,42 @@ const stateOf = (iso) => {
     return iso < props.today ? 'past' : 'open';
 };
 
+/**
+ * Tap a day to pick it, tap a later one to make it a range; the button under
+ * the grid then closes them. Two taps for one day.
+ */
 const pick = (iso) => {
     if (stateOf(iso) !== 'open') return;
+
+    if (tapped.value && !form.value.to && iso > form.value.from) {
+        form.value.to = iso;
+        return;
+    }
+
     form.value.from = iso;
+    form.value.to = '';
+    tapped.value = true;
 };
+
+const inRange = (iso) => form.value.to && iso > form.value.from && iso <= form.value.to;
+
+const pickedLabel = computed(() => {
+    const format = (iso) => new Date(`${iso}T00:00:00`).toLocaleDateString(document.documentElement.lang === 'en' ? 'en-MY' : 'ms-MY', { day: 'numeric', month: 'short' });
+
+    return form.value.to ? `${format(form.value.from)} – ${format(form.value.to)}` : format(form.value.from);
+});
 </script>
 
 <template>
+    <form v-if="confirm" :action="confirm.url" method="POST" class="mb-6 flex flex-col gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-4 sm:flex-row sm:items-center sm:justify-between">
+        <input type="hidden" name="_token" :value="csrf">
+        <p class="text-sm">{{ confirm.ago ? $t('availability.confirmed_ago', { ago: confirm.ago }) : $t('availability.never_confirmed') }}</p>
+        <button type="submit" class="shrink-0 rounded-full bg-brand-600 px-5 py-2 text-sm font-semibold text-white transition hover:bg-brand-700">{{ $t('availability.confirm_calendar') }}</button>
+    </form>
+
     <div class="grid gap-8 lg:grid-cols-2">
         <section class="flex flex-col gap-4">
-            <form :action="storeUrl" method="POST" class="flex flex-col gap-4 rounded-2xl border border-line bg-surface-raised p-6">
+            <form id="close-dates" :action="storeUrl" method="POST" class="flex flex-col gap-4 rounded-2xl border border-line bg-surface-raised p-6">
                 <input type="hidden" name="_token" :value="csrf">
                 <h2 class="font-semibold">{{ $t('availability.tutup_tarikh') }}</h2>
 
@@ -75,6 +106,14 @@ const pick = (iso) => {
                 </div>
 
                 <UiField v-model="form.reason" :label="$t('availability.sebab_pilihan')" name="reason" :placeholder="$t('availability.cuti_majlis_luar_platform_dll')" :error="errors.reason" />
+
+                <label v-if="capacity > 1" class="flex flex-col gap-1.5">
+                    <span class="text-sm font-medium">{{ $t('availability.how_much') }}</span>
+                    <select v-model="form.slots" name="slots" class="nk-select rounded-xl border border-line bg-surface px-4 py-2.5 pr-10 text-sm focus:border-brand-400 focus:outline-none">
+                        <option value="">{{ $t('availability.whole_day') }}</option>
+                        <option v-for="count in capacity - 1" :key="count" :value="count">{{ $t('availability.slots_taken', { count, capacity }) }}</option>
+                    </select>
+                </label>
 
                 <button type="submit" class="w-fit rounded-full bg-brand-600 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700">{{ $t('availability.tutup_tarikh_2') }}</button>
             </form>
@@ -86,7 +125,9 @@ const pick = (iso) => {
                     <li v-for="date in closed" :key="date.id" class="flex flex-wrap items-center gap-x-3 gap-y-1 px-5 py-3 text-sm">
                         <span class="font-medium">{{ date.label }}</span>
                         <span class="truncate text-ink-muted">{{ date.reason }}</span>
-                        <form :action="date.destroy_url" method="POST" class="ml-auto">
+                        <span v-if="date.slots" class="rounded-full bg-surface-muted px-2 py-0.5 text-xs">{{ $t('availability.slots_taken', { count: date.slots, capacity }) }}</span>
+                        <span v-if="date.imported" class="ml-auto rounded-full bg-sky-50 px-2 py-0.5 text-xs text-sky-800">{{ $t('availability.from_google') }}</span>
+                        <form v-else-if="date.destroy_url" :action="date.destroy_url" method="POST" class="ml-auto">
                             <input type="hidden" name="_token" :value="csrf">
                             <input type="hidden" name="_method" value="DELETE">
                             <button type="submit" class="text-xs font-medium text-brand-600 hover:underline">{{ $t('availability.buka_semula') }}</button>
@@ -122,12 +163,18 @@ const pick = (iso) => {
                                 stateOf(cell.iso) === 'closed' ? 'bg-surface-muted text-ink-muted line-through' : '',
                                 stateOf(cell.iso) === 'past' ? 'text-ink-muted/40' : '',
                                 stateOf(cell.iso) === 'open' ? 'hover:bg-brand-50 hover:text-brand-700' : '',
-                                form.from === cell.iso ? 'ring-2 ring-brand-600' : '',
+                                form.from === cell.iso || inRange(cell.iso) ? 'ring-2 ring-brand-600' : '',
                             ]"
                             @click="pick(cell.iso)"
                         >{{ cell.day }}</button>
                     </template>
                 </div>
+
+                <div v-if="tapped" class="mt-4 flex items-center justify-between gap-3 rounded-xl bg-brand-50 px-4 py-3">
+                    <p class="text-sm font-medium">{{ pickedLabel }}</p>
+                    <button type="submit" form="close-dates" class="shrink-0 rounded-full bg-brand-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-700">{{ $t('availability.close_now') }}</button>
+                </div>
+                <p v-else class="mt-4 text-xs text-ink-muted">{{ $t('availability.tap_hint') }}</p>
 
                 <ul class="mt-4 flex flex-wrap gap-4 text-xs text-ink-muted">
                     <li class="flex items-center gap-1.5"><span class="size-3 rounded bg-emerald-100"></span>{{ $t('availability.ada_tempahan') }}</li>

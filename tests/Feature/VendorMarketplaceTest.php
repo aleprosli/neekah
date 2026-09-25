@@ -223,9 +223,9 @@ it('offers no booking form while booking through the platform is off', function 
 });
 
 it('brings the booking form back when booking is switched on', function () {
-    config(['neekah.bookings_enabled' => true]);
+    enableOnlineBooking();
 
-    $vendor = Vendor::factory()->for($this->photography)->create();
+    $vendor = Vendor::factory()->for($this->photography)->takingOnlineBookings()->create();
     Package::factory()->for($vendor)->create();
 
     $this->get(route('vendors.show', $vendor))->assertOk()->assertSee('Log masuk untuk tempah');

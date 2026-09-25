@@ -182,6 +182,12 @@ return [
     */
 
     'custom' => [
+        'pax_needs_fixed_deposit' => 'Your price is per pax, so the deposit must be a fixed amount (RM).',
+        'online_booking_closed' => 'This vendor is not taking online bookings right now.',
+        'date_weekday_off' => 'The vendor does not take bookings on this day of the week.',
+        'date_too_soon' => 'This date is too soon to book online.',
+        'date_too_far' => 'This date is not open for booking yet.',
+        'date_past' => 'This date has passed.',
         'herepay_keys_missing' => 'Herepay cannot be switched on yet. Fill these in .env first: :keys.',
         'file_too_large' => 'That file is too large. This server accepts :sizeMB per upload.',
 

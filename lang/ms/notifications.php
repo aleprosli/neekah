@@ -41,6 +41,11 @@ return [
     ],
 
     'booking_cancelled' => [
+        'note_prefix' => 'Dibatalkan:',
+        'system' => 'Sistem Neekah',
+        'expired_intro' => 'Tempahan :reference dibatalkan kerana deposit tidak dibayar dalam masa yang ditetapkan.',
+        'expired_body' => 'Deposit untuk :package tidak dibayar; tarikh telah dibuka semula.',
+        'vendor_refunds' => 'Deposit yang sudah dibayar akan dipulangkan oleh vendor terus kepada anda, mengikut terma vendor.',
         'title' => 'Booking :reference dibatalkan',
         'body' => ':name membatalkan tempahan :package.',
         'subject' => 'Booking :reference dibatalkan',
@@ -174,4 +179,33 @@ return [
         'action' => 'Sambung Pro',
     ],
 
+    'booking_held' => [
+        'title' => 'Tempahan :reference menunggu deposit',
+        'subject' => 'Bayar deposit untuk :vendor',
+        'intro' => 'Tarikh anda dengan :vendor sedang dipegang.',
+        'body' => 'Bayar deposit :deposit sebelum :deadline, atau tarikh akan dilepaskan.',
+        'pay_online' => 'Bayar melalui halaman tempahan anda (FPX). Wang terus ke akaun vendor.',
+        'pay_transfer' => 'Pindahkan deposit ke akaun bank vendor (butiran di halaman tempahan), kemudian rekod bayaran dengan resit.',
+    ],
+
+    'deposit_refund' => [
+        'title' => 'Deposit :reference perlu dipulangkan',
+        'subject' => 'Deposit perlu dipulangkan: :reference',
+        'body' => 'Deposit :amount untuk :vendor pada :date diterima selepas tempoh pegang tamat, dan tarikh itu sudah diambil. Vendor akan memulangkan deposit ini terus kepada pengantin.',
+    ],
+
+    'calendar_reminder' => [
+        'weekly_title' => 'Kalendar anda masih terkini?',
+        'weekly_body' => 'Ada tempahan luar minggu ini (WhatsApp, walk-in)? Tutup tarikhnya di Neekah supaya tiada pengantin menempah tarikh yang sama, kemudian sahkan kalendar.',
+        'pausing_title' => 'Tempahan online akan dijeda dalam 2 hari',
+        'pausing_body' => 'Kalendar anda belum disahkan. Sahkan sekarang supaya pengantin masih boleh menempah anda secara online.',
+        'paused_title' => 'Tempahan online dijeda',
+        'paused_body' => 'Kalendar anda tidak disahkan dalam tempoh yang ditetapkan, jadi borang tempahan disembunyikan. Semak kalendar dan sahkan untuk membukanya semula.',
+        'action' => 'Buka kalendar',
+    ],
+
+    'deposit_waiting' => [
+        'title' => 'Resit deposit :reference menunggu anda',
+        'body' => 'Pengantin telah merekod deposit :amount dua hari lalu. Semak akaun anda dan sahkan (atau tolak) supaya tempahan tidak tergantung.',
+    ],
 ];

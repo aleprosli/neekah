@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\UpdateContactSettingsRequest;
 use App\Http\Requests\UpdateHerepaySettingsRequest;
 use App\Http\Requests\UpdateImageSettingsRequest;
+use App\Http\Requests\UpdateOnlineBookingSettingsRequest;
 use App\Http\Requests\UpdatePaymentSettingsRequest;
 use App\Http\Requests\UpdateProSettingsRequest;
 use App\Http\Requests\UpdateSeoSettingsRequest;
@@ -18,6 +19,7 @@ use App\Support\Herepay\PaymentLinkGateway;
 use App\Support\HerepaySettings;
 use App\Support\ImageSettings;
 use App\Support\Locales;
+use App\Support\OnlineBookingSettings;
 use App\Support\PaymentSettings;
 use App\Support\ProSettings;
 use App\Support\Seo;
@@ -40,18 +42,18 @@ class SettingController extends Controller
     public const MENU = [
         'laman' => ['perhubungan', 'seo', 'gambar'],
         'sistem' => ['keselamatan', 'telegram'],
-        'wang' => ['pro', 'bayaran'],
+        'wang' => ['pro', 'tempahan', 'bayaran'],
     ];
 
     /** Every page, in menu order; the first is the default. */
-    public const SECTIONS = ['perhubungan', 'seo', 'gambar', 'keselamatan', 'telegram', 'pro', 'bayaran'];
+    public const SECTIONS = ['perhubungan', 'seo', 'gambar', 'keselamatan', 'telegram', 'pro', 'tempahan', 'bayaran'];
 
     /**
      * One page at a time, with the menu of the others. A page can hold more
      * than one form (Neekah Pro holds the plan and the gateway that takes its
      * payments); each form still posts on its own and comes back here.
      */
-    public function edit(ContactSettings $contact, SeoSettings $seo, TurnstileSettings $turnstile, TelegramSettings $telegram, ImageSettings $images, PaymentSettings $payments, ProSettings $pro, HerepaySettings $herepay, HerepayClient $herepayClient, string $section = self::SECTIONS[0]): View
+    public function edit(ContactSettings $contact, SeoSettings $seo, TurnstileSettings $turnstile, TelegramSettings $telegram, ImageSettings $images, PaymentSettings $payments, ProSettings $pro, HerepaySettings $herepay, HerepayClient $herepayClient, OnlineBookingSettings $onlineBooking, string $section = self::SECTIONS[0]): View
     {
         $pages = [
             'perhubungan' => [$this->contactSection($contact->all())],
@@ -60,6 +62,7 @@ class SettingController extends Controller
             'keselamatan' => [$this->turnstileSection($turnstile->all(), $turnstile->isEnabled())],
             'telegram' => [$this->telegramSection($telegram->all(), $telegram->isEnabled())],
             'pro' => [$this->proSection($pro, $herepayClient), $this->herepaySection($herepay, $herepayClient)],
+            'tempahan' => [$this->onlineBookingSection($onlineBooking)],
             'bayaran' => [$this->paymentSection($payments)],
         ];
 
@@ -292,6 +295,39 @@ class SettingController extends Controller
     }
 
     /**
+     * Online booking for Neekah Pro vendors, site-wide. Deposits go to each
+     * vendor's own account, so there is no money setting here: only whether it
+     * is open, how long an unpaid booking holds its date, and how recently a
+     * vendor must have confirmed their calendar.
+     *
+     * @return array<string, mixed>
+     */
+    private function onlineBookingSection(OnlineBookingSettings $settings): array
+    {
+        $values = $settings->all();
+
+        return [
+            'id' => 'tempahan',
+            'icon' => '📅',
+            'label' => __('props.admin.online_booking_label'),
+            'title' => __('props.admin.online_booking_title'),
+            'description' => __('props.admin.online_booking_description'),
+            'action' => route('admin.settings.online-booking'),
+            'submit' => __('props.admin.online_booking_submit'),
+            'columns' => true,
+            'badge' => [
+                'active' => $settings->isEnabled(),
+                'label' => $settings->isEnabled() ? __('props.copy.active') : __('props.copy.inactive'),
+            ],
+            'fields' => [
+                ['name' => 'enabled', 'label' => __('props.admin.online_booking_enabled'), 'type' => 'checkbox', 'value' => $values['enabled'], 'help' => __('props.admin.online_booking_enabled_help')],
+                ['name' => 'hold_hours', 'label' => Str::ucfirst(__('fields.tempoh_pegang')), 'type' => 'number', 'value' => $values['hold_hours'], 'min' => 1, 'max' => 72, 'required' => true, 'help' => __('props.admin.online_booking_hold_help')],
+                ['name' => 'calendar_fresh_days', 'label' => Str::ucfirst(__('fields.tempoh_sah_kalendar')), 'type' => 'number', 'value' => $values['calendar_fresh_days'], 'min' => 1, 'max' => 60, 'required' => true, 'help' => __('props.admin.online_booking_fresh_help')],
+            ],
+        ];
+    }
+
+    /**
      * The payment gateway behind Neekah Pro. Only the on/off switch is kept
      * here; the keys stay in .env, and the note shows which are in place so an
      * admin knows what is still missing before switching it on.
@@ -441,6 +477,13 @@ class SettingController extends Controller
         $herepay->save($request->settings());
 
         return $this->saved(__('flash.admin.herepay_saved'));
+    }
+
+    public function updateOnlineBooking(UpdateOnlineBookingSettingsRequest $request, OnlineBookingSettings $settings): RedirectResponse
+    {
+        $settings->save($request->settings());
+
+        return $this->saved(__('flash.admin.online_booking_saved'));
     }
 
     public function update(UpdateImageSettingsRequest $request, ImageSettings $images): RedirectResponse

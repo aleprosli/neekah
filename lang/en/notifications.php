@@ -41,6 +41,11 @@ return [
     ],
 
     'booking_cancelled' => [
+        'note_prefix' => 'Cancelled:',
+        'system' => 'Neekah',
+        'expired_intro' => 'Booking :reference was cancelled because the deposit was not paid in time.',
+        'expired_body' => 'The deposit for :package was not paid; the date has been reopened.',
+        'vendor_refunds' => 'The vendor will refund the deposit already paid directly to you, under their terms.',
         'title' => 'Booking :reference cancelled',
         'body' => ':name cancelled the :package booking.',
         'subject' => 'Booking :reference cancelled',
@@ -174,4 +179,33 @@ return [
         'action' => 'Renew Pro',
     ],
 
+    'booking_held' => [
+        'title' => 'Booking :reference is waiting for its deposit',
+        'subject' => 'Pay the deposit for :vendor',
+        'intro' => 'Your date with :vendor is on hold.',
+        'body' => 'Pay the :deposit deposit before :deadline, or the date is released.',
+        'pay_online' => 'Pay from your booking page (FPX). The money goes straight to the vendor.',
+        'pay_transfer' => 'Transfer the deposit to the vendor\'s bank account (details on your booking page), then record the payment with the receipt.',
+    ],
+
+    'deposit_refund' => [
+        'title' => 'Deposit for :reference needs a refund',
+        'subject' => 'Deposit needs a refund: :reference',
+        'body' => 'The :amount deposit for :vendor on :date arrived after the hold ran out, and the date has been taken. The vendor will refund it directly to the couple.',
+    ],
+
+    'calendar_reminder' => [
+        'weekly_title' => 'Is your calendar still up to date?',
+        'weekly_body' => 'Any outside bookings this week (WhatsApp, walk-in)? Close those dates on Neekah so no couple books the same day, then confirm your calendar.',
+        'pausing_title' => 'Online booking pauses in 2 days',
+        'pausing_body' => 'Your calendar has not been confirmed. Confirm it now so couples can keep booking you online.',
+        'paused_title' => 'Online booking is paused',
+        'paused_body' => 'Your calendar was not confirmed in time, so the booking form is hidden. Check your calendar and confirm it to reopen.',
+        'action' => 'Open calendar',
+    ],
+
+    'deposit_waiting' => [
+        'title' => 'Deposit receipt :reference is waiting for you',
+        'body' => 'The couple recorded a :amount deposit two days ago. Check your account and confirm (or reject) it so the booking is not left hanging.',
+    ],
 ];

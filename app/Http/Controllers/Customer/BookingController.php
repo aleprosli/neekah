@@ -3,6 +3,9 @@
 namespace App\Http\Controllers\Customer;
 
 use App\Actions\CreateBooking;
+use App\Actions\StartDepositPayment;
+use App\Enums\BookingStatus;
+use App\Enums\DepositChannel;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreBookingRequest;
 use App\Models\Booking;
@@ -11,11 +14,13 @@ use App\Models\Payment;
 use App\Models\Vendor;
 use App\Support\ImageSettings;
 use App\Support\PaymentSettings;
+use App\Support\VendorAvailability;
 use App\Support\VueProps;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use RuntimeException;
 
 class BookingController extends Controller
 {
@@ -53,14 +58,18 @@ class BookingController extends Controller
         ]);
     }
 
-    public function store(StoreBookingRequest $request, Vendor $vendor, CreateBooking $createBooking): RedirectResponse
+    /**
+     * Book a date online. Only a vendor taking online bookings answers here
+     * (VendorAvailability); every other vendor page offers WhatsApp and an
+     * enquiry instead, and this endpoint is a 404 for them.
+     *
+     * The booking holds the date first, then the couple is sent to pay the
+     * deposit on the vendor's Herepay account, or shown the vendor's bank
+     * details to transfer it.
+     */
+    public function store(StoreBookingRequest $request, Vendor $vendor, CreateBooking $createBooking, StartDepositPayment $startDeposit): RedirectResponse
     {
-        // Booking through Neekah is switched off while the platform is a
-        // network: the vendor profile offers WhatsApp and an enquiry instead,
-        // and this endpoint answers 404 rather than quietly accepting a post
-        // nothing on the site links to. Vendors still record their own.
-        abort_unless(config('neekah.bookings_enabled'), 404);
-        abort_unless($vendor->isApproved(), 404);
+        abort_unless(VendorAvailability::for($vendor)->acceptsOnlineBookings(), 404);
 
         $package = Package::findOrFail($request->integer('package_id'));
 
@@ -70,11 +79,58 @@ class BookingController extends Controller
                 ? $request->integer('wedding_id')
                 : $request->user()->weddings()->latest('event_date')->value('weddings.id'),
             'notes' => $request->string('notes')->toString() ?: null,
-        ]);
+        ], online: true);
+
+        if ($booking->payment_mode === DepositChannel::Herepay) {
+            try {
+                return redirect()->away($startDeposit->handle($booking, $request->user()));
+            } catch (RuntimeException $exception) {
+                report($exception);
+
+                return redirect()->route('bookings.show', $booking)
+                    ->withErrors(['deposit' => __('flash.couple.deposit_link_failed')]);
+            }
+        }
 
         return redirect()
             ->route('bookings.show', $booking)
-            ->with('status', __('flash.couple.booking_created', ['reference' => $booking->reference]));
+            ->with('status', __('flash.couple.booking_held', ['reference' => $booking->reference]));
+    }
+
+    /** Pay the deposit again while the hold lasts: an open link is reused. */
+    public function payDeposit(Request $request, Booking $booking, StartDepositPayment $startDeposit): RedirectResponse
+    {
+        Gate::authorize('recordPayment', $booking);
+
+        try {
+            return redirect()->away($startDeposit->handle($booking, $request->user()));
+        } catch (RuntimeException $exception) {
+            report($exception);
+
+            return redirect()->route('bookings.show', $booking)
+                ->withErrors(['deposit' => __('flash.couple.deposit_link_failed')]);
+        }
+    }
+
+    /**
+     * Where Herepay sends the couple back. What it shows comes from our own
+     * records, never from Herepay's query string: the callback, not this
+     * visit, is what confirms a booking.
+     */
+    public function paymentDone(Request $request, Booking $booking): View
+    {
+        Gate::authorize('view', $booking);
+
+        $booking->load(['vendor', 'payments']);
+
+        return view('customer.bookings.payment-done', [
+            'booking' => $booking,
+            'state' => match (true) {
+                $booking->status === BookingStatus::Confirmed => 'confirmed',
+                $booking->isHeld() => 'waiting',
+                default => 'lapsed',
+            },
+        ]);
     }
 
     public function show(Request $request, Booking $booking, PaymentSettings $paymentSettings, ImageSettings $images): View|RedirectResponse
@@ -89,6 +145,7 @@ class BookingController extends Controller
 
         return view('customer.bookings.show', [
             'booking' => $booking,
+            'deposit' => $this->deposit($booking),
             'props' => VueProps::for([
                 'booking' => [
                     'reference' => $booking->reference,
@@ -114,16 +171,9 @@ class BookingController extends Controller
                 'reviewForm' => $booking->review || ! $booking->canBeReviewed() ? null : [
                     'action' => route('bookings.review.store', $booking),
                     'comment' => old('comment', ''),
-                    'fields' => collect([
-                        'rating' => 'Keseluruhan',
-                        'quality' => 'Kualiti',
-                        'service' => 'Servis',
-                        'communication' => 'Komunikasi',
-                        'value' => 'Nilai',
-                        'punctuality' => 'Ketepatan masa',
-                    ])->map(fn (string $label, string $name): array => [
+                    'fields' => collect(['rating', 'quality', 'service', 'communication', 'value', 'punctuality'])->map(fn (string $name): array => [
                         'name' => $name,
-                        'label' => $label,
+                        'label' => __('ui.booking.review_'.$name),
                         'value' => (int) old($name, 5),
                     ])->values(),
                 ],
@@ -141,11 +191,11 @@ class BookingController extends Controller
         $firstVerified = $booking->payments->first(fn (Payment $payment): bool => $payment->isPaid());
 
         $steps = [
-            ['Booking dibuat', true, $booking->created_at],
+            [__('ui.booking.booking_dibuat'), true, $booking->created_at],
             [__('ui.booking.bayaran_direkod'), $booking->payments->isNotEmpty(), $booking->payments->first()?->created_at],
             [__('ui.booking.bayaran_disahkan_vendor'), $firstVerified !== null, $firstVerified?->verified_at],
             [__('ui.booking.majlis_selesai'), $booking->completed_at !== null, $booking->completed_at],
-            ['Review diberi', $booking->review !== null, $booking->review?->created_at],
+            [__('ui.booking.review_diberi'), $booking->review !== null, $booking->review?->created_at],
         ];
 
         return collect($steps)
@@ -200,16 +250,43 @@ class BookingController extends Controller
 
         return [
             'action' => route('bookings.payments.store', $booking),
-            'instructions' => $settings->instructions(),
-            'imageHint' => $images->uploadHint('gambar resit penuh'),
+            // An online booking is paid into the vendor's own account, so it
+            // shows the vendor's bank details rather than Neekah's wording.
+            'instructions' => $booking->isOnline() && $booking->vendor->bookingSettingsOrDefault()->hasManualInstructions()
+                ? $booking->vendor->bookingSettingsOrDefault()->manual_instructions
+                : $settings->instructions(),
+            'imageHint' => $images->uploadHint(__('ui.booking.gambar_resit_penuh')),
             'today' => now()->toDateString(),
             'outstanding' => round($booking->outstandingAmount() - $awaiting, 2),
             'outstandingLabel' => 'RM'.number_format(max($booking->outstandingAmount() - $awaiting, 0), 2),
             'old' => [
-                'amount' => old('amount', ''),
+                'amount' => old('amount', $booking->isHeld() && $booking->payments->isEmpty() ? (string) $booking->deposit_amount : ''),
                 'paid_on' => old('paid_on', now()->toDateString()),
                 'note' => old('note', ''),
             ],
+        ];
+    }
+
+    /**
+     * An online booking still waiting for its deposit: how much, by when, and
+     * the pay button for a Herepay deposit.
+     *
+     * @return array<string, mixed>|null
+     */
+    private function deposit(Booking $booking): ?array
+    {
+        if (! $booking->isOnline() || $booking->status !== BookingStatus::PendingPayment) {
+            return null;
+        }
+
+        return [
+            'amount' => 'RM'.number_format((float) $booking->deposit_amount, 2),
+            'balance' => 'RM'.number_format(max(0, (float) $booking->total_amount - (float) $booking->deposit_amount), 2),
+            'deadline' => $booking->hold_expires_at?->translatedFormat('l, j M Y, g:i A'),
+            'held' => $booking->isHeld(),
+            'online' => $booking->payment_mode === DepositChannel::Herepay,
+            'waiting' => $booking->payments->contains(fn (Payment $payment): bool => $payment->isAwaitingVerification()),
+            'pay_url' => $booking->payment_mode === DepositChannel::Herepay && $booking->isHeld() ? route('bookings.deposit.pay', $booking) : null,
         ];
     }
 }

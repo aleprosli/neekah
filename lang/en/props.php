@@ -115,6 +115,14 @@ return [
     ],
 
     'admin' => [
+        'online_booking_label' => 'Online booking',
+        'online_booking_title' => 'Online booking (couple → Pro vendor)',
+        'online_booking_description' => 'Neekah Pro vendors can take date bookings with the deposit paid straight into their own account (their Herepay or a bank transfer). Neekah never holds this money.',
+        'online_booking_submit' => 'Save online booking settings',
+        'online_booking_enabled' => 'Open online booking',
+        'online_booking_enabled_help' => 'The main switch. When off, every booking form is hidden and vendor pages go back to WhatsApp.',
+        'online_booking_hold_help' => 'How long a date is held for its deposit before it is released automatically.',
+        'online_booking_fresh_help' => 'Vendors must confirm their calendar within this many days, or their online booking pauses.',
         'herepay_label' => 'Herepay',
         'herepay_title' => 'Take Pro payments through Herepay',
         'herepay_description' => 'Neekah\'s own Herepay account. Vendors pay Neekah for Pro (monthly or yearly) through this gateway: they are sent to the Herepay payment page (FPX) and brought back to Neekah after paying.',

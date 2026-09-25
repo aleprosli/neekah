@@ -12,6 +12,7 @@ use App\Support\ContentVersion;
 use App\Support\PhoneNumber;
 use App\Support\SocialLinks;
 use App\Support\States;
+use App\Support\VendorAvailability;
 use App\Support\VendorFeatureSettings;
 use Database\Factories\VendorFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -22,6 +23,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
@@ -163,6 +165,20 @@ class Vendor extends Model
     public function portfolioItems(): HasMany
     {
         return $this->hasMany(PortfolioItem::class)->orderBy('sort_order');
+    }
+
+    public function bookingSettings(): HasOne
+    {
+        return $this->hasOne(VendorBookingSetting::class);
+    }
+
+    /**
+     * The saved settings, or an unsaved row with the defaults, so a vendor who
+     * never opened the page reads the same as one who kept every default.
+     */
+    public function bookingSettingsOrDefault(): VendorBookingSetting
+    {
+        return $this->bookingSettings ?? $this->bookingSettings()->make();
     }
 
     public function unavailableDates(): HasMany
@@ -536,19 +552,11 @@ class Vendor extends Model
     }
 
     /**
-     * Whether the vendor can take a booking on the given date.
+     * Whether there is room for one more booking that day. The rules live in
+     * VendorAvailability, together with the online-only ones.
      */
     public function isAvailableOn(\DateTimeInterface|string $date): bool
     {
-        $date = Carbon::parse($date)->toDateString();
-
-        if ($this->unavailableDates()->whereDate('date', $date)->exists()) {
-            return false;
-        }
-
-        return ! $this->bookings()
-            ->whereDate('event_date', $date)
-            ->whereIn('status', [BookingStatus::PendingPayment, BookingStatus::Confirmed])
-            ->exists();
+        return VendorAvailability::for($this)->hasCapacityOn(Carbon::parse($date));
     }
 }

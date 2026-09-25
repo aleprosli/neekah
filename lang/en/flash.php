@@ -21,6 +21,7 @@ return [
     ],
 
     'admin' => [
+        'online_booking_saved' => 'Online booking settings saved.',
         'category_added' => 'Category added.',
         'category_updated' => 'Category updated.',
         'contact_saved' => 'Contact details saved.',
@@ -67,6 +68,8 @@ return [
     ],
 
     'couple' => [
+        'deposit_link_failed' => 'The payment link could not be created right now. Your date is still on hold; try paying again in a moment.',
+        'booking_held' => 'Date held for booking :reference. Pay the deposit to confirm it.',
         'nfc_card_not_ready' => 'This card is not linked to an invitation yet.',
         'wedding_created' => 'Your wedding project is ready, with a checklist and a suggested budget. Next: create your digital wedding card.',
         'wedding_updated' => 'The wedding details have been updated.',
@@ -112,6 +115,13 @@ return [
     ],
 
     'vendor' => [
+        'booking_cancelled' => 'Booking :reference cancelled. The couple has been told.',
+        'payment_refunded' => ':amount recorded as refunded.',
+        'booking_settings_saved' => 'Booking rules saved.',
+        'herepay_connected' => 'Herepay connected. Deposits will go straight to your account.',
+        'herepay_test_failed' => 'Herepay did not accept these keys. Check the Secret Key and the environment (UAT/Production).',
+        'herepay_disconnected' => 'Herepay disconnected.',
+        'calendar_confirmed' => 'Thanks. Your calendar is confirmed up to date.',
         'photos_uploaded' => ':count photos uploaded.',
         'profile_updated' => 'Profile updated.',
         'package_added' => 'Package added.',

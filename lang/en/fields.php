@@ -138,4 +138,17 @@ return [
     'pro_yearly_price' => 'yearly price (RM)',
     'pro_sponsored_slots' => 'number of sponsored slots',
 
+    'terma_deposit' => 'deposit terms',
+    'jenis_deposit' => 'deposit type',
+    'nilai_deposit' => 'deposit value',
+    'had_sehari' => 'bookings per day',
+    'hari_dibuka' => 'open days',
+    'tempoh_minimum' => 'minimum lead time',
+    'tempoh_maksimum' => 'maximum lead time',
+    'butiran_bank' => 'bank details',
+    'herepay_secret_key' => 'Herepay Secret Key',
+    'herepay_private_key' => 'Herepay Private Key',
+    'slot_ditempah' => 'places taken',
+    'tempoh_pegang' => 'hold time (hours)',
+    'tempoh_sah_kalendar' => 'calendar valid for (days)',
 ];

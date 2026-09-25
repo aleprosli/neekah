@@ -227,16 +227,19 @@
                 </section>
             </div>
 
-            {{-- What the couple does next. Booking through Neekah is off while
-                 the platform is a network: they deal with the vendor themselves,
-                 so this offers WhatsApp and an enquiry. Switching
-                 config('neekah.bookings_enabled') on brings the booking form back
-                 for when booking is automated. --}}
+            {{-- What the couple does next. A Neekah Pro vendor taking online
+                 bookings gets the booking form: pick an open date, pay the
+                 deposit straight to the vendor. Everyone else gets WhatsApp
+                 and an enquiry. $onlineBooking comes from VendorAvailability
+                 on every request and is never cached with the page. --}}
             <aside id="hubungi" class="min-w-0 lg:sticky lg:top-28 lg:self-start">
-                @if (config('neekah.bookings_enabled'))
+                @if ($onlineBooking)
                     <form method="POST" action="{{ route('vendors.bookings.store', $vendor) }}" class="flex flex-col gap-4 rounded-2xl border border-line bg-surface-raised p-6 shadow-xl shadow-brand-900/10">
                         @csrf
-                        <p class="text-sm text-ink-muted">{{ __('pages.profile.dari') }}<span class="font-display text-2xl font-semibold text-ink">RM{{ number_format($vendor->price_from) }}</span> / {{ $vendor->price_unit->label() }}</p>
+                        <div class="flex items-center justify-between gap-2">
+                            <p class="text-sm text-ink-muted">{{ __('pages.profile.dari') }}<span class="font-display text-2xl font-semibold text-ink">RM{{ number_format($vendor->price_from) }}</span> / {{ $vendor->price_unit->label() }}</p>
+                            <span class="shrink-0 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-800">{{ __('pages.online_booking.badge') }}</span>
+                        </div>
 
                         @if ($errors->any())
                             <ul class="flex flex-col gap-1 rounded-xl bg-brand-50 p-3 text-xs text-brand-800">
@@ -246,30 +249,54 @@
                             </ul>
                         @endif
 
-                        <div class="overflow-hidden rounded-xl border border-line">
-                            <label class="flex flex-col gap-0.5 border-b border-line px-4 py-2.5 focus-within:bg-surface-muted">
-                                <span class="text-[10px] font-semibold tracking-wide uppercase">{{ __('pages.profile.tarikh_majlis') }}</span>
-                                <input type="date" name="event_date" value="{{ old('event_date', $defaultEventDate ?? '') }}" min="{{ now()->addDay()->toDateString() }}" required class="bg-transparent text-sm focus:outline-none">
-                            </label>
-                            <label class="flex flex-col gap-0.5 border-b border-line px-4 py-2.5 focus-within:bg-surface-muted">
-                                <span class="text-[10px] font-semibold tracking-wide uppercase">{{ __('pages.profile.pakej') }}</span>
-                                <select name="package_id" class="nk-select w-full bg-transparent pr-6 text-sm focus:outline-none" required>
-                                    @foreach ($vendor->packages as $package)
-                                        <option value="{{ $package->id }}" @selected((int) old('package_id') === $package->id)>{{ $package->name }} · RM{{ number_format($package->price) }}</option>
-                                    @endforeach
-                                </select>
-                            </label>
-                            <label class="flex flex-col gap-0.5 px-4 py-2.5 focus-within:bg-surface-muted">
-                                <span class="text-[10px] font-semibold tracking-wide uppercase">{{ __('pages.profile.nota_untuk_vendor') }}</span>
-                                <input type="text" name="notes" value="{{ old('notes') }}" :placeholder="__('pages.profile.contoh_majlis_di_dewan_500')" class="bg-transparent text-sm focus:outline-none">
-                            </label>
+                        <div class="flex flex-col gap-2">
+                            <span class="text-[10px] font-semibold tracking-wide uppercase">{{ __('pages.profile.tarikh_majlis') }}</span>
+                            {{-- resources/js/components/vendor/VendorDatePicker.vue. Without
+                                 JavaScript: a plain date field and the next open days. --}}
+                            <div data-vue="vendor-date-picker" data-props="@vueProps(['availabilityUrl' => $onlineBooking['availabilityUrl'], 'value' => old('event_date', ''), 'today' => today()->toDateString()])">
+                                <input type="date" name="event_date" value="{{ old('event_date', $defaultEventDate ?? '') }}" min="{{ now()->addDay()->toDateString() }}" required class="w-full rounded-xl border border-line bg-surface px-4 py-2.5 text-sm focus:border-brand-400 focus:outline-none">
+                                @if ($onlineBooking['nextOpen'] !== [])
+                                    <p class="mt-2 text-xs text-ink-muted">{{ __('pages.online_booking.next_open', ['dates' => collect($onlineBooking['nextOpen'])->map(fn ($day) => $day->translatedFormat('j M'))->join(', ')]) }}</p>
+                                @endif
+                            </div>
                         </div>
+
+                        <label class="flex flex-col gap-1.5">
+                            <span class="text-[10px] font-semibold tracking-wide uppercase">{{ __('pages.profile.pakej') }}</span>
+                            <select name="package_id" class="nk-select w-full rounded-xl border border-line bg-surface px-4 py-2.5 pr-10 text-sm focus:border-brand-400 focus:outline-none" required>
+                                @foreach ($onlineBooking['packages'] as $package)
+                                    <option value="{{ $package['id'] }}" @selected((int) old('package_id') === $package['id'])>{{ $package['name'] }} · RM{{ number_format($package['price']) }} · {{ __('pages.online_booking.deposit_short', ['amount' => 'RM'.number_format($package['deposit'], 2)]) }}</option>
+                                @endforeach
+                            </select>
+                        </label>
+
+                        <label class="flex flex-col gap-1.5">
+                            <span class="text-[10px] font-semibold tracking-wide uppercase">{{ __('pages.profile.nota_untuk_vendor') }}</span>
+                            <input type="text" name="notes" value="{{ old('notes') }}" placeholder="{{ __('pages.profile.contoh_majlis_di_dewan_500') }}" class="rounded-xl border border-line bg-surface px-4 py-2.5 text-sm focus:border-brand-400 focus:outline-none">
+                        </label>
+
+                        @if ($onlineBooking['terms'])
+                            <details class="rounded-xl border border-line px-4 py-3 text-sm">
+                                <summary class="cursor-pointer font-medium">{{ __('pages.online_booking.terms_title') }}</summary>
+                                <p class="mt-2 whitespace-pre-line text-ink-muted">{{ $onlineBooking['terms'] }}</p>
+                            </details>
+                            <label class="flex items-start gap-2 text-sm">
+                                <input type="checkbox" name="terms" value="1" required class="mt-1 accent-brand-600" @checked(old('terms'))>
+                                <span>{{ __('pages.online_booking.terms_agree') }}</span>
+                            </label>
+                        @endif
 
                         <x-turnstile />
 
-                        <button type="submit" class="rounded-full bg-brand-600 py-3.5 text-sm font-semibold text-white transition hover:bg-brand-700 disabled:opacity-50" @disabled($vendor->packages->isEmpty())>
-                            {{ auth()->check() ? __('pages.profile.book_now') : __('pages.profile.login_to_book') }}
+                        <button type="submit" class="rounded-full bg-brand-600 py-3.5 text-sm font-semibold text-white transition hover:bg-brand-700">
+                            @auth
+                                {{ $onlineBooking['channel'] === App\Enums\DepositChannel::Herepay ? __('pages.online_booking.book_and_pay') : __('pages.online_booking.book_date') }}
+                            @else
+                                {{ __('pages.profile.login_to_book') }}
+                            @endauth
                         </button>
+
+                        <p class="text-center text-xs text-ink-muted">{{ __('pages.online_booking.money_note') }}</p>
 
                         @auth
                             {{-- The vendor's own number is only ever rendered for a signed-in
@@ -290,8 +317,6 @@
                                 <p class="text-center text-sm text-ink-muted">{{ __('pages.profile.nombor_vendor_hanya_dipaparkan_kepada') }}</p>
                             @endif
                         @endauth
-
-                        <p class="text-center text-sm text-ink-muted">{{ __('pages.profile.anda_tidak_dicaj_di_sini') }}</p>
                     </form>
                 @else
                     <div class="flex flex-col gap-4 rounded-2xl border border-line bg-surface-raised p-6 shadow-xl shadow-brand-900/10">
@@ -365,7 +390,7 @@
                 <p><span class="font-semibold">RM{{ number_format($vendor->price_from) }}</span> <span class="text-ink-muted">/ {{ $vendor->price_unit->label() }}</span></p>
                 <p class="text-xs"><span class="text-gold-500">★</span> {{ $vendor->reviews_count ? number_format($vendor->rating_avg, 1) : 'Baru' }} <span class="text-ink-muted">· {{ $publishedReviewsCount }} review</span></p>
             </div>
-            <a href="#hubungi" class="rounded-full bg-brand-600 px-6 py-3 text-sm font-semibold text-white">{{ __('pages.profile.hubungi_vendor') }}</a>
+            <a href="#hubungi" class="rounded-full bg-brand-600 px-6 py-3 text-sm font-semibold text-white">{{ $onlineBooking ? __('pages.online_booking.book_date') : __('pages.profile.hubungi_vendor') }}</a>
         </div>
     </div>
 

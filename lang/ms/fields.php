@@ -138,4 +138,17 @@ return [
     'pro_yearly_price' => 'harga tahunan (RM)',
     'pro_sponsored_slots' => 'bilangan slot Ditaja',
 
+    'terma_deposit' => 'terma deposit',
+    'jenis_deposit' => 'jenis deposit',
+    'nilai_deposit' => 'nilai deposit',
+    'had_sehari' => 'had tempahan sehari',
+    'hari_dibuka' => 'hari dibuka',
+    'tempoh_minimum' => 'tempoh minimum',
+    'tempoh_maksimum' => 'tempoh maksimum',
+    'butiran_bank' => 'butiran bank',
+    'herepay_secret_key' => 'Secret Key Herepay',
+    'herepay_private_key' => 'Private Key Herepay',
+    'slot_ditempah' => 'slot ditempah',
+    'tempoh_pegang' => 'tempoh pegang (jam)',
+    'tempoh_sah_kalendar' => 'tempoh sah kalendar (hari)',
 ];

@@ -21,6 +21,7 @@ return [
     ],
 
     'admin' => [
+        'online_booking_saved' => 'Tetapan tempahan online disimpan.',
         'category_added' => 'Kategori ditambah.',
         'category_updated' => 'Kategori dikemas kini.',
         'contact_saved' => 'Maklumat perhubungan disimpan.',
@@ -67,6 +68,8 @@ return [
     ],
 
     'couple' => [
+        'deposit_link_failed' => 'Pautan bayaran tidak dapat dibuat sekarang. Tarikh anda masih dipegang; cuba bayar semula sebentar lagi.',
+        'booking_held' => 'Tarikh dipegang untuk tempahan :reference. Bayar deposit untuk mengesahkannya.',
         'nfc_card_not_ready' => 'Kad ini belum dihubungkan dengan mana-mana jemputan.',
         'wedding_created' => 'Wedding project dicipta, lengkap dengan checklist dan cadangan bajet. Langkah seterusnya: cipta kad kahwin digital anda.',
         'wedding_updated' => 'Maklumat majlis dikemas kini.',
@@ -112,6 +115,13 @@ return [
     ],
 
     'vendor' => [
+        'booking_cancelled' => 'Tempahan :reference dibatalkan. Pengantin telah dimaklumkan.',
+        'payment_refunded' => ':amount direkodkan sebagai sudah dipulangkan.',
+        'booking_settings_saved' => 'Peraturan tempahan disimpan.',
+        'herepay_connected' => 'Herepay disambung. Deposit akan terus ke akaun anda.',
+        'herepay_test_failed' => 'Herepay tidak menerima kunci ini. Semak Secret Key dan persekitaran (UAT/Production).',
+        'herepay_disconnected' => 'Herepay diputuskan.',
+        'calendar_confirmed' => 'Terima kasih. Kalendar disahkan terkini.',
         'photos_uploaded' => ':count gambar dimuat naik.',
         'profile_updated' => 'Profil dikemas kini.',
         'package_added' => 'Pakej ditambah.',

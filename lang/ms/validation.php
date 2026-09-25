@@ -182,6 +182,12 @@ return [
     */
 
     'custom' => [
+        'pax_needs_fixed_deposit' => 'Harga anda dikira setiap pax, jadi deposit mesti jumlah tetap (RM).',
+        'online_booking_closed' => 'Vendor ini tidak menerima tempahan online sekarang.',
+        'date_weekday_off' => 'Vendor tidak menerima tempahan pada hari ini dalam minggu.',
+        'date_too_soon' => 'Tarikh ini terlalu dekat untuk ditempah online.',
+        'date_too_far' => 'Tarikh ini belum dibuka untuk tempahan.',
+        'date_past' => 'Tarikh ini sudah lepas.',
         'herepay_keys_missing' => 'Herepay tidak boleh dihidupkan lagi. Isi dahulu dalam .env: :keys.',
         'file_too_large' => 'Fail terlalu besar. Had server ini ialah :sizeMB setiap muat naik.',
 

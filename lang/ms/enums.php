@@ -3,6 +3,7 @@
 return [
 
     'vendor_feature' => [
+        'online_booking' => 'Tempahan online',
         'packages' => 'Pakej',
         'portfolio' => 'Portfolio',
         'calendar' => 'Kalendar',
@@ -13,6 +14,7 @@ return [
     ],
 
     'vendor_feature_desc' => [
+        'online_booking' => 'Pengantin tempah tarikh dan bayar deposit terus di halaman vendor.',
         'packages' => 'Urus pakej dan harga yang dipaparkan di halaman awam.',
         'portfolio' => 'Muat naik dan susun gambar portfolio.',
         'calendar' => 'Tutup tarikh yang sudah penuh.',
@@ -215,4 +217,45 @@ return [
         'failed' => 'Gagal',
     ],
 
+    'booking_source' => [
+        'vendor' => 'Direkod vendor',
+        'online' => 'Tempahan online',
+    ],
+
+    'deposit_channel' => [
+        'herepay' => 'Herepay (FPX)',
+        'manual' => 'Pindahan bank',
+    ],
+
+    'cancellation_reason' => [
+        'couple' => 'Dibatalkan pengantin',
+        'vendor' => 'Dibatalkan vendor',
+        'expired' => 'Deposit tidak dibayar',
+    ],
+
+    'deposit_type' => [
+        'percent' => 'Peratus harga pakej',
+        'fixed' => 'Jumlah tetap (RM)',
+    ],
+
+    'day_status' => [
+        'open' => 'Kosong',
+        'full' => 'Penuh',
+        'closed' => 'Ditutup',
+        'weekday_off' => 'Tidak dibuka',
+        'too_soon' => 'Terlalu dekat',
+        'too_far' => 'Belum dibuka',
+        'past' => 'Sudah lepas',
+    ],
+
+    'online_booking_state' => [
+        'open' => 'Aktif: pengantin boleh tempah terus',
+        'globally_off' => 'Tempahan online belum dibuka oleh Neekah',
+        'not_approved' => 'Akaun belum diluluskan',
+        'feature_off' => 'Tempahan online untuk vendor Neekah Pro',
+        'switched_off' => 'Dimatikan oleh anda',
+        'no_packages' => 'Tiada pakej aktif',
+        'no_payment_path' => 'Tiada cara bayar deposit: sambung Herepay atau isi butiran bank',
+        'calendar_stale' => 'Dijeda: sahkan kalendar anda',
+    ],
 ];

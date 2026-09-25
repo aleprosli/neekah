@@ -115,6 +115,14 @@ return [
     ],
 
     'admin' => [
+        'online_booking_label' => 'Tempahan online',
+        'online_booking_title' => 'Tempahan online (pengantin → vendor Pro)',
+        'online_booking_description' => 'Vendor Neekah Pro boleh terima tempahan tarikh dengan deposit terus ke akaun mereka sendiri (Herepay vendor atau pindahan bank). Neekah tidak memegang wang ini.',
+        'online_booking_submit' => 'Simpan tetapan tempahan online',
+        'online_booking_enabled' => 'Buka tempahan online',
+        'online_booking_enabled_help' => 'Suis utama. Bila ditutup, semua borang tempahan disembunyikan dan halaman vendor kembali kepada WhatsApp.',
+        'online_booking_hold_help' => 'Berapa lama tarikh dipegang untuk deposit sebelum dilepaskan automatik.',
+        'online_booking_fresh_help' => 'Vendor mesti sahkan kalendar dalam tempoh ini, atau tempahan online mereka dijeda.',
         'herepay_label' => 'Herepay',
         'herepay_title' => 'Terima bayaran Pro melalui Herepay',
         'herepay_description' => 'Akaun Herepay milik Neekah. Vendor membayar langganan Pro (bulanan atau tahunan) kepada Neekah melalui gateway ini: mereka dihantar ke halaman bayaran Herepay (FPX) dan dibawa kembali ke Neekah selepas bayar.',

@@ -16,6 +16,7 @@ use App\Support\ProSettings;
 use App\Support\Seo;
 use App\Support\SeoSettings;
 use App\Support\States;
+use App\Support\VendorAvailability;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -333,7 +334,39 @@ class VendorController extends Controller
             'extraCategories' => $vendor->extraCategories(),
             'related' => $related,
             'defaultEventDate' => $request->user()?->weddings()->latest('event_date')->first()?->event_date->toDateString(),
+            'onlineBooking' => $this->onlineBooking($vendor),
         ]);
+    }
+
+    /**
+     * What the booking form needs when this vendor takes online bookings, or
+     * null to leave the contact card. Worked out on every request and never
+     * cached with the page: it moves with today's date and every booking.
+     *
+     * @return array<string, mixed>|null
+     */
+    private function onlineBooking(Vendor $vendor): ?array
+    {
+        $availability = VendorAvailability::for($vendor);
+
+        if (! $availability->acceptsOnlineBookings()) {
+            return null;
+        }
+
+        $settings = $availability->settings();
+
+        return [
+            'channel' => $availability->paymentChannel(),
+            'terms' => $settings->deposit_terms,
+            'packages' => $vendor->packages->map(fn (Package $package): array => [
+                'id' => $package->id,
+                'name' => $package->name,
+                'price' => (float) $package->price,
+                'deposit' => $settings->depositFor((float) $package->price),
+            ])->values(),
+            'nextOpen' => $availability->nextOpenDays(6),
+            'availabilityUrl' => route('vendors.availability', $vendor),
+        ];
     }
 
     /**
