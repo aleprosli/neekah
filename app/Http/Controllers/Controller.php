@@ -28,13 +28,13 @@ abstract class Controller
 
     /**
      * Where a vendor lands after changing their catalogue. One still waiting
-     * for approval works only from the setup cards on the dashboard, so the
-     * page they came from is the dashboard, not the full editor.
+     * for approval works only from the setup page on the dashboard, so they go
+     * back there, with the step they were on still open.
      */
-    protected function vendorReturnUrl(Request $request, string $route, string $section): string
+    protected function vendorReturnUrl(Request $request, string $route, string $step): string
     {
         return $request->user()->vendor->isAwaitingApproval()
-            ? route('vendor.dashboard').'#'.$section
+            ? route('vendor.dashboard', ['langkah' => $step])
             : route($route);
     }
 }

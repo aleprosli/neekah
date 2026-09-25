@@ -122,7 +122,6 @@ return [
         'package_deleted' => 'Pakej dipadam.',
         'setup_profile_saved' => 'Tagline dan penerangan disimpan.',
         'setup_cover_saved' => 'Gambar utama dimuat naik.',
-        'setup_price_saved' => 'Harga bermula disimpan.',
         'photo_deleted' => 'Gambar dipadam.',
         'enquiry_replied' => 'Balasan dihantar kepada pelanggan.',
     ],

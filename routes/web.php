@@ -114,7 +114,6 @@ $site = function (): void {
         Route::get('/', VendorArea\DashboardController::class)->name('dashboard');
         Route::put('/persediaan/profil', [VendorArea\SetupController::class, 'profile'])->name('setup.profile');
         Route::post('/persediaan/gambar-utama', [VendorArea\SetupController::class, 'cover'])->name('setup.cover');
-        Route::put('/persediaan/harga', [VendorArea\SetupController::class, 'price'])->name('setup.price');
         Route::post('/packages', [VendorArea\PackageController::class, 'store'])->name('packages.store');
         Route::delete('/packages/{package}', [VendorArea\PackageController::class, 'destroy'])->name('packages.destroy');
         Route::post('/portfolio', [VendorArea\PortfolioItemController::class, 'store'])->name('portfolio.store');
@@ -166,59 +165,65 @@ $site = function (): void {
         Route::post('/vendor/tukar-akaun', [VendorArea\AccountConversionController::class, 'store']);
         Route::post('/impersonate/stop', [AdminArea\ImpersonationController::class, 'destroy'])->name('impersonate.stop');
 
-        Route::post('/vendors/{vendor}/bookings', [BookingController::class, 'store'])->name('vendors.bookings.store');
-        Route::get('/bookings', [BookingController::class, 'index'])->name('bookings.index');
+        // Shared: a vendor opening a booking link is sent on to their own view of it.
         Route::get('/bookings/{booking}', [BookingController::class, 'show'])->name('bookings.show');
-        Route::post('/bookings/{booking}/cancel', [CustomerArea\BookingCancellationController::class, 'store'])->name('bookings.cancel');
-        Route::post('/bookings/{booking}/payments', [PaymentController::class, 'store'])->name('bookings.payments.store');
-        Route::delete('/bookings/{booking}/payments/{payment}', [PaymentController::class, 'destroy'])->name('bookings.payments.destroy')->scopeBindings();
-        Route::post('/bookings/{booking}/review', [CustomerArea\ReviewController::class, 'store'])->name('bookings.review.store');
 
-        Route::get('/dashboard', CustomerArea\DashboardController::class)->name('dashboard');
-        Route::get('/weddings/create', [CustomerArea\WeddingController::class, 'create'])->name('weddings.create');
-        Route::post('/weddings', [CustomerArea\WeddingController::class, 'store'])->name('weddings.store');
-        Route::get('/weddings/{wedding}/edit', [CustomerArea\WeddingController::class, 'edit'])->name('weddings.edit');
-        Route::put('/weddings/{wedding}', [CustomerArea\WeddingController::class, 'update'])->name('weddings.update');
-        Route::post('/weddings/{wedding}/invitations', [CustomerArea\WeddingInvitationController::class, 'store'])->name('weddings.invitations.store');
-        Route::delete('/weddings/{wedding}/invitations/{invitation}', [CustomerArea\WeddingInvitationController::class, 'destroy'])->name('weddings.invitations.destroy');
-        Route::delete('/weddings/{wedding}/members/{member}', [CustomerArea\WeddingMemberController::class, 'destroy'])->name('weddings.members.destroy');
-        Route::post('/invitations/{invitation}', [InvitationAcceptanceController::class, 'store'])->name('invitations.accept');
+        // The couple's side of the app. A vendor or an admin typing one of
+        // these addresses is sent to their own dashboard (EnsureUserIsCouple).
+        Route::middleware('couple')->group(function (): void {
+            Route::post('/vendors/{vendor}/bookings', [BookingController::class, 'store'])->name('vendors.bookings.store');
+            Route::get('/bookings', [BookingController::class, 'index'])->name('bookings.index');
+            Route::post('/bookings/{booking}/cancel', [CustomerArea\BookingCancellationController::class, 'store'])->name('bookings.cancel');
+            Route::post('/bookings/{booking}/payments', [PaymentController::class, 'store'])->name('bookings.payments.store');
+            Route::delete('/bookings/{booking}/payments/{payment}', [PaymentController::class, 'destroy'])->name('bookings.payments.destroy')->scopeBindings();
+            Route::post('/bookings/{booking}/review', [CustomerArea\ReviewController::class, 'store'])->name('bookings.review.store');
 
-        Route::get('/checklist', [CustomerArea\WeddingTaskController::class, 'index'])->middleware('wedding')->name('checklist.index');
-        Route::post('/weddings/{wedding}/tasks', [CustomerArea\WeddingTaskController::class, 'store'])->name('weddings.tasks.store');
-        Route::put('/weddings/{wedding}/tasks', [CustomerArea\WeddingTaskController::class, 'update'])->name('weddings.tasks.update');
-        Route::delete('/weddings/{wedding}/tasks/{task}', [CustomerArea\WeddingTaskController::class, 'destroy'])->name('weddings.tasks.destroy');
+            Route::get('/dashboard', CustomerArea\DashboardController::class)->name('dashboard');
+            Route::get('/weddings/create', [CustomerArea\WeddingController::class, 'create'])->name('weddings.create');
+            Route::post('/weddings', [CustomerArea\WeddingController::class, 'store'])->name('weddings.store');
+            Route::get('/weddings/{wedding}/edit', [CustomerArea\WeddingController::class, 'edit'])->name('weddings.edit');
+            Route::put('/weddings/{wedding}', [CustomerArea\WeddingController::class, 'update'])->name('weddings.update');
+            Route::post('/weddings/{wedding}/invitations', [CustomerArea\WeddingInvitationController::class, 'store'])->name('weddings.invitations.store');
+            Route::delete('/weddings/{wedding}/invitations/{invitation}', [CustomerArea\WeddingInvitationController::class, 'destroy'])->name('weddings.invitations.destroy');
+            Route::delete('/weddings/{wedding}/members/{member}', [CustomerArea\WeddingMemberController::class, 'destroy'])->name('weddings.members.destroy');
+            Route::post('/invitations/{invitation}', [InvitationAcceptanceController::class, 'store'])->name('invitations.accept');
 
-        Route::get('/tetamu', [CustomerArea\WeddingGuestController::class, 'index'])->middleware('wedding')->name('guests.index');
-        Route::post('/weddings/{wedding}/guests', [CustomerArea\WeddingGuestController::class, 'store'])->name('weddings.guests.store');
-        Route::put('/weddings/{wedding}/guests/{guest}', [CustomerArea\WeddingGuestController::class, 'update'])->name('weddings.guests.update');
-        Route::delete('/weddings/{wedding}/guests/{guest}', [CustomerArea\WeddingGuestController::class, 'destroy'])->name('weddings.guests.destroy');
-        Route::post('/weddings/{wedding}/guests/import', [CustomerArea\WeddingGuestImportController::class, 'store'])->name('weddings.guests.import');
-        Route::post('/weddings/{wedding}/guests/{guest}/share', [CustomerArea\WeddingGuestShareController::class, 'store'])->name('weddings.guests.share');
-        Route::delete('/weddings/{wedding}/guests/{guest}/share', [CustomerArea\WeddingGuestShareController::class, 'destroy'])->name('weddings.guests.share.destroy');
-        Route::put('/weddings/{wedding}/rsvps/{rsvp}', [CustomerArea\WeddingRsvpController::class, 'update'])->name('weddings.rsvps.update');
+            Route::get('/checklist', [CustomerArea\WeddingTaskController::class, 'index'])->middleware('wedding')->name('checklist.index');
+            Route::post('/weddings/{wedding}/tasks', [CustomerArea\WeddingTaskController::class, 'store'])->name('weddings.tasks.store');
+            Route::put('/weddings/{wedding}/tasks', [CustomerArea\WeddingTaskController::class, 'update'])->name('weddings.tasks.update');
+            Route::delete('/weddings/{wedding}/tasks/{task}', [CustomerArea\WeddingTaskController::class, 'destroy'])->name('weddings.tasks.destroy');
 
-        Route::get('/timeline', [CustomerArea\WeddingTimelineController::class, 'index'])->middleware('wedding')->name('timeline.index');
-        Route::post('/weddings/{wedding}/timeline', [CustomerArea\WeddingTimelineController::class, 'store'])->name('weddings.timeline.store');
-        Route::put('/weddings/{wedding}/timeline/{item}', [CustomerArea\WeddingTimelineController::class, 'update'])->name('weddings.timeline.update');
-        Route::delete('/weddings/{wedding}/timeline/{item}', [CustomerArea\WeddingTimelineController::class, 'destroy'])->name('weddings.timeline.destroy');
+            Route::get('/tetamu', [CustomerArea\WeddingGuestController::class, 'index'])->middleware('wedding')->name('guests.index');
+            Route::post('/weddings/{wedding}/guests', [CustomerArea\WeddingGuestController::class, 'store'])->name('weddings.guests.store');
+            Route::put('/weddings/{wedding}/guests/{guest}', [CustomerArea\WeddingGuestController::class, 'update'])->name('weddings.guests.update');
+            Route::delete('/weddings/{wedding}/guests/{guest}', [CustomerArea\WeddingGuestController::class, 'destroy'])->name('weddings.guests.destroy');
+            Route::post('/weddings/{wedding}/guests/import', [CustomerArea\WeddingGuestImportController::class, 'store'])->name('weddings.guests.import');
+            Route::post('/weddings/{wedding}/guests/{guest}/share', [CustomerArea\WeddingGuestShareController::class, 'store'])->name('weddings.guests.share');
+            Route::delete('/weddings/{wedding}/guests/{guest}/share', [CustomerArea\WeddingGuestShareController::class, 'destroy'])->name('weddings.guests.share.destroy');
+            Route::put('/weddings/{wedding}/rsvps/{rsvp}', [CustomerArea\WeddingRsvpController::class, 'update'])->name('weddings.rsvps.update');
 
-        Route::get('/kad', [CustomerArea\WeddingSiteController::class, 'edit'])->middleware('wedding')->name('site.edit');
-        Route::get('/kad/preview', [CustomerArea\WeddingSiteController::class, 'preview'])->middleware('wedding')->name('site.preview');
-        Route::get('/kad/alamat', [CustomerArea\WeddingSiteController::class, 'checkSubdomain'])->middleware(['wedding', 'throttle:60,1'])->name('site.subdomain');
-        Route::get('/kad/reka-bentuk', [CustomerArea\WeddingSiteController::class, 'designs'])->middleware(['wedding', 'throttle:120,1'])->name('site.designs');
-        Route::get('/kad/statistik', CustomerArea\WeddingSiteInsightsController::class)->middleware('wedding')->name('site.insights');
-        Route::put('/weddings/{wedding}/kad', [CustomerArea\WeddingSiteController::class, 'update'])->name('weddings.site.update');
-        Route::post('/weddings/{wedding}/kad/galeri', [CustomerArea\WeddingSitePhotoController::class, 'store'])->name('weddings.site.photos.store');
-        Route::delete('/weddings/{wedding}/kad/galeri/{photo}', [CustomerArea\WeddingSitePhotoController::class, 'destroy'])->name('weddings.site.photos.destroy');
-        Route::put('/weddings/{wedding}/kad/publish', [CustomerArea\WeddingSiteController::class, 'publish'])->name('weddings.site.publish');
+            Route::get('/timeline', [CustomerArea\WeddingTimelineController::class, 'index'])->middleware('wedding')->name('timeline.index');
+            Route::post('/weddings/{wedding}/timeline', [CustomerArea\WeddingTimelineController::class, 'store'])->name('weddings.timeline.store');
+            Route::put('/weddings/{wedding}/timeline/{item}', [CustomerArea\WeddingTimelineController::class, 'update'])->name('weddings.timeline.update');
+            Route::delete('/weddings/{wedding}/timeline/{item}', [CustomerArea\WeddingTimelineController::class, 'destroy'])->name('weddings.timeline.destroy');
 
-        Route::get('/budget', [CustomerArea\WeddingBudgetController::class, 'index'])->middleware('wedding')->name('budget.index');
-        Route::put('/weddings/{wedding}/budget', [CustomerArea\WeddingBudgetController::class, 'update'])->name('weddings.budget.update');
+            Route::get('/kad', [CustomerArea\WeddingSiteController::class, 'edit'])->middleware('wedding')->name('site.edit');
+            Route::get('/kad/preview', [CustomerArea\WeddingSiteController::class, 'preview'])->middleware('wedding')->name('site.preview');
+            Route::get('/kad/alamat', [CustomerArea\WeddingSiteController::class, 'checkSubdomain'])->middleware(['wedding', 'throttle:60,1'])->name('site.subdomain');
+            Route::get('/kad/reka-bentuk', [CustomerArea\WeddingSiteController::class, 'designs'])->middleware(['wedding', 'throttle:120,1'])->name('site.designs');
+            Route::get('/kad/statistik', CustomerArea\WeddingSiteInsightsController::class)->middleware('wedding')->name('site.insights');
+            Route::put('/weddings/{wedding}/kad', [CustomerArea\WeddingSiteController::class, 'update'])->name('weddings.site.update');
+            Route::post('/weddings/{wedding}/kad/galeri', [CustomerArea\WeddingSitePhotoController::class, 'store'])->name('weddings.site.photos.store');
+            Route::delete('/weddings/{wedding}/kad/galeri/{photo}', [CustomerArea\WeddingSitePhotoController::class, 'destroy'])->name('weddings.site.photos.destroy');
+            Route::put('/weddings/{wedding}/kad/publish', [CustomerArea\WeddingSiteController::class, 'publish'])->name('weddings.site.publish');
 
-        Route::get('/enquiries', [CustomerArea\EnquiryController::class, 'index'])->name('enquiries.index');
-        Route::get('/enquiries/{enquiry}', [CustomerArea\EnquiryController::class, 'show'])->name('enquiries.show');
-        Route::post('/vendors/{vendor}/enquiries', [CustomerArea\EnquiryController::class, 'store'])->name('vendors.enquiries.store');
+            Route::get('/budget', [CustomerArea\WeddingBudgetController::class, 'index'])->middleware('wedding')->name('budget.index');
+            Route::put('/weddings/{wedding}/budget', [CustomerArea\WeddingBudgetController::class, 'update'])->name('weddings.budget.update');
+
+            Route::get('/enquiries', [CustomerArea\EnquiryController::class, 'index'])->name('enquiries.index');
+            Route::get('/enquiries/{enquiry}', [CustomerArea\EnquiryController::class, 'show'])->name('enquiries.show');
+            Route::post('/vendors/{vendor}/enquiries', [CustomerArea\EnquiryController::class, 'store'])->name('vendors.enquiries.store');
+        });
 
         // Signed-in only, like the number itself. WhatsApp goes through a
         // redirect that counts the tap; a tel: link cannot, so the page reports

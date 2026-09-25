@@ -5,6 +5,7 @@ use App\Http\Middleware\EnsureAccountIsActive;
 use App\Http\Middleware\EnsurePhoneNumber;
 use App\Http\Middleware\EnsureUserHasRole;
 use App\Http\Middleware\EnsureUserHasWedding;
+use App\Http\Middleware\EnsureUserIsCouple;
 use App\Http\Middleware\EnsureVendorIsApproved;
 use App\Http\Middleware\SetLocale;
 use App\Support\ImageSettings;
@@ -33,6 +34,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'role' => EnsureUserHasRole::class,
             'wedding' => EnsureUserHasWedding::class,
             'vendor.approved' => EnsureVendorIsApproved::class,
+            'couple' => EnsureUserIsCouple::class,
             'locale' => SetLocale::class,
         ]);
     })

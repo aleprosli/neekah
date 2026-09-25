@@ -33,8 +33,8 @@ it('walks a new vendor through what is missing and what each photo is for', func
 
             // Every step explains itself; a bare checklist does not tell a
             // vendor what a portfolio photo is even for.
-            return $keys === ['profil', 'cover', 'portfolio', 'pakej', 'harga']
-                && $done === array_fill(0, 5, false)
+            return $keys === ['profil', 'cover', 'portfolio', 'pakej']
+                && $done === array_fill(0, 4, false)
                 && collect($steps)->every(fn (array $step): bool => filled($step['why']) && filled($step['href']));
         });
 });

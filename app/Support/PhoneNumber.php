@@ -33,4 +33,15 @@ class PhoneNumber
 
         return $parsed->isValid() ? $parsed->formatE164() : null;
     }
+
+    /**
+     * A number written the way people read it ("+60 11-6398 3556"), or as it
+     * came when it cannot be parsed.
+     */
+    public static function display(string $phone): string
+    {
+        $parsed = new ParsedPhoneNumber(str_starts_with($phone, '+') ? $phone : '+'.$phone);
+
+        return $parsed->isValid() ? $parsed->formatInternational() : $phone;
+    }
 }

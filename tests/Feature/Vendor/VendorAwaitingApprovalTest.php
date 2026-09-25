@@ -4,6 +4,7 @@ use App\Models\Category;
 use App\Models\Package;
 use App\Models\PortfolioItem;
 use App\Models\Vendor;
+use App\Support\ContactSettings;
 use Database\Seeders\CategorySeeder;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -25,6 +26,8 @@ it('shows a vendor awaiting approval the setup guide instead of the sidebar and 
         ->assertOk()
         ->assertViewIs('vendor.setup')
         ->assertSee(__('pages.vendor_setup.guide_title'))
+        ->assertSee(__('pages.vendor_setup.why_title'))
+        ->assertSee(__('pages.vendor_setup.unlock_title'))
         ->assertSee(route('vendor.setup.profile'), false)
         ->assertDontSee('id="dashboard-drawer"', false)
         ->assertDontSee(route('vendor.bookings.create'), false);
@@ -59,7 +62,7 @@ it('keeps the full vendor area for an approved vendor', function () {
 it('saves the tagline and description from the setup card', function () {
     $this->actingAs($this->vendor->user)
         ->put(route('vendor.setup.profile'), ['tagline' => 'Candid di utara', 'description' => 'Fotografi majlis.'])
-        ->assertRedirect(route('vendor.dashboard').'#profil')
+        ->assertRedirect(route('vendor.dashboard'))
         ->assertSessionHas('status', __('flash.vendor.setup_profile_saved'));
 
     expect($this->vendor->refresh())
@@ -71,28 +74,16 @@ it('keeps setup card errors in the card own bag', function () {
     $this->actingAs($this->vendor->user)
         ->put(route('vendor.setup.profile'), [])
         ->assertSessionHasErrors(['tagline', 'description'], errorBag: 'setupProfile');
-
-    $this->actingAs($this->vendor->user)
-        ->put(route('vendor.setup.price'), ['price_from' => 0, 'price_unit' => 'package'])
-        ->assertSessionHasErrors(['price_from'], errorBag: 'setupPrice');
 });
 
-it('uploads the cover photo and sets the starting price from the setup cards', function () {
+it('uploads the cover photo from the setup card', function () {
     Storage::fake('public');
 
     $this->actingAs($this->vendor->user)
         ->post(route('vendor.setup.cover'), ['cover_image' => UploadedFile::fake()->image('cover.jpg', 800, 600)])
-        ->assertRedirect(route('vendor.dashboard').'#cover');
+        ->assertRedirect(route('vendor.dashboard'));
 
-    $this->actingAs($this->vendor->user)
-        ->put(route('vendor.setup.price'), ['price_from' => 1500, 'price_unit' => 'pax'])
-        ->assertRedirect(route('vendor.dashboard').'#harga');
-
-    $this->vendor->refresh();
-
-    Storage::disk('public')->assertExists($this->vendor->cover_image);
-    expect((float) $this->vendor->price_from)->toBe(1500.0)
-        ->and($this->vendor->price_unit->value)->toBe('pax');
+    Storage::disk('public')->assertExists($this->vendor->refresh()->cover_image);
 });
 
 it('returns a vendor awaiting approval to the dashboard after changing the catalogue', function () {
@@ -101,18 +92,80 @@ it('returns a vendor awaiting approval to the dashboard after changing the catal
 
     $this->actingAs($user)
         ->post(route('vendor.portfolio.store'), ['images' => [UploadedFile::fake()->image('a.jpg', 800, 600)]])
-        ->assertRedirect(route('vendor.dashboard').'#portfolio');
+        ->assertRedirect(route('vendor.dashboard', ['langkah' => 'portfolio']));
 
     $this->actingAs($user)
         ->delete(route('vendor.portfolio.destroy', PortfolioItem::sole()))
-        ->assertRedirect(route('vendor.dashboard').'#portfolio');
+        ->assertRedirect(route('vendor.dashboard', ['langkah' => 'portfolio']));
 
     $this->actingAs($user)
         ->post(route('vendor.packages.store'), ['name' => 'Pakej Asas', 'price' => 2000, 'features' => "Album\nVideo"])
-        ->assertRedirect(route('vendor.dashboard').'#pakej');
+        ->assertRedirect(route('vendor.dashboard', ['langkah' => 'pakej']));
+
+    // There is no price card: the starting price comes from the cheapest package.
+    expect((float) $this->vendor->refresh()->price_from)->toBe(2000.0);
 
     $this->actingAs($user)
         ->delete(route('vendor.packages.destroy', Package::sole()))
-        ->assertRedirect(route('vendor.dashboard').'#pakej');
+        ->assertRedirect(route('vendor.dashboard', ['langkah' => 'pakej']));
 
+});
+
+it('tells a vendor awaiting approval how to reach the Neekah team', function () {
+    app(ContactSettings::class)->save(['email' => 'neekahhq@gmail.com', 'phone' => '601163983556', 'whatsapp' => '601163983556']);
+
+    $this->actingAs($this->vendor->user)
+        ->get(route('vendor.dashboard'))
+        ->assertSee('mailto:neekahhq@gmail.com', false)
+        ->assertSee('https://wa.me/601163983556?text=', false)
+        ->assertSee('tel:+601163983556', false)
+        ->assertSee('+60 11-6398 3556');
+});
+
+/**
+ * The radio that opens a step, as the setup page renders it when that step is on screen.
+ */
+function openStep(string $key): string
+{
+    return 'id="langkah-'.$key.'" value="'.$key.'" class="sr-only" checked';
+}
+
+it('opens the first step still to do, and a named step when a save comes back to it', function () {
+    $this->vendor->update(['tagline' => 'Candid', 'description' => 'Fotografi majlis.']);
+
+    $this->actingAs($this->vendor->user)
+        ->get(route('vendor.dashboard'))
+        ->assertSee(openStep('cover'), false)
+        ->assertDontSee(openStep('profil'), false);
+
+    $this->actingAs($this->vendor->user)
+        ->get(route('vendor.dashboard', ['langkah' => 'pakej']))
+        ->assertSee(openStep('pakej'), false);
+});
+
+it('opens the step whose form came back with errors', function () {
+    $this->actingAs($this->vendor->user)
+        ->from(route('vendor.dashboard'))
+        ->followingRedirects()
+        ->post(route('vendor.packages.store'), [])
+        ->assertSee(openStep('pakej'), false);
+});
+
+it('thanks a vendor who has done every step and says the admin will review them', function () {
+    $this->vendor->update(['tagline' => 'Candid', 'description' => 'Fotografi majlis.', 'cover_image' => 'vendors/cover.webp']);
+    PortfolioItem::factory()->count(3)->for($this->vendor)->create();
+    Package::factory()->for($this->vendor)->create();
+
+    $this->actingAs($this->vendor->user)
+        ->get(route('vendor.dashboard'))
+        ->assertSee(openStep('selesai'), false)
+        ->assertSee(__('pages.vendor_setup.thanks_title', ['name' => $this->vendor->name]))
+        ->assertSee(__('pages.vendor_setup.finish'));
+});
+
+it('points the last step at what is still missing instead of offering to finish', function () {
+    $this->actingAs($this->vendor->user)
+        ->get(route('vendor.dashboard', ['langkah' => 'pakej']))
+        ->assertDontSee('id="langkah-selesai"', false)
+        ->assertSee(__('pages.vendor_setup.still_to_do', ['count' => 4]));
 });

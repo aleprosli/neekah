@@ -3,12 +3,10 @@
 namespace App\Http\Controllers\Vendor;
 
 use App\Actions\StoreOptimizedImage;
-use App\Enums\PriceUnit;
 use App\Http\Controllers\Controller;
 use App\Support\ImageSettings;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 
 /**
  * The setup cards on the dashboard each save one thing, so a vendor waiting
@@ -30,7 +28,7 @@ class SetupController extends Controller
 
         $request->user()->vendor->update($data);
 
-        return $this->backToCard('profil', __('flash.vendor.setup_profile_saved'));
+        return $this->backToSetup(__('flash.vendor.setup_profile_saved'));
     }
 
     public function cover(Request $request, StoreOptimizedImage $storeImage, ImageSettings $images): RedirectResponse
@@ -46,26 +44,15 @@ class SetupController extends Controller
         $storeImage->delete($vendor->cover_image);
         $vendor->update(['cover_image' => $storeImage->handle($request->file('cover_image'), 'vendors/'.$vendor->id)]);
 
-        return $this->backToCard('cover', __('flash.vendor.setup_cover_saved'));
+        return $this->backToSetup(__('flash.vendor.setup_cover_saved'));
     }
 
-    public function price(Request $request): RedirectResponse
+    /**
+     * No step is named, so the setup page opens the next one still to do:
+     * saving a step is how a vendor moves through them.
+     */
+    private function backToSetup(string $status): RedirectResponse
     {
-        $data = $request->validateWithBag('setupPrice', [
-            'price_from' => ['required', 'numeric', 'gt:0', 'max:9999999'],
-            'price_unit' => ['required', Rule::enum(PriceUnit::class)],
-        ], attributes: [
-            'price_from' => __('fields.harga_bermula'),
-            'price_unit' => __('fields.unit_harga'),
-        ]);
-
-        $request->user()->vendor->update($data);
-
-        return $this->backToCard('harga', __('flash.vendor.setup_price_saved'));
-    }
-
-    private function backToCard(string $section, string $status): RedirectResponse
-    {
-        return redirect()->to(route('vendor.dashboard').'#'.$section)->with('status', $status);
+        return redirect()->route('vendor.dashboard')->with('status', $status);
     }
 }

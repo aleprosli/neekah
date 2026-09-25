@@ -5,12 +5,13 @@ namespace App\Http\Controllers\Vendor;
 use App\Enums\BookingStatus;
 use App\Enums\EnquiryStatus;
 use App\Enums\PaymentStatus;
-use App\Enums\PriceUnit;
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
 use App\Models\Payment;
 use App\Models\Vendor;
+use App\Support\ContactSettings;
 use App\Support\ImageSettings;
+use App\Support\PhoneNumber;
 use App\Support\VendorAnalytics;
 use App\Support\VueProps;
 use Illuminate\Contracts\View\View;
@@ -23,7 +24,7 @@ class DashboardController extends Controller
         $vendor = $request->user()->vendor;
 
         if ($vendor->isAwaitingApproval()) {
-            return $this->setup($vendor);
+            return $this->setup($request, $vendor);
         }
 
         $stats = [
@@ -74,18 +75,25 @@ class DashboardController extends Controller
      * Before approval the dashboard is the whole vendor area: a short guide to
      * what happens next and one card per missing piece, each saving in place.
      */
-    private function setup(Vendor $vendor, ImageSettings $images = new ImageSettings): View
+    private function setup(Request $request, Vendor $vendor, ImageSettings $images = new ImageSettings): View
     {
         $steps = collect($this->onboarding($vendor))->keyBy('key');
+        $contact = app(ContactSettings::class);
+        $phone = PhoneNumber::normalise($contact->phone());
 
         return view('vendor.setup', [
             'vendor' => $vendor,
+            'requestedStep' => $request->string('langkah')->toString(),
             'steps' => $steps,
             'doneCount' => $steps->where('done', true)->count(),
             'portfolio' => $vendor->portfolioItems()->orderBy('sort_order')->get(),
             'packages' => $vendor->packages()->orderBy('sort_order')->get(),
-            'priceUnits' => PriceUnit::cases(),
             'imageHint' => $images->uploadHint(),
+            'support' => array_filter([
+                'email' => $contact->email() ?: null,
+                'whatsapp' => $contact->whatsappUrl(__('pages.vendor_setup.help_whatsapp_message', ['name' => $vendor->name])),
+                'phone' => $phone ? ['label' => PhoneNumber::display($phone), 'url' => 'tel:+'.$phone] : null,
+            ]),
         ]);
     }
 
@@ -143,16 +151,6 @@ class DashboardController extends Controller
                 'action' => __('props.vendor_onboarding.pakej_action'),
                 'href' => route('vendor.packages.index'),
                 'done' => $vendor->packages()->exists(),
-            ],
-            [
-                'key' => 'harga',
-                'label' => __('props.vendor.harga_bermula'),
-                'why' => __('props.vendor_onboarding.harga_why'),
-                'specs' => [__('props.vendor_onboarding.harga_spec_1')],
-                'preview' => 'harga',
-                'action' => __('props.vendor_onboarding.harga_action'),
-                'href' => route('vendor.profile.edit'),
-                'done' => (float) $vendor->price_from > 0,
             ],
         ];
     }

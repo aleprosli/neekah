@@ -122,7 +122,6 @@ return [
         'package_deleted' => 'The package has been deleted.',
         'setup_profile_saved' => 'Your tagline and description have been saved.',
         'setup_cover_saved' => 'Your cover photo has been uploaded.',
-        'setup_price_saved' => 'Your starting price has been saved.',
         'photo_deleted' => 'The photo has been deleted.',
         'enquiry_replied' => 'Your reply has been sent to the customer.',
     ],
