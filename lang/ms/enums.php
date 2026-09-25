@@ -258,4 +258,9 @@ return [
         'no_payment_path' => 'Tiada cara bayar deposit: sambung Herepay atau isi butiran bank',
         'calendar_stale' => 'Dijeda: sahkan kalendar anda',
     ],
+
+    'camera_tier' => [
+        'basic' => 'Basic',
+        'pro' => 'Pro',
+    ],
 ];

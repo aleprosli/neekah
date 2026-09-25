@@ -214,4 +214,11 @@ return [
         'body' => 'The last few imports failed (:reason). Dates already imported stay closed, but new bookings in your calendar are not reaching Neekah.',
         'action' => 'Check settings',
     ],
+
+    'camera_activated' => [
+        'title' => 'Kamera Majlis :tier is live',
+        'body' => 'Share the link or QR with your guests. The album is kept until :date.',
+        'receipt' => 'Receipt :reference · RM:amount',
+        'action' => 'Open Kamera Majlis',
+    ],
 ];

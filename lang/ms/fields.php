@@ -152,4 +152,13 @@ return [
     'tempoh_pegang' => 'tempoh pegang (jam)',
     'tempoh_sah_kalendar' => 'tempoh sah kalendar (hari)',
     'ical_url' => 'alamat iCal',
+    'camera_basic_price' => 'harga Basic (RM)',
+    'camera_pro_price' => 'harga Pro (RM)',
+    'camera_basic_max_photos' => 'had gambar Basic',
+    'camera_basic_photo_px' => 'saiz gambar Basic (px)',
+    'camera_pro_photo_px' => 'saiz gambar Pro (px)',
+    'camera_pro_video_max_mb' => 'had video Pro (MB)',
+    'camera_pro_video_max_seconds' => 'panjang video Pro (saat)',
+    'camera_retention_days' => 'disimpan selepas majlis (hari)',
+    'camera_pro_fair_use_gb' => 'amaran guna berlebihan Pro (GB)',
 ];

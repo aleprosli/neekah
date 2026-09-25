@@ -29,11 +29,15 @@ class Translations
      */
     private const GROUPS_BY_SHELL = [
         'card' => [],
-        'auth' => ['common', 'auth', 'vendor_signup'],
+        // copy: the show/hide password button in every password field.
+        'auth' => ['common', 'auth', 'vendor_signup', 'copy'],
         // vendor_signup is not here: the sign-up form is an auth page, and its
         // placeholder examples were turning up in the markup of every public
         // page, where two tests reasonably assert that a vendor's name is not.
-        'site' => ['common', 'auth', 'blog', 'invitation', 'notifications', 'gallery', 'report'],
+        // date_picker: the booking calendar on a vendor page taking online bookings.
+        'site' => ['common', 'auth', 'blog', 'invitation', 'notifications', 'gallery', 'report', 'date_picker', 'copy'],
+        // The Kamera Majlis page a guest opens from the QR.
+        'camera' => ['common', 'copy', 'camera'],
     ];
 
     /**

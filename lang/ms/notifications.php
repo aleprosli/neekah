@@ -214,4 +214,11 @@ return [
         'body' => 'Beberapa import terakhir gagal (:reason). Tarikh yang sudah diimport kekal ditutup, tetapi tempahan baru di kalendar anda tidak masuk ke Neekah.',
         'action' => 'Semak tetapan',
     ],
+
+    'camera_activated' => [
+        'title' => 'Kamera Majlis :tier sudah aktif',
+        'body' => 'Kongsi pautan atau QR dengan tetamu. Album disimpan sehingga :date.',
+        'receipt' => 'Resit :reference · RM:amount',
+        'action' => 'Buka Kamera Majlis',
+    ],
 ];

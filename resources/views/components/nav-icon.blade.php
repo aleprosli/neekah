@@ -30,6 +30,7 @@
         'star' => '<path d="m12 3.5 2.6 5.5 6 .8-4.3 4.2 1 6-5.3-2.9-5.3 2.9 1-6L3.4 9.8l6-.8L12 3.5Z"/>',
         'rings' => '<circle cx="9" cy="14" r="5.5"/><circle cx="16" cy="14" r="5.5"/><path d="m9 5 1.5 2.5h-3L9 5Z"/>',
         'check' => '<path d="M4 5h16v15H4z"/><path d="m8 12 3 3 5-6"/>',
+        'camera' => '<path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1Z"/><circle cx="12" cy="13.5" r="3.5"/>',
         'mail' => '<path d="M3 6h18v12H3z"/><path d="m3 7 9 6 9-6"/>',
         'user' => '<circle cx="12" cy="8" r="3.5"/><path d="M5 20a7 7 0 0 1 14 0"/>',
         'search' => '<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>',

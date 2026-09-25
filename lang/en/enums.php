@@ -258,4 +258,9 @@ return [
         'no_payment_path' => 'No way to pay the deposit: connect Herepay or add bank details',
         'calendar_stale' => 'Paused: confirm your calendar',
     ],
+
+    'camera_tier' => [
+        'basic' => 'Basic',
+        'pro' => 'Pro',
+    ],
 ];

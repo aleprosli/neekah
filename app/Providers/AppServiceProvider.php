@@ -4,7 +4,9 @@ namespace App\Providers;
 
 use App\Models\User;
 use App\Routing\LocalisedUrlGenerator;
+use App\Support\Herepay\CameraPaymentGateway;
 use App\Support\Herepay\DepositGateway;
+use App\Support\Herepay\HerepayCameraClient;
 use App\Support\Herepay\HerepayClient;
 use App\Support\Herepay\HerepayDepositClient;
 use App\Support\Herepay\PaymentLinkGateway;
@@ -29,6 +31,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->scoped(Seo::class);
         $this->app->bind(PaymentLinkGateway::class, HerepayClient::class);
         $this->app->bind(DepositGateway::class, HerepayDepositClient::class);
+        $this->app->bind(CameraPaymentGateway::class, HerepayCameraClient::class);
 
         // route() has to answer with the page in the language being served.
         $this->app->extend('url', function (UrlGenerator $url, $app): LocalisedUrlGenerator {

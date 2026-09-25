@@ -4,7 +4,7 @@ Before planning or editing, find the row whose globs match the file's path and r
 
 | Applies to | Rule file |
 | --- | --- |
-| app/Actions/SeedWeddingChecklist.php, app/Actions/StoreOptimizedImage.php, app/Actions/ImportVendorIcal.php | .ai/rules/actions.md |
+| app/Actions/SeedWeddingChecklist.php, app/Actions/StoreOptimizedImage.php, app/Actions/ImportVendorIcal.php, app/Actions/ActivateCameraAlbum.php | .ai/rules/actions.md |
 | app/Http/Controllers/Admin/**, app/Http/Controllers/Admin/SettingController.php | .ai/rules/admin.md |
 | app/** | .ai/rules/app.md |
 | app/Support/Card/** | .ai/rules/card.md |
@@ -29,7 +29,7 @@ Before planning or editing, find the row whose globs match the file's path and r
 | routes/** | .ai/rules/routes.md |
 | app/Rules/** | .ai/rules/rules.md |
 | resources/views/sites/** | .ai/rules/sites.md |
-| app/Support/Seo.php, app/Support/**, app/Support/ImageSettings.php, app/Support/ContentVersion.php, app/Support/VendorAvailability.php | .ai/rules/support.md |
+| app/Support/Seo.php, app/Support/**, app/Support/ImageSettings.php, app/Support/ContentVersion.php, app/Support/VendorAvailability.php, app/Support/Translations.php | .ai/rules/support.md |
 | tests/** | .ai/rules/tests.md |
 | resources/js/components/ui/DataTable.vue, resources/js/components/ui/UiFlagSelect.vue, resources/js/components/ui/** | .ai/rules/ui.md |
 | app/Http/Controllers/Vendor/ReviewController.php, app/Http/Controllers/Vendor/** | .ai/rules/vendor.md |

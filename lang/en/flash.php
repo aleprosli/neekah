@@ -21,6 +21,7 @@ return [
     ],
 
     'admin' => [
+        'camera_saved' => 'Kamera Majlis settings saved.',
         'online_booking_saved' => 'Online booking settings saved.',
         'category_added' => 'Category added.',
         'category_updated' => 'Category updated.',
@@ -68,6 +69,8 @@ return [
     ],
 
     'couple' => [
+        'camera_checkout_failed' => 'The payment link could not be created right now. Please try again shortly.',
+        'camera_already_owned' => 'Your album already has this plan.',
         'deposit_link_failed' => 'The payment link could not be created right now. Your date is still on hold; try paying again in a moment.',
         'booking_held' => 'Date held for booking :reference. Pay the deposit to confirm it.',
         'nfc_card_not_ready' => 'This card is not linked to an invitation yet.',

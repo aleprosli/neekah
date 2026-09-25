@@ -604,6 +604,7 @@ return [
     ],
 
     'sidebar_couple' => [
+        'kamera' => 'Kamera Majlis',
         'hari_lagi' => ':count hari lagi',
         'hari_ini' => 'Hari ini!',
         'majlis_saya' => 'Majlis saya',
@@ -942,5 +943,22 @@ return [
         'channel_herepay' => 'Deposit dibayar melalui Herepay anda.',
         'channel_manual' => 'Deposit dibayar melalui pindahan bank ke akaun anda.',
         'channel_none' => 'Belum ada cara bayar deposit: sambung Herepay atau isi butiran bank.',
+    ],
+
+    'camera' => [
+        'title' => 'Kamera Majlis',
+        'subheading' => 'Tetamu imbas QR, ambil gambar dan kongsi terus ke album majlis anda.',
+        'herepay_title' => 'Kamera Majlis :tier · :wedding',
+        'herepay_description' => 'Rujukan Neekah: :reference',
+        'open_album' => 'Buka Kamera Majlis',
+        'done_paid_title' => 'Kamera Majlis aktif!',
+        'done_paid_body' => 'Pakej :tier sudah dibuka. Kongsi pautan atau QR dengan tetamu anda.',
+        'done_waiting_title' => 'Menunggu pengesahan bayaran',
+        'done_waiting_body' => 'Kami sedang menunggu Herepay mengesahkan bayaran untuk pakej :tier. Halaman ini dikemas kini sendiri.',
+        'done_failed_title' => 'Bayaran tidak berjaya',
+        'done_failed_body' => 'Bayaran untuk pakej :tier tidak berjaya. Anda tidak dicaj; cuba sekali lagi.',
+        'guest_title' => 'Kamera Majlis · :wedding',
+        'guest_intro' => 'Album ini sedia. Tidak lama lagi anda boleh ambil dan kongsi gambar di sini.',
+        'guest_closed' => 'Album ini sudah ditutup.',
     ],
 ];

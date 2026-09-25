@@ -115,6 +115,16 @@ return [
     ],
 
     'admin' => [
+        'camera_label' => 'Kamera Majlis',
+        'camera_title' => 'Kamera Majlis (couple → Neekah)',
+        'camera_description' => 'A shared album for wedding guests: guests scan a QR and take or upload photos. Couples pay Neekah through Herepay (the same account as Neekah Pro).',
+        'camera_submit' => 'Save Kamera Majlis settings',
+        'camera_enabled' => 'Sell Kamera Majlis',
+        'camera_enabled_help' => 'When on and Herepay is live, couples can buy from their Kamera Majlis page.',
+        'camera_upgrade_help' => 'Couples upgrading from Basic pay the difference.',
+        'camera_fair_use_help' => 'Pro has no cap; the admin is told (Telegram) when one album passes this size.',
+        'camera_retention_help' => 'The album and every file are deleted this long after the event date.',
+        'camera_gateway_missing' => 'Herepay is not switched on (Settings → Neekah Pro), so buying is not open yet.',
         'online_booking_label' => 'Online booking',
         'online_booking_title' => 'Online booking (couple → Pro vendor)',
         'online_booking_description' => 'Neekah Pro vendors can take date bookings with the deposit paid straight into their own account (their Herepay or a bank transfer). Neekah never holds this money.',

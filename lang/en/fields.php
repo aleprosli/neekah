@@ -152,4 +152,13 @@ return [
     'tempoh_pegang' => 'hold time (hours)',
     'tempoh_sah_kalendar' => 'calendar valid for (days)',
     'ical_url' => 'iCal address',
+    'camera_basic_price' => 'Basic price (RM)',
+    'camera_pro_price' => 'Pro price (RM)',
+    'camera_basic_max_photos' => 'Basic photo limit',
+    'camera_basic_photo_px' => 'Basic photo size (px)',
+    'camera_pro_photo_px' => 'Pro photo size (px)',
+    'camera_pro_video_max_mb' => 'Pro video limit (MB)',
+    'camera_pro_video_max_seconds' => 'Pro video length (seconds)',
+    'camera_retention_days' => 'kept after the event (days)',
+    'camera_pro_fair_use_gb' => 'Pro fair-use alert (GB)',
 ];
