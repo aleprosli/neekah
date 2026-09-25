@@ -26,6 +26,9 @@ return [
     ],
 
     'enquiry_received' => [
+        'locked_title' => 'You have a new enquiry',
+        'locked_body' => 'A couple sent you an enquiry. Upgrade to Neekah Pro to read and answer it.',
+        'locked_action' => 'Upgrade to Pro',
         'title' => 'New enquiry from :name',
         'body' => 'Reply within 24 hours to keep your response rate up.',
         'subject' => 'New enquiry from :name',

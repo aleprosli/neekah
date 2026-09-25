@@ -164,7 +164,7 @@ it('lets the vendor connect and disconnect the calendar, keeping the address enc
     expect(importedDates($this->vendor))->toBe(['2026-11-07'])
         ->and(DB::table('vendor_booking_settings')->value('ical_url'))->not->toContain('private-abc');
 
-    $this->actingAs($this->vendor->user)->get(route('vendor.booking-settings.edit'))->assertDontSee('private-abc');
+    $this->actingAs($this->vendor->user)->get(route('vendor.availability.index'))->assertDontSee('private-abc');
 
     $this->actingAs($this->vendor->user)->delete(route('vendor.booking-settings.ical.disconnect'));
     expect(importedDates($this->vendor))->toBe([])

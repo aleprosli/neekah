@@ -272,6 +272,12 @@ class UserController extends Controller
                         : __('props.copy.active')],
                     ['label' => __('props.admin.daftar_3'), 'value' => $user->created_at->translatedFormat('j M Y').($user->google_id ? ' · Google' : '')],
                     ['label' => __('props.admin.majlis_2'), 'value' => __('props.units.shared_created', ['shared' => $user->weddings_count, 'created' => $user->created_weddings_count])],
+                    ...($user->vendor ? [[
+                        'label' => __('props.admin.plan'),
+                        'value' => $user->vendor->isPro()
+                            ? 'Pro · '.__('props.admin.plan_until', ['date' => $user->vendor->pro_until->translatedFormat('j M Y')])
+                            : 'Basic',
+                    ]] : []),
                     ['label' => __('props.admin.tempahan_sebagai_pengantin'), 'value' => $user->bookings_count],
                     ['label' => __('props.admin.enquiry_review'), 'value' => $user->enquiries_count.' · '.$user->reviews_count],
                 ],

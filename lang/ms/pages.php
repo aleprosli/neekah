@@ -686,27 +686,10 @@ return [
         'review_again' => 'Semak semula profil',
     ],
 
-    'vendor_features' => [
-        'title' => 'Ciri vendor',
-        'subheading' => 'Pilih bahagian dashboard vendor yang dibuka untuk setiap pelan.',
-        'feature' => 'Ciri',
-        'plan_basic' => 'Basic',
-        'plan_pro' => 'Pro',
-        'always_open' => 'Ringkasan, Profil, halaman Neekah Pro dan Akaun sentiasa dibuka untuk semua vendor.',
-        'overridden' => ':count vendor ada pengecualian sendiri, yang mengatasi tetapan di sini.',
-        'save' => 'Simpan ciri vendor',
-        'vendor_heading' => 'Ciri untuk vendor ini',
-        'vendor_plan' => 'Pelan semasa: :plan',
-        'edit_plans' => 'Ubah ciri setiap pelan',
-        'open' => 'dibuka',
-        'closed' => 'ditutup',
-        'follow_plan' => 'Ikut pelan (:state)',
-        'always_open_option' => 'Sentiasa buka',
-        'always_closed_option' => 'Sentiasa tutup',
-        'save_vendor' => 'Simpan ciri vendor ini',
-    ],
-
     'sidebar_vendor' => [
+        'kalendar_tempahan' => 'Kalendar & tempahan',
+        'langganan_pro' => 'Langganan Pro',
+        'upgrade_pro' => 'Naik taraf ke Pro',
         'boost' => 'Boost',
         'tempahan_online' => 'Tempahan online',
         'pro' => 'Neekah Pro',
@@ -726,7 +709,6 @@ return [
 
     'sidebar_admin' => [
         'kamera' => 'Kamera Majlis',
-        'ciri_vendor' => 'Ciri vendor',
         'muzik_kad' => 'Muzik kad',
         'kad_nfc' => 'Kad NFC',
         'ringkasan' => 'Ringkasan',
@@ -792,8 +774,16 @@ return [
         'until' => 'hingga :date',
         'benefits' => [
             'booking' => [
-                'title' => 'Tempahan online dengan deposit',
-                'body' => 'Pengantin pilih tarikh kosong di kalendar anda dan bayar deposit terus ke akaun anda (Herepay atau pindahan bank). Tempahan disahkan automatik; anda tetapkan hari, kapasiti dan deposit.',
+                'title' => 'Kalendar & tempahan online',
+                'body' => 'Tutup tarikh, sync Google Calendar, dan biar pengantin tempah tarikh kosong serta bayar deposit terus ke akaun anda.',
+            ],
+            'enquiries' => [
+                'title' => 'Enquiry dan tempahan',
+                'body' => 'Baca dan balas enquiry pengantin, rekod tempahan dan terima bayaran di satu tempat.',
+            ],
+            'ranking' => [
+                'title' => 'Point & ranking',
+                'body' => 'Lihat point, skor dan tahap anda, dan apa yang menaikkannya.',
             ],
             'boost' => [
                 'title' => 'Token boost setiap bulan',
@@ -1002,5 +992,14 @@ return [
         'done_failed_title' => 'Bayaran tidak berjaya',
         'done_failed_body' => 'Tiada caj dibuat untuk :count token. Cuba lagi dari halaman Boost.',
         'back' => 'Kembali ke Boost',
+    ],
+
+    'calendar' => [
+        'title' => 'Kalendar & tempahan',
+        'subheading' => 'Tarikh anda, tempahan online dan deposit di satu tempat.',
+    ],
+    'enquiries_locked' => [
+        'subheading' => 'Pengantin boleh menghantar enquiry kepada anda.',
+        'waiting' => ':count enquiry menunggu anda.',
     ],
 ];

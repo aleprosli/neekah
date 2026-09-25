@@ -48,7 +48,7 @@ it('does not let a vendor awaiting approval record a booking', function () {
 });
 
 it('keeps the full vendor area for an approved vendor', function () {
-    $approved = Vendor::factory()->for(Category::first())->create();
+    $approved = Vendor::factory()->pro()->for(Category::first())->create();
 
     $this->actingAs($approved->user)
         ->get(route('vendor.dashboard'))
