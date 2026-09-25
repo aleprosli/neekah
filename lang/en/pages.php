@@ -687,7 +687,7 @@ return [
     ],
 
     'sidebar_vendor' => [
-        'kalendar_tempahan' => 'Calendar & bookings',
+        'kalendar_tempahan' => 'Calendar & Bookings',
         'langganan_pro' => 'Pro subscription',
         'upgrade_pro' => 'Upgrade to Pro',
         'boost' => 'Boost',
@@ -995,7 +995,7 @@ return [
     ],
 
     'calendar' => [
-        'title' => 'Calendar & bookings',
+        'title' => 'Calendar & Bookings',
         'subheading' => 'Your dates, online booking and deposits in one place.',
     ],
     'enquiries_locked' => [

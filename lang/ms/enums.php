@@ -13,14 +13,14 @@ return [
 
     'vendor_feature' => [
         'boost' => 'Boost',
-        'online_booking' => 'Tempahan online',
+        'online_booking' => 'Tempahan Online',
         'packages' => 'Pakej',
         'portfolio' => 'Portfolio',
-        'calendar' => 'Kalendar & tempahan online',
+        'calendar' => 'Kalendar & Tempahan Online',
         'bookings' => 'Tempahan',
         'enquiries' => 'Enquiry',
         'reviews' => 'Review',
-        'points' => 'Point & ranking',
+        'points' => 'Point & Ranking',
     ],
 
     'vendor_feature_desc' => [

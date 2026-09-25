@@ -122,3 +122,31 @@ it('shows the calendar, the booking rules, the deposit and Google Calendar on on
     // Links to the old settings page land on its tab.
     $this->actingAs($this->vendor->user)->get('/vendor/tempahan-online')->assertRedirect('/vendor/availability?tab=tempahan');
 });
+
+it('turns online booking on only once couples have a way to pay the deposit', function () {
+    $this->actingAs($this->vendor->user->fresh())->put(route('vendor.booking-settings.toggle'), ['enabled' => 1])
+        ->assertSessionHasErrors(['enabled' => __('flash.vendor.online_needs_payment')]);
+    expect($this->vendor->bookingSettings()->value('enabled'))->toBeFalsy();
+
+    $this->actingAs($this->vendor->user->fresh())->put(route('vendor.booking-settings.manual'), ['manual_instructions' => 'Maybank 1234 · Studio Nur'])->assertSessionHasNoErrors();
+    $this->actingAs($this->vendor->user->fresh())->put(route('vendor.booking-settings.toggle'), ['enabled' => 1])->assertSessionHasNoErrors();
+
+    $settings = $this->vendor->bookingSettings()->sole();
+    expect($settings->enabled)->toBeTrue()
+        ->and($settings->manual_instructions)->toBe('Maybank 1234 · Studio Nur');
+
+    // Saving the rules without the switch leaves it where it is.
+    $this->actingAs($this->vendor->user->fresh())->put(route('vendor.booking-settings.update'), collect(bookingRules())->except('enabled', 'manual_instructions')->all())->assertSessionHasNoErrors();
+    expect($settings->fresh()->enabled)->toBeTrue()
+        ->and($settings->fresh()->manual_instructions)->toBe('Maybank 1234 · Studio Nur');
+
+    $this->actingAs($this->vendor->user->fresh())->put(route('vendor.booking-settings.toggle'), ['enabled' => 0]);
+    expect($settings->fresh()->enabled)->toBeFalse();
+});
+
+it('guides the vendor through four steps, with where to sign up for Herepay', function () {
+    $props = $this->actingAs($this->vendor->user)->get(route('vendor.availability.index'))->viewData('props');
+
+    expect($props['steps'])->toBe(['deposit' => false, 'rules' => false, 'calendar' => false, 'live' => false])
+        ->and($props['deposit']['registerUrl'])->toBe('https://app.herepay.org/register');
+});

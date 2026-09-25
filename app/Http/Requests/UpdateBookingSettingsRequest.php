@@ -59,7 +59,9 @@ class UpdateBookingSettingsRequest extends FormRequest
     {
         return [
             ...$this->safe()->except('enabled', 'available_weekdays'),
-            'enabled' => $this->boolean('enabled'),
+            // The switch has its own form now (BookingSettingsController::toggle);
+            // an older form that still sends it keeps working.
+            ...($this->has('enabled') ? ['enabled' => $this->boolean('enabled')] : []),
             'available_weekdays' => collect($this->validated('available_weekdays'))->map(fn (mixed $day): int => (int) $day)->unique()->sort()->values()->all(),
         ];
     }

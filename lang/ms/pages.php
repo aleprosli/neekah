@@ -687,7 +687,7 @@ return [
     ],
 
     'sidebar_vendor' => [
-        'kalendar_tempahan' => 'Kalendar & tempahan',
+        'kalendar_tempahan' => 'Kalendar & Tempahan',
         'langganan_pro' => 'Langganan Pro',
         'upgrade_pro' => 'Naik taraf ke Pro',
         'boost' => 'Boost',
@@ -995,7 +995,7 @@ return [
     ],
 
     'calendar' => [
-        'title' => 'Kalendar & tempahan',
+        'title' => 'Kalendar & Tempahan',
         'subheading' => 'Tarikh anda, tempahan online dan deposit di satu tempat.',
     ],
     'enquiries_locked' => [

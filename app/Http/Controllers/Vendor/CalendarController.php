@@ -11,6 +11,7 @@ use App\Models\VendorBookingSetting;
 use App\Models\VendorUnavailableDate;
 use App\Support\Herepay\HerepayClient;
 use App\Support\OnlineBookingSettings;
+use App\Support\PaymentSettings;
 use App\Support\VendorAvailability;
 use App\Support\VueProps;
 use Illuminate\Contracts\View\View;
@@ -25,13 +26,16 @@ use Illuminate\Http\Request;
  */
 class CalendarController extends Controller
 {
-    public function index(Request $request, HerepayClient $herepay, OnlineBookingSettings $site): View
+    public function index(Request $request, HerepayClient $herepay, OnlineBookingSettings $site, PaymentSettings $payments): View
     {
         $vendor = $request->user()->vendor;
         $availability = VendorAvailability::for($vendor);
         $settings = $availability->settings();
         $state = $availability->onlineState();
         $channel = $availability->paymentChannel();
+        $hasRules = $vendor->bookingSettings()->exists();
+        $hasPackages = $vendor->packages()->where('is_active', true)->exists();
+        $freshDays = $site->calendarFreshDays();
 
         return view('vendor.calendar.index', [
             'props' => VueProps::for([
@@ -39,7 +43,7 @@ class CalendarController extends Controller
                     'open' => $state->isOpen(),
                     'label' => $state->label(),
                     'confirmed' => $settings->calendar_confirmed_at?->diffForHumans(),
-                    'freshDays' => $site->calendarFreshDays(),
+                    'freshDays' => $freshDays,
                     'confirmUrl' => route('vendor.booking-settings.calendar'),
                     'publicUrl' => route('vendors.show', $vendor).'#hubungi',
                 ],
@@ -76,9 +80,21 @@ class CalendarController extends Controller
                             'status_tone' => $booking->status->tone(),
                         ])->values(),
                 ],
+                // The four steps to online booking, each done or not.
+                'steps' => [
+                    'deposit' => $channel !== null,
+                    'rules' => $hasRules,
+                    'calendar' => $settings->calendarIsFresh($freshDays),
+                    'live' => (bool) $settings->enabled,
+                ],
+                'online' => [
+                    'enabled' => (bool) $settings->enabled,
+                    'toggleUrl' => route('vendor.booking-settings.toggle'),
+                    'hasPackages' => $hasPackages,
+                    'packagesUrl' => route('vendor.packages.index'),
+                ],
                 'rules' => [
                     'url' => route('vendor.booking-settings.update'),
-                    'enabled' => (bool) old('enabled', $settings->enabled),
                     'deposit_type' => old('deposit_type', $settings->deposit_type->value),
                     'deposit_value' => (float) old('deposit_value', $settings->deposit_value),
                     'weekdays' => array_map('intval', old('available_weekdays', $settings->weekdays())),
@@ -86,7 +102,6 @@ class CalendarController extends Controller
                     'min_lead_days' => (int) old('min_lead_days', $settings->min_lead_days),
                     'max_advance_months' => (int) old('max_advance_months', $settings->max_advance_months),
                     'deposit_terms' => old('deposit_terms', $settings->deposit_terms),
-                    'manual_instructions' => old('manual_instructions', $settings->manual_instructions),
                     'depositTypes' => array_map(fn (DepositType $type): array => ['value' => $type->value, 'label' => $type->label()], DepositType::cases()),
                     'weekdayOptions' => array_map(fn (int $day): array => [
                         'value' => $day,
@@ -99,6 +114,11 @@ class CalendarController extends Controller
                 ],
                 'deposit' => [
                     'channel' => $channel?->value,
+                    'registerUrl' => config('services.herepay.register_url'),
+                    'keysGuideUrl' => config('services.herepay.keys_guide_url'),
+                    'manualOffered' => $payments->manualTransferEnabled(),
+                    'manualInstructions' => old('manual_instructions', $settings->manual_instructions),
+                    'manualUrl' => route('vendor.booking-settings.manual'),
                     'connected' => $settings->hasHerepay(),
                     'environment' => $herepay->environment() ?? '—',
                     'verified' => $settings->herepay_verified_at?->translatedFormat('j M Y'),
