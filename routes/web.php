@@ -78,6 +78,14 @@ $site = function (): void {
     // Kamera Majlis: the guest page the QR opens. No account needed; the
     // unguessable token is the key.
     Route::get('/k/{album}', [CameraGuestController::class, 'show'])->middleware('throttle:60,1')->name('camera.show');
+    Route::post('/k/{album}/masuk', [CameraGuestController::class, 'enter'])->middleware('throttle:20,1')->name('camera.enter');
+    Route::post('/k/{album}/nama', [CameraGuestController::class, 'name'])->middleware('throttle:20,1')->name('camera.name');
+    Route::post('/k/{album}/muat-naik', [CameraGuestController::class, 'reserve'])->middleware('throttle:120,1')->name('camera.upload.reserve');
+    Route::put('/k/{album}/muat-naik/{media}/fail', [CameraGuestController::class, 'receive'])->middleware(['signed', 'throttle:120,1'])->name('camera.upload.file');
+    Route::post('/k/{album}/muat-naik/{media}/selesai', [CameraGuestController::class, 'complete'])->middleware('throttle:120,1')->name('camera.upload.complete');
+    Route::post('/k/{album}/muat-naik-biasa', [CameraGuestController::class, 'fallbackUpload'])->middleware('throttle:30,1')->name('camera.upload.fallback');
+    Route::get('/k/{album}/galeri', [CameraGuestController::class, 'gallery'])->middleware('throttle:120,1')->name('camera.gallery');
+    Route::delete('/k/{album}/media/{media}', [CameraGuestController::class, 'destroy'])->middleware('throttle:60,1')->name('camera.media.destroy');
     Route::get('/vendors/{vendor}/ketersediaan', VendorAvailabilityController::class)->middleware('throttle:60,1')->name('vendors.availability');
     // Open to everyone, signed in or not, so the throttle is what stands between
     // a profile and someone with a script.

@@ -11,7 +11,7 @@ Before planning or editing, find the row whose globs match the file's path and r
 | resources/js/components/card/** | .ai/rules/components-card.md |
 | resources/js/components/** | .ai/rules/components.md |
 | config/filesystems.php | .ai/rules/config.md |
-| app/Http/Controllers/**, app/Http/Controllers/SitemapController.php, app/Http/Controllers/SiteTemplatePreviewController.php | .ai/rules/controllers.md |
+| app/Http/Controllers/**, app/Http/Controllers/SitemapController.php, app/Http/Controllers/SiteTemplatePreviewController.php, app/Http/Controllers/CameraGuestController.php | .ai/rules/controllers.md |
 | resources/css/app.css | .ai/rules/css.md |
 | app/Http/Controllers/Customer/**, app/Http/Controllers/Customer/WeddingTaskController.php | .ai/rules/customer.md |
 | app/Enums/UserSegment.php, app/Enums/VendorFeature.php | .ai/rules/enums.md |

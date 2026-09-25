@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\CameraAlbum;
 use App\Models\Category;
 use App\Models\Package;
 use App\Models\Vendor;
@@ -33,4 +34,13 @@ it('gives the sign-in page the show and hide password labels', function () {
     $dictionary = clientDictionary($this->get(route('login'))->assertOk());
 
     expect($dictionary['copy']['show_password'] ?? null)->toBe(__('ui.copy.show_password'));
+});
+
+it('gives the Kamera Majlis guest page its own strings and nothing of the couple editor', function () {
+    $album = CameraAlbum::factory()->create();
+
+    $dictionary = clientDictionary($this->get(route('camera.show', $album))->assertOk());
+
+    expect($dictionary['camera']['take_photo'] ?? null)->toBe(__('ui.camera.take_photo'))
+        ->and($dictionary)->not->toHaveKey('guests');
 });

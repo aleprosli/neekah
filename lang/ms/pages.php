@@ -946,6 +946,8 @@ return [
     ],
 
     'camera' => [
+        'fallback_upload' => 'Muat naik gambar',
+        'fallback_uploaded' => 'Terima kasih! Gambar anda sedang ditambah ke album.',
         'title' => 'Kamera Majlis',
         'subheading' => 'Tetamu imbas QR, ambil gambar dan kongsi terus ke album majlis anda.',
         'herepay_title' => 'Kamera Majlis :tier · :wedding',

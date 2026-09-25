@@ -19,6 +19,9 @@ use RuntimeException;
  */
 class StoreOptimizedImage
 {
+    /** The quality for the file being encoded now: the admin's, unless a caller asked otherwise. */
+    private ?int $quality = null;
+
     public function __construct(private ImageSettings $settings) {}
 
     /**
@@ -31,18 +34,23 @@ class StoreOptimizedImage
     }
 
     /**
+     * $maxDimension and $quality override the admin's image settings for this
+     * call only. Kamera Majlis uses them (its tiers keep photos at their own
+     * size); every other caller leaves them null.
+     *
      * @return string The stored path on the public disk.
      */
-    public function storeContents(string $contents, string $directory, bool $lossless = false): string
+    public function storeContents(string $contents, string $directory, bool $lossless = false, ?int $maxDimension = null, ?int $quality = null): string
     {
         $this->allowMemoryForDecoding();
+        $this->quality = $quality;
 
         $image = $this->decode($contents);
         $extension = $lossless ? 'png' : ($this->settings->format() === 'jpeg' ? 'jpg' : 'webp');
         $path = trim($directory, '/').'/'.Str::random(40).'.'.$extension;
         $disk = Storage::disk('public');
 
-        $largest = $this->settings->maxDimension();
+        $largest = $maxDimension ?? $this->settings->maxDimension();
         $thumbnail = self::thumbnailPath($path);
 
         // The public disk is configured not to throw, so a write it cannot make
@@ -91,6 +99,7 @@ class StoreOptimizedImage
     public function refreshThumbnail(string $path): string
     {
         $this->allowMemoryForDecoding();
+        $this->quality = null;
 
         $disk = Storage::disk('public');
         $contents = $disk->get($path);
@@ -244,7 +253,7 @@ class StoreOptimizedImage
     private function encodeWebp(GdImage $image): void
     {
         imagesavealpha($image, true);
-        imagewebp($image, null, $this->settings->quality());
+        imagewebp($image, null, $this->quality ?? $this->settings->quality());
     }
 
     /**
@@ -257,7 +266,7 @@ class StoreOptimizedImage
         imagefill($flat, 0, 0, imagecolorallocate($flat, 255, 255, 255));
         imagecopy($flat, $image, 0, 0, 0, 0, imagesx($image), imagesy($image));
         imageinterlace($flat, true);
-        imagejpeg($flat, null, $this->settings->quality());
+        imagejpeg($flat, null, $this->quality ?? $this->settings->quality());
     }
 
     private function encodePng(GdImage $image): void
