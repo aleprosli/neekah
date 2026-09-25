@@ -110,6 +110,12 @@ return [
         'pax' => 'pax',
     ],
 
+    'camera_album_filter' => [
+        'active' => 'Aktif',
+        'reported' => 'Ada laporan',
+        'purged' => 'Tamat',
+    ],
+
     'review_filter' => [
         'reported' => 'Dilaporkan vendor',
         'hidden' => 'Disembunyikan',
@@ -257,5 +263,10 @@ return [
         'no_packages' => 'Tiada pakej aktif',
         'no_payment_path' => 'Tiada cara bayar deposit: sambung Herepay atau isi butiran bank',
         'calendar_stale' => 'Dijeda: sahkan kalendar anda',
+    ],
+
+    'camera_tier' => [
+        'basic' => 'Basic',
+        'pro' => 'Pro',
     ],
 ];

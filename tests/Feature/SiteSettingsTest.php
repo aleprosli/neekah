@@ -9,7 +9,7 @@ use App\Support\TurnstileSettings;
 
 it('gives every settings group its own page, listed in one menu', function () {
     $admin = User::factory()->admin()->create();
-    $ids = ['perhubungan', 'seo', 'gambar', 'keselamatan', 'telegram', 'pro', 'tempahan', 'bayaran'];
+    $ids = ['perhubungan', 'seo', 'gambar', 'keselamatan', 'telegram', 'pro', 'tempahan', 'kamera', 'bayaran'];
 
     $response = $this->actingAs($admin)->get(route('admin.settings.edit'))->assertOk();
 

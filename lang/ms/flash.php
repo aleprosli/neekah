@@ -21,6 +21,7 @@ return [
     ],
 
     'admin' => [
+        'camera_saved' => 'Tetapan Kamera Majlis disimpan.',
         'online_booking_saved' => 'Tetapan tempahan online disimpan.',
         'category_added' => 'Kategori ditambah.',
         'category_updated' => 'Kategori dikemas kini.',
@@ -31,6 +32,10 @@ return [
         'vendor_overrides_saved' => 'Ciri untuk :vendor disimpan.',
         'herepay_saved' => 'Tetapan Herepay disimpan.',
         'pro_activated' => 'Pro untuk :vendor aktif sehingga :date.',
+        'camera_activated' => 'Kamera Majlis :tier untuk :wedding sudah aktif.',
+        'camera_purged' => 'Album Kamera Majlis :wedding telah dipadam.',
+        'camera_media_deleted' => 'Fail yang dilaporkan telah dipadam.',
+        'camera_report_dismissed' => 'Laporan diabaikan.',
         'pro_settings_saved' => 'Tetapan Pro disimpan.',
         'card_music_added' => 'Trek muzik ditambah.',
         'card_music_updated' => 'Trek muzik dikemas kini.',
@@ -68,6 +73,11 @@ return [
     ],
 
     'couple' => [
+        'camera_saved' => 'Tetapan album disimpan.',
+        'camera_link_rotated' => 'Pautan baharu sedia. Pautan dan QR lama tidak lagi berfungsi.',
+        'camera_export_queued' => 'ZIP sedang disediakan. Kami akan emel anda bila siap.',
+        'camera_checkout_failed' => 'Pautan bayaran tidak dapat dibuat sekarang. Sila cuba sebentar lagi.',
+        'camera_already_owned' => 'Album anda sudah ada pakej ini.',
         'deposit_link_failed' => 'Pautan bayaran tidak dapat dibuat sekarang. Tarikh anda masih dipegang; cuba bayar semula sebentar lagi.',
         'booking_held' => 'Tarikh dipegang untuk tempahan :reference. Bayar deposit untuk mengesahkannya.',
         'nfc_card_not_ready' => 'Kad ini belum dihubungkan dengan mana-mana jemputan.',

@@ -15,7 +15,7 @@ it('sends a vendor who opens a couple page to the vendor dashboard', function (s
     $this->actingAs($vendor->user)
         ->get(route($route))
         ->assertRedirect(route('vendor.dashboard'));
-})->with(['dashboard', 'bookings.index', 'enquiries.index', 'weddings.create', 'checklist.index', 'guests.index', 'budget.index', 'site.edit']);
+})->with(['dashboard', 'bookings.index', 'enquiries.index', 'weddings.create', 'checklist.index', 'guests.index', 'budget.index', 'site.edit', 'camera.index']);
 
 it('sends an admin who opens a couple page to the admin panel', function () {
     $this->actingAs(User::factory()->admin()->create())

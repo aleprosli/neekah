@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Enums\PaymentMethod;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\UpdateCameraSettingsRequest;
 use App\Http\Requests\UpdateContactSettingsRequest;
 use App\Http\Requests\UpdateHerepaySettingsRequest;
 use App\Http\Requests\UpdateImageSettingsRequest;
@@ -13,6 +14,7 @@ use App\Http\Requests\UpdateProSettingsRequest;
 use App\Http\Requests\UpdateSeoSettingsRequest;
 use App\Http\Requests\UpdateTelegramSettingsRequest;
 use App\Http\Requests\UpdateTurnstileSettingsRequest;
+use App\Support\CameraSettings;
 use App\Support\ContactSettings;
 use App\Support\Herepay\HerepayClient;
 use App\Support\Herepay\PaymentLinkGateway;
@@ -42,18 +44,18 @@ class SettingController extends Controller
     public const MENU = [
         'laman' => ['perhubungan', 'seo', 'gambar'],
         'sistem' => ['keselamatan', 'telegram'],
-        'wang' => ['pro', 'tempahan', 'bayaran'],
+        'wang' => ['pro', 'tempahan', 'kamera', 'bayaran'],
     ];
 
     /** Every page, in menu order; the first is the default. */
-    public const SECTIONS = ['perhubungan', 'seo', 'gambar', 'keselamatan', 'telegram', 'pro', 'tempahan', 'bayaran'];
+    public const SECTIONS = ['perhubungan', 'seo', 'gambar', 'keselamatan', 'telegram', 'pro', 'tempahan', 'kamera', 'bayaran'];
 
     /**
      * One page at a time, with the menu of the others. A page can hold more
      * than one form (Neekah Pro holds the plan and the gateway that takes its
      * payments); each form still posts on its own and comes back here.
      */
-    public function edit(ContactSettings $contact, SeoSettings $seo, TurnstileSettings $turnstile, TelegramSettings $telegram, ImageSettings $images, PaymentSettings $payments, ProSettings $pro, HerepaySettings $herepay, HerepayClient $herepayClient, OnlineBookingSettings $onlineBooking, string $section = self::SECTIONS[0]): View
+    public function edit(ContactSettings $contact, SeoSettings $seo, TurnstileSettings $turnstile, TelegramSettings $telegram, ImageSettings $images, PaymentSettings $payments, ProSettings $pro, HerepaySettings $herepay, HerepayClient $herepayClient, OnlineBookingSettings $onlineBooking, CameraSettings $camera, string $section = self::SECTIONS[0]): View
     {
         $pages = [
             'perhubungan' => [$this->contactSection($contact->all())],
@@ -63,6 +65,7 @@ class SettingController extends Controller
             'telegram' => [$this->telegramSection($telegram->all(), $telegram->isEnabled())],
             'pro' => [$this->proSection($pro, $herepayClient), $this->herepaySection($herepay, $herepayClient)],
             'tempahan' => [$this->onlineBookingSection($onlineBooking)],
+            'kamera' => [$this->cameraSection($camera, $herepayClient)],
             'bayaran' => [$this->paymentSection($payments)],
         ];
 
@@ -328,6 +331,57 @@ class SettingController extends Controller
     }
 
     /**
+     * Kamera Majlis: what couples pay Neekah for a shared wedding album, and
+     * what each tier allows. Taken on Neekah's own Herepay, like Pro, so the
+     * badge also says whether a couple can actually pay.
+     *
+     * @return array<string, mixed>
+     */
+    private function cameraSection(CameraSettings $settings, PaymentLinkGateway $gateway): array
+    {
+        $values = $settings->all();
+        $open = $settings->isEnabled() && $gateway->isConfigured();
+        $number = fn (string $key, ?string $help = null): array => [
+            'name' => $key,
+            'label' => Str::ucfirst(__('fields.camera_'.$key)),
+            'type' => 'number',
+            'value' => $values[$key],
+            'min' => UpdateCameraSettingsRequest::NUMBERS[$key][0],
+            'max' => UpdateCameraSettingsRequest::NUMBERS[$key][1],
+            'required' => true,
+            'help' => $help,
+        ];
+
+        return [
+            'id' => 'kamera',
+            'icon' => '📸',
+            'label' => __('props.admin.camera_label'),
+            'title' => __('props.admin.camera_title'),
+            'description' => __('props.admin.camera_description'),
+            'action' => route('admin.settings.camera'),
+            'submit' => __('props.admin.camera_submit'),
+            'columns' => true,
+            'badge' => [
+                'active' => $open,
+                'label' => $open ? __('props.admin.pro_checkout_open') : __('props.admin.pro_checkout_closed'),
+            ],
+            'note' => $gateway->isConfigured() ? null : __('props.admin.camera_gateway_missing'),
+            'fields' => [
+                ['name' => 'enabled', 'label' => __('props.admin.camera_enabled'), 'type' => 'checkbox', 'value' => $values['enabled'], 'help' => __('props.admin.camera_enabled_help')],
+                $number('basic_price'),
+                $number('pro_price', __('props.admin.camera_upgrade_help')),
+                $number('basic_max_photos'),
+                $number('basic_photo_px'),
+                $number('pro_photo_px'),
+                $number('pro_video_max_mb'),
+                $number('pro_video_max_seconds'),
+                $number('pro_fair_use_gb', __('props.admin.camera_fair_use_help')),
+                $number('retention_days', __('props.admin.camera_retention_help')),
+            ],
+        ];
+    }
+
+    /**
      * The payment gateway behind Neekah Pro. Only the on/off switch is kept
      * here; the keys stay in .env, and the note shows which are in place so an
      * admin knows what is still missing before switching it on.
@@ -477,6 +531,13 @@ class SettingController extends Controller
         $herepay->save($request->settings());
 
         return $this->saved(__('flash.admin.herepay_saved'));
+    }
+
+    public function updateCamera(UpdateCameraSettingsRequest $request, CameraSettings $settings): RedirectResponse
+    {
+        $settings->save($request->settings());
+
+        return $this->saved(__('flash.admin.camera_saved'));
     }
 
     public function updateOnlineBooking(UpdateOnlineBookingSettingsRequest $request, OnlineBookingSettings $settings): RedirectResponse

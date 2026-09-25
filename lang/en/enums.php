@@ -110,6 +110,12 @@ return [
         'pax' => 'pax',
     ],
 
+    'camera_album_filter' => [
+        'active' => 'Active',
+        'reported' => 'Reported',
+        'purged' => 'Ended',
+    ],
+
     'review_filter' => [
         'reported' => 'Reported by vendor',
         'hidden' => 'Hidden',
@@ -257,5 +263,10 @@ return [
         'no_packages' => 'No active package',
         'no_payment_path' => 'No way to pay the deposit: connect Herepay or add bank details',
         'calendar_stale' => 'Paused: confirm your calendar',
+    ],
+
+    'camera_tier' => [
+        'basic' => 'Basic',
+        'pro' => 'Pro',
     ],
 ];

@@ -182,6 +182,16 @@ return [
     */
 
     'custom' => [
+        'camera_album_closed' => 'Album ini tidak menerima gambar sekarang.',
+        'camera_video_not_allowed' => 'Video hanya untuk Kamera Majlis Pro.',
+        'camera_file_type' => 'Fail ini bukan gambar atau video yang disokong.',
+        'camera_file_too_large' => 'Fail mesti :mb MB atau kurang.',
+        'camera_video_too_long' => 'Video mesti :minutes minit atau kurang.',
+        'camera_slow_down' => 'Terlalu banyak muat naik dari telefon ini. Cuba lagi sebentar.',
+        'camera_limit_reached' => 'Album ini sudah penuh (:count gambar).',
+        'camera_passcode_wrong' => 'Kata laluan tidak betul.',
+        'camera_no_wedding' => 'Tiada majlis ditemui untuk emel ini.',
+        'camera_passcode_throttled' => 'Terlalu banyak cubaan. Cuba lagi dalam :minutes minit.',
         'pax_needs_fixed_deposit' => 'Harga anda dikira setiap pax, jadi deposit mesti jumlah tetap (RM).',
         'online_booking_closed' => 'Vendor ini tidak menerima tempahan online sekarang.',
         'date_weekday_off' => 'Vendor tidak menerima tempahan pada hari ini dalam minggu.',

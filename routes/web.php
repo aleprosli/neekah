@@ -10,10 +10,12 @@ use App\Http\Controllers\Auth\PhoneNumberController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\CalendarController;
+use App\Http\Controllers\CameraGuestController;
 use App\Http\Controllers\Customer as CustomerArea;
 use App\Http\Controllers\Customer\BookingController;
 use App\Http\Controllers\Customer\PaymentController;
 use App\Http\Controllers\HerepayBookingWebhookController;
+use App\Http\Controllers\HerepayCameraWebhookController;
 use App\Http\Controllers\HerepayWebhookController;
 use App\Http\Controllers\InvitationAcceptanceController;
 use App\Http\Controllers\InvitationPreviewController;
@@ -73,6 +75,18 @@ $site = function (): void {
     Route::get('/', [VendorController::class, 'index'])->name('vendors.index');
     Route::get('/compare', VendorComparisonController::class)->name('vendors.compare');
     Route::get('/vendors/{vendor}', [VendorController::class, 'show'])->name('vendors.show');
+    // Kamera Majlis: the guest page the QR opens. No account needed; the
+    // unguessable token is the key.
+    Route::get('/k/{album}', [CameraGuestController::class, 'show'])->middleware('throttle:60,1')->name('camera.show');
+    Route::post('/k/{album}/masuk', [CameraGuestController::class, 'enter'])->middleware('throttle:20,1')->name('camera.enter');
+    Route::post('/k/{album}/nama', [CameraGuestController::class, 'name'])->middleware('throttle:20,1')->name('camera.name');
+    Route::post('/k/{album}/muat-naik', [CameraGuestController::class, 'reserve'])->middleware('throttle:120,1')->name('camera.upload.reserve');
+    Route::put('/k/{album}/muat-naik/{media}/fail', [CameraGuestController::class, 'receive'])->middleware(['signed', 'throttle:120,1'])->name('camera.upload.file');
+    Route::post('/k/{album}/muat-naik/{media}/selesai', [CameraGuestController::class, 'complete'])->middleware('throttle:120,1')->name('camera.upload.complete');
+    Route::post('/k/{album}/muat-naik-biasa', [CameraGuestController::class, 'fallbackUpload'])->middleware('throttle:30,1')->name('camera.upload.fallback');
+    Route::get('/k/{album}/galeri', [CameraGuestController::class, 'gallery'])->middleware('throttle:120,1')->name('camera.gallery');
+    Route::delete('/k/{album}/media/{media}', [CameraGuestController::class, 'destroy'])->middleware('throttle:60,1')->name('camera.media.destroy');
+    Route::post('/k/{album}/media/{media}/lapor', [CameraGuestController::class, 'report'])->middleware('throttle:10,60')->name('camera.media.report');
     Route::get('/vendors/{vendor}/ketersediaan', VendorAvailabilityController::class)->middleware('throttle:60,1')->name('vendors.availability');
     // Open to everyone, signed in or not, so the throttle is what stands between
     // a profile and someone with a script.
@@ -261,6 +275,16 @@ $site = function (): void {
             Route::put('/weddings/{wedding}/kad/publish', [CustomerArea\WeddingSiteController::class, 'publish'])->name('weddings.site.publish');
 
             Route::get('/budget', [CustomerArea\WeddingBudgetController::class, 'index'])->middleware('wedding')->name('budget.index');
+            Route::get('/kamera', [CustomerArea\CameraController::class, 'index'])->middleware('wedding')->name('camera.index');
+            Route::post('/weddings/{wedding}/kamera/checkout', [CustomerArea\CameraController::class, 'checkout'])->middleware('throttle:10,1')->name('camera.checkout');
+            Route::get('/kamera/bayaran-selesai', [CustomerArea\CameraController::class, 'done'])->name('camera.done');
+            Route::put('/weddings/{wedding}/kamera', [CustomerArea\CameraController::class, 'update'])->name('camera.update');
+            Route::post('/weddings/{wedding}/kamera/pautan', [CustomerArea\CameraController::class, 'rotate'])->name('camera.rotate');
+            Route::put('/weddings/{wedding}/kamera/reka-bentuk', [CustomerArea\CameraController::class, 'design'])->name('camera.design');
+            Route::get('/weddings/{wedding}/kamera/media', [CustomerArea\CameraController::class, 'media'])->name('camera.media');
+            Route::post('/weddings/{wedding}/kamera/media/padam', [CustomerArea\CameraController::class, 'destroyMedia'])->name('camera.media.bulk');
+            Route::post('/weddings/{wedding}/kamera/zip', [CustomerArea\CameraController::class, 'export'])->middleware('throttle:5,1')->name('camera.export');
+            Route::get('/weddings/{wedding}/kamera/zip/{part}', [CustomerArea\CameraController::class, 'downloadExport'])->whereNumber('part')->name('camera.export.download');
             Route::put('/weddings/{wedding}/budget', [CustomerArea\WeddingBudgetController::class, 'update'])->name('weddings.budget.update');
 
             Route::get('/enquiries', [CustomerArea\EnquiryController::class, 'index'])->name('enquiries.index');
@@ -296,6 +320,12 @@ $site = function (): void {
         Route::put('/vendors/{vendor}/tier', [AdminArea\VendorTierController::class, 'update'])->name('vendors.tier');
         Route::post('/vendors/{vendor}/pro', [AdminArea\VendorProController::class, 'store'])->name('vendors.pro');
         Route::put('/vendors/{vendor}/features', [AdminArea\VendorFeatureOverrideController::class, 'update'])->name('vendors.features');
+        Route::get('/kamera', [AdminArea\CameraController::class, 'index'])->name('camera.index');
+        Route::get('/kamera/data', [AdminArea\CameraController::class, 'data'])->name('camera.data');
+        Route::post('/kamera', [AdminArea\CameraController::class, 'store'])->name('camera.store');
+        Route::delete('/kamera/media/{media}', [AdminArea\CameraController::class, 'destroyMedia'])->name('camera.media.destroy');
+        Route::post('/kamera/media/{media}/abaikan', [AdminArea\CameraController::class, 'dismissReport'])->name('camera.media.dismiss');
+        Route::delete('/kamera/{album}', [AdminArea\CameraController::class, 'destroy'])->name('camera.destroy');
         Route::get('/reviews', [AdminArea\ReviewController::class, 'index'])->name('reviews.index');
         Route::get('/reviews/data', [AdminArea\ReviewController::class, 'data'])->name('reviews.data');
         Route::post('/reviews', [AdminArea\ReviewController::class, 'store'])->name('reviews.store');
@@ -360,6 +390,7 @@ $site = function (): void {
         Route::put('/settings/pro', [AdminArea\SettingController::class, 'updatePro'])->name('settings.pro');
         Route::put('/settings/herepay', [AdminArea\SettingController::class, 'updateHerepay'])->name('settings.herepay');
         Route::put('/settings/tempahan-online', [AdminArea\SettingController::class, 'updateOnlineBooking'])->name('settings.online-booking');
+        Route::put('/settings/kamera', [AdminArea\SettingController::class, 'updateCamera'])->name('settings.camera');
     });
 
 };
@@ -379,6 +410,11 @@ Route::post('/webhooks/herepay', HerepayWebhookController::class)
 
 // A booking deposit, paid on the vendor's own Herepay account. Its own route,
 // so the route name in the signed callback URL says which kind it is.
+// A Kamera Majlis purchase, on Neekah's own Herepay account.
+Route::post('/webhooks/herepay/kamera', HerepayCameraWebhookController::class)
+    ->middleware('throttle:60,1')
+    ->name('webhooks.herepay.camera');
+
 Route::post('/webhooks/herepay/tempahan', HerepayBookingWebhookController::class)
     ->middleware('throttle:60,1')
     ->name('webhooks.herepay.booking');

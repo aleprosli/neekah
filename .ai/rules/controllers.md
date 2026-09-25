@@ -3,6 +3,7 @@ paths:
   - 'app/Http/Controllers/**'
   - app/Http/Controllers/SitemapController.php
   - app/Http/Controllers/SiteTemplatePreviewController.php
+  - app/Http/Controllers/CameraGuestController.php
 ---
 
 # Controllers
@@ -31,3 +32,9 @@ Call thumbnails() once per request, not inside the per-tile closure.
 Route::getController() caches the controller instance on the Route object, and the RouteCollection lives as long as the application. A property set during one request is still there on the next one in the same process - in tests, and under Octane in production. A per-request memo on VendorController served the second visitor the first visitor's vendor catalogue, and it looked like a cache-invalidation bug for an hour.
 
 Read the value once at the top of the action and pass it down as an argument. If something really is per-request, put it in a scoped binding (see Seo in AppServiceProvider), not on the controller.
+
+## Kamera Majlis uploads go phone → storage; the server only reserves, checks and processes
+Guest routes camera.* live at /k/{token} inside the language sets, outside auth, noindex. A guest is a hashed device token (cookie nk_cam with the session as fallback), an optional name, and a session flag per album once the passcode (Hash, throttled 5/10 min per IP and 50 per album, version bump signs everyone out) is entered. Upload = ReserveCameraUpload (tier/type/size/length checks, per-device hourly limit, ONE conditional increment on camera_albums so two phones cannot take the last Basic place) → CameraUploadTarget (presigned R2 PUT signed for Content-Type when the public disk is s3; a signed local PUT route otherwise) → CompleteCameraUpload (exists, exact declared size, MediaSniffer magic bytes must match the declared type; HEIC refused, the browser converts) → queued ProcessCameraMedia (photos through StoreOptimizedImage with the tier's maxDimension/quality override — strips EXIF/GPS; videos moved as-is, or through ffmpeg -map_metadata -1 when FFMPEG_BINARY is set). Never accept the original bytes of a photo, never trust the browser's MIME. Production needs an R2 CORS rule allowing PUT from the site and CSP connect-src for the R2 S3 endpoint, or presigned uploads fail in the browser. Guests may delete their own upload for 24h (DeleteCameraMedia keeps counters right). Covered by CameraUploadTest.
+
+## A guest report never hides a Kamera Majlis file by itself
+POST /k/{album}/media/{media}/lapor (throttled 10/hour) sets reported_at and report_reason only the first time, and sends one Telegram alert. The file stays visible until an admin deletes it or dismisses the report on /admin/kamera, so one guest cannot empty an album by reporting everything. A guest cannot report their own upload; report_url is null for their own device. Covered by AdminCameraTest.

@@ -604,6 +604,7 @@ return [
     ],
 
     'sidebar_couple' => [
+        'kamera' => 'Kamera Majlis',
         'hari_lagi' => ':count days to go',
         'hari_ini' => 'Today!',
         'majlis_saya' => 'My wedding',
@@ -723,6 +724,7 @@ return [
     ],
 
     'sidebar_admin' => [
+        'kamera' => 'Kamera Majlis',
         'ciri_vendor' => 'Vendor features',
         'muzik_kad' => 'Card music',
         'kad_nfc' => 'NFC cards',
@@ -942,5 +944,46 @@ return [
         'channel_herepay' => 'Deposits are paid through your Herepay.',
         'channel_manual' => 'Deposits are paid by bank transfer to your account.',
         'channel_none' => 'No way to pay a deposit yet: connect Herepay or add your bank details.',
+    ],
+
+    'camera' => [
+        'fallback_upload' => 'Upload photo',
+        'fallback_uploaded' => 'Thank you! Your photo is being added to the album.',
+        'title' => 'Kamera Majlis',
+        'subheading' => 'Guests scan a QR, take photos and share them straight to your wedding album.',
+        'herepay_title' => 'Kamera Majlis :tier · :wedding',
+        'herepay_description' => 'Neekah reference: :reference',
+        'open_album' => 'Open Kamera Majlis',
+        'done_paid_title' => 'Kamera Majlis is live!',
+        'done_paid_body' => 'The :tier plan is open. Share the link or QR with your guests.',
+        'done_waiting_title' => 'Waiting for the payment to confirm',
+        'done_waiting_body' => 'We are waiting for Herepay to confirm the payment for the :tier plan. This page updates itself.',
+        'done_failed_title' => 'The payment did not go through',
+        'done_failed_body' => 'The payment for the :tier plan did not go through. You were not charged; try again.',
+        'guest_title' => 'Kamera Majlis · :wedding',
+        'guest_intro' => 'This album is ready. Soon you can take and share photos here.',
+        'guest_closed' => 'This album is closed.',
+    ],
+
+    'admin_camera' => [
+        'title' => 'Kamera Majlis',
+        'subheading' => 'Every guest album, what it holds and until when, and what guests reported.',
+        'col_wedding' => 'Wedding',
+        'col_tier' => 'Package',
+        'col_media' => 'Photos / videos',
+        'col_storage' => 'Storage',
+        'col_paid' => 'Paid',
+        'col_expires' => 'Deleted on',
+        'col_state' => 'Status',
+        'stat_active' => 'Active albums',
+        'stat_media' => 'Photos & videos kept',
+        'stat_storage' => 'Storage used',
+        'stat_revenue' => 'Kamera Majlis sales',
+        'media_count' => ':photos photos · :videos videos',
+        'state_expiring' => 'Waiting to be deleted',
+        'purge' => 'Delete album',
+        'purge_title' => 'Delete the Kamera Majlis album of :wedding now?',
+        'purge_message' => ':count photos and videos are deleted for good, and the guest link closes. The purchase records stay.',
+        'purge_confirm' => 'Yes, delete the album',
     ],
 ];

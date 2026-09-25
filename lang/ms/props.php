@@ -115,6 +115,16 @@ return [
     ],
 
     'admin' => [
+        'camera_label' => 'Kamera Majlis',
+        'camera_title' => 'Kamera Majlis (pengantin → Neekah)',
+        'camera_description' => 'Album bersama untuk tetamu majlis: tetamu imbas QR, ambil dan muat naik gambar. Pengantin bayar kepada Neekah melalui Herepay (akaun yang sama dengan Neekah Pro).',
+        'camera_submit' => 'Simpan tetapan Kamera Majlis',
+        'camera_enabled' => 'Jual Kamera Majlis',
+        'camera_enabled_help' => 'Bila dihidupkan dan Herepay aktif, pengantin boleh membeli dari halaman Kamera Majlis mereka.',
+        'camera_upgrade_help' => 'Pengantin yang naik taraf dari Basic bayar beza harga.',
+        'camera_fair_use_help' => 'Pro tiada had; admin diberitahu (Telegram) bila satu album melepasi saiz ini.',
+        'camera_retention_help' => 'Album dan semua fail dipadam selepas tempoh ini dari tarikh majlis.',
+        'camera_gateway_missing' => 'Herepay belum dihidupkan (Tetapan → Neekah Pro), jadi pembelian belum dibuka.',
         'online_booking_label' => 'Tempahan online',
         'online_booking_title' => 'Tempahan online (pengantin → vendor Pro)',
         'online_booking_description' => 'Vendor Neekah Pro boleh terima tempahan tarikh dengan deposit terus ke akaun mereka sendiri (Herepay vendor atau pindahan bank). Neekah tidak memegang wang ini.',

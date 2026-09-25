@@ -12,11 +12,13 @@ class DeleteUserAccount
     public function __construct(
         private RemoveVendorProfile $removeVendorProfile,
         private StoreOptimizedImage $images,
+        private PurgeCameraAlbum $purgeCameraAlbum,
     ) {}
 
     /**
      * Delete an account an admin was allowed to delete (UserPolicy::delete),
-     * along with the photos it uploaded to its vendor profile or wedding cards.
+     * along with the photos it uploaded to its vendor profile or wedding cards,
+     * and everything guests shared into its Kamera Majlis album.
      */
     public function handle(User $user, User $admin): void
     {
@@ -25,10 +27,14 @@ class DeleteUserAccount
                 $this->removeVendorProfile->handle($user->vendor);
             }
 
-            $user->createdWeddings()->with('site.photos')->get()->each(function (Wedding $wedding): void {
+            $user->createdWeddings()->with(['site.photos', 'cameraAlbum'])->get()->each(function (Wedding $wedding): void {
                 $this->images->delete($wedding->site?->cover_image);
                 $this->images->delete($wedding->site?->gift_qr_image);
                 $wedding->site?->photos->each(fn ($photo) => $this->images->delete($photo->path));
+
+                if ($wedding->cameraAlbum) {
+                    $this->purgeCameraAlbum->handle($wedding->cameraAlbum);
+                }
             });
 
             $user->delete();
