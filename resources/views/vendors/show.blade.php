@@ -177,10 +177,10 @@
                              something the platform cannot stand behind. --}}
                         <div class="flex flex-wrap gap-x-6 gap-y-1 text-sm">
                             @if ($vendor->reviews_count)
-                                <p><span class="text-gold-500">★</span> <span class="font-semibold">{{ number_format($vendor->rating_avg, 1) }}</span> <span class="text-ink-muted">· {{ $vendor->reviews_count }} dari tempahan disahkan</span></p>
+                                <p><span class="text-gold-500">★</span> <span class="font-semibold">{{ number_format($vendor->rating_avg, 1) }}</span> <span class="text-ink-muted">· {{ __('pages.profile.from_confirmed_bookings', ['count' => $vendor->reviews_count]) }}</span></p>
                             @endif
                             @if ($openReviews['total'])
-                                <p><span class="text-gold-500">★</span> <span class="font-semibold">{{ number_format($openReviews['average'], 1) }}</span> <span class="text-ink-muted">· {{ $openReviews['total'] }} review terbuka</span></p>
+                                <p><span class="text-gold-500">★</span> <span class="font-semibold">{{ number_format($openReviews['average'], 1) }}</span> <span class="text-ink-muted">· {{ __('pages.profile.open_reviews_count', ['count' => $openReviews['total']]) }}</span></p>
                             @endif
                         </div>
                     </div>
@@ -242,7 +242,7 @@
                     <form method="POST" action="{{ route('vendors.bookings.store', $vendor) }}" class="flex flex-col gap-4 rounded-2xl border border-line bg-surface-raised p-6 shadow-xl shadow-brand-900/10">
                         @csrf
                         <div class="flex items-center justify-between gap-2">
-                            <p class="text-sm text-ink-muted">{{ __('pages.profile.dari') }}<span class="font-display text-2xl font-semibold text-ink">RM{{ number_format($vendor->price_from) }}</span> / {{ $vendor->price_unit->label() }}</p>
+                            <p class="text-sm text-ink-muted">{{ __('pages.profile.dari') }} <span class="font-display text-2xl font-semibold text-ink">RM{{ number_format($vendor->price_from) }}</span> / {{ $vendor->price_unit->label() }}</p>
                             <span class="shrink-0 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-800">{{ __('pages.online_booking.badge') }}</span>
                         </div>
 
@@ -312,7 +312,7 @@
                             @endif
 
                             @if ($vendor->phone)
-                                <p class="text-center text-sm text-ink-muted">{{ __('pages.profile.atau_hubungi_terus_di') }}<a href="tel:{{ preg_replace('/[^0-9+]/', '', $vendor->phone) }}" data-track-phone="{{ route('vendors.contact.phone', $vendor) }}" data-track-token="{{ csrf_token() }}" class="font-medium text-ink underline underline-offset-4">{{ $vendor->phone }}</a>
+                                <p class="text-center text-sm text-ink-muted">{{ __('pages.profile.atau_hubungi_terus_di') }} <a href="tel:{{ preg_replace('/[^0-9+]/', '', $vendor->phone) }}" data-track-phone="{{ route('vendors.contact.phone', $vendor) }}" data-track-token="{{ csrf_token() }}" class="font-medium text-ink underline underline-offset-4">{{ $vendor->phone }}</a>
                                 </p>
                             @endif
                         @else
@@ -325,7 +325,7 @@
                     </form>
                 @else
                     <div class="flex flex-col gap-4 rounded-2xl border border-line bg-surface-raised p-6 shadow-xl shadow-brand-900/10">
-                        <p class="text-sm text-ink-muted">{{ __('pages.profile.dari_2') }}<span class="font-display text-2xl font-semibold text-ink">RM{{ number_format($vendor->price_from) }}</span> / {{ $vendor->price_unit->label() }}</p>
+                        <p class="text-sm text-ink-muted">{{ __('pages.profile.dari_2') }} <span class="font-display text-2xl font-semibold text-ink">RM{{ number_format($vendor->price_from) }}</span> / {{ $vendor->price_unit->label() }}</p>
 
                         @auth
                             {{-- The vendor's own number is only ever rendered for a signed-in
@@ -336,7 +336,7 @@
                             @endif
 
                             @if ($vendor->phone)
-                                <p class="text-center text-sm text-ink-muted">{{ __('pages.profile.atau_hubungi_terus_di_2') }}<a href="tel:{{ preg_replace('/[^0-9+]/', '', $vendor->phone) }}" data-track-phone="{{ route('vendors.contact.phone', $vendor) }}" data-track-token="{{ csrf_token() }}" class="font-medium text-ink underline underline-offset-4">{{ $vendor->phone }}</a>
+                                <p class="text-center text-sm text-ink-muted">{{ __('pages.profile.atau_hubungi_terus_di_2') }} <a href="tel:{{ preg_replace('/[^0-9+]/', '', $vendor->phone) }}" data-track-phone="{{ route('vendors.contact.phone', $vendor) }}" data-track-token="{{ csrf_token() }}" class="font-medium text-ink underline underline-offset-4">{{ $vendor->phone }}</a>
                                 </p>
                             @endif
                         @else
@@ -368,7 +368,7 @@
 
                 @auth
                     @if (auth()->user()->isCustomer())
-                        <p class="mt-3 text-center text-xs text-ink-muted">{{ __('pages.profile.ada_masalah_dengan_vendor_ini') }}<a href="{{ route('vendors.report.create', $vendor) }}" class="font-medium underline underline-offset-4 hover:text-ink">{{ __('pages.profile.laporkan_vendor') }}</a>
+                        <p class="mt-3 text-center text-xs text-ink-muted">{{ __('pages.profile.ada_masalah_dengan_vendor_ini') }} <a href="{{ route('vendors.report.create', $vendor) }}" class="font-medium underline underline-offset-4 hover:text-ink">{{ __('pages.profile.laporkan_vendor') }}</a>
                         </p>
                     @endif
                 @endauth
@@ -377,7 +377,7 @@
 
         @if ($related->isNotEmpty())
             <section class="mt-12 flex flex-col gap-5 border-t border-line pt-10">
-                <h2 class="font-display text-2xl font-semibold">{{ $category->name }} lain yang mungkin anda suka</h2>
+                <h2 class="font-display text-2xl font-semibold">{{ __('pages.profile.lain_yang_mungkin_anda_suka', ['category' => $category->name]) }}</h2>
                 <ul class="grid grid-cols-2 gap-x-3 gap-y-8 sm:gap-x-6 md:grid-cols-3">
                     @foreach ($related as $candidate)
                         <li><x-vendor-card :vendor="$candidate" /></li>

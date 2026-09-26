@@ -7,7 +7,7 @@ return [
             'eyebrow' => 'Neekah Kenangan',
             'title' => 'Setiap tetamu jadi jurugambar majlis anda',
             'body' => 'Letak kad QR di setiap meja. Tetamu imbas, ambil gambar dan video dengan telefon mereka, dan semuanya masuk ke satu album bersama. Tiada aplikasi, tiada log masuk.',
-            'per_album' => 'bayaran sekali untuk satu album majlis',
+            'per_album' => 'Bayaran sekali untuk satu album majlis',
             'cta' => 'Cuba Neekah Kenangan',
             'steps' => [
                 'scan' => ['title' => 'Imbas QR.', 'body' => 'Tetamu imbas kad di meja dan terus masuk ke album anda.'],
@@ -23,7 +23,7 @@ return [
             'free' => 'Percuma',
             'basic_body' => 'Untuk mula dikenali dan dihubungi pengantin.',
             'per_month' => '/ bulan',
-            'pro_yearly' => 'atau :price setahun',
+            'pro_yearly' => 'Atau :price setahun',
             'pro_includes' => 'Semua dalam Basic, ditambah:',
             'pro_tokens_title' => 'Token boost bulanan',
             'pro_tokens' => ':count token setiap bulan untuk naik ke atas senarai.',
@@ -146,6 +146,7 @@ return [
         'lihat_semua_vendor' => 'Lihat semua vendor →',
         'tak_jumpa_vendor_yang_anda' => 'Tak jumpa vendor yang anda cari?',
         'whatsapp_kami' => 'WhatsApp kami',
+        'kami_bantu_kongsikan' => ', kami bantu kongsikan kepada vendor lain.',
         'tanpa_orang_tengah' => 'Tanpa orang tengah',
         'deal_terus_dengan_vendor_kami' => 'Deal terus dengan vendor. Kami cuma jambatan.',
         'neekah_tidak_mengambil_sebarang_bayaran' => 'Neekah tidak mengambil sebarang bayaran, sama ada daripada anda atau vendor. Hubungi vendor terus, bincang pakej, buat site visit, dan bayar mengikut cara yang anda berdua setuju. Tugas kami ialah pastikan anda jumpa vendor yang tepat, dengan lebih cepat.',
@@ -173,6 +174,7 @@ return [
 
     'compare' => [
         'sebelum_anda_pilih' => 'Sebelum anda pilih',
+        'terbaik' => 'Terbaik',
         'kategori' => 'Kategori',
         'lokasi' => 'Lokasi',
         'kawasan_dicover' => 'Kawasan dicover',
@@ -395,6 +397,9 @@ return [
         'pakej_yang_ditawarkan' => 'Pakej yang ditawarkan',
         'vendor_ini_belum_menambah_pakej' => 'Vendor ini belum menambah pakej.',
         'review' => 'Review',
+        'from_confirmed_bookings' => ':count dari tempahan disahkan',
+        'open_reviews_count' => ':count review terbuka',
+        'lain_yang_mungkin_anda_suka' => ':category lain yang mungkin anda suka',
         'dari' => 'Dari',
         'tarikh_majlis' => 'Tarikh majlis',
         'pakej' => 'Pakej',
@@ -462,12 +467,14 @@ return [
         'buang_pasangan_2' => 'Buang pasangan',
         'batalkan_jemputan' => 'Batalkan jemputan',
         'emel_pasangan' => 'Emel pasangan',
+        'emel_pasangan_anda' => 'Emel pasangan anda',
         'jemput_pasangan' => 'Jemput pasangan',
         'hanya_pemilik_majlis_boleh_menjemput' => 'Hanya pemilik majlis boleh menjemput pasangan.',
     ],
 
     'impersonation' => [
         'mod_impersonate_anda_melihat_neekah' => 'Mod impersonate. Anda melihat Neekah sebagai',
+        'pembayaran_dimatikan' => '. Pembayaran dimatikan.',
         'kembali_sebagai_admin' => 'Kembali sebagai admin',
     ],
 
@@ -488,6 +495,8 @@ return [
         'hantar_review' => 'Hantar review',
         'anda_boleh_hantar_tanpa_akaun' => 'Anda boleh hantar tanpa akaun.',
         'log_masuk' => 'Log masuk',
+        'jika_mahu_terikat_pada_akaun' => 'jika mahu review ini terikat pada akaun anda.',
+        'tulis_review_untuk' => 'Tulis review untuk :name',
     ],
 
     'gallery_page' => [
@@ -509,9 +518,9 @@ return [
         'gaya' => 'Gaya',
         'kad_kahwin_digital' => 'Kad kahwin digital',
         'kad_jemputan_yang_terasa_seperti' => 'Kad jemputan yang terasa seperti kad sebenar',
-        'sampul_yang_dibuka_kertas_bertekstur' => 'Sampul yang dibuka, kertas bertekstur dan nama anda dalam tulisan khat. Tetamu dapat peta, kalendar dan RSVP dalam satu pautan &mdash;',
+        'sampul_yang_dibuka_kertas_bertekstur' => 'Sampul yang dibuka, kertas bertekstur dan nama anda dalam tulisan khat. Tetamu dapat peta, kalendar dan RSVP dalam satu pautan —',
         'semua' => 'Semua',
-        'lihat' => 'Lihat &rarr;',
+        'lihat' => 'Lihat →',
         'sudah_jumpa_yang_berkenan' => 'Sudah jumpa yang berkenan?',
         'anda_boleh_tukar_template_bila' => 'Anda boleh tukar template bila-bila masa; maklumat majlis kekal.',
     ],
@@ -609,7 +618,7 @@ return [
     'blog_page' => [
         'blog' => 'Blog',
         'blog_neekah' => 'Blog Neekah',
-        'panduan_idea_majlis_perkahwinan' => 'Panduan &amp; idea majlis perkahwinan',
+        'panduan_idea_majlis_perkahwinan' => 'Panduan & idea majlis perkahwinan',
         'tip_merancang_majlis_memilih_vendor' => 'Tip merancang majlis, memilih vendor, menyusun bajet dan menjemput tetamu, daripada pasukan Neekah.',
     ],
 

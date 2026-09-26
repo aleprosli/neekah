@@ -59,7 +59,7 @@ const remove = (at) => {
     <div class="flex min-w-0 flex-col gap-2">
         <span class="text-xs font-semibold tracking-wide uppercase">
             {{ label }}
-            <span class="font-normal normal-case opacity-70">(pilihan, sehingga {{ max }})</span>
+            <span class="font-normal normal-case opacity-70">{{ $t('common.optional_up_to', { count: max }) }}</span>
         </span>
 
         <ul v-if="chosen.length" class="flex flex-wrap gap-2">

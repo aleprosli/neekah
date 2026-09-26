@@ -469,7 +469,7 @@ return [
 
     'units' => [
         'people' => ':count people',
-        'up_to_people' => 'up to :count people',
+        'up_to_people' => 'Up to :count people',
         'replies' => ':count replies',
         'guests_on_list' => ':count guests on the list',
         'shared_created' => ':shared shared · :created created',
@@ -496,7 +496,6 @@ return [
         'deactivated_since' => 'Deactivated since :date',
         'delete_forever' => 'Yes, delete for good',
         'deleted_user' => 'Deleted user',
-        'deleted_user_lower' => 'deleted user',
         'card_draft_note' => 'Your card will be at :address once it is published.',
         'card_address_free' => 'Available! Your card will be at :address',
         'pick_one_vendor' => 'Pick at least one vendor.',

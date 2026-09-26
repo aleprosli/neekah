@@ -59,6 +59,11 @@ return [
         'subtitle' => 'Masukkan emel anda dan kami akan hantar pautan untuk set semula kata laluan.',
     ],
 
+    'reset' => [
+        'title' => 'Set kata laluan baharu',
+        'subtitle' => 'Pilih kata laluan baharu untuk akaun anda.',
+    ],
+
     'phone' => [
         'title' => 'Satu langkah lagi',
         'subtitle' => 'Masukkan nombor telefon anda supaya vendor boleh menghubungi anda selepas anda menempah.',

@@ -7,7 +7,7 @@ return [
             'eyebrow' => 'Neekah Moments',
             'title' => 'Every guest becomes your wedding photographer',
             'body' => 'Put a QR card on every table. Guests scan it, take photos and videos on their own phones, and everything lands in one shared album. No app, no sign-in.',
-            'per_album' => 'one-off payment for one wedding album',
+            'per_album' => 'One-off payment for one wedding album',
             'cta' => 'Try Neekah Moments',
             'steps' => [
                 'scan' => ['title' => 'Scan the QR.', 'body' => 'Guests scan the card on their table and go straight into your album.'],
@@ -23,7 +23,7 @@ return [
             'free' => 'Free',
             'basic_body' => 'To get found and contacted by couples.',
             'per_month' => '/ month',
-            'pro_yearly' => 'or :price a year',
+            'pro_yearly' => 'Or :price a year',
             'pro_includes' => 'Everything in Basic, plus:',
             'pro_tokens_title' => 'Monthly boost tokens',
             'pro_tokens' => ':count tokens every month to rise to the top of the list.',
@@ -146,6 +146,7 @@ return [
         'lihat_semua_vendor' => 'See all vendors →',
         'tak_jumpa_vendor_yang_anda' => 'Cannot find the vendor you are after?',
         'whatsapp_kami' => 'WhatsApp us',
+        'kami_bantu_kongsikan' => ' and we will pass it on to other vendors.',
         'tanpa_orang_tengah' => 'No middlemen',
         'deal_terus_dengan_vendor_kami' => 'Deal directly with vendors. We are only the bridge.',
         'neekah_tidak_mengambil_sebarang_bayaran' => 'Neekah takes no payment, from you or from the vendor. Contact vendors directly, discuss packages, do a site visit, and pay however the two of you agree. Our job is to help you find the right vendor, faster.',
@@ -173,6 +174,7 @@ return [
 
     'compare' => [
         'sebelum_anda_pilih' => 'Before you choose',
+        'terbaik' => 'Best',
         'kategori' => 'Category',
         'lokasi' => 'Location',
         'kawasan_dicover' => 'Areas covered',
@@ -394,7 +396,10 @@ return [
         'kawasan_perkhidmatan' => 'Areas covered',
         'pakej_yang_ditawarkan' => 'Packages offered',
         'vendor_ini_belum_menambah_pakej' => 'This vendor has not added any packages yet.',
-        'review' => 'reviews',
+        'review' => 'Reviews',
+        'from_confirmed_bookings' => ':count from confirmed bookings',
+        'open_reviews_count' => ':count open reviews',
+        'lain_yang_mungkin_anda_suka' => 'More :category you may like',
         'dari' => 'From',
         'tarikh_majlis' => 'Wedding date',
         'pakej' => 'Package',
@@ -462,12 +467,14 @@ return [
         'buang_pasangan_2' => 'Remove partner',
         'batalkan_jemputan' => 'Cancel invitation',
         'emel_pasangan' => "Partner's email",
+        'emel_pasangan_anda' => "Your partner's email",
         'jemput_pasangan' => 'Invite partner',
         'hanya_pemilik_majlis_boleh_menjemput' => 'Only the wedding owner can invite a partner.',
     ],
 
     'impersonation' => [
         'mod_impersonate_anda_melihat_neekah' => 'Impersonating. You are seeing Neekah as',
+        'pembayaran_dimatikan' => '. Payments are switched off.',
         'kembali_sebagai_admin' => 'Back to being an admin',
     ],
 
@@ -488,6 +495,8 @@ return [
         'hantar_review' => 'Send review',
         'anda_boleh_hantar_tanpa_akaun' => 'You can send one without an account.',
         'log_masuk' => 'Log in',
+        'jika_mahu_terikat_pada_akaun' => 'if you want this review tied to your account.',
+        'tulis_review_untuk' => 'Write a review for :name',
     ],
 
     'gallery_page' => [
@@ -509,9 +518,9 @@ return [
         'gaya' => 'Style',
         'kad_kahwin_digital' => 'Digital wedding cards',
         'kad_jemputan_yang_terasa_seperti' => 'Invitations that feel like a real card',
-        'sampul_yang_dibuka_kertas_bertekstur' => 'An envelope that opens, textured paper and your names in script. Guests get the map, the calendar and RSVP in one link &mdash;',
+        'sampul_yang_dibuka_kertas_bertekstur' => 'An envelope that opens, textured paper and your names in script. Guests get the map, the calendar and RSVP in one link —',
         'semua' => 'All',
-        'lihat' => 'View &rarr;',
+        'lihat' => 'View →',
         'sudah_jumpa_yang_berkenan' => 'Found one you like?',
         'anda_boleh_tukar_template_bila' => 'You can change template whenever you like; your details stay put.',
     ],
@@ -609,7 +618,7 @@ return [
     'blog_page' => [
         'blog' => 'Blog',
         'blog_neekah' => 'The Neekah blog',
-        'panduan_idea_majlis_perkahwinan' => 'Wedding guides &amp; ideas',
+        'panduan_idea_majlis_perkahwinan' => 'Wedding guides & ideas',
         'tip_merancang_majlis_memilih_vendor' => 'Tips on planning the day, choosing vendors, working out a budget and inviting guests, from the Neekah team.',
     ],
 

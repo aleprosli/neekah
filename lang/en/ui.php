@@ -6,7 +6,7 @@ return [
         'forgot_password' => 'Forgot your password?',
         'continue_google' => 'Continue with Google',
         'remember_me' => 'Remember me',
-        'or' => 'or',
+        'or' => 'Or',
     ],
 
     'common' => [
@@ -41,11 +41,14 @@ return [
         'previous' => 'Previous',
         'next' => 'Next',
         'find_vendors' => 'Find vendors',
+        'optional' => '(optional)',
+        'optional_up_to' => '(optional, up to :count)',
     ],
 
     'customer' => [
         'tetapkan_tarikh_lokasi_dan_bajet' => 'Set the date, the place and the budget. Neekah tracks your vendors, payments and what is left.',
         'belum_ada_vendor_ditempah' => 'No vendors booked yet.',
+        'untuk_mula' => 'to get started.',
         'tanya_vendor_tentang_pakej_tarikh' => 'Ask a vendor about packages, dates or prices before you book.',
         'start_project_title' => 'Start with your wedding project',
         'start_project_action' => 'Create a wedding project',
@@ -270,7 +273,7 @@ return [
 
     'guests' => [
         'tetamu_akan_dibuang' => ':name will be removed from the list. Their RSVP reply stays.',
-        'aina_sofea_0123456789_bride_family' => 'Aina Sofea, 0123456789, bride, family, 2&#10;Pak Long Rahim, , groom, family, 4',
+        'aina_sofea_0123456789_bride_family' => "Aina Sofea, 0123456789, bride, family, 2\nPak Long Rahim, , groom, family, 4",
         'senarai_tetamu_masih_kosong' => 'Your guest list is empty',
         'tambah_tetamu_satu_per_satu' => 'Add guests one at a time, or paste a list from Excel or WhatsApp. Each guest gets their own personal card link.',
         'padam_tetamu_ini' => 'Delete this guest?',
@@ -382,7 +385,7 @@ return [
         'diselaraskan_automatik_dengan_pakej_termurah' => 'Set automatically from your cheapest package once you add one.',
         'unit_harga' => 'Price unit',
         'maklumat_asas' => 'Basic details',
-        'hubungi_harga' => 'Contact &amp; price',
+        'hubungi_harga' => 'Contact & price',
         'media_sosial' => 'Social media',
         'dipaparkan_pada_halaman_awam_anda' => 'Shown on your public page. Type a username or paste the full link; leave blank if you have none.',
         'rupa_kad_vendor' => 'Vendor card look',
@@ -517,6 +520,8 @@ return [
         'belum_ada_gambar_portfolio_yang' => 'No photos yet. A strong portfolio gets more bookings.',
         'susunan_galeri' => 'Gallery order',
         'seret_untuk_susun' => 'Drag to reorder.',
+        'first_photos' => 'The first :count photos',
+        'first_photos_fill_grid' => 'fill the grid at the top of your public page; the rest appear when a couple taps “Show all photos”.',
         'menyimpan' => 'Saving…',
         'grid_utama' => 'Main grid',
         'disembunyikan' => 'Hidden',
@@ -739,9 +744,10 @@ return [
         'pelapor' => 'Reported by',
         'booking' => 'Booking',
         'keputusan' => 'Decision',
-        'sahkan_kenakan_tindakan' => 'Uphold &amp; apply the action',
+        'sahkan_kenakan_tindakan' => 'Uphold & apply the action',
         'tolak_laporan' => 'Dismiss report',
         'tindakan' => 'Action:',
+        'offence_number' => '(offence no. :number)',
     ],
 
     'admin_vendor' => [
@@ -892,7 +898,7 @@ return [
         'gambar_utama_pilihan' => 'Main photo (optional)',
         'atur_cara' => 'Itinerary',
         'susunan_acara_pada_hari_majlis' => 'The order of the day, as your guests will read it.',
-        'hubungi_rsvp' => 'Contact &amp; RSVP',
+        'hubungi_rsvp' => 'Contact & RSVP',
         'benarkan_tetamu_mengesahkan_kehadiran_rsvp' => 'Let guests confirm they are coming (RSVP)',
         'salam_kaut' => 'Money gifts',
         'kod_qr_duitnow_dan_nombor' => 'A DuitNow QR code and account numbers for guests who want to send a gift.',
@@ -1075,7 +1081,7 @@ return [
         'name_placeholder' => 'Your name (optional)',
         'save_name' => 'Save',
         'sharing_as' => 'Sharing as :name',
-        'change' => 'change',
+        'change' => 'Change',
         'take_photo' => 'Take a photo',
         'pick_files' => 'Pick from phone',
         'record_video' => 'Record a video',

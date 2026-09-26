@@ -114,7 +114,7 @@ const tones = {
                     </div>
 
                     <label class="flex flex-col gap-1.5 text-sm">
-                        <span class="font-medium">{{ $t('booking.nota_2') }}<span class="font-normal text-ink-muted">(pilihan)</span></span>
+                        <span class="font-medium">{{ $t('booking.nota_2') }} <span class="font-normal text-ink-muted">{{ $t('common.optional') }}</span></span>
                         <input
                             type="text"
                             name="note"
@@ -127,7 +127,7 @@ const tones = {
                     </label>
 
                     <label class="flex flex-col gap-1.5 text-sm">
-                        <span class="font-medium">{{ $t('booking.gambar_resit') }}<span class="font-normal text-ink-muted">(pilihan)</span></span>
+                        <span class="font-medium">{{ $t('booking.gambar_resit') }} <span class="font-normal text-ink-muted">{{ $t('common.optional') }}</span></span>
                         <input
                             type="file"
                             name="receipt"

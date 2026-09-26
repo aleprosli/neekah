@@ -6,7 +6,7 @@ return [
         'forgot_password' => 'Lupa kata laluan?',
         'continue_google' => 'Teruskan dengan Google',
         'remember_me' => 'Ingat saya',
-        'or' => 'atau',
+        'or' => 'Atau',
     ],
 
     'common' => [
@@ -41,11 +41,14 @@ return [
         'previous' => 'Sebelum',
         'next' => 'Seterusnya',
         'find_vendors' => 'Cari vendor',
+        'optional' => '(pilihan)',
+        'optional_up_to' => '(pilihan, sehingga :count)',
     ],
 
     'customer' => [
         'tetapkan_tarikh_lokasi_dan_bajet' => 'Tetapkan tarikh, lokasi dan bajet. Neekah akan jejak vendor, bayaran dan baki bajet anda.',
         'belum_ada_vendor_ditempah' => 'Belum ada vendor ditempah.',
+        'untuk_mula' => 'untuk mula.',
         'tanya_vendor_tentang_pakej_tarikh' => 'Tanya vendor tentang pakej, tarikh atau harga sebelum menempah.',
         'start_project_title' => 'Mula dengan wedding project anda',
         'start_project_action' => 'Cipta wedding project',
@@ -270,7 +273,7 @@ return [
 
     'guests' => [
         'tetamu_akan_dibuang' => ':name akan dibuang dari senarai. Jawapan RSVP mereka kekal.',
-        'aina_sofea_0123456789_bride_family' => 'Aina Sofea, 0123456789, bride, family, 2&#10;Pak Long Rahim, , groom, family, 4',
+        'aina_sofea_0123456789_bride_family' => "Aina Sofea, 0123456789, bride, family, 2\nPak Long Rahim, , groom, family, 4",
         'senarai_tetamu_masih_kosong' => 'Senarai tetamu masih kosong',
         'tambah_tetamu_satu_per_satu' => 'Tambah tetamu satu per satu, atau tampal senarai dari Excel atau WhatsApp. Setiap tetamu dapat pautan kad peribadi mereka sendiri.',
         'padam_tetamu_ini' => 'Padam tetamu ini?',
@@ -382,7 +385,7 @@ return [
         'diselaraskan_automatik_dengan_pakej_termurah' => 'Diselaraskan automatik dengan pakej termurah bila anda tambah pakej.',
         'unit_harga' => 'Unit harga',
         'maklumat_asas' => 'Maklumat asas',
-        'hubungi_harga' => 'Hubungi &amp; harga',
+        'hubungi_harga' => 'Hubungi & harga',
         'media_sosial' => 'Media sosial',
         'dipaparkan_pada_halaman_awam_anda' => 'Dipaparkan pada halaman awam anda. Taip nama pengguna atau tampal pautan penuh; biarkan kosong jika tiada.',
         'rupa_kad_vendor' => 'Rupa kad vendor',
@@ -517,6 +520,8 @@ return [
         'belum_ada_gambar_portfolio_yang' => 'Belum ada gambar. Portfolio yang menarik menaikkan kadar tempahan.',
         'susunan_galeri' => 'Susunan galeri',
         'seret_untuk_susun' => 'Seret untuk susun.',
+        'first_photos' => ':count gambar pertama',
+        'first_photos_fill_grid' => 'mengisi grid di atas halaman awam anda; selebihnya muncul apabila pengantin menekan “Tunjuk semua gambar”.',
         'menyimpan' => 'Menyimpan…',
         'grid_utama' => 'Grid utama',
         'disembunyikan' => 'Disembunyikan',
@@ -739,9 +744,10 @@ return [
         'pelapor' => 'Pelapor',
         'booking' => 'Booking',
         'keputusan' => 'Keputusan',
-        'sahkan_kenakan_tindakan' => 'Sahkan &amp; kenakan tindakan',
+        'sahkan_kenakan_tindakan' => 'Sahkan & kenakan tindakan',
         'tolak_laporan' => 'Tolak laporan',
         'tindakan' => 'Tindakan:',
+        'offence_number' => '(pelanggaran ke-:number)',
     ],
 
     'admin_vendor' => [
@@ -892,7 +898,7 @@ return [
         'gambar_utama_pilihan' => 'Gambar utama (pilihan)',
         'atur_cara' => 'Atur cara',
         'susunan_acara_pada_hari_majlis' => 'Susunan acara pada hari majlis, seperti yang tetamu akan baca.',
-        'hubungi_rsvp' => 'Hubungi &amp; RSVP',
+        'hubungi_rsvp' => 'Hubungi & RSVP',
         'benarkan_tetamu_mengesahkan_kehadiran_rsvp' => 'Benarkan tetamu mengesahkan kehadiran (RSVP)',
         'salam_kaut' => 'Salam kaut',
         'kod_qr_duitnow_dan_nombor' => 'Kod QR DuitNow dan nombor akaun untuk tetamu yang ingin memberi hadiah.',
@@ -1075,7 +1081,7 @@ return [
         'name_placeholder' => 'Nama anda (pilihan)',
         'save_name' => 'Simpan',
         'sharing_as' => 'Berkongsi sebagai :name',
-        'change' => 'tukar',
+        'change' => 'Tukar',
         'take_photo' => 'Ambil gambar',
         'pick_files' => 'Pilih dari telefon',
         'record_video' => 'Rakam video',

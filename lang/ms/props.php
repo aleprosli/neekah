@@ -469,7 +469,7 @@ return [
 
     'units' => [
         'people' => ':count orang',
-        'up_to_people' => 'sehingga :count orang',
+        'up_to_people' => 'Sehingga :count orang',
         'replies' => ':count jawapan',
         'guests_on_list' => ':count tetamu dalam senarai',
         'shared_created' => ':shared dikongsi · :created dicipta',
@@ -496,7 +496,6 @@ return [
         'deactivated_since' => 'Dinyahaktif sejak :date',
         'delete_forever' => 'Ya, padam kekal',
         'deleted_user' => 'Pengguna dipadam',
-        'deleted_user_lower' => 'pengguna dipadam',
         'card_draft_note' => 'Kad anda akan berada di :address selepas disiarkan.',
         'card_address_free' => 'Tersedia! Kad anda akan berada di :address',
         'pick_one_vendor' => 'Pilih sekurang-kurangnya satu vendor.',
