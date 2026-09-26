@@ -55,10 +55,10 @@ return [
     ],
 
     'booking_status' => [
-        'pending_payment' => 'Pending Payment',
-        'confirmed' => 'Confirmed',
-        'completed' => 'Completed',
-        'cancelled' => 'Cancelled',
+        'pending_payment' => 'Menunggu bayaran',
+        'confirmed' => 'Disahkan',
+        'completed' => 'Selesai',
+        'cancelled' => 'Dibatalkan',
     ],
 
     'enquiry_status' => [
