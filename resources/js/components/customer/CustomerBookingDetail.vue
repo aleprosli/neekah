@@ -217,6 +217,7 @@ const tones = {
                     <p v-if="payment.note" class="text-xs break-words text-ink-muted">{{ payment.note }}</p>
 
                     <a v-if="payment.receipt_url" :href="payment.receipt_url" target="_blank" rel="noopener" class="text-xs font-medium text-brand-700 underline underline-offset-4">{{ $t('booking.lihat_resit') }}</a>
+                    <a v-if="payment.document_url" :href="payment.document_url" target="_blank" rel="noopener" class="text-xs font-medium text-brand-700 underline underline-offset-4">{{ $t('payments.official_receipt') }}</a>
 
                     <UiConfirm
                         v-if="payment.destroy_url"

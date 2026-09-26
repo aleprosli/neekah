@@ -101,9 +101,16 @@ return [
     'payment_received' => [
         'title' => 'Bayaran :amount disahkan',
         'body' => 'Vendor mengesahkan bayaran anda untuk booking :reference.',
-        'subject' => 'Bayaran :reference disahkan',
-        'intro' => ':vendor mengesahkan bayaran :amount untuk booking :reference.',
-        'detail' => 'Majlis: :date · Rujukan bayaran: :reference',
+    ],
+
+    'payment_receipt' => [
+        'subject' => 'Resit :number · :app',
+        'intro' => 'Terima kasih! Bayaran anda telah kami terima. Ini resit rasmi anda.',
+        'next_pro' => 'Neekah Pro anda kini aktif sehingga :date.',
+        'next_boost' => ':count token boost telah dimasukkan ke akaun anda.',
+        'next_kenangan' => 'Album Neekah Kenangan anda sudah aktif dan sedia dikongsi dengan tetamu.',
+        'next_booking' => 'Tempahan anda bersama :vendor telah disahkan.',
+        'action' => 'Lihat & cetak resit',
     ],
 
     'payment_rejected' => [
@@ -168,10 +175,6 @@ return [
     'pro_activated' => [
         'title' => 'Neekah Pro aktif',
         'body' => 'Pro anda aktif sehingga :date.',
-        'subject' => 'Resit Neekah Pro',
-        'thanks' => 'Terima kasih! :vendor kini vendor Pro di Neekah.',
-        'receipt' => 'Rujukan :reference · Pelan :plan · RM:amount',
-        'until' => 'Pro anda aktif sehingga :date.',
     ],
 
     'pro_expiring' => [

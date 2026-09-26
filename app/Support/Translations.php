@@ -38,6 +38,8 @@ class Translations
         'site' => ['common', 'auth', 'blog', 'invitation', 'notifications', 'gallery', 'report', 'date_picker', 'copy'],
         // The Kamera Majlis page a guest opens from the QR.
         'camera' => ['common', 'copy', 'camera'],
+        // A printable invoice or receipt: no islands at all.
+        'document' => [],
     ];
 
     /**

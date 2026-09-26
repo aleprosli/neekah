@@ -3,10 +3,8 @@
 namespace App\Notifications;
 
 use App\Models\Payment;
-use App\Support\NeekahMail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
 class PaymentReceived extends Notification implements ShouldQueue
@@ -16,11 +14,14 @@ class PaymentReceived extends Notification implements ShouldQueue
     public function __construct(public Payment $payment) {}
 
     /**
+     * The email is the receipt (PaymentReceipt, sent by IssueReceipt); this
+     * only rings the bell.
+     *
      * @return array<int, string>
      */
     public function via(object $notifiable): array
     {
-        return ['mail', 'database'];
+        return ['database'];
     }
 
     /**
@@ -36,16 +37,5 @@ class PaymentReceived extends Notification implements ShouldQueue
             'body_params' => ['reference' => $this->payment->booking->reference],
             'url' => route('bookings.show', $this->payment->booking),
         ];
-    }
-
-    public function toMail(object $notifiable): MailMessage
-    {
-        $booking = $this->payment->booking;
-
-        return NeekahMail::to($notifiable)
-            ->subject(__('notifications.payment_received.subject', ['reference' => $this->payment->reference]))
-            ->line(__('notifications.payment_received.intro', ['vendor' => $booking->vendor->name, 'amount' => 'RM'.number_format((float) $this->payment->amount, 2), 'reference' => $booking->reference]))
-            ->line(__('notifications.payment_received.detail', ['date' => $booking->event_date->translatedFormat('j F Y'), 'reference' => $this->payment->reference]))
-            ->action(__('notifications.actions.view_booking'), route('bookings.show', $booking));
     }
 }
