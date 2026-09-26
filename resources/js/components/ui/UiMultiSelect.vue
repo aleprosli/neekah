@@ -67,7 +67,7 @@ const triggerLabel = computed(() => (chosen.value.length ? `${chosen.value.lengt
 
 <template>
     <div ref="root" class="flex min-w-0 flex-col gap-1.5">
-        <span class="text-sm font-medium">{{ label }}</span>
+        <span class="text-sm font-medium first-letter:uppercase">{{ label }}</span>
 
         <ul v-if="chosen.length" class="flex flex-wrap gap-2">
             <li

@@ -2,6 +2,7 @@
 paths:
   - resources/js/components/ui/DataTable.vue
   - resources/js/components/ui/UiFlagSelect.vue
+  - 'resources/js/components/ui/**'
 ---
 
 # Ui
@@ -29,3 +30,6 @@ The list is teleported and positioned with getBoundingClientRect, because the ma
 The negeri list is static data in config/states.php ({name, slug}), read only through App\Support\States — never config('states') directly, and there is no Vendor::STATES any more. Validation uses Rule::in(States::names()); dropdowns get States::options() ({value, label, flag}), which controllers pass as `states` to the Vue forms. The 16 SVGs live in public/img/flag named after each entry's slug, which is written in the config rather than derived so renaming a negeri cannot silently break its flag. StatesTest fails if one is missing.
 
 Picking several of something (categories, negeri covered) uses UiMultiSelect, not a wrap of checkboxes: thirteen or sixteen chips run off the bottom of a phone. What is picked shows as removable chips above the field, each row in the list says "Dipilih", and a `locked` option (the primary category, the home state) posts a value nobody can take off. Both it and UiFlagSelect share the popup placement in composables/useAnchoredMenu.js.
+
+## Every label starts with a capital; fields.* keys are lowercase on purpose
+Owner, 25 Sep 2026: every visible label must start with a capital letter. lang/*/fields.php is lowercase because it names fields inside validation sentences ("Medan nama perniagaan diperlukan"); when a fields.* key is reused as a label, wrap it in Str::ucfirst() / ucfirst(). As a safety net the label element of every shared form component (UiField, UiSelect, UiTextarea, UiFlagSelect, UiMultiSelect, UiPhoneField, x-form.field, x-form.select, AdminSettingsPage checkbox) carries first-letter:uppercase — it needs a block-level box, so the span must be a flex item or `block`. No UI text is written inline in PHP, Blade or Vue: it goes through lang (server) or lang/*/ui.php via $t (Vue), in both languages. SiteSettingsTest checks settings labels.

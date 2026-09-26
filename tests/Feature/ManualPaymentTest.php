@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\Storage;
 beforeEach(function () {
     $this->seed(CategorySeeder::class);
     $this->customer = User::factory()->create();
-    $this->vendor = Vendor::factory()->for(Category::first())->create();
+    $this->vendor = Vendor::factory()->pro()->for(Category::first())->create();
     $this->booking = Booking::factory()->for($this->customer)->for($this->vendor)->create(['total_amount' => 2500]);
 });
 
@@ -68,7 +68,7 @@ it('rejects a payment the vendor cannot find, and tells the couple', function ()
 
 it('keeps another vendor from verifying a payment that is not theirs', function () {
     $payment = Payment::factory()->for($this->booking)->create(['amount' => 500]);
-    $other = Vendor::factory()->for(Category::first())->create();
+    $other = Vendor::factory()->pro()->for(Category::first())->create();
 
     $this->actingAs($other->user)
         ->post(route('vendor.bookings.payments.verify', [$this->booking, $payment]))

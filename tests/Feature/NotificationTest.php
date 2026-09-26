@@ -11,6 +11,7 @@ use App\Notifications\BookingCompleted;
 use App\Notifications\BookingConfirmed;
 use App\Notifications\BookingCreatedForCustomer;
 use App\Notifications\BookingCreatedForVendor;
+use App\Notifications\BookingHeldForCustomer;
 use App\Notifications\EnquiryReceived;
 use App\Notifications\EnquiryReplied;
 use App\Notifications\PaymentReceived;
@@ -20,18 +21,18 @@ use Database\Seeders\CategorySeeder;
 use Illuminate\Support\Facades\Notification;
 
 beforeEach(function () {
-    // Booking through the platform is off by default; these cover the flow
-    // itself, which vendors still use and which returns when it is switched on.
-    config(['neekah.bookings_enabled' => true]);
+    // Online booking is a Neekah Pro feature and off site-wide by default;
+    // these vendors take it, so the couple's booking flow is live.
+    enableOnlineBooking();
 
     Notification::fake();
     $this->seed(CategorySeeder::class);
     $this->customer = User::factory()->create();
-    $this->vendor = Vendor::factory()->for(Category::first())->create();
+    $this->vendor = Vendor::factory()->for(Category::first())->takingOnlineBookings()->create();
     $this->package = Package::factory()->for($this->vendor)->create(['price' => 2500]);
 });
 
-it('emails both parties when a booking is created', function () {
+it('emails both parties when a booking is created, the couple with the deposit due', function () {
     $this->actingAs($this->customer)
         ->post(route('vendors.bookings.store', $this->vendor), [
             'package_id' => $this->package->id,
@@ -39,7 +40,10 @@ it('emails both parties when a booking is created', function () {
         ])
         ->assertRedirect();
 
-    Notification::assertSentTo($this->customer, BookingCreatedForCustomer::class);
+    // An online booking holds the date for its deposit. With a bank transfer
+    // on the way, the vendor is told now: only they can confirm it.
+    Notification::assertSentTo($this->customer, BookingHeldForCustomer::class);
+    Notification::assertNotSentTo($this->customer, BookingCreatedForCustomer::class);
     Notification::assertSentTo($this->vendor->user, BookingCreatedForVendor::class);
 });
 

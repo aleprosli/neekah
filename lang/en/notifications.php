@@ -26,6 +26,9 @@ return [
     ],
 
     'enquiry_received' => [
+        'locked_title' => 'You have a new enquiry',
+        'locked_body' => 'A couple sent you an enquiry. Upgrade to Neekah Pro to read and answer it.',
+        'locked_action' => 'Upgrade to Pro',
         'title' => 'New enquiry from :name',
         'body' => 'Reply within 24 hours to keep your response rate up.',
         'subject' => 'New enquiry from :name',
@@ -41,6 +44,11 @@ return [
     ],
 
     'booking_cancelled' => [
+        'note_prefix' => 'Cancelled:',
+        'system' => 'Neekah',
+        'expired_intro' => 'Booking :reference was cancelled because the deposit was not paid in time.',
+        'expired_body' => 'The deposit for :package was not paid; the date has been reopened.',
+        'vendor_refunds' => 'The vendor will refund the deposit already paid directly to you, under their terms.',
         'title' => 'Booking :reference cancelled',
         'body' => ':name cancelled the :package booking.',
         'subject' => 'Booking :reference cancelled',
@@ -170,8 +178,82 @@ return [
         'title' => 'Neekah Pro ends in :days days',
         'body' => 'Your Pro plan ends on :date.',
         'subject' => '{1} Neekah Pro ends tomorrow|[2,*] Neekah Pro ends in :days days',
-        'renew' => 'Pay again to keep your sponsored slot, analytics and Pro badge. You lose none of the time left; the new period starts after it.',
+        'renew' => 'Pay again to keep online booking, monthly boost tokens, analytics and the Pro badge. You lose none of the time left; the new period starts after it.',
         'action' => 'Renew Pro',
     ],
 
+    'booking_held' => [
+        'title' => 'Booking :reference is waiting for its deposit',
+        'subject' => 'Pay the deposit for :vendor',
+        'intro' => 'Your date with :vendor is on hold.',
+        'body' => 'Pay the :deposit deposit before :deadline, or the date is released.',
+        'pay_online' => 'Pay from your booking page (FPX). The money goes straight to the vendor.',
+        'pay_transfer' => 'Transfer the deposit to the vendor\'s bank account (details on your booking page), then record the payment with the receipt.',
+    ],
+
+    'deposit_refund' => [
+        'title' => 'Deposit for :reference needs a refund',
+        'subject' => 'Deposit needs a refund: :reference',
+        'body' => 'The :amount deposit for :vendor on :date arrived after the hold ran out, and the date has been taken. The vendor will refund it directly to the couple.',
+    ],
+
+    'calendar_reminder' => [
+        'weekly_title' => 'Is your calendar still up to date?',
+        'weekly_body' => 'Any outside bookings this week (WhatsApp, walk-in)? Close those dates on Neekah so no couple books the same day, then confirm your calendar.',
+        'pausing_title' => 'Online booking pauses in 2 days',
+        'pausing_body' => 'Your calendar has not been confirmed. Confirm it now so couples can keep booking you online.',
+        'paused_title' => 'Online booking is paused',
+        'paused_body' => 'Your calendar was not confirmed in time, so the booking form is hidden. Check your calendar and confirm it to reopen.',
+        'action' => 'Open calendar',
+    ],
+
+    'deposit_waiting' => [
+        'title' => 'Deposit receipt :reference is waiting for you',
+        'body' => 'The couple recorded a :amount deposit two days ago. Check your account and confirm (or reject) it so the booking is not left hanging.',
+    ],
+
+    'ical_failed' => [
+        'title' => 'Your Google Calendar could not be imported',
+        'body' => 'The last few imports failed (:reason). Dates already imported stay closed, but new bookings in your calendar are not reaching Neekah.',
+        'action' => 'Check settings',
+    ],
+
+    'camera_activated' => [
+        'title' => 'Kamera Majlis :tier is live',
+        'body' => 'Share the link or QR with your guests. The album is kept until :date.',
+        'receipt' => 'Receipt :reference · RM:amount',
+        'action' => 'Open Kamera Majlis',
+    ],
+
+    'camera_export' => [
+        'title' => 'Your Kamera Majlis ZIP is ready',
+        'body' => 'Download every photo and video before the album is deleted on :date.',
+    ],
+
+    'camera_retention' => [
+        'after_event_title' => 'Thank you for using Kamera Majlis',
+        'after_event_body' => 'Your guests shared :count photos and videos. Download the ZIP before the album is deleted on :date.',
+        'expiring_7_title' => 'Your Kamera Majlis album is deleted in 7 days',
+        'expiring_7_body' => 'Every photo and video will be deleted on :date. Download the ZIP now.',
+        'expiring_1_title' => 'Your Kamera Majlis album is deleted tomorrow',
+        'expiring_1_body' => 'Last reminder: every photo and video will be deleted on :date.',
+        'purged_title' => 'Your Kamera Majlis album has been deleted',
+        'purged_body' => 'Its storage period has ended and every photo and video has been deleted from Neekah.',
+        'action' => 'Open Kamera Majlis',
+    ],
+
+    'boost_tokens' => [
+        'title' => ':count boost tokens landed in your account',
+        'welcome' => 'Welcome to Neekah! Here are some boost tokens on us. Balance: :balance tokens.',
+        'pro_monthly' => 'Your Neekah Pro monthly boost tokens are in. Balance: :balance tokens.',
+        'purchase' => 'Thank you for your purchase. Balance: :balance tokens.',
+        'admin' => 'The Neekah team added boost tokens for you. Balance: :balance tokens.',
+        'how' => 'One token lifts your profile to the top of the Recommended list in a category you choose, for a day.',
+        'action' => 'Use boost tokens',
+    ],
+    'boost_ending' => [
+        'title' => 'Your :category boost ends tomorrow',
+        'body' => 'Your boost ends on :date. Add days to stay at the top.',
+        'action' => 'Extend the boost',
+    ],
 ];

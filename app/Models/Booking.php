@@ -2,7 +2,10 @@
 
 namespace App\Models;
 
+use App\Enums\BookingSource;
 use App\Enums\BookingStatus;
+use App\Enums\CancellationReason;
+use App\Enums\DepositChannel;
 use App\Enums\PaymentStatus;
 use Database\Factories\BookingFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -17,7 +20,8 @@ use Illuminate\Support\Str;
 
 #[Fillable([
     'reference', 'user_id', 'vendor_id', 'wedding_id', 'package_id', 'package_name', 'event_date',
-    'total_amount', 'commission_rate', 'commission_amount', 'status', 'notes',
+    'total_amount', 'deposit_amount', 'commission_rate', 'commission_amount', 'status', 'notes',
+    'source', 'payment_mode', 'hold_expires_at', 'cancelled_reason',
     'confirmed_at', 'completed_at', 'cancelled_at',
 ])]
 class Booking extends Model
@@ -33,6 +37,20 @@ class Booking extends Model
      */
     public const COMMISSION_RATE = 0.0;
 
+    /** Made by the couple on the vendor's page, rather than recorded by the vendor. */
+    public function isOnline(): bool
+    {
+        return $this->source === BookingSource::Online;
+    }
+
+    /** Still waiting for its deposit, with the date held for it. */
+    public function isHeld(): bool
+    {
+        return $this->status === BookingStatus::PendingPayment
+            && $this->hold_expires_at !== null
+            && $this->hold_expires_at->isFuture();
+    }
+
     /** Whether this booking was made under a platform commission at all. */
     public function hasCommission(): bool
     {
@@ -47,6 +65,11 @@ class Booking extends Model
         return [
             'event_date' => 'date',
             'total_amount' => 'decimal:2',
+            'deposit_amount' => 'decimal:2',
+            'source' => BookingSource::class,
+            'payment_mode' => DepositChannel::class,
+            'cancelled_reason' => CancellationReason::class,
+            'hold_expires_at' => 'datetime',
             'commission_rate' => 'decimal:2',
             'commission_amount' => 'decimal:2',
             'status' => BookingStatus::class,

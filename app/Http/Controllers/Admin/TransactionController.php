@@ -51,7 +51,7 @@ class TransactionController extends Controller
             )],
             'stats' => [
                 ['label' => __('props.admin.gross_transaction_value'), 'value' => 'RM'.number_format($gross, 2), 'hint' => __('props.admin.semua_bayaran_diterima')],
-                ['label' => __('props.admin.komisen_platform_2'), 'value' => 'RM'.number_format($commission, 2), 'hint' => '8% daripada booking aktif'],
+                ['label' => __('props.admin.komisen_platform_2'), 'value' => 'RM'.number_format($commission, 2), 'hint' => Booking::COMMISSION_RATE > 0 ? __('props.copy.commission_hint', ['rate' => round(Booking::COMMISSION_RATE * 100)]) : __('props.copy.commission_off')],
                 ['label' => __('props.admin.payout_vendor'), 'value' => 'RM'.number_format($gross - $commission, 2), 'hint' => __('props.admin.selepas_komisen')],
                 ['label' => __('props.admin.menunggu_pengesahan'), 'value' => 'RM'.number_format((float) Payment::where('status', PaymentStatus::AwaitingVerification)
                     ->whereHas('booking', fn ($query) => $query->whereNot('status', BookingStatus::Cancelled))

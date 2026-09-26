@@ -21,7 +21,7 @@ class PhoneNumberController extends Controller
         return view('auth.phone', [
             'props' => AuthForm::for([
                 'action' => route('phone.store'),
-                'submitLabel' => 'Simpan dan teruskan',
+                'submitLabel' => __('props.copy.save_and_continue'),
                 'fields' => [
                     [
                         'name' => 'phone',

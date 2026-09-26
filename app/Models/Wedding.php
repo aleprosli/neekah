@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Actions\ActivateCameraAlbum;
 use App\Enums\WeddingRole;
 use Database\Factories\WeddingFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -35,6 +36,29 @@ class Wedding extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Moving the event date moves when the Kamera Majlis album is deleted,
+     * which is counted from the event.
+     */
+    protected static function booted(): void
+    {
+        static::updated(function (Wedding $wedding): void {
+            if ($wedding->wasChanged('event_date') && ($album = $wedding->cameraAlbum()->first()) && $album->purged_at === null && $album->activated_at !== null) {
+                $album->update(['expires_at' => ActivateCameraAlbum::expiryFor($wedding->event_date)]);
+            }
+        });
+    }
+
+    public function cameraAlbum(): HasOne
+    {
+        return $this->hasOne(CameraAlbum::class);
+    }
+
+    public function cameraPurchases(): HasMany
+    {
+        return $this->hasMany(CameraPurchase::class);
     }
 
     public function members(): BelongsToMany

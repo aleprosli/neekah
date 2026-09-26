@@ -20,6 +20,7 @@
         ['label' => __('pages.sidebar_couple.tetamu'), 'items' => [
             $item(__('pages.sidebar_couple.senarai_tetamu'), 'users', 'guests.index', 'guests.*'),
             $item(__('pages.sidebar_couple.kad_jemputan'), 'mail', 'site.edit', 'site.*'),
+            $item(__('pages.sidebar_couple.kamera'), 'camera', 'camera.index', 'camera.*'),
         ]],
         ['label' => __('pages.sidebar_couple.vendor'), 'items' => [
             ['label' => __('pages.sidebar_couple.cari_vendor'), 'icon' => 'search', 'href' => route('vendors.index'), 'active' => false, 'badge' => null],

@@ -13,7 +13,7 @@ namespace App\Support;
 class States
 {
     /**
-     * @return array<int, array{name: string, slug: string}>
+     * @return array<int, array{name: string, slug: string, area: string, districts: array<int, string>}>
      */
     public static function all(): array
     {
@@ -68,5 +68,38 @@ class States
             'label' => $state['name'],
             'flag' => self::flagUrl($state['name']),
         ], self::all());
+    }
+
+    /**
+     * The daerah (or bahagian, or main areas) inside one negeri; empty for
+     * anything that is not a negeri.
+     *
+     * @return array<int, string>
+     */
+    public static function districts(?string $name): array
+    {
+        foreach (self::all() as $state) {
+            if ($state['name'] === $name) {
+                return $state['districts'] ?? [];
+            }
+        }
+
+        return [];
+    }
+
+    /**
+     * Every negeri's areas, keyed by negeri, with what that list is called
+     * ("Daerah", "Bahagian", "Kawasan"), for a field that follows the negeri.
+     *
+     * @return array<string, array{label: string, options: array<int, string>}>
+     */
+    public static function districtOptions(): array
+    {
+        return collect(self::all())
+            ->mapWithKeys(fn (array $state): array => [$state['name'] => [
+                'label' => __('ui.areas.'.($state['area'] ?? 'daerah')),
+                'options' => $state['districts'] ?? [],
+            ]])
+            ->all();
     }
 }

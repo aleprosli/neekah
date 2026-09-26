@@ -95,7 +95,7 @@ const tones = {
                                 :placeholder="paymentForm.outstanding > 0 ? String(paymentForm.outstanding) : '0.00'"
                                 class="rounded-xl border border-line bg-surface px-4 py-2.5 focus:border-brand-400 focus:outline-none"
                             >
-                            <span class="text-xs text-ink-muted">Belum direkod: {{ paymentForm.outstandingLabel }}</span>
+                            <span class="text-xs text-ink-muted">{{ $t('booking.belum_direkod', { amount: paymentForm.outstandingLabel }) }}</span>
                             <span v-if="errors.amount" class="text-xs text-brand-700">{{ errors.amount }}</span>
                         </label>
 

@@ -40,8 +40,8 @@ class VendorApprovalController extends Controller
             'ids' => ['required', 'array', 'max:100'],
             'ids.*' => ['integer', 'exists:vendors,id'],
         ], [
-            'ids.required' => 'Pilih sekurang-kurangnya satu vendor.',
-            'ids.max' => 'Maksimum 100 vendor dalam satu masa.',
+            'ids.required' => __('props.copy.pick_one_vendor'),
+            'ids.max' => __('props.copy.max_vendors_at_once'),
         ]);
 
         $status = VendorStatus::from($validated['status']);

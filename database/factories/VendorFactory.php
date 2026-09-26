@@ -8,6 +8,7 @@ use App\Enums\VendorTier;
 use App\Models\Category;
 use App\Models\User;
 use App\Models\Vendor;
+use App\Models\VendorBookingSetting;
 use App\Support\States;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
@@ -58,6 +59,18 @@ class VendorFactory extends Factory
     public function covering(array $states): static
     {
         return $this->state(fn () => ['service_states' => $states]);
+    }
+
+    /**
+     * A Neekah Pro vendor with online booking set up: switched on, open every
+     * day from tomorrow, bank details for a manual deposit, calendar just
+     * confirmed. Online booking must also be open site-wide
+     * (enableOnlineBooking() in tests/Pest.php).
+     */
+    public function takingOnlineBookings(array $settings = []): static
+    {
+        return $this->state(fn (): array => ['pro_until' => now()->addYear()])
+            ->afterCreating(fn (Vendor $vendor) => VendorBookingSetting::factory()->for($vendor)->create($settings));
     }
 
     public function pending(): static

@@ -12,7 +12,10 @@ use Illuminate\Http\Request;
  */
 interface PaymentLinkGateway
 {
-    /** Whether the keys are in place; checkout is not offered until they are. */
+    /**
+     * Whether checkout can be offered: switched on by an admin and every key
+     * in place.
+     */
     public function isConfigured(): bool;
 
     /**
@@ -24,7 +27,7 @@ interface PaymentLinkGateway
      * Read a callback. Null when it cannot be verified as coming from the
      * provider, which the webhook answers with a refusal.
      *
-     * @return array{reference: string, gateway_reference: string|null, paid: bool}|null
+     * @return array{reference: string, gateway_reference: string|null, status: 'paid'|'failed'|'pending', amount: float}|null
      */
     public function parseCallback(Request $request): ?array;
 }

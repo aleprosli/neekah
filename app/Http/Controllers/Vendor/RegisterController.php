@@ -31,6 +31,7 @@ class RegisterController extends Controller
                 'convertUrl' => route('vendor.convert'),
                 'categories' => Category::active()->ordered()->get(['id', 'name', 'icon']),
                 'states' => States::options(),
+                'districts' => States::districtOptions(),
                 'old' => old(),
                 'turnstileSiteKey' => $turnstile->isEnabled() ? $turnstile->siteKey() : null,
             ]),

@@ -14,7 +14,7 @@ use Illuminate\Support\Str;
 #[Fillable([
     'reference', 'booking_id', 'recorded_by', 'amount', 'paid_on', 'method',
     'receipt_image', 'note', 'status', 'gateway', 'gateway_reference', 'paid_at',
-    'verified_at', 'verified_by',
+    'verified_at', 'verified_by', 'payment_url', 'expires_at',
 ])]
 class Payment extends Model
 {
@@ -32,6 +32,7 @@ class Payment extends Model
             'paid_at' => 'datetime',
             'paid_on' => 'date',
             'verified_at' => 'datetime',
+            'expires_at' => 'datetime',
         ];
     }
 

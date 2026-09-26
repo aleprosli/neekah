@@ -4,6 +4,8 @@ paths:
   - 'app/Support/**'
   - app/Support/ImageSettings.php
   - app/Support/ContentVersion.php
+  - app/Support/VendorAvailability.php
+  - app/Support/Translations.php
 ---
 
 # Support
@@ -32,3 +34,9 @@ Every cached public payload carries a ContentVersion string in its key. A write 
 Trap 1 - order inside bump(). Cache::memo()->forget() clears the UNDERLYING store as well as the memo. Forget first, write second. Writing then forgetting deletes the version just minted and leaves the next reader to invent another one, so the payload is written under a key nobody reads back.
 
 Trap 2 - config/cache.php sets serializable_classes to false, deliberately: no PHP object may be unserialized from the cache, so a leaked APP_KEY cannot become a gadget chain. Cache raw attribute arrays (Model::getAttributes()) and rebuild with Model::hydrate(). Caching a model or an Eloquent collection gives __PHP_Incomplete_Class on read. Do not widen that setting to make a cache work. PublicPageCostTest asserts no cache row contains "O:".
+
+## VendorAvailability is the only place a date is decided
+Whether a vendor can be booked on a day, and whether they take online bookings at all, is decided only in App\Support\VendorAvailability (owner, 25 Sep 2026). Capacity = VendorBookingSetting::max_per_day; active bookings (pending/confirmed) take a place each; a vendor_unavailable_dates row closes the day, or takes `slots` places when set. Online-only rules: past/today, min_lead_days, max_advance_months, available_weekdays (ISO 1-7). onlineState() returns the first blocker in fix order (GloballyOff, NotApproved, FeatureOff, SwitchedOff, NoPackages, NoPaymentPath, CalendarStale, Open). Vendor::isAvailableOn, StoreBookingRequest, StoreVendorBookingRequest, CreateBooking (under a vendor row lock), the public ketersediaan JSON and the vendor calendar all ask it; never re-implement a check elsewhere. Booking settings live in vendor_booking_settings, not on vendors, so saving them or confirming the calendar never moves ContentVersion::global(). Herepay keys there are `encrypted` casts: rotating APP_KEY needs APP_PREVIOUS_KEYS. Dates are Asia/Kuala_Lumpur calendar days. Covered by VendorAvailabilityTest, OnlineBookingTest.
+
+## A Vue island on a site/auth/camera page needs its ui group in GROUPS_BY_SHELL
+Translations::forClient() ships only some lang/*/ui.php groups to public shells (site, auth, card, camera); signed-in dashboards get everything. A component that calls $t('group.key') on a public page shows the raw key unless that group is listed for the page's shell — the vendor page date picker (date_picker) and the password eye (copy) shipped broken this way. When adding a $t group to a component used on a public page, add it to GROUPS_BY_SHELL and assert it in ClientTranslationsTest.

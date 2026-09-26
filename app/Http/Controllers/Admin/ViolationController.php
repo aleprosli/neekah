@@ -75,7 +75,7 @@ class ViolationController extends Controller
                 'url' => route('admin.violations.show', $violation),
                 'vendor' => e($violation->vendor->name),
                 'type' => $violation->type->label(),
-                'reporter' => $violation->reporter?->name ?? 'pengguna dipadam',
+                'reporter' => $violation->reporter?->name ?? __('props.copy.deleted_user_lower'),
                 'description' => $violation->description,
                 'reported' => $violation->created_at->diffForHumans(),
                 'badge' => view('components.admin.status-pill', [
@@ -115,7 +115,7 @@ class ViolationController extends Controller
                     'resolved_at' => $violation->resolved_at?->translatedFormat('j M Y, g:i A'),
                     'update_url' => route('admin.violations.update', $violation),
                     'reporter' => [
-                        'name' => $violation->reporter?->name ?? 'Pengguna dipadam',
+                        'name' => $violation->reporter?->name ?? __('props.copy.deleted_user'),
                         'email' => $violation->reporter?->email,
                     ],
                     'booking' => $violation->booking ? [

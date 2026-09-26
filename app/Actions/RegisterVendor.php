@@ -17,7 +17,7 @@ class RegisterVendor
     /**
      * Create the owner account and a pending vendor profile.
      *
-     * @param  array{name: string, email: string, phone: string, password: string, business_name: string, category_id: int, city: string, state: string, tagline?: string|null}  $data
+     * @param  array{name: string, email: string, phone: string, password: string, business_name: string, category_id: int, city: string, district: string, state: string, tagline?: string|null}  $data
      */
     public function handle(array $data): Vendor
     {
@@ -44,7 +44,7 @@ class RegisterVendor
      * (User::canBecomeVendor), so nothing is left pointing at a vendor as if it
      * were a couple.
      *
-     * @param  array{phone: string, business_name: string, category_id: int, city: string, state: string, tagline?: string|null}  $data
+     * @param  array{phone: string, business_name: string, category_id: int, city: string, district: string, state: string, tagline?: string|null}  $data
      */
     public function convert(User $owner, array $data): Vendor
     {
@@ -63,7 +63,7 @@ class RegisterVendor
     }
 
     /**
-     * @param  array{phone: string, business_name: string, category_id: int, city: string, state: string, tagline?: string|null}  $data
+     * @param  array{phone: string, business_name: string, category_id: int, city: string, district: string, state: string, tagline?: string|null}  $data
      */
     private function createProfile(User $owner, array $data): Vendor
     {
@@ -74,6 +74,7 @@ class RegisterVendor
             'slug' => $this->uniqueSlug($data['business_name']),
             'tagline' => $data['tagline'] ?? null,
             'city' => $data['city'],
+            'district' => $data['district'],
             'state' => $data['state'],
             'phone' => $data['phone'],
             'whatsapp' => $data['phone'],
@@ -89,7 +90,7 @@ class RegisterVendor
         SendTelegramAlert::about($headline, [
             'Perniagaan' => $vendor->name,
             'Kategori' => $vendor->category->name,
-            'Lokasi' => $vendor->city.', '.$vendor->state,
+            'Lokasi' => $vendor->city.', '.$vendor->district.', '.$vendor->state,
             'Nama' => $vendor->user->name,
             'Emel' => $vendor->user->email,
             'Telefon' => $vendor->phone,

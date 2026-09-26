@@ -19,6 +19,9 @@ use RuntimeException;
  */
 class StoreOptimizedImage
 {
+    /** The quality for the file being encoded now: the admin's, unless a caller asked otherwise. */
+    private ?int $quality = null;
+
     public function __construct(private ImageSettings $settings) {}
 
     /**
@@ -31,26 +34,34 @@ class StoreOptimizedImage
     }
 
     /**
+     * $maxDimension and $quality override the admin's image settings for this
+     * call only, and $cacheControl the disk's year-long immutable header.
+     * Kamera Majlis uses them (its tiers keep photos at their own size, and
+     * its files are deleted after the event, so the CDN must not keep them a
+     * year); every other caller leaves them null.
+     *
      * @return string The stored path on the public disk.
      */
-    public function storeContents(string $contents, string $directory, bool $lossless = false): string
+    public function storeContents(string $contents, string $directory, bool $lossless = false, ?int $maxDimension = null, ?int $quality = null, ?string $cacheControl = null): string
     {
         $this->allowMemoryForDecoding();
+        $this->quality = $quality;
 
         $image = $this->decode($contents);
         $extension = $lossless ? 'png' : ($this->settings->format() === 'jpeg' ? 'jpg' : 'webp');
         $path = trim($directory, '/').'/'.Str::random(40).'.'.$extension;
         $disk = Storage::disk('public');
 
-        $largest = $this->settings->maxDimension();
+        $largest = $maxDimension ?? $this->settings->maxDimension();
         $thumbnail = self::thumbnailPath($path);
 
         // The public disk is configured not to throw, so a write it cannot make
         // comes back as false. Ignoring that returned a path for a file that was
         // never written, and the caller saved it: a wedding card pointing at a
         // 404, with nothing anywhere saying the upload had failed.
-        $stored = $disk->put($path, $this->encode($this->resize($image, $largest, $largest), $extension))
-            && $disk->put($thumbnail, $this->encode($this->resize($image, $this->settings->thumbnailWidth(), PHP_INT_MAX), $extension));
+        $options = $cacheControl ? ['CacheControl' => $cacheControl] : [];
+        $stored = $disk->put($path, $this->encode($this->resize($image, $largest, $largest), $extension), $options)
+            && $disk->put($thumbnail, $this->encode($this->resize($image, $this->settings->thumbnailWidth(), PHP_INT_MAX), $extension), $options);
 
         if (! $stored) {
             // Whichever half landed is of no use on its own.
@@ -91,6 +102,7 @@ class StoreOptimizedImage
     public function refreshThumbnail(string $path): string
     {
         $this->allowMemoryForDecoding();
+        $this->quality = null;
 
         $disk = Storage::disk('public');
         $contents = $disk->get($path);
@@ -244,7 +256,7 @@ class StoreOptimizedImage
     private function encodeWebp(GdImage $image): void
     {
         imagesavealpha($image, true);
-        imagewebp($image, null, $this->settings->quality());
+        imagewebp($image, null, $this->quality ?? $this->settings->quality());
     }
 
     /**
@@ -257,7 +269,7 @@ class StoreOptimizedImage
         imagefill($flat, 0, 0, imagecolorallocate($flat, 255, 255, 255));
         imagecopy($flat, $image, 0, 0, 0, 0, imagesx($image), imagesy($image));
         imageinterlace($flat, true);
-        imagejpeg($flat, null, $this->settings->quality());
+        imagejpeg($flat, null, $this->quality ?? $this->settings->quality());
     }
 
     private function encodePng(GdImage $image): void

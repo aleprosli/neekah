@@ -6,6 +6,7 @@
 import './contact-beacon.js';
 import './form-guard.js';
 import './navigation.js';
+import './nav-groups.js';
 import { mountIslands } from './vue.js';
 
 mountIslands();

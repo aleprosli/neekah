@@ -12,10 +12,10 @@ use App\Models\User;
 use App\Models\Vendor;
 use App\Support\ContactSettings;
 use App\Support\ContentVersion;
-use App\Support\ProSettings;
 use App\Support\Seo;
 use App\Support\SeoSettings;
 use App\Support\States;
+use App\Support\VendorAvailability;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -37,9 +37,6 @@ class VendorController extends Controller
     /** Other vendors suggested at the foot of a profile. */
     private const RELATED_VENDORS = 3;
 
-    /** Seconds a sponsored row is held before the next vendors take their turn. */
-    private const SPONSORED_TTL = 300;
-
     /** User agents that fetch a page without a person reading it. */
     private const NOT_A_VISITOR = ['bot', 'crawler', 'spider', 'facebookexternalhit', 'whatsapp', 'preview', 'lighthouse', 'headless'];
 
@@ -57,6 +54,7 @@ class VendorController extends Controller
             'price_asc' => __('marketplace.sorts.price_asc'),
             'price_desc' => __('marketplace.sorts.price_desc'),
             'reviews' => __('marketplace.sorts.reviews'),
+            'popular' => __('marketplace.sorts.popular'),
         ];
     }
 
@@ -82,18 +80,11 @@ class VendorController extends Controller
         $activeCategory = $filters['category'] ? $categories->firstWhere('slug', $filters['category']) : null;
 
         $vendors = $this->listing($filters, $activeCategory, $request);
-        $sponsored = $this->sponsored($filters, $activeCategory, $request);
-
-        // Shown once, in the row that is labelled as paid.
-        if ($sponsored->isNotEmpty()) {
-            $vendors->setCollection($vendors->getCollection()->reject(fn (Vendor $vendor): bool => $sponsored->contains('id', $vendor->id))->values());
-        }
 
         $this->describeListing($seo, $request, $activeCategory, $filters);
 
         return view('vendors.index', [
             'vendors' => $vendors,
-            'sponsored' => $sponsored,
             'filters' => $filters,
             'categories' => $categories,
             'activeCategory' => $activeCategory,
@@ -102,7 +93,7 @@ class VendorController extends Controller
             'tiers' => VendorTier::cases(),
             'sorts' => self::sorts(),
             'activeFilterCount' => count(array_filter([$filters['state'], $filters['min_price'], $filters['max_price'], $filters['min_rating'], $filters['tier']], fn ($value) => $value !== null)),
-            'helpUrl' => $vendors->isEmpty() && $sponsored->isEmpty() ? $this->helpUrl($activeCategory, $filters) : null,
+            'helpUrl' => $vendors->isEmpty() ? $this->helpUrl($activeCategory, $filters) : null,
         ]);
     }
 
@@ -147,6 +138,9 @@ class VendorController extends Controller
      * What is cached is the page's rows and its three counters, not the
      * paginator - see categories() for why nothing here may be an object.
      *
+     * The hour is in the key too: boosts start and end on the hour, so one
+     * that runs out leaves the top without anything having to save.
+     *
      * @param  array<string, mixed>  $filters
      * @return LengthAwarePaginator<int, Vendor>
      */
@@ -156,7 +150,7 @@ class VendorController extends Controller
         $key = md5(serialize([$filters, $page, $request->url()]));
 
         $cached = Cache::remember(
-            'marketplace:list:'.$key.':'.ContentVersion::global(),
+            'marketplace:list:'.$key.':'.now()->format('YmdH').':'.ContentVersion::global(),
             ContentVersion::TTL,
             function () use ($filters, $activeCategory): array {
                 $paginator = self::filtered($filters, $activeCategory)
@@ -165,7 +159,8 @@ class VendorController extends Controller
                         'price_asc' => $query->orderBy('price_from'),
                         'price_desc' => $query->orderByDesc('price_from'),
                         'reviews' => $query->orderByDesc('reviews_count'),
-                        default => $query->orderByDesc('score'),
+                        'popular' => $query->orderByDesc('views_30d'),
+                        default => $query->boostedFirst($activeCategory)->orderByDesc('score'),
                     })
                     ->orderBy('id')
                     ->paginate(self::PER_PAGE);
@@ -188,8 +183,6 @@ class VendorController extends Controller
 
     /**
      * Approved vendors matching the visitor's filters, before any ordering.
-     * The listing and the sponsored row both start here, so a sponsored vendor
-     * always answers the search it is shown above.
      *
      * @param  array<string, mixed>  $filters
      * @return Builder<Vendor>
@@ -206,37 +199,6 @@ class VendorController extends Controller
             ->when($filters['max_price'] !== null, fn (Builder $query) => $query->where('price_from', '<=', $filters['max_price']))
             ->when($filters['min_rating'] !== null, fn (Builder $query) => $query->where('rating_avg', '>=', $filters['min_rating']))
             ->when($filters['tier'], fn (Builder $query, string $tier) => $query->where('tier', $tier));
-    }
-
-    /**
-     * The Ditaja row above the listing: Pro vendors who match the search, a
-     * few at a time, taking turns.
-     *
-     * Only on the first page of the default order. Someone who asked for the
-     * cheapest, or the best rated, gets exactly that with nothing paid above
-     * it, and the ordinary listing below never moves for money.
-     *
-     * Cached for a few minutes rather than against the version alone, so the
-     * turn comes round and an expired plan drops out without anything saving.
-     *
-     * @param  array<string, mixed>  $filters
-     * @return Collection<int, Vendor>
-     */
-    private function sponsored(array $filters, ?Category $activeCategory, Request $request): Collection
-    {
-        $slots = app(ProSettings::class)->sponsoredSlots();
-
-        if ($slots === 0 || $filters['sort'] !== 'recommended' || $request->integer('page', 1) > 1) {
-            return collect();
-        }
-
-        $rows = Cache::remember(
-            'marketplace:sponsored:'.md5(serialize([$filters, $slots])).':'.ContentVersion::global(),
-            self::SPONSORED_TTL,
-            fn (): array => self::vendorRows(self::filtered($filters, $activeCategory)->pro()->inRandomOrder()->limit($slots)->get()),
-        );
-
-        return self::hydrateVendors($rows);
     }
 
     /**
@@ -333,13 +295,48 @@ class VendorController extends Controller
             'extraCategories' => $vendor->extraCategories(),
             'related' => $related,
             'defaultEventDate' => $request->user()?->weddings()->latest('event_date')->first()?->event_date->toDateString(),
+            'onlineBooking' => $this->onlineBooking($vendor),
         ]);
+    }
+
+    /**
+     * What the booking form needs when this vendor takes online bookings, or
+     * null to leave the contact card. Worked out on every request and never
+     * cached with the page: it moves with today's date and every booking.
+     *
+     * @return array<string, mixed>|null
+     */
+    private function onlineBooking(Vendor $vendor): ?array
+    {
+        $availability = VendorAvailability::for($vendor);
+
+        if (! $availability->acceptsOnlineBookings()) {
+            return null;
+        }
+
+        $settings = $availability->settings();
+
+        return [
+            'channel' => $availability->paymentChannel(),
+            'terms' => $settings->deposit_terms,
+            'packages' => $vendor->packages->map(fn (Package $package): array => [
+                'id' => $package->id,
+                'name' => $package->name,
+                'price' => (float) $package->price,
+                'deposit' => $settings->depositFor((float) $package->price),
+            ])->values(),
+            'nextOpen' => $availability->nextOpenDays(6),
+            'availabilityUrl' => route('vendors.availability', $vendor),
+        ];
     }
 
     /**
      * One view for the vendor's analytics. Once per visitor per session, so a
      * couple flicking between photos is one look, not ten; and never the vendor
      * themselves, an admin, or a crawler.
+     *
+     * Views also order "Paling ramai dilihat", so one address counts once a
+     * day per vendor as well: clearing cookies and reloading does not climb.
      */
     private function countView(Request $request, Vendor $vendor): void
     {
@@ -352,8 +349,13 @@ class VendorController extends Controller
 
         $key = 'vendor-viewed.'.$vendor->getKey();
 
-        if ($request->hasSession() && ! $request->session()->has($key)) {
-            $request->session()->put($key, true);
+        if (! $request->hasSession() || $request->session()->has($key)) {
+            return;
+        }
+
+        $request->session()->put($key, true);
+
+        if (Cache::add('vendor-view:'.$vendor->getKey().':'.sha1((string) $request->ip()).':'.today()->toDateString(), true, now()->endOfDay())) {
             $vendor->recordStat('profile_views');
         }
     }

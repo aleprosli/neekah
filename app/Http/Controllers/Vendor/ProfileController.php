@@ -34,6 +34,7 @@ class ProfileController extends Controller
                     'state' => old('state', $vendor->state),
                     'service_states' => old('service_states', $vendor->serviceStates()),
                     'city' => old('city', $vendor->city),
+                    'district' => old('district', $vendor->district) ?? '',
                     'tagline' => old('tagline', $vendor->tagline),
                     'description' => old('description', $vendor->description),
                     'phone' => old('phone', $vendor->phone),
@@ -49,6 +50,7 @@ class ProfileController extends Controller
                 'categories' => Category::active()->ordered()->get(['id', 'name', 'icon']),
                 'maxCategories' => UpdateVendorProfileRequest::MAX_CATEGORIES,
                 'states' => States::options(),
+                'districts' => States::districtOptions(),
                 'socialPlatforms' => collect(SocialLinks::PLATFORMS)
                     ->map(fn (array $details, string $platform): array => ['key' => $platform, 'label' => $details['label'], 'placeholder' => $details['placeholder']])
                     ->values()
@@ -93,6 +95,6 @@ class ProfileController extends Controller
         // save themselves out of the category their card and profile show.
         $vendor->categories()->sync($request->safe()->collect('category_ids')->push($vendor->category_id)->unique()->all());
 
-        return $this->redirectOrJson($request, route('vendor.profile.edit'), 'Profil dikemas kini.');
+        return $this->redirectOrJson($request, route('vendor.profile.edit'), __('flash.vendor.profile_updated'));
     }
 }

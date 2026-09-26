@@ -7,11 +7,13 @@ use App\Models\Category;
 use App\Models\User;
 use App\Models\Vendor;
 use App\Rules\Turnstile;
+use App\Support\PhoneNumber;
 use App\Support\States;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\Validator;
+use Propaganistas\LaravelPhone\Rules\Phone;
 
 class RegisterVendorRequest extends FormRequest
 {
@@ -28,11 +30,12 @@ class RegisterVendorRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:120'],
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique(User::class, 'email')->whereNot('role', UserRole::Customer->value)],
-            'phone' => ['required', 'string', 'max:30'],
+            'phone' => ['required', 'string', 'max:30', (new Phone)->international()->country('MY')],
             'password' => ['required', 'confirmed', Password::min(8)],
             'business_name' => ['required', 'string', 'max:120', Rule::unique(Vendor::class, 'name')],
             'category_id' => ['required', Rule::exists(Category::class, 'id')->where('is_active', true)],
             'city' => ['required', 'string', 'max:80'],
+            'district' => ['required', 'string', Rule::in(States::districts($this->input('state')))],
             'state' => ['required', Rule::in(States::names())],
             'tagline' => ['nullable', 'string', 'max:160'],
             'cf-turnstile-response' => [app(Turnstile::class)],
@@ -61,6 +64,17 @@ class RegisterVendorRequest extends FormRequest
     }
 
     /**
+     * Store the number the way wa.me and every other country reads it. One
+     * that cannot be read is left as typed, for the phone rule to refuse.
+     */
+    protected function prepareForValidation(): void
+    {
+        if (filled($phone = PhoneNumber::toE164($this->string('phone')->toString()))) {
+            $this->merge(['phone' => $phone]);
+        }
+    }
+
+    /**
      * @return array<string, string>
      */
     public function attributes(): array
@@ -73,6 +87,7 @@ class RegisterVendorRequest extends FormRequest
             'business_name' => __('fields.nama_perniagaan'),
             'category_id' => __('fields.kategori'),
             'city' => __('fields.bandar'),
+            'district' => __('fields.daerah'),
             'state' => __('fields.negeri'),
             'tagline' => __('fields.tagline'),
         ];

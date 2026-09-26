@@ -9,6 +9,7 @@
         default => route('dashboard'),
     };
     $onAccount = App\Support\Locales::routeIs('account.*');
+    $hasSidebar = $nav !== [];
 @endphp
 
 {{-- The web-app shell every signed-in role works in: a sidebar that runs the
@@ -25,13 +26,17 @@
 
      On a phone the sidebar is a drawer. It opens through the checkbox below,
      so it needs no JavaScript, and it sits inside the swapped region so every
-     navigation closes it again. --}}
+     navigation closes it again.
+
+     An empty `nav` drops the sidebar altogether (a vendor still waiting for
+     approval has one page), and the account and log-out move to the top bar. --}}
 <x-layouts.app :title="$title" shell="dashboard">
     <div class="min-h-screen bg-ivory">
         <div data-nav-region>
+            @if ($hasSidebar)
             <input type="checkbox" id="dashboard-drawer" class="peer sr-only" aria-hidden="true" tabindex="-1">
 
-            <label for="dashboard-drawer" class="fixed inset-0 z-40 hidden bg-brand-900/30 backdrop-blur-[2px] peer-checked:block lg:hidden" aria-label="Tutup menu"></label>
+            <label for="dashboard-drawer" class="fixed inset-0 z-40 hidden bg-brand-900/30 backdrop-blur-[2px] peer-checked:block lg:hidden" aria-label="{{ __('nav.close_menu') }}"></label>
 
             <aside class="fixed inset-y-0 left-0 z-40 flex w-[17rem] -translate-x-full flex-col overflow-hidden border-r border-gold-300/50 bg-surface-raised bg-linear-to-b from-surface-raised via-surface-raised to-brand-50 transition-transform duration-200 peer-checked:translate-x-0 lg:translate-x-0" aria-label="Dashboard">
                 {{-- The brand's two rings, faint, behind the account card. --}}
@@ -46,7 +51,7 @@
                     <a href="{{ $home }}" class="flex min-w-0 items-center" aria-label="{{ config('app.name') }}">
                         <x-brand.lockup class="h-8 max-w-full object-contain" />
                     </a>
-                    <label for="dashboard-drawer" class="-mr-2 flex size-9 cursor-pointer items-center justify-center rounded-full text-ink-muted hover:bg-brand-50 lg:hidden" aria-label="Tutup menu">
+                    <label for="dashboard-drawer" class="-mr-2 flex size-9 cursor-pointer items-center justify-center rounded-full text-ink-muted hover:bg-brand-50 lg:hidden" aria-label="{{ __('nav.close_menu') }}">
                         <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
                     </label>
                 </div>
@@ -59,28 +64,32 @@
 
                 <nav class="no-scrollbar relative flex-1 overflow-y-auto px-4 pt-4 pb-6">
                     @foreach ($nav as $group)
-                        <div @class(['mt-5' => ! $loop->first])>
-                            @if ($group['label'])
-                                <p class="mb-1.5 px-3 font-display text-[13px] text-gold-600 italic">{{ $group['label'] }}</p>
-                            @endif
-                            <ul class="flex flex-col gap-0.5">
-                                @foreach ($group['items'] as $item)
-                                    <li>
-                                        <a href="{{ $item['href'] }}" @class([
-                                            'group flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition',
-                                            'bg-surface-raised text-brand-700 shadow-sm shadow-brand-900/5 ring-1 ring-brand-100 [&_svg]:text-brand-600' => $item['active'],
-                                            'text-ink-muted hover:bg-surface-raised/70 hover:text-ink' => ! $item['active'],
-                                        ]) @if ($item['active']) aria-current="page" @endif>
-                                            <x-nav-icon :name="$item['icon']" />
-                                            <span class="min-w-0 flex-1 truncate">{{ $item['label'] }}</span>
-                                            @if (! empty($item['badge']))
-                                                <span class="rounded-full bg-brand-600 px-1.5 py-px text-[11px] font-semibold text-white">{{ $item['badge'] }}</span>
-                                            @endif
-                                        </a>
-                                    </li>
-                                @endforeach
-                            </ul>
-                        </div>
+                        @if (! empty($group['key']))
+                            {{-- A group that folds away. nav-groups.js remembers
+                                 the choice; the one holding this page stays open. --}}
+                            <details data-nav-group="{{ $group['key'] }}" open @class(['group/nav', 'mt-5' => ! $loop->first])>
+                                <summary class="mb-1.5 flex cursor-pointer list-none items-center gap-2 rounded-lg px-3 py-1 transition hover:bg-surface-raised/60 [&::-webkit-details-marker]:hidden">
+                                    <span class="font-display text-[13px] text-gold-600 italic">{{ $group['label'] }}</span>
+                                    @if (! empty($group['tag']))
+                                        <span class="rounded-full bg-gold-300/40 px-1.5 py-px text-[10px] font-semibold tracking-wide text-brand-900 uppercase">{{ $group['tag'] }}</span>
+                                    @endif
+                                    <svg class="ml-auto size-3.5 text-ink-muted transition group-open/nav:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+                                </summary>
+                                <x-dashboard.nav-items :items="$group['items']" />
+                                @if (! empty($group['footer']))
+                                    <a href="{{ $group['footer']['href'] }}" class="mx-3 mt-2 flex items-center justify-center gap-1.5 rounded-xl border border-gold-300/70 bg-gold-300/15 px-3 py-2 text-xs font-semibold text-brand-800 transition hover:bg-gold-300/30">
+                                        <x-nav-icon name="crown" class="size-3.5" />{{ $group['footer']['label'] }}
+                                    </a>
+                                @endif
+                            </details>
+                        @else
+                            <div @class(['mt-5' => ! $loop->first])>
+                                @if ($group['label'])
+                                    <p class="mb-1.5 px-3 font-display text-[13px] text-gold-600 italic">{{ $group['label'] }}</p>
+                                @endif
+                                <x-dashboard.nav-items :items="$group['items']" />
+                            </div>
+                        @endif
                     @endforeach
                 </nav>
 
@@ -102,19 +111,26 @@
                             @csrf
                             <button type="submit" class="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-ink-muted transition hover:bg-brand-50/60 hover:text-brand-700">
                                 <svg class="size-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
-                                Log keluar
+                                {{ __('nav.logout') }}
                             </button>
                         </form>
                     </div>
                 </div>
             </aside>
+            @endif
         </div>
 
-        <div class="flex min-h-screen flex-col lg:pl-[17rem]">
+        <div @class(['flex min-h-screen flex-col', 'lg:pl-[17rem]' => $hasSidebar])>
             <header class="sticky top-0 z-30 flex h-16 shrink-0 items-center gap-3 border-b border-gold-300/40 bg-ivory/85 px-4 backdrop-blur-md sm:px-6 lg:px-10">
-                <label for="dashboard-drawer" class="-ml-1 flex size-9 cursor-pointer items-center justify-center rounded-full text-ink-muted hover:bg-brand-50 lg:hidden" aria-label="{{ __('nav.open_menu') }}">
-                    <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
-                </label>
+                @if ($hasSidebar)
+                    <label for="dashboard-drawer" class="-ml-1 flex size-9 cursor-pointer items-center justify-center rounded-full text-ink-muted hover:bg-brand-50 lg:hidden" aria-label="{{ __('nav.open_menu') }}">
+                        <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+                    </label>
+                @else
+                    <a href="{{ $home }}" class="shrink-0" aria-label="{{ config('app.name') }}">
+                        <x-brand.lockup class="h-7 w-auto object-contain" />
+                    </a>
+                @endif
 
                 {{-- Where you are: the wedding and its countdown, the business
                      and its status, or simply the admin panel and today. --}}
@@ -141,6 +157,13 @@
                     </a>
                     <x-site.language-switcher />
                     <x-notification-bell />
+                    @unless ($hasSidebar)
+                        <a href="{{ route('account.edit') }}" class="hidden rounded-full px-3 py-2 text-sm font-medium text-ink-muted transition hover:bg-brand-50 hover:text-brand-700 sm:block">{{ __('nav.account') }}</a>
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button type="submit" class="rounded-full px-3 py-2 text-sm font-medium text-ink-muted transition hover:bg-brand-50 hover:text-brand-700">{{ __('nav.logout') }}</button>
+                        </form>
+                    @endunless
                 </div>
             </header>
 

@@ -43,7 +43,8 @@ function fakeProGateway(bool $configured = true): PaymentLinkGateway
             return [
                 'reference' => (string) $request->input('reference'),
                 'gateway_reference' => $request->input('transaction_id'),
-                'paid' => $request->input('status') === 'paid',
+                'status' => (string) $request->input('status'),
+                'amount' => (float) $request->input('amount', VendorSubscription::where('reference', $request->input('reference'))->value('amount')),
             ];
         }
     };
@@ -185,19 +186,18 @@ it('does not let a vendor activate Pro through the admin route', function () {
     expect($this->vendor->fresh()->isPro())->toBeFalse();
 });
 
-it('saves the Pro prices and slots from admin settings', function () {
+it('saves the Pro prices from admin settings', function () {
     $admin = User::factory()->admin()->create();
 
     $this->actingAs($admin)
-        ->put(route('admin.settings.pro'), ['enabled' => '1', 'monthly_price' => 59, 'yearly_price' => 590, 'sponsored_slots' => 4])
+        ->put(route('admin.settings.pro'), ['enabled' => '1', 'monthly_price' => 59, 'yearly_price' => 590])
         ->assertRedirect()
         ->assertSessionHasNoErrors();
 
     $settings = app(ProSettings::class);
 
     expect($settings->isEnabled())->toBeTrue()
-        ->and($settings->price(VendorPlan::Monthly))->toBe(59.0)
-        ->and($settings->sponsoredSlots())->toBe(4);
+        ->and($settings->price(VendorPlan::Monthly))->toBe(59.0);
 });
 
 it('reminds a vendor a week before Pro runs out, and not a day earlier', function () {

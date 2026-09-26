@@ -31,6 +31,15 @@ class BookingPolicy
         return $this->belongsToCustomer($user, $booking) && $booking->canBeCancelled();
     }
 
+    /**
+     * The vendor may call off an active booking of theirs, paid or not: a
+     * deposit already paid is theirs to refund, under their own terms.
+     */
+    public function vendorCancel(User $user, Booking $booking): bool
+    {
+        return $this->ownsAsVendor($user, $booking) && $booking->status->isActive();
+    }
+
     /** Only the vendor can see their own account, so only they may verify. */
     public function verifyPayment(User $user, Booking $booking): bool
     {
@@ -43,6 +52,11 @@ class BookingPolicy
     public function review(User $user, Booking $booking): bool
     {
         return $this->belongsToCustomer($user, $booking);
+    }
+
+    private function ownsAsVendor(User $user, Booking $booking): bool
+    {
+        return $user->isVendor() && $user->vendor?->id === $booking->vendor_id;
     }
 
     private function belongsToCustomer(User $user, Booking $booking): bool

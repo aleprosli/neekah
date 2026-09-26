@@ -268,19 +268,27 @@ class UserController extends Controller
                     ['label' => __('props.admin.telefon_2'), 'value' => $user->phone ?: '—'],
                     ['label' => __('props.admin.peranan_2'), 'value' => $user->role->label()],
                     ['label' => __('props.admin.status_5'), 'value' => $user->isDeactivated()
-                        ? 'Dinyahaktif sejak '.$user->deactivated_at->translatedFormat('j M Y')
-                        : 'Aktif'],
+                        ? __('props.copy.deactivated_since', ['date' => $user->deactivated_at->translatedFormat('j M Y')])
+                        : __('props.copy.active')],
                     ['label' => __('props.admin.daftar_3'), 'value' => $user->created_at->translatedFormat('j M Y').($user->google_id ? ' · Google' : '')],
                     ['label' => __('props.admin.majlis_2'), 'value' => __('props.units.shared_created', ['shared' => $user->weddings_count, 'created' => $user->created_weddings_count])],
+                    ...($user->vendor ? [[
+                        'label' => __('props.admin.plan'),
+                        'value' => $user->vendor->isPro()
+                            ? 'Pro · '.__('props.admin.plan_until', ['date' => $user->vendor->pro_until->translatedFormat('j M Y')])
+                            : 'Basic',
+                    ]] : []),
                     ['label' => __('props.admin.tempahan_sebagai_pengantin'), 'value' => $user->bookings_count],
                     ['label' => __('props.admin.enquiry_review'), 'value' => $user->enquiries_count.' · '.$user->reviews_count],
                 ],
                 'actions' => $this->accountActions($user, $admin),
+                'camera' => CameraController::userCard($user),
                 'vendorForm' => $admin->can('switchToVendor', $user) ? VueProps::for([
                     'action' => route('admin.users.vendor.store', $user),
                     'loginUrl' => route('login'),
                     'categories' => Category::active()->ordered()->get(['id', 'name', 'icon']),
                     'states' => States::options(),
+                    'districts' => States::districtOptions(),
                     'old' => ['phone' => $user->phone, ...old()],
                     'account' => ['name' => $user->name, 'email' => $user->email],
                 ]) : null,
@@ -372,7 +380,7 @@ class UserController extends Controller
             'tone' => 'danger',
             'confirm_title' => __('props.admin.padam_akaun_3').$user->name.'?',
             'confirm_message' => __('props.admin.akaun_majlis_enquiry_review_dan'),
-            'confirm_label' => 'Ya, padam kekal',
+            'confirm_label' => __('props.copy.delete_forever'),
         ];
 
         return $actions;

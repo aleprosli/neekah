@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Enums\SubscriptionStatus;
 use App\Enums\VendorStatus;
 use App\Enums\VendorTier;
 use App\Http\Controllers\Controller;
@@ -19,6 +18,9 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class VendorController extends Controller
 {
+    /** The plan chips on the list. */
+    private const PLANS = ['basic', 'pro'];
+
     /** Columns for components/ui/DataTable.vue. */
     /**
      * A constant cannot hold a function call, and these labels are
@@ -33,6 +35,7 @@ class VendorController extends Controller
             ['key' => 'category', 'label' => __('props.admin.kategori')],
             ['key' => 'location', 'label' => __('props.admin.lokasi')],
             ['key' => 'setup', 'label' => __('props.admin.kelengkapan'), 'type' => 'html'],
+            ['key' => 'plan', 'label' => __('props.admin.plan'), 'type' => 'html'],
             ['key' => 'tier', 'label' => __('props.admin.tahap')],
             ['key' => 'score', 'label' => __('props.admin.score'), 'sortable' => true, 'align' => 'right'],
             ['key' => 'status', 'label' => __('props.admin.status_6'), 'type' => 'html'],
@@ -102,6 +105,17 @@ class VendorController extends Controller
                     ], VendorStatus::cases()),
                 ],
                 [
+                    'key' => 'plan',
+                    'label' => __('props.admin.plan'),
+                    'value' => in_array($request->string('plan')->toString(), self::PLANS, true) ? $request->string('plan')->toString() : null,
+                    'allLabel' => __('props.common.all'),
+                    'allCount' => Vendor::count(),
+                    'options' => [
+                        ['value' => 'basic', 'label' => 'Basic', 'count' => Vendor::query()->where(fn (Builder $query) => $query->whereNull('pro_until')->orWhere('pro_until', '<=', now()))->count()],
+                        ['value' => 'pro', 'label' => 'Pro', 'count' => Vendor::query()->pro()->count()],
+                    ],
+                ],
+                [
                     'key' => 'setup',
                     'label' => __('props.admin.kelengkapan_2'),
                     'value' => in_array($request->string('setup')->toString(), ['complete', 'partial'], true)
@@ -129,7 +143,7 @@ class VendorController extends Controller
         $status = VendorStatus::tryFrom($request->string('status')->toString());
         $setup = $request->string('setup')->toString();
 
-        $vendors = $this->withSetup($this->searched($request), $setup)
+        $vendors = $this->withSetup($this->withPlan($this->searched($request), $request->string('plan')->toString()), $setup)
             ->when($status, fn (Builder $query) => $query->where('status', $status))
             ->with(['category', 'user'])
             ->withCount([
@@ -198,8 +212,9 @@ class VendorController extends Controller
         $direction = $request->string('direction')->toString() === 'asc' ? 'asc' : 'desc';
 
         $setup = $request->string('setup')->toString();
+        $plan = $request->string('plan')->toString();
 
-        $matching = fn (): Builder => $this->searched($request);
+        $matching = fn (): Builder => $this->withPlan($this->searched($request), $plan);
         $withSetup = fn (Builder $query): Builder => $this->withSetup($query, $setup);
 
         $countingSetup = $matching()->when($status, fn (Builder $query) => $query->where('status', $status));
@@ -224,6 +239,7 @@ class VendorController extends Controller
                 'category' => $vendor->category->name,
                 'location' => $vendor->city.', '.$vendor->state,
                 'setup' => view('components.admin.vendor-setup', ['vendor' => $vendor])->render(),
+                'plan' => view('components.admin.vendor-plan', ['vendor' => $vendor])->render(),
                 'tier' => $vendor->tier->label(),
                 'score' => number_format((float) $vendor->score, 1),
                 'status' => view('components.admin.status-pill', ['label' => $vendor->status->label(), 'tone' => $vendor->status->tone()])->render(),
@@ -258,6 +274,11 @@ class VendorController extends Controller
             // left, so a count can never disagree with the table under it.
             'filters' => [
                 'status' => TableFilter::countsByColumn($withSetup($matching()), 'status'),
+                'plan' => [
+                    '' => $withSetup($this->searched($request)->when($status, fn (Builder $query) => $query->where('status', $status)))->count(),
+                    'basic' => $withSetup($this->withPlan($this->searched($request), 'basic')->when($status, fn (Builder $query) => $query->where('status', $status)))->count(),
+                    'pro' => $withSetup($this->withPlan($this->searched($request), 'pro')->when($status, fn (Builder $query) => $query->where('status', $status)))->count(),
+                ],
                 'setup' => [
                     '' => $countingSetup->clone()->count(),
                     'complete' => $countingSetup->clone()->setupComplete()->count(),
@@ -279,8 +300,6 @@ class VendorController extends Controller
 
         return view('admin.vendors.show', [
             'vendor' => $vendor,
-            // Unpaid checkouts are abandoned carts; the history is what was paid.
-            'subscriptions' => $vendor->subscriptions()->with('addedBy')->where('status', '!=', SubscriptionStatus::Pending)->limit(20)->get(),
             'props' => VueProps::for([
                 'vendor' => [
                     'status' => $vendor->status->label(),
@@ -325,6 +344,8 @@ class VendorController extends Controller
                 'tiers' => collect(VendorTier::cases())
                     ->map(fn (VendorTier $case): array => ['value' => $case->value, 'label' => $case->label()])
                     ->all(),
+                'boost' => VendorBoostController::card($vendor),
+                'plan' => VendorProController::card($vendor),
             ]),
         ]);
     }
@@ -348,6 +369,19 @@ class VendorController extends Controller
                 $like = '%'.$keyword.'%';
                 $query->where(fn (Builder $query) => $query->where('name', 'like', $like)->orWhere('city', 'like', $like));
             });
+    }
+
+    /**
+     * Basic is every vendor without Pro running, including one whose Pro ran out.
+     *
+     * @param  Builder<Vendor>  $query
+     * @return Builder<Vendor>
+     */
+    private function withPlan(Builder $query, string $plan): Builder
+    {
+        return $query
+            ->when($plan === 'pro', fn (Builder $query) => $query->pro())
+            ->when($plan === 'basic', fn (Builder $query) => $query->where(fn (Builder $query) => $query->whereNull('pro_until')->orWhere('pro_until', '<=', now())));
     }
 
     /**

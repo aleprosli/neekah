@@ -6,6 +6,7 @@
  */
 import { computed, ref } from 'vue';
 import { useUploadForm } from '../../composables/useUploadForm.js';
+import UiDistrictSelect from '../ui/UiDistrictSelect.vue';
 import UiField from '../ui/UiField.vue';
 import UiFlagSelect from '../ui/UiFlagSelect.vue';
 import UiMultiSelect from '../ui/UiMultiSelect.vue';
@@ -20,6 +21,7 @@ const props = defineProps({
     categories: { type: Array, required: true },
     maxCategories: { type: Number, required: true },
     states: { type: Array, required: true },
+    districts: { type: Object, required: true },
     tones: { type: Array, required: true },
     priceUnits: { type: Array, required: true },
     socialPlatforms: { type: Array, required: true },
@@ -91,7 +93,10 @@ const stateChoices = computed(() =>
                 <UiFlagSelect v-model="form.state" :label="$t('vendor_profile.negeri_asal')" name="state" :options="states" :error="errors.state" required />
             </div>
 
-            <UiField v-model="form.city" :label="$t('vendor_profile.bandar')" name="city" :error="errors.city" required />
+            <div class="grid gap-4 sm:grid-cols-2">
+                <UiDistrictSelect v-model="form.district" :state="form.state" :districts="districts" :error="errors.district" />
+                <UiField v-model="form.city" :label="$t('vendor_profile.bandar')" name="city" :error="errors.city" required />
+            </div>
 
             <div class="grid gap-4 sm:grid-cols-2">
                 <UiMultiSelect

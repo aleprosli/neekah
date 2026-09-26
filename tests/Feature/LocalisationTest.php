@@ -408,10 +408,9 @@ it('walks a brand new English vendor through their onboarding in English', funct
     $html = $this->actingAs($vendor->user)->get('/en/vendor')->assertOk()->getContent();
 
     expect($html)
-        ->toContain('not shown in the marketplace yet')
-        ->not->toContain('belum dipaparkan di marketplace');
+        ->toContain('couples cannot see your profile yet')
+        ->not->toContain('belum dipaparkan kepada pengantin');
 
-    // The step copy is handed to Vue as props, so it lives in data-props.
     expect(html_entity_decode($html))
         ->toContain('The first sentence couples read about you')
         ->not->toContain('Ayat pertama yang pengantin baca');
