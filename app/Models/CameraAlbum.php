@@ -6,6 +6,7 @@ use App\Enums\CameraMediaStatus;
 use App\Enums\CameraTier;
 use App\Support\CameraLimits;
 use App\Support\CameraSettings;
+use Carbon\CarbonInterface;
 use Database\Factories\CameraAlbumFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
@@ -16,12 +17,13 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
 
 /**
- * A wedding's Kamera Majlis album. Guests open it through the QR (the token);
- * it takes uploads until expires_at, 14 days after the event by default, when
- * every file is deleted and purged_at is set. The row stays as the record.
+ * One Neekah Kenangan album of a wedding, for one majlis; a wedding may buy
+ * several. Guests open it through the QR (the token); it takes uploads until
+ * expires_at, 14 days after its event by default, when every file is deleted
+ * and purged_at is set. The row stays as the record.
  */
 #[Fillable([
-    'wedding_id', 'token', 'tier', 'activated_at', 'expires_at', 'purged_at', 'title', 'welcome_message',
+    'wedding_id', 'token', 'tier', 'activated_at', 'expires_at', 'purged_at', 'title', 'event_date', 'welcome_message',
     'passcode_hash', 'passcode_version', 'guests_can_view', 'uploads_open', 'photos_count', 'videos_count',
     'reserved_count', 'bytes_used', 'bytes_reserved', 'qr_design', 'qr_options', 'export_paths', 'exported_at',
 ])]
@@ -48,6 +50,7 @@ class CameraAlbum extends Model
             'activated_at' => 'datetime',
             'expires_at' => 'datetime',
             'purged_at' => 'datetime',
+            'event_date' => 'date',
             'exported_at' => 'datetime',
             'guests_can_view' => 'boolean',
             'uploads_open' => 'boolean',
@@ -91,15 +94,33 @@ class CameraAlbum extends Model
         return $this->hasMany(CameraMedia::class);
     }
 
-    /** What the wedding paid for this album, new and upgrades alike. */
+    /** What was paid for this album, the purchase that opened it and any upgrade. */
     public function purchases(): HasMany
     {
-        return $this->hasMany(CameraPurchase::class, 'wedding_id', 'wedding_id');
+        return $this->hasMany(CameraPurchase::class);
+    }
+
+    /** Written and spoken wishes guests left for the couple. */
+    public function wishes(): HasMany
+    {
+        return $this->hasMany(CameraWish::class);
     }
 
     public function readyMedia(): HasMany
     {
         return $this->media()->where('status', CameraMediaStatus::Ready);
+    }
+
+    /** The album's own majlis date, or the wedding's when it has none. */
+    public function eventDate(): CarbonInterface
+    {
+        return $this->event_date ?? $this->wedding->event_date;
+    }
+
+    /** What guests and the couple see it called: its title, or the wedding's. */
+    public function displayTitle(): string
+    {
+        return $this->title ?: $this->wedding->title;
     }
 
     public function isActive(): bool
@@ -122,6 +143,17 @@ class CameraAlbum extends Model
     public function limits(): CameraLimits
     {
         return app(CameraSettings::class)->limitsFor($this->tier);
+    }
+
+    /**
+     * A tag that changes whenever what the album holds changes: its counters
+     * move on every ready, deleted or purged file. Media listings send it as
+     * an ETag, so a phone or the couple's page asking again gets a 304
+     * instead of the same page rebuilt.
+     */
+    public function contentsTag(string ...$context): string
+    {
+        return sha1(implode('|', [$this->id, $this->photos_count, $this->videos_count, $this->bytes_used, $this->purged_at?->timestamp, ...$context]));
     }
 
     public function url(): string

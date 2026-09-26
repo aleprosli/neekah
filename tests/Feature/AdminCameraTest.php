@@ -42,7 +42,7 @@ it('records a purchase paid outside Herepay for the couple of an email', functio
     expect($purchase->status)->toBe(SubscriptionStatus::Paid)
         ->and((float) $purchase->amount)->toBe(0.0)
         ->and($purchase->added_by)->toBe($this->admin->id)
-        ->and($wedding->cameraAlbum()->first()->tier)->toBe(CameraTier::Pro);
+        ->and($wedding->cameraAlbums()->sole()->tier)->toBe(CameraTier::Pro);
 
     $this->actingAs($this->admin)->post(route('admin.camera.store'), ['email' => 'tiada@neekah.my', 'tier' => 'basic'])
         ->assertSessionHasErrors('email');
@@ -98,7 +98,7 @@ it('sets a couple\'s Kamera Majlis from their account page: on for free, down a 
     expect($camera()['current'])->toBe('off');
 
     $set('pro');
-    $album = $wedding->cameraAlbum()->first();
+    $album = $wedding->cameraAlbums()->sole();
     expect($camera()['current'])->toBe('pro')
         ->and($camera()['album']['url'])->toBe($album->url())
         ->and((float) $wedding->cameraPurchases()->sole()->amount)->toBe(0.0);

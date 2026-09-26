@@ -21,7 +21,7 @@ class DeleteCameraMedia
     public function handle(CameraMedia $media): void
     {
         $disk = Storage::disk('public');
-        PurgeCdnUrls::for([$media->url(), $media->thumbnailUrl()]);
+        PurgeCdnUrls::for(array_filter([$media->url(), $media->thumbnailUrl(), $media->display_path ? $media->displayUrl() : null]));
 
         if ($media->type === CameraMediaType::Photo) {
             $this->images->delete($media->path);

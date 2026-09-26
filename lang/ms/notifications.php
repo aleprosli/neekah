@@ -219,27 +219,27 @@ return [
     ],
 
     'camera_activated' => [
-        'title' => 'Kamera Majlis :tier sudah aktif',
+        'title' => 'Neekah Kenangan :tier sudah aktif',
         'body' => 'Kongsi pautan atau QR dengan tetamu. Album disimpan sehingga :date.',
         'receipt' => 'Resit :reference · RM:amount',
-        'action' => 'Buka Kamera Majlis',
+        'action' => 'Buka Neekah Kenangan',
     ],
 
     'camera_export' => [
-        'title' => 'ZIP Kamera Majlis anda sedia',
+        'title' => 'ZIP Neekah Kenangan anda sedia',
         'body' => 'Muat turun semua gambar dan video sebelum album dipadam pada :date.',
     ],
 
     'camera_retention' => [
-        'after_event_title' => 'Terima kasih kerana guna Kamera Majlis',
+        'after_event_title' => 'Terima kasih kerana guna Neekah Kenangan',
         'after_event_body' => 'Tetamu berkongsi :count gambar dan video. Muat turun ZIP sebelum album dipadam pada :date.',
-        'expiring_7_title' => 'Album Kamera Majlis dipadam dalam 7 hari',
+        'expiring_7_title' => 'Album Neekah Kenangan dipadam dalam 7 hari',
         'expiring_7_body' => 'Semua gambar dan video akan dipadam pada :date. Muat turun ZIP sekarang.',
-        'expiring_1_title' => 'Album Kamera Majlis dipadam esok',
+        'expiring_1_title' => 'Album Neekah Kenangan dipadam esok',
         'expiring_1_body' => 'Ini peringatan terakhir: semua gambar dan video akan dipadam pada :date.',
-        'purged_title' => 'Album Kamera Majlis telah dipadam',
+        'purged_title' => 'Album Neekah Kenangan telah dipadam',
         'purged_body' => 'Tempoh simpanan sudah tamat dan semua gambar serta video telah dipadam dari Neekah.',
-        'action' => 'Buka Kamera Majlis',
+        'action' => 'Buka Neekah Kenangan',
     ],
 
     'boost_tokens' => [

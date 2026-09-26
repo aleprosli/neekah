@@ -2,6 +2,8 @@
 
 use App\Actions\StoreOptimizedImage;
 use App\Enums\CameraMediaStatus;
+use App\Enums\CameraTier;
+use App\Jobs\ProcessCameraMedia;
 use App\Models\CameraAlbum;
 use App\Models\CameraMedia;
 use App\Support\Camera\CameraUploadTarget;
@@ -68,6 +70,23 @@ it('takes a photo into the album at the tier size, with its thumbnail', function
     Storage::disk('public')->assertExists($media->path);
     Storage::disk('public')->assertExists(StoreOptimizedImage::thumbnailPath($media->path));
     expect(Storage::disk('public')->allFiles('camera/'.$album->id.'/incoming'))->toBe([]);
+});
+
+it('draws a light grid thumbnail and a display copy, so looking never downloads the original', function () {
+    $this->album->update(['tier' => CameraTier::Pro]);
+
+    guestUpload($this->album, jpegBytes(3000, 2000))->assertOk();
+
+    $media = CameraMedia::sole();
+    $disk = Storage::disk('public');
+    [$thumbWidth] = getimagesizefromstring($disk->get(StoreOptimizedImage::thumbnailPath($media->path)));
+    [$displayWidth] = getimagesizefromstring($disk->get($media->display_path));
+
+    expect($media->display_path)->toBe(StoreOptimizedImage::displayPath($media->path))
+        ->and($thumbWidth)->toBe(ProcessCameraMedia::THUMBNAIL_WIDTH)
+        ->and($displayWidth)->toBe(ProcessCameraMedia::DISPLAY_DIMENSION)
+        ->and($media->width)->toBe(3000)
+        ->and($media->bytes)->toBe($disk->size($media->path) + $disk->size(StoreOptimizedImage::thumbnailPath($media->path)) + $disk->size($media->display_path));
 });
 
 it('keeps Pro photos at full quality size', function () {
@@ -155,6 +174,15 @@ it('shows guests everyone else photos unless the couple turned that off', functi
 
     $this->album->update(['guests_can_view' => false]);
     $this->getJson(route('camera.gallery', $this->album))->assertOk()->assertJsonCount(0, 'items');
+});
+
+it('answers a guest 304 while nothing in the album changed', function () {
+    $tag = $this->getJson(route('camera.gallery', $this->album))->assertOk()->headers->get('ETag');
+
+    $this->getJson(route('camera.gallery', $this->album), ['If-None-Match' => $tag])->assertStatus(304);
+
+    $this->album->update(['guests_can_view' => false]);
+    $this->getJson(route('camera.gallery', $this->album), ['If-None-Match' => $tag])->assertOk();
 });
 
 it('lets a guest take back their own upload for a day, and nobody else', function () {

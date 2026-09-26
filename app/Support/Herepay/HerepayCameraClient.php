@@ -25,7 +25,7 @@ class HerepayCameraClient implements CameraPaymentGateway
     public function createPaymentLink(CameraPurchase $purchase, User $payer): string
     {
         return $this->transport->createLink(HerepayCredentials::neekah(), [
-            'title' => Str::limit(__('pages.camera.herepay_title', ['tier' => $purchase->tier->label(), 'wedding' => $purchase->wedding->title]), 250),
+            'title' => Str::limit(__('pages.camera.herepay_title', ['tier' => $purchase->tier->label(), 'wedding' => $purchase->album_title ?: $purchase->album?->displayTitle() ?? $purchase->wedding->title]), 250),
             'amount' => round((float) $purchase->amount, 2),
             'description' => e(__('pages.camera.herepay_description', ['reference' => $purchase->reference])),
             'usage_type' => 'single',

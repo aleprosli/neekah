@@ -161,6 +161,7 @@ return [
     'camera_retention_days' => 'disimpan selepas majlis (hari)',
     'camera_pro_fair_use_gb' => 'amaran guna berlebihan Pro (GB)',
     'camera_album_title' => 'nama album',
+    'camera_event_date' => 'tarikh majlis',
     'camera_welcome' => 'ucapan untuk tetamu',
     'camera_passcode' => 'kata laluan',
     'boost_welcome_tokens' => 'token selamat datang',

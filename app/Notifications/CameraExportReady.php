@@ -34,7 +34,7 @@ class CameraExportReady extends Notification implements ShouldQueue
             'title_key' => 'notifications.camera_export.title',
             'body_key' => 'notifications.camera_export.body',
             'body_params' => ['date' => $this->album->expires_at?->translatedFormat('j F Y') ?? ''],
-            'url' => route('camera.index'),
+            'url' => route('camera.album', $this->album),
         ];
     }
 
@@ -43,6 +43,6 @@ class CameraExportReady extends Notification implements ShouldQueue
         return NeekahMail::to($notifiable)
             ->subject(__('notifications.camera_export.title'))
             ->line(__('notifications.camera_export.body', ['date' => $this->album->expires_at?->translatedFormat('j F Y') ?? '']))
-            ->action(__('notifications.camera_activated.action'), route('camera.index'));
+            ->action(__('notifications.camera_activated.action'), route('camera.album', $this->album));
     }
 }

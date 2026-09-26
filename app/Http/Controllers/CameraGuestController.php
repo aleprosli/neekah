@@ -4,12 +4,16 @@ namespace App\Http\Controllers;
 
 use App\Actions\CompleteCameraUpload;
 use App\Actions\DeleteCameraMedia;
+use App\Actions\PurgeCameraAlbum;
 use App\Actions\ReserveCameraUpload;
 use App\Enums\CameraMediaStatus;
 use App\Enums\CameraMediaType;
+use App\Enums\CameraTier;
+use App\Enums\CameraWishType;
 use App\Jobs\SendTelegramAlert;
 use App\Models\CameraAlbum;
 use App\Models\CameraMedia;
+use App\Support\Camera\AudioSniffer;
 use App\Support\Camera\CameraGuest;
 use App\Support\Camera\CameraUploadTarget;
 use App\Support\ImageSettings;
@@ -23,6 +27,7 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 
@@ -43,6 +48,17 @@ class CameraGuestController extends Controller
     /** How long a guest can take back their own upload. */
     public const OWN_DELETE_HOURS = 24;
 
+    /** The longest written wish. */
+    public const WISH_MAX_CHARACTERS = 1000;
+
+    /** The longest voice wish, and the most it may weigh. */
+    public const VOICE_MAX_SECONDS = 60;
+
+    public const VOICE_MAX_KILOBYTES = 3072;
+
+    /** Wishes one phone may leave in one album. */
+    public const WISHES_PER_DEVICE = 20;
+
     public function show(Request $request, CameraAlbum $album, Seo $seo): View
     {
         $seo->noindex();
@@ -56,8 +72,8 @@ class CameraGuestController extends Controller
             'closed' => ! $album->isActive(),
             'props' => VueProps::for([
                 'album' => [
-                    'title' => $album->title ?: $album->wedding->title,
-                    'date' => $album->wedding->event_date->translatedFormat('j F Y'),
+                    'title' => $album->displayTitle(),
+                    'date' => $album->eventDate()->translatedFormat('j F Y'),
                     'welcome' => $album->welcome_message,
                     'tier' => $album->tier->value,
                     'active' => $album->isActive(),
@@ -65,6 +81,9 @@ class CameraGuestController extends Controller
                     'guests_can_view' => $album->guests_can_view,
                     'limits' => $limits->toArray(),
                     'photos' => $album->photos_count,
+                    'allows_voice' => $album->tier === CameraTier::Pro,
+                    'wish_max_characters' => self::WISH_MAX_CHARACTERS,
+                    'voice_max_seconds' => self::VOICE_MAX_SECONDS,
                 ],
                 'entered' => $guest->mayEnter($album),
                 'name' => $guest->name(),
@@ -73,6 +92,7 @@ class CameraGuestController extends Controller
                     'name' => route('camera.name', $album),
                     'reserve' => route('camera.upload.reserve', $album),
                     'gallery' => route('camera.gallery', $album),
+                    'wish' => route('camera.guest.wish', $album),
                 ],
             ]),
         ]);
@@ -174,12 +194,22 @@ class CameraGuestController extends Controller
 
     /**
      * The album, newest first: everyone's when the couple lets guests see it,
-     * otherwise only this phone's.
+     * otherwise only this phone's. Asked again with the same ETag while
+     * nothing changed, it answers 304 without building the page.
      */
     public function gallery(Request $request, CameraAlbum $album): JsonResponse
     {
         $this->ensureEntered($request, $album);
         $device = (new CameraGuest($request))->deviceHash();
+
+        $response = response()->json()
+            ->setEtag($album->contentsTag('guest', $device, (string) (int) $album->guests_can_view, (string) $request->integer('before')))
+            ->setPrivate();
+        $response->headers->addCacheControlDirective('no-cache');
+
+        if ($response->isNotModified($request)) {
+            return $response;
+        }
 
         $page = $album->readyMedia()
             ->when(! $album->guests_can_view, fn ($query) => $query->where('device_hash', $device))
@@ -192,16 +222,17 @@ class CameraGuestController extends Controller
             'id' => $media->id,
             'type' => $media->type->value,
             'url' => $media->url(),
+            'display' => $media->displayUrl(),
             'thumb' => $media->thumbnailUrl() ?? $media->url(),
             'by' => $media->uploader_name,
             'delete_url' => $this->mayDelete($media, $device) ? route('camera.media.destroy', [$album, $media]) : null,
             'report_url' => $media->device_hash === $device ? null : route('camera.media.report', [$album, $media]),
         ])->values();
 
-        return response()->json([
+        return $response->setData([
             'items' => $items,
             'next' => $page->count() > self::PAGE ? $items->last()['id'] : null,
-            'photos' => $album->fresh()->photos_count,
+            'photos' => $album->photos_count,
         ]);
     }
 
@@ -231,7 +262,7 @@ class CameraGuestController extends Controller
         if ($media->reported_at === null) {
             $media->update(['reported_at' => now(), 'report_reason' => filled($reason) ? trim(strip_tags($reason)) : null]);
 
-            SendTelegramAlert::about('🚩 <b>Kamera Majlis file reported</b>', [
+            SendTelegramAlert::about('🚩 <b>Neekah Kenangan file reported</b>', [
                 'Wedding' => $album->wedding->title,
                 'Reason' => $media->report_reason,
                 'File' => $media->url(),
@@ -240,6 +271,65 @@ class CameraGuestController extends Controller
         }
 
         return response()->json(['reported' => true]);
+    }
+
+    /**
+     * A wish for the couple: a written message on every tier, or a short
+     * voice recording on Pro. Only the couple sees it. The recording is
+     * checked by its first bytes, never by the type the browser claimed.
+     */
+    public function wish(Request $request, CameraAlbum $album): JsonResponse
+    {
+        $this->ensureEntered($request, $album);
+        abort_unless($album->acceptsUploads(), 410);
+
+        $guest = new CameraGuest($request);
+        $device = $guest->deviceHash();
+
+        if ($album->wishes()->where('device_hash', $device)->count() >= self::WISHES_PER_DEVICE) {
+            throw ValidationException::withMessages(['message' => __('validation.custom.camera_wish_limit')]);
+        }
+
+        if (! $request->hasFile('audio')) {
+            $message = $request->validate(['message' => ['required', 'string', 'max:'.self::WISH_MAX_CHARACTERS]])['message'];
+
+            $album->wishes()->create([
+                'type' => CameraWishType::Text,
+                'message' => trim(strip_tags($message)),
+                'guest_name' => $guest->name(),
+                'device_hash' => $device,
+            ]);
+
+            return response()->json(['saved' => true]);
+        }
+
+        abort_unless($album->tier === CameraTier::Pro, 403);
+        $validated = $request->validate([
+            'audio' => ['required', 'file', 'max:'.self::VOICE_MAX_KILOBYTES],
+            'seconds' => ['required', 'integer', 'min:1', 'max:'.self::VOICE_MAX_SECONDS],
+        ]);
+
+        $contents = (string) file_get_contents($validated['audio']->getRealPath());
+        $format = AudioSniffer::detect(substr($contents, 0, 16));
+
+        if ($format === null) {
+            throw ValidationException::withMessages(['audio' => __('validation.custom.camera_voice_unreadable')]);
+        }
+
+        $path = PurgeCameraAlbum::directory($album).'/wishes/'.Str::random(40).'.'.$format['extension'];
+        Storage::disk('public')->put($path, $contents, ['CacheControl' => CameraAlbum::CACHE_CONTROL]);
+
+        $album->wishes()->create([
+            'type' => CameraWishType::Voice,
+            'audio_path' => $path,
+            'mime' => $format['mime'],
+            'bytes' => strlen($contents),
+            'duration_seconds' => (int) $validated['seconds'],
+            'guest_name' => $guest->name(),
+            'device_hash' => $device,
+        ]);
+
+        return response()->json(['saved' => true]);
     }
 
     /**

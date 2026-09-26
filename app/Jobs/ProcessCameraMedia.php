@@ -32,6 +32,15 @@ class ProcessCameraMedia implements ShouldQueue
 {
     use Queueable;
 
+    /** Grid thumbnails: three to six across a phone or a dashboard, never wider. */
+    public const THUMBNAIL_WIDTH = 480;
+
+    /** The copy the full-screen viewer opens, sharp on a laptop screen. */
+    public const DISPLAY_DIMENSION = 1600;
+
+    /** Thumbnails and display copies are for looking, not keeping. */
+    public const PREVIEW_QUALITY = 78;
+
     public int $tries = 2;
 
     public int $timeout = 300;
@@ -52,8 +61,18 @@ class ProcessCameraMedia implements ShouldQueue
 
         if ($media->type === CameraMediaType::Photo) {
             $limits = $album->limits();
-            $path = $images->storeContents((string) $disk->get($media->incoming_path), $directory, maxDimension: $limits->photoPixels, quality: $limits->photoQuality, cacheControl: CameraAlbum::CACHE_CONTROL);
-            $bytes = (int) $disk->size($path) + (int) $disk->size(StoreOptimizedImage::thumbnailPath($path));
+            $path = $images->storeContents(
+                (string) $disk->get($media->incoming_path),
+                $directory,
+                maxDimension: $limits->photoPixels,
+                quality: $limits->photoQuality,
+                cacheControl: CameraAlbum::CACHE_CONTROL,
+                thumbnailWidth: self::THUMBNAIL_WIDTH,
+                displayDimension: self::DISPLAY_DIMENSION,
+                previewQuality: self::PREVIEW_QUALITY,
+            );
+            $displayPath = StoreOptimizedImage::displayPath($path);
+            $bytes = (int) $disk->size($path) + (int) $disk->size(StoreOptimizedImage::thumbnailPath($path)) + (int) $disk->size($displayPath);
             $size = @getimagesizefromstring((string) $disk->get($path)) ?: [null, null];
             $disk->delete($media->incoming_path);
         } else {
@@ -64,12 +83,14 @@ class ProcessCameraMedia implements ShouldQueue
             $this->storeVideo($media->incoming_path, $path, $extension);
             $bytes = (int) $disk->size($path);
             $size = [null, null];
+            $displayPath = null;
         }
 
-        DB::transaction(function () use ($media, $album, $path, $bytes, $size): void {
+        DB::transaction(function () use ($media, $album, $path, $displayPath, $bytes, $size): void {
             $media->update([
                 'status' => CameraMediaStatus::Ready,
                 'path' => $path,
+                'display_path' => $displayPath,
                 'incoming_path' => null,
                 'bytes' => $bytes,
                 'width' => $size[0],
@@ -151,7 +172,7 @@ class ProcessCameraMedia implements ShouldQueue
         $limit = app(CameraSettings::class)->proFairUseGigabytes() * 1024 ** 3;
 
         if ($album->bytes_used >= $limit && Cache::add('camera-fair-use:'.$album->id, true, now()->addDays(30))) {
-            SendTelegramAlert::about('📸 <b>Kamera Majlis melepasi had guna wajar</b>', [
+            SendTelegramAlert::about('📸 <b>Neekah Kenangan melepasi had guna wajar</b>', [
                 'Majlis' => $album->wedding->title,
                 'Storan' => round($album->bytes_used / 1024 ** 3, 1).' GB',
             ]);

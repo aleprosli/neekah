@@ -36,13 +36,19 @@ class StoreOptimizedImage
     /**
      * $maxDimension and $quality override the admin's image settings for this
      * call only, and $cacheControl the disk's year-long immutable header.
-     * Kamera Majlis uses them (its tiers keep photos at their own size, and
+     * Neekah Kenangan uses them (its tiers keep photos at their own size, and
      * its files are deleted after the event, so the CDN must not keep them a
      * year); every other caller leaves them null.
      *
+     * Neekah Kenangan also asks for a smaller grid thumbnail
+     * ($thumbnailWidth), and for a "-display" copy no larger than
+     * $displayDimension that the full-screen viewer shows instead of the
+     * original. Both are encoded at $previewQuality, so a Pro album's
+     * near-lossless originals do not make its grid heavy.
+     *
      * @return string The stored path on the public disk.
      */
-    public function storeContents(string $contents, string $directory, bool $lossless = false, ?int $maxDimension = null, ?int $quality = null, ?string $cacheControl = null): string
+    public function storeContents(string $contents, string $directory, bool $lossless = false, ?int $maxDimension = null, ?int $quality = null, ?string $cacheControl = null, ?int $thumbnailWidth = null, ?int $displayDimension = null, ?int $previewQuality = null): string
     {
         $this->allowMemoryForDecoding();
         $this->quality = $quality;
@@ -60,12 +66,18 @@ class StoreOptimizedImage
         // never written, and the caller saved it: a wedding card pointing at a
         // 404, with nothing anywhere saying the upload had failed.
         $options = $cacheControl ? ['CacheControl' => $cacheControl] : [];
-        $stored = $disk->put($path, $this->encode($this->resize($image, $largest, $largest), $extension), $options)
-            && $disk->put($thumbnail, $this->encode($this->resize($image, $this->settings->thumbnailWidth(), PHP_INT_MAX), $extension), $options);
+        $stored = $disk->put($path, $this->encode($this->resize($image, $largest, $largest), $extension), $options);
+
+        $this->quality = $previewQuality ?? $quality;
+        $stored = $stored && $disk->put($thumbnail, $this->encode($this->resize($image, $thumbnailWidth ?? $this->settings->thumbnailWidth(), PHP_INT_MAX), $extension), $options);
+
+        if ($displayDimension !== null) {
+            $stored = $stored && $disk->put(self::displayPath($path), $this->encode($this->resize($image, $displayDimension, $displayDimension), $extension), $options);
+        }
 
         if (! $stored) {
-            // Whichever half landed is of no use on its own.
-            $disk->delete([$path, $thumbnail]);
+            // Whichever part landed is of no use on its own.
+            $disk->delete([$path, $thumbnail, self::displayPath($path)]);
 
             throw new RuntimeException('Could not write the uploaded image to '.$directory.'.');
         }
@@ -136,7 +148,7 @@ class StoreOptimizedImage
     }
 
     /**
-     * Remove an image and its thumbnail.
+     * Remove an image, its thumbnail and its display copy if it has one.
      */
     public function delete(?string $path): void
     {
@@ -144,7 +156,7 @@ class StoreOptimizedImage
             return;
         }
 
-        Storage::disk('public')->delete([$path, self::thumbnailPath($path)]);
+        Storage::disk('public')->delete([$path, self::thumbnailPath($path), self::displayPath($path)]);
     }
 
     /**
@@ -152,10 +164,23 @@ class StoreOptimizedImage
      */
     public static function thumbnailPath(string $path): string
     {
+        return self::variantPath($path, 'thumb');
+    }
+
+    /**
+     * "camera/7/abc.webp" becomes "camera/7/abc-display.webp".
+     */
+    public static function displayPath(string $path): string
+    {
+        return self::variantPath($path, 'display');
+    }
+
+    private static function variantPath(string $path, string $suffix): string
+    {
         $info = pathinfo($path);
         $directory = ($info['dirname'] ?? '.') === '.' ? '' : $info['dirname'].'/';
 
-        return $directory.$info['filename'].'-thumb'.(isset($info['extension']) ? '.'.$info['extension'] : '');
+        return $directory.$info['filename'].'-'.$suffix.(isset($info['extension']) ? '.'.$info['extension'] : '');
     }
 
     /**

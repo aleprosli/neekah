@@ -1,6 +1,7 @@
 <?php
 
 use App\Enums\WeddingRole;
+use App\Http\Controllers\Customer\CameraController;
 use App\Jobs\BuildCameraExport;
 use App\Models\CameraAlbum;
 use App\Models\CameraMedia;
@@ -28,7 +29,7 @@ function storedPhoto(CameraAlbum $album, array $attributes = []): CameraMedia
 }
 
 it('saves what guests see, and a new passcode signs every guest out', function () {
-    $this->actingAs($this->couple)->put(route('camera.update', $this->wedding), [
+    $this->actingAs($this->couple)->put(route('camera.update', $this->album), [
         'title' => 'Majlis Aina & Hakim', 'welcome_message' => 'Kongsi detik anda!',
         'guests_can_view' => '0', 'uploads_open' => '1', 'passcode' => 'KAHWIN',
     ])->assertSessionHasNoErrors();
@@ -39,14 +40,14 @@ it('saves what guests see, and a new passcode signs every guest out', function (
         ->and(Hash::check('KAHWIN', $album->passcode_hash))->toBeTrue()
         ->and($album->passcode_version)->toBe(1);
 
-    $this->actingAs($this->couple)->put(route('camera.update', $this->wedding), ['guests_can_view' => '1', 'uploads_open' => '1', 'remove_passcode' => '1']);
+    $this->actingAs($this->couple)->put(route('camera.update', $this->album), ['guests_can_view' => '1', 'uploads_open' => '1', 'remove_passcode' => '1']);
     expect($this->album->fresh()->isRestricted())->toBeFalse();
 });
 
 it('changes the guest address so the old QR stops working', function () {
     $old = $this->album->token;
 
-    $this->actingAs($this->couple)->post(route('camera.rotate', $this->wedding))->assertRedirect();
+    $this->actingAs($this->couple)->post(route('camera.rotate', $this->album))->assertRedirect();
 
     expect($this->album->fresh()->token)->not->toBe($old);
     $this->get('/k/'.$old)->assertNotFound();
@@ -58,12 +59,12 @@ it('lists the album for the couple and their partner, not for anyone else', func
     $partner = User::factory()->create();
     $this->wedding->addMember($partner, WeddingRole::Partner);
 
-    $this->actingAs($partner)->getJson(route('camera.media', $this->wedding))->assertOk()->assertJsonCount(2, 'items');
-    $this->actingAs($this->couple)->getJson(route('camera.media', [$this->wedding, 'type' => 'video']))->assertOk()->assertJsonCount(1, 'items');
+    $this->actingAs($partner)->getJson(route('camera.media', $this->album))->assertOk()->assertJsonCount(2, 'items');
+    $this->actingAs($this->couple)->getJson(route('camera.media', [$this->album, 'type' => 'video']))->assertOk()->assertJsonCount(1, 'items');
 
     $stranger = User::factory()->create();
     Wedding::factory()->for($stranger)->create();
-    $this->actingAs($stranger)->getJson(route('camera.media', $this->wedding))->assertForbidden();
+    $this->actingAs($stranger)->getJson(route('camera.media', $this->album))->assertForbidden();
 });
 
 it('deletes many at once, only from this album, with the files and counters', function () {
@@ -71,7 +72,7 @@ it('deletes many at once, only from this album, with the files and counters', fu
     [$one, $two] = [storedPhoto($this->album), storedPhoto($this->album)];
     $elsewhere = storedPhoto(CameraAlbum::factory()->create());
 
-    $this->actingAs($this->couple)->postJson(route('camera.media.bulk', $this->wedding), ['ids' => [$one->id, $two->id, $elsewhere->id]])
+    $this->actingAs($this->couple)->postJson(route('camera.media.bulk', $this->album), ['ids' => [$one->id, $two->id, $elsewhere->id]])
         ->assertOk()->assertJson(['deleted' => 2]);
 
     expect(CameraMedia::whereKey($elsewhere->id)->exists())->toBeTrue()
@@ -85,7 +86,7 @@ it('builds the album into ZIP parts the couple can download, and tells them', fu
     BuildCameraExport::$partBytes = 15;
     $photos = [storedPhoto($this->album), storedPhoto($this->album)];
 
-    $this->actingAs($this->couple)->post(route('camera.export', $this->wedding))->assertRedirect();
+    $this->actingAs($this->couple)->post(route('camera.export', $this->album))->assertRedirect();
 
     $album = $this->album->fresh();
     expect($album->export_paths)->toHaveCount(2)
@@ -100,28 +101,77 @@ it('builds the album into ZIP parts the couple can download, and tells them', fu
     $zip->close();
     unlink($local);
 
-    $this->actingAs($this->couple)->get(route('camera.export.download', [$this->wedding, 2]))->assertRedirect();
-    $this->actingAs($this->couple)->get(route('camera.export.download', [$this->wedding, 3]))->assertNotFound();
+    $this->actingAs($this->couple)->get(route('camera.export.download', [$this->album, 2]))->assertRedirect();
+    $this->actingAs($this->couple)->get(route('camera.export.download', [$this->album, 3]))->assertNotFound();
     Notification::assertSentTo($this->couple, CameraExportReady::class);
 
     BuildCameraExport::$partBytes = 2 * 1024 ** 3;
 });
 
-it('shows the couple their album settings and links on the Kamera Majlis page', function () {
+it('lists every album of the wedding, each opening its own page', function () {
+    $second = CameraAlbum::factory()->for($this->wedding)->pro()->create(['title' => 'Majlis Bertandang']);
+
     $props = $this->actingAs($this->couple)->get(route('camera.index'))->assertOk()->viewData('props');
 
-    expect($props['album']['urls']['update'])->toBe(route('camera.update', $this->wedding))
-        ->and($props['album']['export']['parts'])->toBe([]);
+    expect(collect($props['albums'])->pluck('show_url')->all())->toBe([route('camera.album', $second), route('camera.album', $this->album)])
+        ->and($props['albums'][0]['title'])->toBe('Majlis Bertandang')
+        ->and($props['albums'][0]['allows_voice'])->toBeTrue();
+});
+
+it('shows the couple an album\'s settings and links on its own page, and keeps other couples out', function () {
+    $props = $this->actingAs($this->couple)->get(route('camera.album', $this->album))->assertOk()->viewData('props');
+
+    expect($props['album']['urls']['update'])->toBe(route('camera.update', $this->album))
+        ->and($props['album']['export']['parts'])->toBe([])
+        ->and($props['upgrade']['tier'])->toBe('pro');
+
+    $stranger = User::factory()->create();
+    Wedding::factory()->for($stranger)->create();
+    $this->actingAs($stranger)->get(route('camera.album', $this->album))->assertForbidden();
+    $this->actingAs($stranger)->put(route('camera.update', $this->album), ['title' => 'Bukan saya'])->assertForbidden();
+});
+
+it('answers 304 while nothing in the album changed', function () {
+    storedPhoto($this->album);
+    $this->album->update(['photos_count' => 1]);
+
+    $first = $this->actingAs($this->couple)->getJson(route('camera.media', $this->album))->assertOk();
+    $tag = $first->headers->get('ETag');
+
+    $this->actingAs($this->couple)->getJson(route('camera.media', $this->album), ['If-None-Match' => $tag])->assertStatus(304);
+
+    $this->album->update(['photos_count' => 2]);
+    $this->actingAs($this->couple)->getJson(route('camera.media', $this->album), ['If-None-Match' => $tag])->assertOk();
+});
+
+it('zips only the chosen files of this album, straight away', function () {
+    $one = storedPhoto($this->album);
+    storedPhoto($this->album);
+    $elsewhere = storedPhoto(CameraAlbum::factory()->create());
+
+    $response = $this->actingAs($this->couple)->post(route('camera.export.selected', $this->album), ['ids' => [$one->id, $elsewhere->id]])->assertOk();
+
+    $zip = new ZipArchive;
+    $zip->open($response->baseResponse->getFile()->getPathname());
+    expect($zip->numFiles)->toBe(1)
+        ->and($zip->getNameIndex(0))->toEndWith('-'.$one->id.'.webp');
+    $zip->close();
+});
+
+it('refuses a chosen set too big to zip while the couple waits', function () {
+    $one = storedPhoto($this->album, ['bytes' => CameraController::SELECTED_MAX_BYTES + 1]);
+
+    $this->actingAs($this->couple)->post(route('camera.export.selected', $this->album), ['ids' => [$one->id]])->assertSessionHasErrors('ids');
 });
 
 it('hands the card designer the QR address and remembers the chosen design', function () {
-    $props = $this->actingAs($this->couple)->get(route('camera.index'))->assertOk()->viewData('props');
+    $props = $this->actingAs($this->couple)->get(route('camera.album', $this->album))->assertOk()->viewData('props');
 
     expect($props['album']['print']['url'])->toBe(route('camera.show', $this->album))
         ->and($props['album']['print']['card'])->toBeNull();
 
-    $this->actingAs($this->couple)->putJson(route('camera.design', $this->wedding), ['design' => 'bunga', 'size' => 'a5', 'per_sheet' => 2, 'headline' => 'Kongsi'])->assertOk();
-    $this->actingAs($this->couple)->putJson(route('camera.design', $this->wedding), ['design' => 'neon', 'size' => 'a5', 'per_sheet' => 2])->assertJsonValidationErrors('design');
+    $this->actingAs($this->couple)->putJson(route('camera.design', $this->album), ['design' => 'bunga', 'size' => 'a5', 'per_sheet' => 2, 'headline' => 'Kongsi'])->assertOk();
+    $this->actingAs($this->couple)->putJson(route('camera.design', $this->album), ['design' => 'neon', 'size' => 'a5', 'per_sheet' => 2])->assertJsonValidationErrors('design');
 
     expect($this->album->fresh()->qr_design)->toBe('bunga')
         ->and($this->album->fresh()->qr_options['per_sheet'])->toBe(2);

@@ -161,6 +161,7 @@ return [
     'camera_retention_days' => 'kept after the event (days)',
     'camera_pro_fair_use_gb' => 'Pro fair-use alert (GB)',
     'camera_album_title' => 'album name',
+    'camera_event_date' => 'event date',
     'camera_welcome' => 'note for guests',
     'camera_passcode' => 'passcode',
     'boost_welcome_tokens' => 'welcome tokens',

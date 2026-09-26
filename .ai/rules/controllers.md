@@ -38,3 +38,6 @@ Guest routes camera.* live at /k/{token} inside the language sets, outside auth,
 
 ## A guest report never hides a Kamera Majlis file by itself
 POST /k/{album}/media/{media}/lapor (throttled 10/hour) sets reported_at and report_reason only the first time, and sends one Telegram alert. The file stays visible until an admin deletes it or dismisses the report on /admin/kamera, so one guest cannot empty an album by reporting everything. A guest cannot report their own upload; report_url is null for their own device. Covered by AdminCameraTest.
+
+## Guest wishes: written on every tier, voice on Pro, couple-only
+Owner, 26 Sep 2026: guests leave wishes through the album's QR (camera_wishes). Written (≤1000 chars) on every tier; voice (MediaRecorder, ≤60 s, ≤3 MB) on Pro only, stored under camera/{album}/wishes/ and accepted only when AudioSniffer recognises the first bytes (WebM, Ogg, MP4/M4A). Max 20 per device per album; closed when uploads_open is off. Only the couple sees them (tab Ucapan); they go into the full ZIP (Ucapan.txt + voice folder) and are deleted by PurgeCameraAlbum. Covered by CameraWishTest.

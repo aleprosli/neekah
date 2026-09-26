@@ -2,6 +2,7 @@
 
 namespace App\Actions;
 
+use App\Models\CameraAlbum;
 use App\Models\User;
 use App\Models\Wedding;
 use Illuminate\Support\Facades\DB;
@@ -27,14 +28,12 @@ class DeleteUserAccount
                 $this->removeVendorProfile->handle($user->vendor);
             }
 
-            $user->createdWeddings()->with(['site.photos', 'cameraAlbum'])->get()->each(function (Wedding $wedding): void {
+            $user->createdWeddings()->with(['site.photos', 'cameraAlbums'])->get()->each(function (Wedding $wedding): void {
                 $this->images->delete($wedding->site?->cover_image);
                 $this->images->delete($wedding->site?->gift_qr_image);
                 $wedding->site?->photos->each(fn ($photo) => $this->images->delete($photo->path));
 
-                if ($wedding->cameraAlbum) {
-                    $this->purgeCameraAlbum->handle($wedding->cameraAlbum);
-                }
+                $wedding->cameraAlbums->each(fn (CameraAlbum $album) => $this->purgeCameraAlbum->handle($album));
             });
 
             $user->delete();

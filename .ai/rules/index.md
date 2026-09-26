@@ -20,7 +20,7 @@ Before planning or editing, find the row whose globs match the file's path and r
 | resources/views/errors/** | .ai/rules/errors.md |
 | ** | .ai/rules/general.md |
 | app/Support/Herepay/** | .ai/rules/herepay.md |
-| app/Jobs/** | .ai/rules/jobs.md |
+| app/Jobs/**, app/Jobs/ProcessCameraMedia.php | .ai/rules/jobs.md |
 | resources/js/**, resources/js/navigation.js | .ai/rules/js.md |
 | lang/** | .ai/rules/lang.md |
 | resources/views/components/layouts/** | .ai/rules/layouts.md |

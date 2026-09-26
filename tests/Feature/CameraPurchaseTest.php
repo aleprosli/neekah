@@ -46,12 +46,13 @@ function cameraCallback(CameraPurchase $purchase, array $fields = []): TestRespo
 it('offers both tiers at the admin prices before anything is bought', function () {
     $props = $this->actingAs($this->couple)->get(route('camera.index'))->assertOk()->viewData('props');
 
-    expect($props['album'])->toBeNull()
-        ->and($props['canCheckout'])->toBeTrue()
-        ->and(collect($props['tiers'])->pluck('price', 'value')->all())->toBe(['basic' => 29.0, 'pro' => 99.0])
-        ->and($props['tiers'][0]['limits']['max_photos'])->toBe(500)
-        ->and($props['tiers'][0]['limits']['allows_video'])->toBeFalse()
-        ->and($props['tiers'][1]['limits']['video_max_seconds'])->toBe(180);
+    expect($props['albums'])->toBeEmpty()
+        ->and($props['buy']['can_checkout'])->toBeTrue()
+        ->and(collect($props['buy']['tiers'])->pluck('price', 'value')->all())->toBe(['basic' => 29.0, 'pro' => 99.0])
+        ->and($props['buy']['tiers'][0]['limits']['max_photos'])->toBe(500)
+        ->and($props['buy']['tiers'][0]['limits']['allows_video'])->toBeFalse()
+        ->and($props['buy']['tiers'][1]['limits']['video_max_seconds'])->toBe(180)
+        ->and(collect($props['buy']['tiers'])->pluck('voice', 'value')->all())->toBe(['basic' => false, 'pro' => true]);
 });
 
 it('sends the couple to pay on Neekah own Herepay account at todays price', function () {
@@ -90,8 +91,8 @@ it('opens the album on a verified callback, once however often it comes', functi
 it('charges the difference to upgrade, keeps the QR address, and never sells a tier twice', function () {
     $album = CameraAlbum::factory()->for($this->wedding)->create();
 
-    $this->actingAs($this->couple)->post(route('camera.checkout', $this->wedding), ['tier' => 'basic'])->assertSessionHasErrors('tier');
-    $this->actingAs($this->couple)->post(route('camera.checkout', $this->wedding), ['tier' => 'pro']);
+    $this->actingAs($this->couple)->post(route('camera.checkout', $this->wedding), ['tier' => 'basic', 'album' => $album->id])->assertSessionHasErrors('tier');
+    $this->actingAs($this->couple)->post(route('camera.checkout', $this->wedding), ['tier' => 'pro', 'album' => $album->id]);
 
     $upgrade = CameraPurchase::sole();
     expect((float) $upgrade->amount)->toBe(70.0)
@@ -100,7 +101,42 @@ it('charges the difference to upgrade, keeps the QR address, and never sells a t
     cameraCallback($upgrade)->assertOk();
 
     expect($album->fresh()->tier)->toBe(CameraTier::Pro)
-        ->and($album->fresh()->token)->toBe($album->token);
+        ->and($album->fresh()->token)->toBe($album->token)
+        ->and($upgrade->fresh()->camera_album_id)->toBe($album->id)
+        ->and(CameraAlbum::count())->toBe(1);
+});
+
+it('opens another album for another majlis, with its own name, date and QR', function () {
+    $first = CameraAlbum::factory()->for($this->wedding)->create();
+    $date = now()->addMonths(3)->toDateString();
+
+    $this->actingAs($this->couple)
+        ->post(route('camera.checkout', $this->wedding), ['tier' => 'basic', 'title' => 'Majlis Bertandang', 'event_date' => $date])
+        ->assertRedirect('https://uat.herepay.org/herepay/pay/CAM');
+
+    $purchase = CameraPurchase::sole();
+    expect($purchase->kind)->toBe(CameraPurchase::KIND_NEW)
+        ->and((float) $purchase->amount)->toBe(29.0)
+        ->and($purchase->camera_album_id)->toBeNull();
+
+    cameraCallback($purchase)->assertOk();
+
+    $second = $purchase->fresh()->album;
+    expect($this->wedding->cameraAlbums()->count())->toBe(2)
+        ->and($second->is($first))->toBeFalse()
+        ->and($second->title)->toBe('Majlis Bertandang')
+        ->and($second->token)->not->toBe($first->token)
+        ->and($second->expires_at->toDateString())->toBe(now()->addMonths(3)->addDays(14)->toDateString());
+});
+
+it('will not upgrade an album of another wedding', function () {
+    $other = CameraAlbum::factory()->create();
+
+    $this->actingAs($this->couple)
+        ->post(route('camera.checkout', $this->wedding), ['tier' => 'pro', 'album' => $other->id])
+        ->assertSessionHasErrors('album');
+
+    expect(CameraPurchase::count())->toBe(0);
 });
 
 it('refuses a callback it cannot verify or that underpays', function () {
@@ -122,12 +158,14 @@ it('keeps checkout closed while it is switched off, and away from other weddings
     $this->actingAs($stranger)->post(route('camera.checkout', $this->wedding), ['tier' => 'basic'])->assertForbidden();
 });
 
-it('moves the deletion date when the couple moves the event', function () {
-    $album = app(ActivateCameraAlbum::class)->recordManually($this->wedding, CameraTier::Basic, User::factory()->admin()->create())->wedding->cameraAlbum;
+it('moves the deletion date when the couple moves the event, except for an album with its own date', function () {
+    $album = app(ActivateCameraAlbum::class)->recordManually($this->wedding, CameraTier::Basic, User::factory()->admin()->create())->album;
+    $ownDate = CameraAlbum::factory()->for($this->wedding)->create(['event_date' => now()->addMonths(3)->toDateString(), 'expires_at' => now()->addMonths(3)->addDays(14)]);
 
     $this->wedding->update(['event_date' => now()->addMonths(5)->toDateString()]);
 
-    expect($album->fresh()->expires_at->toDateString())->toBe(now()->addMonths(5)->addDays(14)->toDateString());
+    expect($album->fresh()->expires_at->toDateString())->toBe(now()->addMonths(5)->addDays(14)->toDateString())
+        ->and($ownDate->fresh()->expires_at->toDateString())->toBe(now()->addMonths(3)->addDays(14)->toDateString());
 });
 
 it('keeps an album bought after the event for at least a few days', function () {

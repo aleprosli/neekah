@@ -39,7 +39,7 @@ class CameraRetentionNotice extends Notification implements ShouldQueue
             'title_key' => "notifications.camera_retention.{$this->moment}_title",
             'body_key' => "notifications.camera_retention.{$this->moment}_body",
             'body_params' => $this->params(),
-            'url' => route('camera.index'),
+            'url' => route('camera.album', $this->album),
         ];
     }
 
@@ -48,7 +48,7 @@ class CameraRetentionNotice extends Notification implements ShouldQueue
         return NeekahMail::to($notifiable)
             ->subject(__("notifications.camera_retention.{$this->moment}_title"))
             ->line(__("notifications.camera_retention.{$this->moment}_body", $this->params()))
-            ->action(__('notifications.camera_retention.action'), route('camera.index'));
+            ->action(__('notifications.camera_retention.action'), route('camera.album', $this->album));
     }
 
     /**
