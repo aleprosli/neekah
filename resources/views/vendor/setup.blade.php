@@ -62,8 +62,39 @@
             <input type="radio" name="langkah" id="langkah-selesai" value="selesai" class="sr-only" @checked($selected === 'selesai')>
         @endif
 
-        {{-- The step on screen: first on a phone, on the right on a desktop. --}}
-        <section class="min-w-0 rounded-2xl border border-line bg-surface-raised lg:order-2">
+        {{-- What to do now, before anything else: first on a phone, where it
+             used to sit under the whole form, and top left on a desktop. The
+             step the vendor is on is marked, so they know where they are. --}}
+        @php
+            $currentGuide = $allDone ? 2 : 1;
+        @endphp
+        <div class="min-w-0 rounded-2xl border border-gold-300/60 bg-surface-raised p-5 lg:col-start-1 lg:row-start-1">
+            <h2 class="font-display text-lg font-semibold">{{ __('pages.vendor_setup.guide_title') }}</h2>
+            <ol class="mt-4 flex flex-col gap-3">
+                @foreach ([1, 2, 3] as $number)
+                    <li @class(['flex min-w-0 gap-3 rounded-xl', 'bg-brand-50/70 -mx-2 p-2 ring-1 ring-brand-100' => $number === $currentGuide, 'opacity-70' => $number > $currentGuide])>
+                        <span @class([
+                            'flex size-6 shrink-0 items-center justify-center rounded-full text-xs font-semibold',
+                            'bg-emerald-500 text-white' => $number < $currentGuide,
+                            'bg-brand-600 text-white' => $number === $currentGuide,
+                            'bg-brand-50 text-brand-700 ring-1 ring-brand-100' => $number > $currentGuide,
+                        ])>{{ $number < $currentGuide ? '✓' : $number }}</span>
+                        <div class="min-w-0">
+                            <p class="flex flex-wrap items-center gap-2 text-sm font-semibold">
+                                {{ __("pages.vendor_setup.guide_{$number}_title") }}
+                                @if ($number === $currentGuide)
+                                    <span class="rounded-full bg-brand-600 px-2 py-0.5 text-[10px] font-semibold tracking-wide text-white uppercase">{{ __('pages.vendor_setup.you_are_here') }}</span>
+                                @endif
+                            </p>
+                            <p class="mt-0.5 text-xs text-ink-muted">{{ __("pages.vendor_setup.guide_{$number}_body") }}</p>
+                        </div>
+                    </li>
+                @endforeach
+            </ol>
+        </div>
+
+        {{-- The step on screen: under the guide on a phone, on the right on a desktop. --}}
+        <section class="min-w-0 rounded-2xl border border-line bg-surface-raised lg:col-start-2 lg:row-span-2 lg:row-start-1">
             <header class="border-b border-line p-4 sm:p-5">
                 <div class="flex items-center justify-between gap-3">
                     <p class="text-sm font-semibold">{{ __('pages.vendor_setup.progress', ['done' => $doneCount, 'total' => $total]) }}</p>
@@ -298,25 +329,11 @@
             @endif
         </section>
 
-        {{-- The guide: a column beside the step on a desktop, under it on a
-             phone. It scrolls with the page and never on its own: an inner
-             scroll hid half of an opened section and nobody could tell there
-             was more. --}}
-        <aside class="flex min-w-0 flex-col gap-3 lg:order-1">
-            <div class="rounded-2xl border border-gold-300/60 bg-surface-raised p-5">
-                <h2 class="font-display text-lg font-semibold">{{ __('pages.vendor_setup.guide_title') }}</h2>
-                <ol class="mt-4 flex flex-col gap-3">
-                    @foreach ([1, 2, 3] as $number)
-                        <li class="flex min-w-0 gap-3">
-                            <span class="flex size-6 shrink-0 items-center justify-center rounded-full bg-brand-50 text-xs font-semibold text-brand-700 ring-1 ring-brand-100">{{ $number }}</span>
-                            <div class="min-w-0">
-                                <p class="text-sm font-semibold">{{ __("pages.vendor_setup.guide_{$number}_title") }}</p>
-                                <p class="mt-0.5 text-xs text-ink-muted">{{ __("pages.vendor_setup.guide_{$number}_body") }}</p>
-                            </div>
-                        </li>
-                    @endforeach
-                </ol>
-            </div>
+        {{-- Why it matters and who to ask: under the step on a phone, under the
+             guide on a desktop. It scrolls with the page and never on its own:
+             an inner scroll hid half of an opened section and nobody could
+             tell there was more. --}}
+        <aside class="flex min-w-0 flex-col gap-3 lg:col-start-1 lg:row-start-2">
 
             @foreach ([
                 ['title' => __('pages.vendor_setup.why_title'), 'intro' => __('pages.vendor_setup.why_intro'), 'items' => array_map(fn (string $reason): string => __("pages.vendor_setup.why_{$reason}"), ['seo', 'marketing', 'referral']), 'outro' => __('pages.vendor_setup.why_community'), 'mark' => '✦'],
