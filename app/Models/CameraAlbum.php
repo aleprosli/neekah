@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\CameraMediaStatus;
 use App\Enums\CameraTier;
+use App\Enums\PaymentPurpose;
 use App\Support\CameraLimits;
 use App\Support\CameraSettings;
 use Carbon\CarbonInterface;
@@ -97,7 +98,7 @@ class CameraAlbum extends Model
     /** What was paid for this album, the purchase that opened it and any upgrade. */
     public function purchases(): HasMany
     {
-        return $this->hasMany(CameraPurchase::class);
+        return $this->hasMany(Payment::class)->where('purpose', PaymentPurpose::Kenangan);
     }
 
     /** Written and spoken wishes guests left for the couple. */

@@ -9,7 +9,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Booking;
 use App\Models\VendorBookingSetting;
 use App\Models\VendorUnavailableDate;
-use App\Support\Herepay\HerepayClient;
+use App\Support\Herepay\HerepayGateway;
 use App\Support\OnlineBookingSettings;
 use App\Support\PaymentSettings;
 use App\Support\VendorAvailability;
@@ -26,7 +26,7 @@ use Illuminate\Http\Request;
  */
 class CalendarController extends Controller
 {
-    public function index(Request $request, HerepayClient $herepay, OnlineBookingSettings $site, PaymentSettings $payments): View
+    public function index(Request $request, HerepayGateway $herepay, OnlineBookingSettings $site, PaymentSettings $payments): View
     {
         $vendor = $request->user()->vendor;
         $availability = VendorAvailability::for($vendor);

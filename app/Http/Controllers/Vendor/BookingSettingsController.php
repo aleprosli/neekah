@@ -7,8 +7,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\ConnectHerepayRequest;
 use App\Http\Requests\UpdateBookingSettingsRequest;
 use App\Models\VendorUnavailableDate;
-use App\Support\Herepay\DepositGateway;
 use App\Support\Herepay\HerepayCredentials;
+use App\Support\Herepay\HerepayGateway;
 use App\Support\VendorAvailability;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -71,9 +71,13 @@ class BookingSettingsController extends Controller
      * Keys are kept only once Herepay has accepted them: a test link is made
      * with them first, so a typo never quietly breaks every booking.
      */
-    public function connect(ConnectHerepayRequest $request, DepositGateway $gateway): RedirectResponse
+    public function connect(ConnectHerepayRequest $request, HerepayGateway $gateway): RedirectResponse
     {
-        $credentials = new HerepayCredentials(trim($request->validated('herepay_secret_key')), trim($request->validated('herepay_private_key')));
+        $credentials = new HerepayCredentials(
+            trim($request->validated('herepay_secret_key')),
+            trim($request->validated('herepay_private_key')),
+            trim((string) $request->validated('herepay_api_key')),
+        );
 
         if (! $gateway->testConnection($credentials)) {
             return back()->withErrors(['herepay_secret_key' => __('flash.vendor.herepay_test_failed')]);
@@ -82,6 +86,7 @@ class BookingSettingsController extends Controller
         $request->user()->vendor->bookingSettings()->updateOrCreate([], [
             'herepay_secret_key' => $credentials->secretKey,
             'herepay_private_key' => $credentials->privateKey,
+            'herepay_api_key' => $credentials->apiKey ?: null,
             'herepay_connected_at' => now(),
             'herepay_verified_at' => null,
         ]);

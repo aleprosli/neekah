@@ -101,6 +101,32 @@ return [
         'paid' => 'Paid',
         'failed' => 'Failed',
         'refunded' => 'Refunded',
+        'expired' => 'Expired',
+    ],
+
+    'payment_purpose' => [
+        'booking' => 'Booking',
+        'vendor_pro' => 'Neekah Pro',
+        'boost_tokens' => 'Boost tokens',
+        'kenangan' => 'Neekah Moments',
+    ],
+
+    'payment_merchant' => [
+        'neekah' => 'Neekah account',
+        'vendor' => 'Vendor account',
+    ],
+
+    'payment_event' => [
+        'link_created' => 'Payment link created',
+        'link_failed' => 'Payment link failed',
+        'callback' => 'Gateway callback',
+        'return' => 'Payer returned',
+        'requery' => 'Requery',
+        'manual_recorded' => 'Recorded by hand',
+        'manual_verified' => 'Verified',
+        'manual_rejected' => 'Rejected',
+        'invoice_attached' => 'Invoice code attached',
+        'settled' => 'Settled',
     ],
 
     'point_reason' => [
@@ -226,12 +252,6 @@ return [
     'vendor_plan' => [
         'monthly' => 'Monthly',
         'yearly' => 'Yearly',
-    ],
-
-    'subscription_status' => [
-        'pending' => 'Unpaid',
-        'paid' => 'Paid',
-        'failed' => 'Failed',
     ],
 
     'booking_source' => [

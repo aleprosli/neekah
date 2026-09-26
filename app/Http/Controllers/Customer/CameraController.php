@@ -5,19 +5,21 @@ namespace App\Http\Controllers\Customer;
 use App\Actions\ActivateCameraAlbum;
 use App\Actions\DeleteCameraMedia;
 use App\Actions\DeleteCameraWish;
+use App\Actions\StartPayment;
 use App\Enums\CameraMediaType;
 use App\Enums\CameraTier;
-use App\Enums\SubscriptionStatus;
+use App\Enums\PaymentPurpose;
+use App\Enums\PaymentStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\UpdateCameraAlbumRequest;
 use App\Jobs\BuildCameraExport;
 use App\Models\CameraAlbum;
 use App\Models\CameraMedia;
-use App\Models\CameraPurchase;
 use App\Models\CameraWish;
+use App\Models\Payment;
 use App\Models\Wedding;
 use App\Support\CameraSettings;
-use App\Support\Herepay\CameraPaymentGateway;
+use App\Support\Herepay\HerepayGateway;
 use App\Support\VueProps;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
@@ -30,8 +32,8 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
+use RuntimeException;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
-use Throwable;
 use ZipArchive;
 
 /**
@@ -58,7 +60,7 @@ class CameraController extends Controller
 
     public const SELECTED_MAX_BYTES = 300 * 1024 * 1024;
 
-    public function index(Request $request, CameraSettings $settings, CameraPaymentGateway $gateway): View
+    public function index(Request $request, CameraSettings $settings, HerepayGateway $gateway): View
     {
         $wedding = $request->user()->weddings()->latest('event_date')->firstOrFail();
         Gate::authorize('view', $wedding);
@@ -76,7 +78,7 @@ class CameraController extends Controller
         ]);
     }
 
-    public function show(CameraAlbum $album, CameraSettings $settings, CameraPaymentGateway $gateway): View
+    public function show(CameraAlbum $album, CameraSettings $settings, HerepayGateway $gateway): View
     {
         Gate::authorize('view', $album->wedding);
         abort_if($album->activated_at === null, 404);
@@ -126,7 +128,7 @@ class CameraController extends Controller
      * an upgrade costs the difference, and a tier an album already has is
      * not sold twice.
      */
-    public function checkout(Request $request, Wedding $wedding, CameraSettings $settings, CameraPaymentGateway $gateway): RedirectResponse
+    public function checkout(Request $request, Wedding $wedding, CameraSettings $settings, HerepayGateway $gateway, StartPayment $start): RedirectResponse
     {
         Gate::authorize('update', $wedding);
         abort_unless($settings->isEnabled() && $gateway->isConfigured(), 404);
@@ -154,51 +156,51 @@ class CameraController extends Controller
             throw ValidationException::withMessages(['tier' => __('flash.couple.camera_already_owned')]);
         }
 
-        $purchase = $wedding->cameraPurchases()->create([
+        $payment = Payment::query()->create([
+            'purpose' => PaymentPurpose::Kenangan,
+            'wedding_id' => $wedding->id,
             'camera_album_id' => $album?->id,
-            'user_id' => $request->user()->id,
-            'reference' => CameraPurchase::generateReference(),
-            'tier' => $tier,
-            'kind' => $album ? CameraPurchase::KIND_UPGRADE : CameraPurchase::KIND_NEW,
-            'album_title' => $album ? null : (trim(strip_tags((string) ($validated['title'] ?? ''))) ?: null),
-            'album_event_date' => $album ? null : ($validated['event_date'] ?? null),
+            'recorded_by' => $request->user()->id,
             'amount' => $amount,
-            'status' => SubscriptionStatus::Pending,
-            'gateway' => CameraPurchase::GATEWAY_HEREPAY,
+            'status' => PaymentStatus::Pending,
+            'gateway' => $gateway->name(),
+            'details' => array_filter([
+                'tier' => $tier->value,
+                'kind' => $album ? 'upgrade' : 'new',
+                'album_title' => $album ? null : (trim(strip_tags((string) ($validated['title'] ?? ''))) ?: null),
+                'album_event_date' => $album ? null : ($validated['event_date'] ?? null),
+            ], fn (?string $value): bool => $value !== null),
         ]);
 
         try {
-            $url = $gateway->createPaymentLink($purchase, $request->user());
-        } catch (Throwable $exception) {
+            return redirect()->away($start->handle($payment, $request->user()));
+        } catch (RuntimeException $exception) {
             report($exception);
-            $purchase->update(['status' => SubscriptionStatus::Failed]);
 
             return back()->withInput()->withErrors(['tier' => __('flash.couple.camera_checkout_failed')]);
         }
-
-        $purchase->update(['payment_url' => $url]);
-
-        return redirect()->away($url);
     }
 
     /**
-     * Where Herepay sends the couple back. The callback, not this visit,
-     * opens the album; this only reports what is known.
+     * Where the couple lands after paying. The gateway's callback, or its
+     * signed return, opens the album; this only reports it.
      */
     public function done(Request $request): View
     {
-        $purchase = CameraPurchase::query()
+        $payment = Payment::query()
+            ->for(PaymentPurpose::Kenangan)
             ->with('album')
             ->where('reference', $request->string('ref')->toString())
             ->whereIn('wedding_id', $request->user()->weddings()->pluck('weddings.id'))
             ->firstOrFail();
 
         return view('customer.camera.done', [
-            'purchase' => $purchase,
-            'openUrl' => $purchase->album ? route('camera.album', $purchase->album) : route('camera.index'),
-            'state' => match ($purchase->status) {
-                SubscriptionStatus::Paid => 'paid',
-                SubscriptionStatus::Failed => 'failed',
+            'payment' => $payment,
+            'tier' => CameraTier::from((string) $payment->detail('tier'))->label(),
+            'openUrl' => $payment->album ? route('camera.album', $payment->album) : route('camera.index'),
+            'state' => match ($payment->status) {
+                PaymentStatus::Paid => 'paid',
+                PaymentStatus::Failed, PaymentStatus::Expired => 'failed',
                 default => 'waiting',
             },
         ]);
@@ -465,7 +467,7 @@ class CameraController extends Controller
      *
      * @return array<string, mixed>
      */
-    private function buyProps(Wedding $wedding, CameraSettings $settings, CameraPaymentGateway $gateway): array
+    private function buyProps(Wedding $wedding, CameraSettings $settings, HerepayGateway $gateway): array
     {
         return [
             'can_checkout' => $settings->isEnabled() && $gateway->isConfigured(),
@@ -486,7 +488,7 @@ class CameraController extends Controller
      *
      * @return array<string, mixed>|null
      */
-    private function upgradeProps(CameraAlbum $album, CameraSettings $settings, CameraPaymentGateway $gateway): ?array
+    private function upgradeProps(CameraAlbum $album, CameraSettings $settings, HerepayGateway $gateway): ?array
     {
         $tier = collect(CameraTier::cases())->first(fn (CameraTier $tier): bool => $tier->rank() > $album->tier->rank());
 
@@ -509,14 +511,14 @@ class CameraController extends Controller
      */
     private function receipts(Wedding $wedding): array
     {
-        return $wedding->cameraPurchases()->with('album.wedding')->where('status', SubscriptionStatus::Paid)->latest()->limit(20)->get()
-            ->map(fn (CameraPurchase $purchase): array => [
-                'reference' => $purchase->reference,
-                'album' => $purchase->album?->displayTitle(),
-                'tier' => $purchase->tier->label(),
-                'kind' => $purchase->kind,
-                'amount' => 'RM'.number_format((float) $purchase->amount, 2),
-                'paid_at' => $purchase->paid_at?->translatedFormat('j M Y'),
+        return $wedding->kenanganPayments()->with('album.wedding')->where('status', PaymentStatus::Paid)->limit(20)->get()
+            ->map(fn (Payment $payment): array => [
+                'reference' => $payment->reference,
+                'album' => $payment->album?->displayTitle(),
+                'tier' => CameraTier::tryFrom((string) $payment->detail('tier'))?->label(),
+                'kind' => $payment->detail('kind'),
+                'amount' => 'RM'.number_format((float) $payment->amount, 2),
+                'paid_at' => $payment->paid_at?->translatedFormat('j M Y'),
             ])->values()->all();
     }
 

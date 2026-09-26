@@ -1,81 +1,44 @@
 <?php
 
-use App\Enums\SubscriptionStatus;
+use App\Enums\PaymentPurpose;
+use App\Enums\PaymentStatus;
 use App\Enums\VendorPlan;
 use App\Models\Category;
+use App\Models\Payment;
+use App\Models\PaymentEvent;
 use App\Models\User;
 use App\Models\Vendor;
-use App\Models\VendorSubscription;
 use App\Notifications\ProActivated;
 use App\Notifications\ProExpiring;
-use App\Support\Herepay\PaymentLinkGateway;
 use App\Support\ProSettings;
 use Database\Seeders\CategorySeeder;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Notification;
-
-/**
- * A stand-in for Herepay: a fixed payment link out, and a callback it trusts
- * only when it carries the test signature.
- */
-function fakeProGateway(bool $configured = true): PaymentLinkGateway
-{
-    $gateway = new class($configured) implements PaymentLinkGateway
-    {
-        public function __construct(private bool $configured) {}
-
-        public function isConfigured(): bool
-        {
-            return $this->configured;
-        }
-
-        public function createPaymentLink(VendorSubscription $subscription, User $payer): string
-        {
-            return 'https://pay.herepay.test/'.$subscription->reference;
-        }
-
-        public function parseCallback(Request $request): ?array
-        {
-            if ($request->input('signature') !== 'valid') {
-                return null;
-            }
-
-            return [
-                'reference' => (string) $request->input('reference'),
-                'gateway_reference' => $request->input('transaction_id'),
-                'status' => (string) $request->input('status'),
-                'amount' => (float) $request->input('amount', VendorSubscription::where('reference', $request->input('reference'))->value('amount')),
-            ];
-        }
-    };
-
-    app()->instance(PaymentLinkGateway::class, $gateway);
-
-    return $gateway;
-}
 
 beforeEach(function () {
     $this->seed(CategorySeeder::class);
     $this->owner = User::factory()->vendor()->create();
     $this->vendor = Vendor::factory()->for(Category::first())->for($this->owner)->create();
     app(ProSettings::class)->save(['enabled' => true, 'monthly_price' => 49, 'yearly_price' => 490]);
+    fakeHerepayKeys();
 });
 
 it('sends the vendor to a payment link for the plan they picked, at todays price', function () {
-    fakeProGateway();
+    fakeHerepayLink('https://uat.herepay.org/herepay/pay/PRO');
 
-    $response = $this->actingAs($this->owner)->post(route('vendor.pro.checkout'), ['plan' => 'yearly']);
+    $this->actingAs($this->owner)->post(route('vendor.pro.checkout'), ['plan' => 'yearly'])
+        ->assertRedirect('https://uat.herepay.org/herepay/pay/PRO');
 
-    $subscription = $this->vendor->subscriptions()->sole();
+    $payment = $this->vendor->proPayments()->sole();
 
-    $response->assertRedirect('https://pay.herepay.test/'.$subscription->reference);
-    expect($subscription->status)->toBe(SubscriptionStatus::Pending)
-        ->and((float) $subscription->amount)->toBe(490.0)
+    expect($payment->status)->toBe(PaymentStatus::Pending)
+        ->and($payment->purpose)->toBe(PaymentPurpose::VendorPro)
+        ->and($payment->detail('plan'))->toBe('yearly')
+        ->and((float) $payment->amount)->toBe(490.0)
         ->and($this->vendor->fresh()->isPro())->toBeFalse();
 });
 
 it('offers no checkout while Herepay is not configured', function () {
-    fakeProGateway(configured: false);
+    fakeHerepayKeys(enabled: false);
 
     $this->actingAs($this->owner)->get(route('vendor.pro.index'))
         ->assertOk()
@@ -84,67 +47,57 @@ it('offers no checkout while Herepay is not configured', function () {
 
     $this->actingAs($this->owner)->post(route('vendor.pro.checkout'), ['plan' => 'monthly'])->assertNotFound();
 
-    expect(VendorSubscription::count())->toBe(0);
+    expect(Payment::count())->toBe(0);
 });
 
 it('refuses a plan that does not exist', function () {
-    fakeProGateway();
-
     $this->actingAs($this->owner)->post(route('vendor.pro.checkout'), ['plan' => 'lifetime'])
         ->assertSessionHasErrors('plan');
 });
 
 it('activates Pro when Herepay confirms the payment, once however often it calls', function () {
-    fakeProGateway();
     Notification::fake();
     $this->freezeTime();
 
-    $subscription = VendorSubscription::factory()->for($this->vendor)->create();
-    $callback = ['signature' => 'valid', 'reference' => $subscription->reference, 'status' => 'paid', 'transaction_id' => 'HP-1'];
+    $payment = Payment::factory()->pro()->create(['vendor_id' => $this->vendor->id]);
 
-    $this->post(route('webhooks.herepay'), $callback)->assertOk();
-    $this->post(route('webhooks.herepay'), $callback)->assertOk();
+    herepayCallback($payment)->assertOk();
+    herepayCallback($payment)->assertOk();
 
-    expect($subscription->fresh()->status)->toBe(SubscriptionStatus::Paid)
-        ->and($subscription->fresh()->gateway_reference)->toBe('HP-1')
+    expect($payment->fresh()->status)->toBe(PaymentStatus::Paid)
+        ->and($payment->fresh()->gateway_reference)->toBe('HP-PAY-1')
+        ->and($payment->fresh()->detail('ends_at'))->toBe(now()->addMonth()->toIso8601String())
         ->and($this->vendor->fresh()->pro_until->toDateTimeString())->toBe(now()->addMonth()->toDateTimeString());
 
     Notification::assertSentToTimes($this->owner, ProActivated::class, 1);
 });
 
 it('adds a renewal onto the time the vendor has left', function () {
-    fakeProGateway();
     $this->freezeTime();
 
     $this->vendor->update(['pro_until' => now()->addDays(10)]);
-    $subscription = VendorSubscription::factory()->yearly()->for($this->vendor)->create();
+    $payment = Payment::factory()->pro(VendorPlan::Yearly)->create(['vendor_id' => $this->vendor->id]);
 
-    $this->post(route('webhooks.herepay'), ['signature' => 'valid', 'reference' => $subscription->reference, 'status' => 'paid']);
+    herepayCallback($payment)->assertOk();
 
     expect($this->vendor->fresh()->pro_until->toDateTimeString())->toBe(now()->addDays(10)->addYear()->toDateTimeString());
 });
 
 it('ignores a callback it cannot verify', function () {
-    fakeProGateway();
+    $payment = Payment::factory()->pro()->create(['vendor_id' => $this->vendor->id]);
 
-    $subscription = VendorSubscription::factory()->for($this->vendor)->create();
+    herepayCallback($payment, key: 'forged')->assertForbidden();
 
-    $this->post(route('webhooks.herepay'), ['signature' => 'forged', 'reference' => $subscription->reference, 'status' => 'paid'])
-        ->assertForbidden();
-
-    expect($subscription->fresh()->status)->toBe(SubscriptionStatus::Pending)
+    expect($payment->fresh()->status)->toBe(PaymentStatus::Pending)
         ->and($this->vendor->fresh()->isPro())->toBeFalse();
 });
 
 it('marks a failed payment without giving Pro', function () {
-    fakeProGateway();
+    $payment = Payment::factory()->pro()->create(['vendor_id' => $this->vendor->id]);
 
-    $subscription = VendorSubscription::factory()->for($this->vendor)->create();
+    herepayCallback($payment, ['status' => 'Failed', 'status_code' => '30'])->assertOk();
 
-    $this->post(route('webhooks.herepay'), ['signature' => 'valid', 'reference' => $subscription->reference, 'status' => 'failed'])
-        ->assertOk();
-
-    expect($subscription->fresh()->status)->toBe(SubscriptionStatus::Failed)
+    expect($payment->fresh()->status)->toBe(PaymentStatus::Failed)
         ->and($this->vendor->fresh()->isPro())->toBeFalse();
 });
 
@@ -168,11 +121,13 @@ it('lets an admin record a manual payment that activates Pro', function () {
         ->post(route('admin.vendors.pro', $this->vendor), ['plan' => 'monthly', 'amount' => 0, 'note' => 'Promosi pelancaran'])
         ->assertRedirect();
 
-    $subscription = $this->vendor->subscriptions()->sole();
+    $payment = $this->vendor->proPayments()->sole();
 
-    expect($subscription->gateway)->toBe(VendorSubscription::GATEWAY_MANUAL)
-        ->and((float) $subscription->amount)->toBe(0.0)
-        ->and($subscription->added_by)->toBe($admin->id)
+    expect($payment->gateway)->toBe(Payment::GATEWAY_MANUAL)
+        ->and($payment->isPaid())->toBeTrue()
+        ->and((float) $payment->amount)->toBe(0.0)
+        ->and($payment->recorded_by)->toBe($admin->id)
+        ->and($payment->events()->pluck('type')->all())->toBe([PaymentEvent::MANUAL_RECORDED])
         ->and($this->vendor->fresh()->isPro())->toBeTrue();
 
     Notification::assertSentTo($this->owner, ProActivated::class);

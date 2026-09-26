@@ -1,8 +1,8 @@
 <x-layouts.vendor :title="__('pages.pro.title')" :heading="__('pages.pro.done_heading')">
     <div class="flex max-w-xl flex-col gap-4 rounded-2xl border border-line bg-surface-raised p-6">
-        @if ($subscription?->isPaid())
+        @if ($payment?->isPaid())
             <p class="font-semibold">{{ __('pages.pro.done_paid', ['date' => $vendor->pro_until->translatedFormat('j F Y')]) }}</p>
-        @elseif ($subscription?->status === \App\Enums\SubscriptionStatus::Failed)
+        @elseif (in_array($payment?->status, [\App\Enums\PaymentStatus::Failed, \App\Enums\PaymentStatus::Expired], true))
             <p class="font-semibold">{{ __('pages.pro.done_failed') }}</p>
         @else
             {{-- The gateway's callback can land a moment after the vendor does. --}}

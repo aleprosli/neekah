@@ -17,7 +17,7 @@
             $item(__('pages.sidebar_admin.vendor'), 'store', 'admin.vendors.index', 'admin.vendors.*', $pendingVendors),
             $item(__('pages.sidebar_admin.kategori'), 'layers', 'admin.categories.index', 'admin.categories.*'),
             $item(__('pages.sidebar_admin.tempahan'), 'receipt', 'admin.bookings.index', 'admin.bookings.*'),
-            $item(__('pages.sidebar_admin.kewangan'), 'wallet', 'admin.transactions.index', 'admin.transactions.*'),
+            $item(__('pages.sidebar_admin.kewangan'), 'wallet', 'admin.payments.index', 'admin.payments.*'),
             $item(__('pages.sidebar_admin.review'), 'star', 'admin.reviews.index', 'admin.reviews.*', $reportedReviews),
             $item(__('pages.sidebar_admin.kamera'), 'camera', 'admin.camera.index', 'admin.camera.*', $reportedCamera),
             $item(__('pages.sidebar_admin.laporan'), 'alert', 'admin.violations.index', 'admin.violations.*', $openViolations),

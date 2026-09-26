@@ -42,16 +42,15 @@ it('shows platform totals, gross value and commission', function () {
         ->assertSee($booking->reference);
 });
 
-it('lists transactions with gross, commission and payout', function () {
+it('opens Kewangan with Neekah revenue apart from what went to vendors', function () {
     $vendor = Vendor::factory()->for(Category::first())->create();
-    $booking = Booking::factory()->completed()->for($vendor)->create(['total_amount' => 1000, 'commission_amount' => 80]);
+    $booking = Booking::factory()->completed()->for($vendor)->create(['total_amount' => 1000]);
     Payment::factory()->for($booking)->paid()->create(['amount' => 1000]);
+    Payment::factory()->pro()->paid()->create(['vendor_id' => $vendor->id, 'amount' => 49, 'paid_at' => now()]);
 
-    $this->actingAs($this->admin)
-        ->get(route('admin.transactions.index'))
-        ->assertOk()
-        ->assertSee('Gross transaction value')
-        ->assertSee('RM1,000.00')
-        ->assertSee('RM80.00')
-        ->assertSee('RM920.00');
+    $props = $this->actingAs($this->admin)->get(route('admin.payments.index'))->assertOk()->viewData('props');
+
+    expect(collect($props['stats'])->pluck('value', 'label')->all())->toMatchArray([
+        __('pages.payments.stat_neekah_all') => 'RM49.00',
+    ]);
 });

@@ -3,45 +3,25 @@
 namespace App\Actions;
 
 use App\Enums\BoostTokenReason;
-use App\Enums\SubscriptionStatus;
-use App\Models\BoostPurchase;
+use App\Models\Payment;
 use App\Notifications\BoostTokensReceived;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Mark a boost pack paid and credit its tokens. Idempotent: Herepay may call
- * back more than once, and only the first call credits anything.
+ * What a paid boost pack buys: its tokens, credited to the vendor with the
+ * payment as their source. SettlePayment calls it once, inside its lock.
  */
 class ActivateBoostPurchase
 {
     public function __construct(private GrantBoostTokens $tokens) {}
 
-    public function handle(BoostPurchase $purchase, ?string $gatewayReference = null): BoostPurchase
+    public function fulfil(Payment $payment): void
     {
-        $credited = DB::transaction(function () use ($purchase, $gatewayReference): bool {
-            $purchase = BoostPurchase::query()->lockForUpdate()->findOrFail($purchase->getKey());
+        $vendor = $payment->vendor;
+        $tokens = (int) $payment->detail('tokens', 0);
 
-            if ($purchase->isPaid()) {
-                return false;
-            }
+        $this->tokens->handle($vendor, $tokens, BoostTokenReason::Purchase, $payment);
 
-            $purchase->update([
-                'status' => SubscriptionStatus::Paid,
-                'gateway_reference' => $gatewayReference ?? $purchase->gateway_reference,
-                'paid_at' => now(),
-            ]);
-
-            $this->tokens->handle($purchase->vendor, $purchase->tokens, BoostTokenReason::Purchase, $purchase);
-
-            return true;
-        });
-
-        $purchase->refresh();
-
-        if ($credited) {
-            $purchase->vendor->user->notify(new BoostTokensReceived($purchase->tokens, BoostTokenReason::Purchase, (int) $purchase->vendor->fresh()->boost_tokens));
-        }
-
-        return $purchase;
+        DB::afterCommit(fn () => $vendor->user->notify(new BoostTokensReceived($tokens, BoostTokenReason::Purchase, (int) $vendor->fresh()->boost_tokens)));
     }
 }

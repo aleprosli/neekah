@@ -76,15 +76,15 @@
             @endunless
         </section>
 
-        @if ($subscriptions->isNotEmpty())
+        @if ($history->isNotEmpty())
             <section class="flex flex-col gap-3">
                 <h2 class="font-display text-xl font-semibold">{{ __('pages.pro.history') }}</h2>
                 <ul class="divide-y divide-line rounded-2xl border border-line">
-                    @foreach ($subscriptions as $subscription)
+                    @foreach ($history as $row)
                         <li class="flex flex-wrap items-center justify-between gap-2 p-4 text-sm">
-                            <span class="font-mono text-xs">{{ $subscription->reference }}</span>
-                            <span>{{ $subscription->plan->label() }} · RM{{ number_format((float) $subscription->amount, 2) }}</span>
-                            <span class="text-ink-muted">{{ $subscription->status->label() }}@if ($subscription->ends_at) · {{ __('pages.pro.until', ['date' => $subscription->ends_at->translatedFormat('j M Y')]) }}@endif</span>
+                            <span class="font-mono text-xs">{{ $row['reference'] }}</span>
+                            <span>{{ $row['plan'] }} · RM{{ $row['amount'] }}</span>
+                            <span class="text-ink-muted">{{ $row['status'] }}@if ($row['until']) · {{ __('pages.pro.until', ['date' => $row['until']]) }}@endif</span>
                         </li>
                     @endforeach
                 </ul>

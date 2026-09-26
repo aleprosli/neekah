@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Actions\ActivateCameraAlbum;
+use App\Enums\PaymentPurpose;
 use App\Enums\WeddingRole;
 use Database\Factories\WeddingFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -65,9 +66,10 @@ class Wedding extends Model
         return $this->hasMany(CameraAlbum::class);
     }
 
-    public function cameraPurchases(): HasMany
+    /** What this wedding paid Neekah for Neekah Kenangan, newest first. */
+    public function kenanganPayments(): HasMany
     {
-        return $this->hasMany(CameraPurchase::class);
+        return $this->hasMany(Payment::class)->where('purpose', PaymentPurpose::Kenangan)->latest('id');
     }
 
     public function members(): BelongsToMany

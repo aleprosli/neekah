@@ -3,14 +3,13 @@
 namespace App\Actions;
 
 use App\Enums\DepositChannel;
+use App\Enums\PaymentPurpose;
 use App\Enums\PaymentStatus;
 use App\Models\Booking;
 use App\Models\Payment;
 use App\Models\User;
-use App\Support\Herepay\DepositGateway;
-use App\Support\Herepay\HerepayCredentials;
+use App\Support\Payments\PaymentGateways;
 use RuntimeException;
-use Throwable;
 
 /**
  * Send a couple to pay the deposit on an online booking, on the vendor's own
@@ -19,15 +18,15 @@ use Throwable;
  */
 class StartDepositPayment
 {
-    /** The gateway reference a deposit payment is recorded under. */
-    public const GATEWAY = 'herepay';
+    /** The gateway a deposit payment is taken through. */
+    public const GATEWAY = Payment::GATEWAY_HEREPAY;
 
-    public function __construct(private DepositGateway $gateway) {}
+    public function __construct(private StartPayment $start, private PaymentGateways $gateways) {}
 
     /**
      * The URL to send the couple to.
      *
-     * @throws RuntimeException when the booking cannot take a payment now, or Herepay refused the link
+     * @throws RuntimeException when the booking cannot take a payment now, or the gateway refused the link
      */
     public function handle(Booking $booking, User $payer): string
     {
@@ -47,29 +46,22 @@ class StartDepositPayment
             return $open->payment_url;
         }
 
-        $credentials = HerepayCredentials::forVendor($booking->vendor->bookingSettingsOrDefault())
-            ?? throw new RuntimeException("Vendor {$booking->vendor_id} has no Herepay account connected.");
-
-        $payment = $booking->payments()->create([
-            'reference' => Payment::generateReference(),
+        $payment = $booking->payments()->make([
+            'purpose' => PaymentPurpose::Booking,
+            'vendor_id' => $booking->vendor_id,
             'recorded_by' => $payer->id,
             'amount' => $booking->deposit_amount,
-            'method' => self::GATEWAY,
             'gateway' => self::GATEWAY,
             'status' => PaymentStatus::Pending,
             'expires_at' => $booking->hold_expires_at,
-        ]);
+        ])->setRelation('booking', $booking);
 
-        try {
-            $url = $this->gateway->createDepositLink($payment->setRelation('booking', $booking), $payer, $credentials);
-        } catch (Throwable $exception) {
-            $payment->update(['status' => PaymentStatus::Failed]);
-
-            throw new RuntimeException('Herepay refused the deposit link.', previous: $exception);
+        if (! $this->gateways->for(self::GATEWAY)->isConfiguredFor($payment)) {
+            throw new RuntimeException("Vendor {$booking->vendor_id} has no Herepay account connected.");
         }
 
-        $payment->update(['payment_url' => $url]);
+        $payment->save();
 
-        return $url;
+        return $this->start->handle($payment, $payer);
     }
 }

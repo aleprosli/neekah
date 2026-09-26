@@ -1,7 +1,11 @@
 <?php
 
+use App\Models\Payment;
+use App\Support\HerepaySettings;
 use App\Support\OnlineBookingSettings;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Testing\TestResponse;
 use Tests\TestCase;
 
@@ -82,4 +86,63 @@ function cardWidgets(TestResponse $response): array
 function enableOnlineBooking(array $settings = []): void
 {
     app(OnlineBookingSettings::class)->save(['enabled' => true, ...$settings]);
+}
+
+/**
+ * Point Herepay at UAT with test keys, as every payment test does. A real
+ * HerepayGateway is used; Http::fake stands in for Herepay itself.
+ */
+function fakeHerepayKeys(bool $enabled = true, ?string $apiKey = 'test-api-key'): void
+{
+    config()->set('services.herepay', [
+        'base_url' => 'https://uat.herepay.org',
+        'secret_key' => 'test-secret',
+        'private_key' => 'test-private',
+        'api_key' => $apiKey,
+    ]);
+    app(HerepaySettings::class)->save(['enabled' => $enabled]);
+}
+
+/** Herepay making a link: every create-payment-link call answers with this pay_url. */
+function fakeHerepayLink(string $payUrl = 'https://uat.herepay.org/herepay/pay/ABC'): void
+{
+    Http::fake(['uat.herepay.org/*' => Http::response(['status' => 200, 'data' => ['pay_url' => $payUrl]])]);
+}
+
+/**
+ * What Herepay sends, the way it signs it: every field but the checksum,
+ * sorted by key, values joined by commas, HMAC-SHA256 with the private key.
+ *
+ * @param  array<string, string>  $fields
+ * @return array<string, string>
+ */
+function herepayFields(Payment $payment, array $fields = [], string $key = 'test-private'): array
+{
+    $fields = [
+        'reference_code' => 'HP-INV-1',
+        'payment_code' => 'HP-PAY-1',
+        'transaction_id' => '2609262114370348',
+        'status' => 'Success',
+        'status_code' => '00',
+        'message' => 'Approved',
+        'amount' => (string) $payment->amount,
+        'currency' => 'MYR',
+        'payment_method' => 'FPX',
+        ...$fields,
+    ];
+    $sorted = $fields;
+    ksort($sorted);
+
+    return [...$fields, 'checksum' => hash_hmac('sha256', implode(',', $sorted), $key)];
+}
+
+/**
+ * Herepay's callback for a payment, to the signed address its link was made
+ * with.
+ *
+ * @param  array<string, string>  $fields
+ */
+function herepayCallback(Payment $payment, array $fields = [], string $key = 'test-private'): TestResponse
+{
+    return test()->post(URL::signedRoute('payments.webhook', ['gateway' => 'herepay', 'ref' => $payment->reference], absolute: false), herepayFields($payment, $fields, $key));
 }

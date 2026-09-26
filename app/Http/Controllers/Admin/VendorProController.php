@@ -3,14 +3,16 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Actions\ActivateVendorPro;
-use App\Enums\SubscriptionStatus;
+use App\Enums\PaymentStatus;
 use App\Enums\VendorPlan;
 use App\Http\Controllers\Controller;
+use App\Models\Payment;
 use App\Models\Vendor;
-use App\Models\VendorSubscription;
+use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
 class VendorProController extends Controller
@@ -36,18 +38,19 @@ class VendorProController extends Controller
                 'price' => $plan->price(),
             ], VendorPlan::cases()),
             // Unpaid checkouts are abandoned carts; the history is what was paid.
-            'history' => $vendor->subscriptions()->with('addedBy')->where('status', '!=', SubscriptionStatus::Pending)->limit(self::HISTORY)->get()
-                ->map(fn (VendorSubscription $subscription): array => [
-                    'id' => $subscription->id,
-                    'reference' => $subscription->reference,
-                    'plan' => $subscription->plan->label(),
-                    'amount' => 'RM'.number_format((float) $subscription->amount, 2),
-                    'status' => $subscription->status->label(),
-                    'period' => collect([$subscription->starts_at?->translatedFormat('j M Y'), $subscription->ends_at?->translatedFormat('j M Y')])->filter()->implode(' – '),
-                    'source' => $subscription->gateway === VendorSubscription::GATEWAY_MANUAL
-                        ? __('pages.pro.manual_by', ['name' => $subscription->addedBy?->name ?? '—'])
-                        : 'Herepay',
-                    'note' => $subscription->note,
+            'history' => $vendor->proPayments()->with('recorder')->whereNot('status', PaymentStatus::Pending)->limit(self::HISTORY)->get()
+                ->map(fn (Payment $payment): array => [
+                    'id' => $payment->id,
+                    'reference' => $payment->reference,
+                    'plan' => VendorPlan::tryFrom((string) $payment->detail('plan'))?->label(),
+                    'amount' => 'RM'.number_format((float) $payment->amount, 2),
+                    'status' => $payment->status->label(),
+                    'period' => collect([$payment->detail('starts_at'), $payment->detail('ends_at')])->filter()->map(fn (string $date): string => Carbon::parse($date)->translatedFormat('j M Y'))->implode(' – '),
+                    'source' => $payment->gateway === Payment::GATEWAY_MANUAL
+                        ? __('pages.pro.manual_by', ['name' => $payment->recorder?->name ?? '—'])
+                        : Str::headline($payment->gateway),
+                    'note' => $payment->note,
+                    'url' => route('admin.payments.show', $payment),
                 ])->values()->all(),
             'storeUrl' => route('admin.vendors.pro', $vendor),
             'endUrl' => route('admin.vendors.pro.end', $vendor),
@@ -66,7 +69,7 @@ class VendorProController extends Controller
             'note' => ['nullable', 'string', 'max:255'],
         ]);
 
-        $subscription = $activate->recordManually(
+        $payment = $activate->recordManually(
             $vendor,
             VendorPlan::from($validated['plan']),
             $request->user(),
@@ -76,7 +79,7 @@ class VendorProController extends Controller
 
         return back()->with('status', __('flash.admin.pro_activated', [
             'vendor' => $vendor->name,
-            'date' => $subscription->ends_at->translatedFormat('j M Y'),
+            'date' => Carbon::parse($payment->detail('ends_at'))->translatedFormat('j M Y'),
         ]));
     }
 

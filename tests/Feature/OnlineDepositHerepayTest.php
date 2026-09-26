@@ -54,7 +54,7 @@ function depositCallback(Payment $payment, array $fields = [], string $key = 've
     $sorted = $fields;
     ksort($sorted);
 
-    return test()->post(URL::signedRoute('webhooks.herepay.booking', ['ref' => $reference ?? $payment->reference], absolute: false), [
+    return test()->post(URL::signedRoute('payments.webhook', ['gateway' => 'herepay', 'ref' => $reference ?? $payment->reference], absolute: false), [
         ...$fields,
         'checksum' => hash_hmac('sha256', implode(',', $sorted), $key),
     ]);
@@ -68,13 +68,15 @@ it('sends the couple to pay the deposit on the vendor own Herepay account', func
 
     expect((float) $payment->amount)->toBe(900.0)
         ->and($payment->status)->toBe(PaymentStatus::Pending)
+        ->and($payment->merchant)->toBe('vendor')
+        ->and($payment->vendor_id)->toBe($this->vendor->id)
         ->and($payment->payment_url)->toBe('https://uat.herepay.org/herepay/pay/DEP');
 
     Http::assertSent(fn (ClientRequest $request): bool => $request->hasHeader('SecretKey', 'vendor-secret')
         && $request['amount'] === 900.0
         && $request['usage_type'] === 'single'
-        && $request['redirect_url'] === route('bookings.payment.done', $booking)
-        && str_contains($request['callback_url'], '/webhooks/herepay/tempahan')
+        && $request['redirect_url'] === route('payments.return', $payment)
+        && str_contains($request['callback_url'], '/webhooks/herepay?ref='.$payment->reference)
         && str_contains($request['callback_url'], 'signature='));
 });
 
@@ -104,7 +106,7 @@ it('refuses a callback checksummed with any other key, Neekah own included', fun
 it('refuses a callback whose reference was changed', function () {
     bookOnline();
     $payment = Payment::sole();
-    $url = URL::signedRoute('webhooks.herepay.booking', ['ref' => $payment->reference], absolute: false);
+    $url = URL::signedRoute('payments.webhook', ['gateway' => 'herepay', 'ref' => $payment->reference], absolute: false);
 
     $this->post(str_replace($payment->reference, 'PAY-OTHER', $url), ['status_code' => '00'])->assertForbidden();
 });
