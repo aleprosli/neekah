@@ -80,7 +80,7 @@ const remove = (at) => {
             v-show="chosen.length < max"
             class="flex w-full cursor-pointer items-center justify-center rounded-xl border border-dashed border-line px-4 py-3 text-sm text-ink-muted transition hover:border-brand-400 sm:w-auto sm:self-start sm:px-6"
         >
-            <span>{{ chosen.length ? $t('portfolio.tambah_gambar_lagi') : $t('portfolio.pilih_gambar') }}</span>
+            <span>{{ chosen.length ? $t('photo_picker.add_more') : $t('photo_picker.pick') }}</span>
             <input
                 ref="input"
                 type="file"

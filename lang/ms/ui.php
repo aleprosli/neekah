@@ -996,6 +996,11 @@ return [
         'show_password' => 'Tunjukkan kata laluan',
     ],
 
+    'photo_picker' => [
+        'pick' => 'Pilih gambar',
+        'add_more' => 'Tambah gambar lagi',
+    ],
+
     'date_picker' => [
         'weekdays' => 'I,S,R,K,J,S,A',
         'previous' => 'Bulan sebelum',

@@ -996,6 +996,11 @@ return [
         'show_password' => 'Show password',
     ],
 
+    'photo_picker' => [
+        'pick' => 'Choose photos',
+        'add_more' => 'Add more photos',
+    ],
+
     'date_picker' => [
         'weekdays' => 'M,T,W,T,F,S,S',
         'previous' => 'Previous month',

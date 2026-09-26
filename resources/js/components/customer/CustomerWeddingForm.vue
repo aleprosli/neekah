@@ -222,7 +222,7 @@ const sectionClass = 'flex min-w-0 flex-col gap-4 rounded-3xl border border-line
                 <p class="text-sm text-ink-muted">{{ editing ? $t('wedding_form.submit_note_edit') : $t('wedding_form.submit_note') }}</p>
                 <div class="flex flex-col-reverse gap-2 sm:flex-row sm:items-center">
                     <a :href="cancelUrl" class="rounded-full px-6 py-3 text-center text-sm font-medium text-ink-muted transition hover:bg-surface-muted">{{ $t('wedding_form.batal') }}</a>
-                    <button type="submit" class="inline-flex items-center justify-center gap-2 rounded-full bg-brand-600 px-8 py-3 text-sm font-semibold text-white shadow-lg shadow-brand-600/20 transition hover:bg-brand-700">
+                    <button type="submit" class="inline-flex shrink-0 items-center justify-center gap-2 rounded-full bg-brand-600 px-8 py-3 text-sm font-semibold whitespace-nowrap text-white shadow-lg shadow-brand-600/20 transition hover:bg-brand-700">
                         <svg v-if="!editing" class="size-4 text-gold-300" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l1.8 5.6L19.5 9l-5.7 1.4L12 16l-1.8-5.6L4.5 9l5.7-1.4L12 2Z" /></svg>
                         {{ editing ? $t('common.simpan') : $t('wedding_form.cipta_majlis') }}
                     </button>

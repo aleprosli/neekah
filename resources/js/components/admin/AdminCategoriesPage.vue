@@ -309,7 +309,7 @@ const clearFilters = () => {
 
                         <div class="min-w-0 flex-1">
                             <div class="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
-                                <p class="truncate font-semibold">{{ row.name }}</p>
+                                <p class="font-semibold leading-snug break-words">{{ row.name }}</p>
                                 <span v-if="!row.is_active" class="shrink-0 rounded-full bg-surface-muted px-2 py-0.5 text-[11px] font-semibold text-ink-muted">{{ $t('admin_categories.tidak_aktif') }}</span>
                                 <span v-for="locale in missingLocales(row)" :key="locale.code" class="shrink-0 rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-semibold text-amber-800">{{ $t('admin_categories.missing_locale', { locale: locale.code.toUpperCase() }) }}</span>
                             </div>
