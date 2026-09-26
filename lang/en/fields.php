@@ -136,6 +136,8 @@ return [
 
     'pro_monthly_price' => 'monthly price (RM)',
     'pro_yearly_price' => 'yearly price (RM)',
+    'pro_elite_bonus_tokens' => 'Elite bonus tokens a month',
+    'pro_elite_row_size' => 'vendors in the Elite picks row',
 
     'terma_deposit' => 'deposit terms',
     'jenis_deposit' => 'deposit type',

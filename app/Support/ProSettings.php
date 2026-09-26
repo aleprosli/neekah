@@ -25,6 +25,27 @@ class ProSettings extends SettingGroup
     }
 
     /**
+     * Pro Elite: Pro vendors whose tier is Top or Recommended. It is earned by
+     * performance, never bought — see Vendor::isElite().
+     */
+    public function eliteEnabled(): bool
+    {
+        return (bool) $this->value('elite_enabled');
+    }
+
+    /** Boost tokens an Elite vendor gets every 30 days, on top of Pro's. */
+    public function eliteBonusTokens(): int
+    {
+        return max(0, (int) $this->value('elite_bonus_tokens'));
+    }
+
+    /** How many vendors the "Pilihan Elite" row on the marketplace shows. */
+    public function eliteRowSize(): int
+    {
+        return max(0, min(12, (int) $this->value('elite_row_size')));
+    }
+
+    /**
      * @return array<string, int|bool>
      */
     public static function defaults(): array
@@ -33,6 +54,9 @@ class ProSettings extends SettingGroup
             'enabled' => false,
             'monthly_price' => 49,
             'yearly_price' => 490,
+            'elite_enabled' => true,
+            'elite_bonus_tokens' => 10,
+            'elite_row_size' => 6,
         ];
     }
 

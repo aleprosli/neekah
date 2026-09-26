@@ -32,6 +32,31 @@
         <p class="-mt-4 text-sm text-ink-muted">{{ __('pages.pro.fair_note') }}</p>
 
         {{-- Analytics: the whole window for Pro, last week's totals otherwise. --}}
+        {{-- Pro Elite: what Pro adds for vendors who perform. Earned, never bought. --}}
+        @if (app(\App\Support\ProSettings::class)->eliteEnabled())
+            <section class="relative overflow-hidden rounded-3xl border border-gold-300/70 bg-linear-to-br from-ink via-brand-900 to-ink p-6 text-surface sm:p-8">
+                <div class="pointer-events-none absolute -top-20 -right-16 size-64 rounded-full bg-gold-300/15 blur-3xl" aria-hidden="true"></div>
+                <div class="relative flex flex-col gap-4">
+                    <div>
+                        <p class="text-[11px] font-semibold tracking-[0.3em] text-gold-300 uppercase">✦ Pro Elite</p>
+                        <h2 class="mt-1 font-display text-2xl font-semibold">{{ $vendor->isElite() ? __('pages.pro.elite.you_are') : __('pages.pro.elite.title') }}</h2>
+                        <p class="mt-1 max-w-2xl text-sm text-surface/75">{{ __('pages.pro.elite.body') }}</p>
+                    </div>
+                    <ul class="grid gap-3 sm:grid-cols-2">
+                        @foreach (['badge', 'row', 'order', 'tokens'] as $perk)
+                            <li class="rounded-2xl bg-white/5 p-4 ring-1 ring-white/10">
+                                <p class="text-sm font-semibold text-gold-300">{{ __('pages.pro.elite.perks.'.$perk.'.title') }}</p>
+                                <p class="mt-1 text-xs text-surface/75">{{ __('pages.pro.elite.perks.'.$perk.'.body', ['count' => app(\App\Support\ProSettings::class)->eliteBonusTokens()]) }}</p>
+                            </li>
+                        @endforeach
+                    </ul>
+                    @unless ($vendor->isElite())
+                        <p class="text-xs text-surface/75">{{ __('pages.pro.elite.how', ['tier' => $vendor->tier->label()]) }}</p>
+                    @endunless
+                </div>
+            </section>
+        @endif
+
         <section class="flex flex-col gap-4">
             <h2 class="font-display text-xl font-semibold">{{ $vendor->isPro() ? __('pages.pro.analytics_heading_pro') : __('pages.pro.analytics_heading_free') }}</h2>
             <div class="grid gap-4 sm:grid-cols-3">

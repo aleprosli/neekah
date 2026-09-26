@@ -246,6 +246,7 @@ return [
         'title' => ':count token boost masuk ke akaun anda',
         'welcome' => 'Selamat datang ke Neekah! Ini hadiah token boost untuk anda. Baki: :balance token.',
         'pro_monthly' => 'Token boost bulanan Neekah Pro anda sudah masuk. Baki: :balance token.',
+        'elite_monthly' => 'Bonus Pro Elite anda: token tambahan kerana prestasi anda di tier Top atau Disyorkan. Baki: :balance token.',
         'purchase' => 'Terima kasih atas pembelian anda. Baki: :balance token.',
         'admin' => 'Admin Neekah menambah token boost untuk anda. Baki: :balance token.',
         'how' => 'Satu token menaikkan profil anda ke atas senarai Disyorkan dalam kategori pilihan anda selama sehari.',

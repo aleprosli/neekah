@@ -5,6 +5,7 @@ return [
     'boost_token_reason' => [
         'welcome' => 'Hadiah selamat datang',
         'pro_monthly' => 'Token bulanan Pro',
+        'elite_monthly' => 'Bonus Elite bulanan',
         'purchase' => 'Pembelian token',
         'admin' => 'Pelarasan admin',
         'spend' => 'Boost kategori',

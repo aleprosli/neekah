@@ -1322,6 +1322,10 @@ return [
         'night' => 'Good night, :name',
     ],
     'vendor_home' => [
+        'elite_yes' => 'You are Pro Elite',
+        'elite_yes_body' => 'The Elite badge, a place in Elite picks, priority in Recommended and monthly bonus tokens.',
+        'elite_need_tier' => 'Reach the Top tier to become Pro Elite: the badge, Elite picks and bonus tokens.',
+        'elite_need_pro' => 'Pro Elite is for Neekah Pro members who reach the Top tier. Upgrade to Pro →',
         'plan_pro' => 'Neekah Pro · until :date',
         'plan_basic' => 'Basic plan',
         'public_page' => 'Public page',

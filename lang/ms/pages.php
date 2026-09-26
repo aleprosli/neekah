@@ -3,6 +3,47 @@
 return [
 
     'landing' => [
+        'kenangan' => [
+            'eyebrow' => 'Neekah Kenangan',
+            'title' => 'Setiap tetamu jadi jurugambar majlis anda',
+            'body' => 'Letak kad QR di setiap meja. Tetamu imbas, ambil gambar dan video dengan telefon mereka, dan semuanya masuk ke satu album bersama. Tiada aplikasi, tiada log masuk.',
+            'per_album' => 'bayaran sekali untuk satu album majlis',
+            'cta' => 'Cuba Neekah Kenangan',
+            'steps' => [
+                'scan' => ['title' => 'Imbas QR.', 'body' => 'Tetamu imbas kad di meja dan terus masuk ke album anda.'],
+                'share' => ['title' => 'Kongsi gambar dan video.', 'body' => 'Dimuat naik terus dari telefon, dalam kualiti pakej anda.'],
+                'wish' => ['title' => 'Tinggalkan ucapan.', 'body' => 'Ucapan bertulis, atau ucapan suara untuk pakej Pro. Hanya anda yang membacanya.'],
+                'keep' => ['title' => 'Simpan kenangan.', 'body' => 'Muat turun semua dalam ZIP. Album disimpan :days hari selepas majlis.'],
+            ],
+        ],
+        'plans' => [
+            'eyebrow' => 'Untuk vendor',
+            'title' => 'Basic percuma. Pro untuk yang mahu lebih.',
+            'body' => 'Setiap vendor bermula percuma dengan Basic. Neekah Pro ialah langganan pilihan untuk vendor yang mahu menerima tempahan online, urus enquiry dan lihat analitik. Tier ranking tidak boleh dibeli.',
+            'free' => 'Percuma',
+            'basic_body' => 'Untuk mula dikenali dan dihubungi pengantin.',
+            'per_month' => '/ bulan',
+            'pro_yearly' => 'atau :price setahun',
+            'pro_includes' => 'Semua dalam Basic, ditambah:',
+            'pro_tokens_title' => 'Token boost bulanan',
+            'pro_tokens' => ':count token setiap bulan untuk naik ke atas senarai.',
+            'deposit_note' => 'Tempahan online: deposit terus ke akaun vendor, Neekah tidak memegang wang anda dan tidak mengenakan komisen.',
+        ],
+        'boost' => [
+            'eyebrow' => 'Boost',
+            'title' => 'Naik ke atas kategori anda',
+            'body' => 'Satu token boost menaikkan profil anda ke atas susunan Disyorkan dalam salah satu kategori anda selama sehari. Kad anda dilabel Dipromosi supaya pengantin tahu.',
+            'welcome' => ':count token hadiah selamat datang sebaik profil diluluskan.',
+            'pro' => ':count token setiap bulan untuk ahli Neekah Pro.',
+            'pack' => 'Pek :count token pada RM:price.',
+            'fair' => 'Boost hanya mengubah susunan Disyorkan, bukan tier atau skor. Susunan lain (rating, harga, paling ramai dilihat) tidak terkesan.',
+        ],
+        'elite' => [
+            'chip' => 'untuk ahli Pro di tier Top atau Recommended',
+            'title' => 'Diperoleh, bukan dibeli',
+            'body' => 'Ahli Neekah Pro yang mencapai tier Top atau Recommended melalui rating, tempahan selesai dan respons sebenar menjadi Pro Elite secara automatik.',
+            'fair' => 'Pro Elite hilang jika tier jatuh atau langganan Pro tamat. Tier sendiri sentiasa dikira dari prestasi.',
+        ],
         'script_eyebrow' => 'Semua urusan majlis',
         'hero_note' => 'Pengantin & vendor berurusan terus. Neekah percuma untuk kedua-duanya.',
         'covers_caption' => 'Tiga daripada 50 reka bentuk kad jemputan',
@@ -761,6 +802,18 @@ return [
     ],
 
     'pro' => [
+        'elite' => [
+            'title' => 'Jadi Pro Elite',
+            'you_are' => 'Anda Pro Elite',
+            'body' => 'Ahli Neekah Pro yang mencapai tier Top atau Disyorkan menjadi Elite secara automatik. Ia diperoleh melalui prestasi sebenar (rating, tempahan selesai, respons) dan tidak boleh dibeli, jadi pengantin boleh mempercayainya.',
+            'how' => 'Tier anda sekarang: :tier. Capai Top dengan lebih banyak tempahan selesai, rating tinggi dan balas enquiry dengan cepat.',
+            'perks' => [
+                'badge' => ['title' => 'Lencana Elite', 'body' => 'Di kad vendor, halaman anda dan hasil carian.'],
+                'row' => ['title' => 'Pilihan Elite', 'body' => 'Baris khas di atas marketplace, berasingan dari vendor Dipromosi.'],
+                'order' => ['title' => 'Keutamaan Disyorkan', 'body' => 'Selepas vendor yang di-boost, Elite muncul dahulu sebelum yang lain.'],
+                'tokens' => ['title' => 'Token bonus', 'body' => '+:count token boost setiap 30 hari, di atas token Pro bulanan.'],
+            ],
+        ],
         'herepay_title' => 'Neekah Pro :plan untuk :vendor',
         'herepay_description' => 'Rujukan Neekah: :reference',
         'title' => 'Neekah Pro',
@@ -799,7 +852,7 @@ return [
                 'body' => 'Lencana Pro pada kad dan profil anda, supaya pasangan tahu anda serius dengan perniagaan anda.',
             ],
         ],
-        'fair_note' => 'Tier (Verified hingga Recommended) dan skor tetap berdasarkan prestasi. Boost hanya menaikkan susunan Disyorkan sepanjang tempoh boost, dan kad anda dilabel Dipromosi.',
+        'fair_note' => 'Tier (Verified hingga Recommended) dan skor tetap berdasarkan prestasi, tidak boleh dibeli. Susunan Disyorkan: vendor yang di-boost dahulu (dilabel Dipromosi), kemudian Pro Elite (ahli Pro di tier Top atau Disyorkan), kemudian yang lain ikut skor.',
         'analytics_heading_pro' => 'Analitik 28 hari',
         'analytics_heading_free' => '7 hari lepas',
         'analytics_teaser' => 'Naik taraf ke Pro untuk melihat graf harian 28 hari.',

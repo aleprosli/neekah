@@ -3,6 +3,47 @@
 return [
 
     'landing' => [
+        'kenangan' => [
+            'eyebrow' => 'Neekah Moments',
+            'title' => 'Every guest becomes your wedding photographer',
+            'body' => 'Put a QR card on every table. Guests scan it, take photos and videos on their own phones, and everything lands in one shared album. No app, no sign-in.',
+            'per_album' => 'one-off payment for one wedding album',
+            'cta' => 'Try Neekah Moments',
+            'steps' => [
+                'scan' => ['title' => 'Scan the QR.', 'body' => 'Guests scan the card on their table and go straight into your album.'],
+                'share' => ['title' => 'Share photos and videos.', 'body' => 'Uploaded straight from their phones, in your package quality.'],
+                'wish' => ['title' => 'Leave a wish.', 'body' => 'A written wish, or a voice wish on Pro. Only you read them.'],
+                'keep' => ['title' => 'Keep the memories.', 'body' => 'Download everything as a ZIP. The album is kept :days days after the event.'],
+            ],
+        ],
+        'plans' => [
+            'eyebrow' => 'For vendors',
+            'title' => 'Basic is free. Pro is for those who want more.',
+            'body' => 'Every vendor starts free on Basic. Neekah Pro is an optional subscription for vendors who want online bookings, enquiries and analytics. Ranking tiers cannot be bought.',
+            'free' => 'Free',
+            'basic_body' => 'To get found and contacted by couples.',
+            'per_month' => '/ month',
+            'pro_yearly' => 'or :price a year',
+            'pro_includes' => 'Everything in Basic, plus:',
+            'pro_tokens_title' => 'Monthly boost tokens',
+            'pro_tokens' => ':count tokens every month to rise to the top of the list.',
+            'deposit_note' => 'Online bookings: the deposit goes straight to the vendor account; Neekah does not hold your money and takes no commission.',
+        ],
+        'boost' => [
+            'eyebrow' => 'Boost',
+            'title' => 'Rise to the top of your category',
+            'body' => 'One boost token lifts your profile to the top of the Recommended order in one of your categories for a day. Your card is labelled Promoted so couples know.',
+            'welcome' => ':count welcome tokens as soon as your profile is approved.',
+            'pro' => ':count tokens every month for Neekah Pro members.',
+            'pack' => 'A pack of :count tokens for RM:price.',
+            'fair' => 'Boost only changes the Recommended order, never tier or score. Other sorts (rating, price, most viewed) are unaffected.',
+        ],
+        'elite' => [
+            'chip' => 'for Pro members at the Top or Recommended tier',
+            'title' => 'Earned, never bought',
+            'body' => 'Neekah Pro members who reach the Top or Recommended tier through real ratings, completed bookings and responses become Pro Elite automatically.',
+            'fair' => 'Pro Elite ends if the tier drops or the Pro subscription ends. The tier itself is always worked out from performance.',
+        ],
         'script_eyebrow' => 'Every wedding errand',
         'hero_note' => 'Couples and vendors deal directly. Neekah is free for both.',
         'covers_caption' => 'Three of fifty invitation designs',
@@ -761,6 +802,18 @@ return [
     ],
 
     'pro' => [
+        'elite' => [
+            'title' => 'Become Pro Elite',
+            'you_are' => 'You are Pro Elite',
+            'body' => 'Neekah Pro members who reach the Top or Recommended tier become Elite automatically. It is earned through real performance (ratings, completed bookings, responses) and cannot be bought, so couples can trust it.',
+            'how' => 'Your tier now: :tier. Reach Top with more completed bookings, strong ratings and quick replies to enquiries.',
+            'perks' => [
+                'badge' => ['title' => 'Elite badge', 'body' => 'On your vendor card, your page and in search results.'],
+                'row' => ['title' => 'Elite picks', 'body' => 'A dedicated row at the top of the marketplace, apart from promoted vendors.'],
+                'order' => ['title' => 'Priority in Recommended', 'body' => 'After boosted vendors, Elite comes before everyone else.'],
+                'tokens' => ['title' => 'Bonus tokens', 'body' => '+:count boost tokens every 30 days, on top of the monthly Pro tokens.'],
+            ],
+        ],
         'herepay_title' => 'Neekah Pro :plan for :vendor',
         'herepay_description' => 'Neekah reference: :reference',
         'title' => 'Neekah Pro',
@@ -799,7 +852,7 @@ return [
                 'body' => 'A Pro badge on your card and profile, so couples know you take your business seriously.',
             ],
         ],
-        'fair_note' => 'Tiers (Verified to Recommended) and the score stay based on performance. A boost only lifts the Recommended order while it runs, and your card is labelled Promoted.',
+        'fair_note' => 'Tiers (Verified to Recommended) and scores stay based on performance and cannot be bought. The Recommended order: boosted vendors first (labelled Promoted), then Pro Elite (Pro members at the Top or Recommended tier), then everyone else by score.',
         'analytics_heading_pro' => 'Last 28 days',
         'analytics_heading_free' => 'Last 7 days',
         'analytics_teaser' => 'Upgrade to Pro to see the daily chart for 28 days.',

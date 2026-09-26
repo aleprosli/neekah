@@ -1322,6 +1322,10 @@ return [
         'night' => 'Selamat malam, :name',
     ],
     'vendor_home' => [
+        'elite_yes' => 'Anda Pro Elite',
+        'elite_yes_body' => 'Lencana Elite, tempat dalam Pilihan Elite, keutamaan dalam Disyorkan dan token bonus bulanan.',
+        'elite_need_tier' => 'Capai tier Top untuk menjadi Pro Elite: lencana, Pilihan Elite dan token bonus.',
+        'elite_need_pro' => 'Pro Elite untuk ahli Neekah Pro yang mencapai tier Top. Naik taraf ke Pro →',
         'plan_pro' => 'Neekah Pro · hingga :date',
         'plan_basic' => 'Pelan Basic',
         'public_page' => 'Halaman awam',
