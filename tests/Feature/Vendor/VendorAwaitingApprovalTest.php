@@ -33,6 +33,19 @@ it('shows a vendor awaiting approval the setup guide instead of the sidebar and 
         ->assertDontSee(route('vendor.bookings.create'), false);
 });
 
+it('puts what to do now above the form, marking the step the vendor is on', function () {
+    // Above the form in the markup, so a phone shows it first.
+    $this->actingAs($this->vendor->user)
+        ->get(route('vendor.dashboard'))
+        ->assertSeeInOrder([
+            __('pages.vendor_setup.guide_title'),
+            __('pages.vendor_setup.guide_1_title'),
+            __('pages.vendor_setup.you_are_here'),
+            __('pages.vendor_setup.guide_2_title'),
+            route('vendor.setup.profile'),
+        ], false);
+});
+
 it('sends a vendor awaiting approval back to the dashboard from every other vendor page', function (string $route) {
     $this->actingAs($this->vendor->user)
         ->get(route($route))
@@ -160,7 +173,9 @@ it('thanks a vendor who has done every step and says the admin will review them'
         ->get(route('vendor.dashboard'))
         ->assertSee(openStep('selesai'), false)
         ->assertSee(__('pages.vendor_setup.thanks_title', ['name' => $this->vendor->name]))
-        ->assertSee(__('pages.vendor_setup.finish'));
+        ->assertSee(__('pages.vendor_setup.finish'))
+        // Their part is done: the guide now points at the admin's review.
+        ->assertSeeInOrder([__('pages.vendor_setup.guide_2_title'), __('pages.vendor_setup.you_are_here'), __('pages.vendor_setup.guide_3_title')]);
 });
 
 it('points the last step at what is still missing instead of offering to finish', function () {

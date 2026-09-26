@@ -635,6 +635,7 @@ return [
         'guide_2_body' => 'A complete profile makes the review easier. While you wait, couples cannot see your profile yet.',
         'guide_3_title' => 'Once you are approved',
         'guide_3_body' => 'We email you. Your profile goes live in the marketplace straight away, and the full menu (bookings, enquiries, reviews, points) opens up.',
+        'you_are_here' => 'You are here',
         'progress' => ':done of :total done',
         'all_done' => 'Everything is complete. The admin will review your profile — you can keep updating any card while you wait.',
         'done' => 'Done',

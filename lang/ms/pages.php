@@ -635,6 +635,7 @@ return [
         'guide_2_body' => 'Profil yang lengkap memudahkan semakan. Semasa menunggu, profil anda belum dipaparkan kepada pengantin.',
         'guide_3_title' => 'Selepas diluluskan',
         'guide_3_body' => 'Kami hantar emel kepada anda. Profil anda terus dipaparkan di marketplace, dan menu penuh (tempahan, enquiry, review, point) dibuka.',
+        'you_are_here' => 'Anda di sini',
         'progress' => ':done daripada :total selesai',
         'all_done' => 'Semua sudah lengkap. Admin akan menyemak profil anda — anda boleh terus kemas kini mana-mana kad sementara menunggu.',
         'done' => 'Selesai',

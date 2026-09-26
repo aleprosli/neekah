@@ -89,6 +89,7 @@ const tones = {
                                     <p class="line-clamp-2 text-sm text-ink-muted">{{ action.body }}</p>
                                 </div>
                                 <span class="hidden shrink-0 text-sm font-medium text-brand-700 group-hover:underline sm:block">{{ action.cta }} →</span>
+                                <span class="shrink-0 text-xl text-brand-600 sm:hidden" aria-hidden="true">›</span>
                             </a>
                         </li>
                     </ul>
