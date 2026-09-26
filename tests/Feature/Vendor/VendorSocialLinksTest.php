@@ -45,7 +45,17 @@ it('turns usernames and pasted links into links on the public profile', function
         ->assertOk()
         ->assertSee('href="https://www.instagram.com/bride.assistant"', false)
         ->assertSee('href="https://brideassistant.my"', false)
-        ->assertDontSee('TikTok ↗');
+        ->assertSee('data-social-icon="instagram"', false)
+        ->assertSee('data-social-icon="website"', false)
+        ->assertDontSee('data-social-icon="tiktok"', false);
+});
+
+it('names the website link in the language of the page', function () {
+    $this->vendor->update(['social_links' => ['website' => 'https://brideassistant.my']]);
+
+    $this->get(route('vendors.show', $this->vendor))->assertOk()->assertSeeText('Ikuti Bride Assistant')->assertSeeText('Laman web');
+
+    $this->get(url()->routeIn('en', 'vendors.show', ['vendor' => $this->vendor]))->assertOk()->assertSeeText('Follow Bride Assistant')->assertSeeText('Website');
 });
 
 it('refuses a link that points somewhere other than its platform', function () {

@@ -100,10 +100,15 @@
 
                 @if ($socialLinks = $vendor->socialLinks())
                     <div class="flex flex-col gap-2 py-6">
-                        <p class="text-sm font-medium">Ikuti {{ $vendor->name }}</p>
+                        <p class="text-sm font-medium">{{ __('pages.profile.ikuti', ['name' => $vendor->name]) }}</p>
                         <ul class="flex flex-wrap gap-2 text-xs font-semibold">
                             @foreach ($socialLinks as $link)
-                                <li><a href="{{ $link['url'] }}" target="_blank" rel="noopener nofollow ugc" class="block rounded-full border border-line px-3.5 py-2 transition hover:border-brand-400">{{ $link['label'] }} ↗</a></li>
+                                <li>
+                                    <a href="{{ $link['url'] }}" target="_blank" rel="noopener nofollow ugc" class="flex items-center gap-2 rounded-full border border-line bg-surface-raised py-2 pr-3.5 pl-2.5 transition hover:border-brand-400 hover:shadow-sm">
+                                        <x-social-icon :platform="$link['platform']" tinted size="size-4.5" />
+                                        {{ $link['label'] }}
+                                    </a>
+                                </li>
                             @endforeach
                         </ul>
                     </div>

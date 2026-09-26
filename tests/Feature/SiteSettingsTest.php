@@ -68,7 +68,9 @@ it('lets an admin publish the contact details shown in the footer', function () 
     $this->get(route('vendors.index'))
         ->assertSee('03-1234 5678')
         ->assertSee('hello@neekah.my')
-        ->assertSee('https://instagram.com/neekahmy');
+        ->assertSee('https://instagram.com/neekahmy')
+        ->assertSee('aria-label="Instagram"', false)
+        ->assertSee('data-social-icon="instagram"', false);
 });
 
 it('rejects a social link that is not a URL', function () {

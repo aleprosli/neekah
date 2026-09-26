@@ -41,6 +41,47 @@ it('creates a wedding project', function () {
     $this->actingAs($this->customer)->get(route('dashboard'))->assertOk()->assertSee('Aina & Hakim');
 });
 
+it('welcomes a couple to their first wedding and previews the budget split they will get', function () {
+    $this->customer->update(['name' => 'Nur Aina Adriana Binti Abdullah']);
+
+    $response = $this->actingAs($this->customer)
+        ->get(route('weddings.create'))
+        ->assertOk()
+        ->assertSee('Selamat datang, Aina')
+        ->assertSee(__('pages.wedding_create.title'));
+
+    $shares = collect($response->viewData('props')['budgetShares']);
+
+    expect($shares->first())->toBe(['name' => 'Catering', 'icon' => '🍽️', 'share' => 0.33])
+        ->and($shares->pluck('share')->all())->toBe($shares->pluck('share')->sortDesc()->values()->all());
+
+    // What the preview promised is what the Bajet page starts with.
+    $this->actingAs($this->customer)->post(route('weddings.store'), [
+        'title' => 'Aina & Hakim',
+        'event_date' => now()->addYear()->toDateString(),
+        'city' => 'Alor Setar',
+        'state' => 'Kedah',
+        'budget' => 30000,
+    ]);
+
+    $catering = Category::where('slug', 'catering')->sole();
+
+    expect((float) Wedding::sole()->budgetItems()->where('category_id', $catering->id)->value('planned_amount'))->toBe(30000 * 0.33);
+});
+
+it('leaves the budget split out when an existing wedding is edited', function () {
+    $wedding = Wedding::factory()->for($this->customer)->create();
+
+    $props = $this->actingAs($this->customer)
+        ->get(route('weddings.edit', $wedding))
+        ->assertOk()
+        ->assertDontSee(__('pages.wedding_create.title'))
+        ->viewData('props');
+
+    expect($props['budgetShares'])->toBe([])
+        ->and($props['budgetUrl'])->toBe(route('budget.index'));
+});
+
 it('rejects a wedding in the past or in an unknown state', function () {
     $this->actingAs($this->customer)
         ->post(route('weddings.store'), [

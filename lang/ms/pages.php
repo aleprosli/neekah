@@ -373,6 +373,8 @@ return [
     ],
 
     'profile' => [
+        'ikuti' => 'Ikuti :name',
+        'laman_web' => 'Laman web',
         'to_send_enquiry' => 'untuk menghantar enquiry kepada vendor ini.',
         'whatsapp_greeting' => 'Hai :name, saya jumpa anda di Neekah. Boleh saya tanya tentang pakej untuk majlis saya?',
         'highlight_contact' => 'Berhubung terus dengan vendor',
@@ -417,10 +419,17 @@ return [
         'hubungi_vendor' => 'Hubungi vendor',
     ],
 
+    'wedding_create' => [
+        'eyebrow' => 'Selamat datang, :name',
+        'title' => 'Mari mulakan perancangan majlis anda',
+        'intro' => 'Beberapa soalan ringkas — nama, tarikh, tempat dan bajet. Dari situ Neekah sediakan checklist, bajet, senarai tetamu dan kad jemputan digital anda, supaya anda tahu apa yang perlu dibuat, dan bila.',
+    ],
+
     'share' => [
         'kongsi_vendor_ini' => 'Kongsi vendor ini',
         'kongsi' => 'Kongsi…',
         'salin_pautan' => 'Salin pautan',
+        'share_text' => ':name di Neekah',
     ],
 
     'bell' => [

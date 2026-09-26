@@ -373,6 +373,8 @@ return [
     ],
 
     'profile' => [
+        'ikuti' => 'Follow :name',
+        'laman_web' => 'Website',
         'to_send_enquiry' => 'to send this vendor an enquiry.',
         'whatsapp_greeting' => 'Hi :name, I found you on Neekah. Could I ask about your packages for my wedding?',
         'highlight_contact' => 'Deal with the vendor directly',
@@ -417,10 +419,17 @@ return [
         'hubungi_vendor' => 'Contact the vendor',
     ],
 
+    'wedding_create' => [
+        'eyebrow' => 'Welcome, :name',
+        'title' => 'Let us start planning your wedding',
+        'intro' => 'A few quick questions — name, date, place and budget. From there Neekah sets up your checklist, budget, guest list and digital invitation card, so you know what needs doing, and when.',
+    ],
+
     'share' => [
         'kongsi_vendor_ini' => 'Share this vendor',
         'kongsi' => 'Share…',
         'salin_pautan' => 'Copy link',
+        'share_text' => ':name on Neekah',
     ],
 
     'bell' => [
