@@ -70,7 +70,7 @@ class PointController extends Controller
                 'periodStats' => [
                     ['label' => __('props.vendor.pendapatan'), 'value' => 'RM'.number_format((float) $revenue->clone()->sum('amount')), 'hint' => __('props.vendor.bayaran_diterima_dalam_tempoh')],
                     ['label' => __('props.vendor.enquiry_dibalas'), 'value' => $enquiryCount > 0 ? $enquiries->clone()->whereNotNull('replied_at')->count().' / '.$enquiryCount : __('props.vendor.tiada_enquiry'), 'hint' => __('props.vendor.enquiry_yang_anda_terima')],
-                    ['label' => __('props.vendor.enquiry_jadi_tempahan'), 'value' => $enquiryCount > 0 ? round($bookingsInPeriod / $enquiryCount * 100).'%' : 'Tiada data', 'hint' => $bookingsInPeriod.' tempahan dalam tempoh'],
+                    ['label' => __('props.vendor.enquiry_jadi_tempahan'), 'value' => $enquiryCount > 0 ? round($bookingsInPeriod / $enquiryCount * 100).'%' : __('props.copy.no_data'), 'hint' => __('props.copy.bookings_in_period', ['count' => $bookingsInPeriod])],
                 ],
                 'charts' => [
                     'revenue' => $this->chart($period->series(MonthlyTotals::of($revenue->clone(), 'paid_at', 'sum', 'amount')), fn (float $value): string => 'RM'.number_format($value)),

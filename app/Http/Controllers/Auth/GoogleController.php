@@ -6,6 +6,7 @@ use App\Actions\AcceptWeddingInvitation;
 use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Support\AuthForm;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
@@ -17,7 +18,7 @@ class GoogleController extends Controller
 {
     public function redirect(): SymfonyRedirect|RedirectResponse
     {
-        if (! config('services.google.client_id')) {
+        if (! AuthForm::offersGoogle()) {
             return redirect()->route('login')->withErrors(['email' => __('flash.account.google_not_configured')]);
         }
 
@@ -29,6 +30,10 @@ class GoogleController extends Controller
      */
     public function callback(AcceptWeddingInvitation $accept): RedirectResponse
     {
+        if (! AuthForm::offersGoogle()) {
+            return redirect()->route('login')->withErrors(['email' => __('flash.account.google_not_configured')]);
+        }
+
         try {
             $googleUser = Socialite::driver('google')->user();
         } catch (Throwable) {

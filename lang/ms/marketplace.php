@@ -45,6 +45,7 @@ return [
         'price_asc' => 'Harga: rendah ke tinggi',
         'price_desc' => 'Harga: tinggi ke rendah',
         'reviews' => 'Paling banyak review',
+        'popular' => 'Paling ramai dilihat',
     ],
 
     // One form, no choices: Laravel has no plural rule for Malay and would
@@ -53,6 +54,10 @@ return [
     'demo' => 'Data demo',
 
     'card' => [
+        'promoted' => 'Dipromosi',
+        'trending' => 'Trending',
+        'pro' => 'Pro',
+        'pro_title' => 'Vendor Neekah Pro',
         'recommended' => 'Disyorkan',
         'top' => 'Vendor terbaik',
         'new' => 'Baru',

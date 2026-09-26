@@ -34,6 +34,8 @@ return [
         'password_confirm' => 'Sahkan kata laluan',
         'email' => 'Emel',
         'password' => 'Kata laluan',
+        'access_code' => 'Kod akses',
+        'access_code_help' => 'Laman ini hanya untuk pasukan dalaman buat masa ini.',
     ],
 
     'links' => [

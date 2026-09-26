@@ -5,6 +5,9 @@ use App\Http\Middleware\EnsureAccountIsActive;
 use App\Http\Middleware\EnsurePhoneNumber;
 use App\Http\Middleware\EnsureUserHasRole;
 use App\Http\Middleware\EnsureUserHasWedding;
+use App\Http\Middleware\EnsureUserIsCouple;
+use App\Http\Middleware\EnsureVendorHasFeature;
+use App\Http\Middleware\EnsureVendorIsApproved;
 use App\Http\Middleware\SetLocale;
 use App\Support\ImageSettings;
 use App\Support\Locales;
@@ -26,9 +29,14 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->appendToGroup('web', EnsureAccountIsActive::class);
         $middleware->appendToGroup('web', EnsurePhoneNumber::class);
 
+        $middleware->validateCsrfTokens(except: ['webhooks/*']);
+
         $middleware->alias([
             'role' => EnsureUserHasRole::class,
             'wedding' => EnsureUserHasWedding::class,
+            'vendor.approved' => EnsureVendorIsApproved::class,
+            'couple' => EnsureUserIsCouple::class,
+            'vendor.feature' => EnsureVendorHasFeature::class,
             'locale' => SetLocale::class,
         ]);
     })

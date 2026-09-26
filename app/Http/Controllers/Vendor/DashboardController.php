@@ -4,15 +4,23 @@ namespace App\Http\Controllers\Vendor;
 
 use App\Enums\BookingStatus;
 use App\Enums\EnquiryStatus;
+use App\Enums\OnlineBookingState;
 use App\Enums\PaymentStatus;
+use App\Enums\VendorFeature;
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
 use App\Models\Payment;
 use App\Models\Vendor;
+use App\Support\ContactSettings;
 use App\Support\ImageSettings;
+use App\Support\PhoneNumber;
+use App\Support\VendorAnalytics;
+use App\Support\VendorAvailability;
 use App\Support\VueProps;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Str;
 
 class DashboardController extends Controller
 {
@@ -20,45 +28,175 @@ class DashboardController extends Controller
     {
         $vendor = $request->user()->vendor;
 
-        $stats = [
-            'upcoming' => $vendor->bookings()->where('status', BookingStatus::Confirmed)->whereDate('event_date', '>=', today())->count(),
-            'pending' => $vendor->bookings()->where('status', BookingStatus::PendingPayment)->count(),
-            'completed' => $vendor->completed_bookings_count,
-            'open_enquiries' => $vendor->enquiries()->where('status', EnquiryStatus::Open)->count(),
-            'paid_total' => (float) Payment::query()
+        if ($vendor->isAwaitingApproval()) {
+            return $this->setup($request, $vendor);
+        }
+
+        $isPro = $vendor->isPro();
+        $reach = (new VendorAnalytics($vendor))->totals(VendorAnalytics::TEASER_DAYS);
+        $openEnquiries = $vendor->enquiries()->where('status', EnquiryStatus::Open)->count();
+        $boostEnds = $vendor->boosts()->where('ends_at', '>', now())->max('ends_at');
+
+        return view('vendor.dashboard', [
+            'vendor' => $vendor,
+            'props' => VueProps::for([
+                'vendor' => [
+                    'name' => $vendor->name,
+                    'firstName' => Str::of($request->user()->name)->before(' ')->value(),
+                    'plan' => $isPro ? 'pro' : 'basic',
+                    'proUntil' => $vendor->pro_until?->translatedFormat('j M Y'),
+                    'tier' => $vendor->tier->label(),
+                    'publicUrl' => route('vendors.show', $vendor),
+                    'proUrl' => route('vendor.pro.index'),
+                    'recordBookingUrl' => $isPro ? route('vendor.bookings.create') : null,
+                ],
+                'actions' => $this->actions($vendor, $openEnquiries),
+                'reach' => [
+                    ['label' => __('props.vendor_dashboard.views'), 'value' => number_format($reach['profile_views']), 'icon' => '👀'],
+                    ['label' => __('props.vendor_dashboard.whatsapp'), 'value' => number_format($reach['whatsapp_clicks']), 'icon' => '💬'],
+                    ['label' => __('props.vendor_dashboard.phone'), 'value' => number_format($reach['phone_clicks']), 'icon' => '📞'],
+                    ['label' => __('props.vendor_dashboard.tokens'), 'value' => number_format((int) $vendor->boost_tokens), 'icon' => '🚀', 'href' => route('vendor.boost.index')],
+                ],
+                'reachUrl' => route('vendor.pro.index'),
+                'business' => $isPro ? $this->business($vendor, $openEnquiries) : null,
+                'upcoming' => $isPro ? $this->upcoming($vendor) : [],
+                'standing' => [
+                    'tier' => $vendor->tier->label(),
+                    'score' => number_format((float) $vendor->score, 1),
+                    'rating' => $vendor->reviews_count ? number_format((float) $vendor->rating_avg, 1) : null,
+                    'reviews' => $vendor->reviews_count,
+                    'views30' => number_format((int) $vendor->views_30d),
+                    'trending' => $vendor->trending_at !== null,
+                    'boostedUntil' => $boostEnds ? Carbon::parse($boostEnds)->translatedFormat('j M, g:i A') : null,
+                    'pointsUrl' => $isPro ? route('vendor.points.index') : null,
+                ],
+                'locked' => $isPro ? [] : collect([VendorFeature::Calendar, VendorFeature::Bookings, VendorFeature::Enquiries, VendorFeature::Points])
+                    ->map(fn (VendorFeature $feature): array => ['label' => $feature->label(), 'description' => $feature->description()])
+                    ->all(),
+            ]),
+        ]);
+    }
+
+    /**
+     * What needs the vendor now, most pressing first. Only what applies is
+     * listed; a complete profile is simply not mentioned again.
+     *
+     * @return array<int, array{key: string, icon: string, tone: string, title: string, body: string, cta: string, href: string}>
+     */
+    private function actions(Vendor $vendor, int $openEnquiries): array
+    {
+        $isPro = $vendor->isPro();
+        $actions = [];
+        $add = function (string $key, string $icon, string $tone, string $title, string $body, string $cta, string $href) use (&$actions): void {
+            $actions[] = compact('key', 'icon', 'tone', 'title', 'body', 'cta', 'href');
+        };
+
+        if ($isPro && $vendor->pro_until->lessThan(now()->addDays(7))) {
+            $add('pro_expiring', '⏳', 'amber', __('props.vendor_dashboard.pro_expiring_title', ['date' => $vendor->pro_until->translatedFormat('j M')]), __('props.vendor_dashboard.pro_expiring_body'), __('props.vendor_dashboard.pro_expiring_cta'), route('vendor.pro.index'));
+        }
+
+        if ($isPro) {
+            $receipts = Payment::query()->where('status', PaymentStatus::AwaitingVerification)
+                ->whereHas('booking', fn ($query) => $query->whereBelongsTo($vendor))->count();
+
+            if ($receipts) {
+                $add('receipts', '🧾', 'brand', __('props.vendor_dashboard.receipts_title', ['count' => $receipts]), __('props.vendor_dashboard.receipts_body'), __('props.vendor_dashboard.receipts_cta'), route('vendor.bookings.index', ['status' => 'pending_payment']));
+            }
+
+            if ($openEnquiries) {
+                $add('enquiries', '💬', 'brand', __('props.vendor_dashboard.enquiries_title', ['count' => $openEnquiries]), __('props.vendor_dashboard.enquiries_body'), __('props.vendor_dashboard.enquiries_cta'), route('vendor.enquiries.index'));
+            }
+
+            $state = VendorAvailability::for($vendor)->onlineState();
+
+            if ($state === OnlineBookingState::CalendarStale) {
+                $add('calendar', '📅', 'amber', __('props.vendor_dashboard.calendar_title'), __('props.vendor_dashboard.calendar_body'), __('props.vendor_dashboard.calendar_cta'), route('vendor.availability.index'));
+            } elseif (! $state->isOpen() && $state !== OnlineBookingState::GloballyOff) {
+                $add('online', '🗓️', 'muted', __('props.vendor_dashboard.online_title'), $state->label(), __('props.vendor_dashboard.online_cta'), route('vendor.availability.index', ['tab' => 'tempahan']));
+            }
+        } elseif ($openEnquiries) {
+            $add('enquiries_locked', '🔒', 'gold', __('props.vendor_dashboard.enquiries_locked_title', ['count' => $openEnquiries]), __('props.vendor_dashboard.enquiries_locked_body'), __('props.vendor_dashboard.upgrade_cta'), route('vendor.enquiries.index'));
+        }
+
+        foreach ($this->onboarding($vendor) as $step) {
+            if (! $step['done']) {
+                $add('setup_'.$step['key'], '✨', 'muted', $step['label'], $step['why'], $step['action'], $step['href']);
+            }
+        }
+
+        if ($vendor->boost_tokens > 0 && ! $vendor->boosts()->where('ends_at', '>', now())->exists()) {
+            $add('boost', '🚀', 'gold', __('props.vendor_dashboard.boost_title', ['count' => $vendor->boost_tokens]), __('props.vendor_dashboard.boost_body'), __('props.vendor_dashboard.boost_cta'), route('vendor.boost.index'));
+        }
+
+        return $actions;
+    }
+
+    /**
+     * The Pro business numbers.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private function business(Vendor $vendor, int $openEnquiries): array
+    {
+        return [
+            ['label' => __('props.vendor.majlis_akan_datang'), 'value' => $vendor->bookings()->where('status', BookingStatus::Confirmed)->whereDate('event_date', '>=', today())->count(), 'href' => route('vendor.bookings.index', ['status' => 'confirmed'])],
+            ['label' => __('props.vendor.menunggu_deposit'), 'value' => $vendor->bookings()->where('status', BookingStatus::PendingPayment)->count(), 'href' => route('vendor.bookings.index', ['status' => 'pending_payment'])],
+            ['label' => __('props.vendor.enquiry_baru'), 'value' => $openEnquiries, 'href' => route('vendor.enquiries.index')],
+            ['label' => __('props.vendor.bayaran_diterima'), 'value' => 'RM'.number_format((float) Payment::query()
                 ->where('status', PaymentStatus::Paid)
                 ->whereHas('booking', fn ($query) => $query->whereBelongsTo($vendor))
-                ->sum('amount'),
+                ->sum('amount'), 2), 'hint' => __('props.units.weddings_completed', ['count' => $vendor->completed_bookings_count])],
         ];
+    }
 
-        $upcomingBookings = $vendor->bookings()
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    private function upcoming(Vendor $vendor): array
+    {
+        return $vendor->bookings()
             ->with('user')
             ->whereIn('status', [BookingStatus::PendingPayment, BookingStatus::Confirmed])
             ->whereDate('event_date', '>=', today())
             ->orderBy('event_date')
             ->limit(5)
-            ->get();
+            ->get()
+            ->map(fn (Booking $booking): array => [
+                'reference' => $booking->reference,
+                'url' => route('vendor.bookings.show', $booking),
+                'day' => $booking->event_date->format('j'),
+                'month' => $booking->event_date->translatedFormat('M'),
+                'customer' => $booking->user->name,
+                'package_name' => $booking->package_name,
+                'status_label' => $booking->status->label(),
+                'status_tone' => $booking->status->tone(),
+            ])
+            ->values()
+            ->all();
+    }
 
-        return view('vendor.dashboard', [
+    /**
+     * Before approval the dashboard is the whole vendor area: a short guide to
+     * what happens next and one card per missing piece, each saving in place.
+     */
+    private function setup(Request $request, Vendor $vendor, ImageSettings $images = new ImageSettings): View
+    {
+        $steps = collect($this->onboarding($vendor))->keyBy('key');
+        $contact = app(ContactSettings::class);
+        $phone = PhoneNumber::normalise($contact->phone());
+
+        return view('vendor.setup', [
             'vendor' => $vendor,
-            'onboarding' => $this->onboarding($vendor),
-            'props' => VueProps::for([
-                'stats' => [
-                    ['label' => __('props.vendor.majlis_akan_datang'), 'value' => $stats['upcoming'], 'href' => route('vendor.bookings.index', ['status' => 'confirmed'])],
-                    ['label' => __('props.vendor.menunggu_deposit'), 'value' => $stats['pending'], 'href' => route('vendor.bookings.index', ['status' => 'pending_payment'])],
-                    ['label' => __('props.vendor.enquiry_baru'), 'value' => $stats['open_enquiries'], 'href' => route('vendor.enquiries.index')],
-                    ['label' => __('props.vendor.bayaran_diterima'), 'value' => 'RM'.number_format($stats['paid_total'], 2), 'hint' => __('props.units.weddings_completed', ['count' => $stats['completed']])],
-                ],
-                'upcoming' => $upcomingBookings->map(fn (Booking $booking): array => [
-                    'reference' => $booking->reference,
-                    'url' => route('vendor.bookings.show', $booking),
-                    'day' => $booking->event_date->format('j'),
-                    'month' => $booking->event_date->translatedFormat('M'),
-                    'customer' => $booking->user->name,
-                    'package_name' => $booking->package_name,
-                    'status_label' => $booking->status->label(),
-                    'status_tone' => $booking->status->tone(),
-                ])->values(),
+            'requestedStep' => $request->string('langkah')->toString(),
+            'steps' => $steps,
+            'doneCount' => $steps->where('done', true)->count(),
+            'portfolio' => $vendor->portfolioItems()->orderBy('sort_order')->get(),
+            'packages' => $vendor->packages()->orderBy('sort_order')->get(),
+            'imageHint' => $images->uploadHint(),
+            'support' => array_filter([
+                'email' => $contact->email() ?: null,
+                'whatsapp' => $contact->whatsappUrl(__('pages.vendor_setup.help_whatsapp_message', ['name' => $vendor->name])),
+                'phone' => $phone ? ['label' => PhoneNumber::display($phone), 'url' => 'tel:+'.$phone] : null,
             ]),
         ]);
     }
@@ -117,25 +255,6 @@ class DashboardController extends Controller
                 'action' => __('props.vendor_onboarding.pakej_action'),
                 'href' => route('vendor.packages.index'),
                 'done' => $vendor->packages()->exists(),
-            ],
-            [
-                'key' => 'harga',
-                'label' => __('props.vendor.harga_bermula'),
-                'why' => __('props.vendor_onboarding.harga_why'),
-                'specs' => [__('props.vendor_onboarding.harga_spec_1')],
-                'preview' => 'harga',
-                'action' => __('props.vendor_onboarding.harga_action'),
-                'href' => route('vendor.profile.edit'),
-                'done' => (float) $vendor->price_from > 0,
-            ],
-            [
-                'key' => 'kalendar',
-                'label' => __('props.vendor.tarikh_tidak_tersedia'),
-                'why' => __('props.vendor_onboarding.kalendar_why'),
-                'specs' => [__('props.vendor_onboarding.kalendar_spec_1')],
-                'action' => __('props.vendor_onboarding.kalendar_action'),
-                'href' => route('vendor.availability.index'),
-                'done' => $vendor->unavailableDates()->exists(),
             ],
         ];
     }

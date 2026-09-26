@@ -191,9 +191,10 @@
             </div>
         @else
             <h1 class="sr-only">{{ $activeCategory?->name ?? __('pages.dash.semua_vendor') }}</h1>
+
             <ul class="grid grid-cols-2 gap-x-3 gap-y-8 sm:gap-x-6 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
                 @foreach ($vendors as $vendor)
-                    <li><x-vendor-card :vendor="$vendor" comparable /></li>
+                    <li><x-vendor-card :vendor="$vendor" comparable :promoted="(bool) $vendor->boosted" /></li>
                 @endforeach
             </ul>
 

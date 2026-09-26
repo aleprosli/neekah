@@ -13,13 +13,13 @@ use App\Models\VendorUnavailableDate;
 use Database\Seeders\CategorySeeder;
 
 beforeEach(function () {
-    // Booking through the platform is off by default; these cover the flow
-    // itself, which vendors still use and which returns when it is switched on.
-    config(['neekah.bookings_enabled' => true]);
+    // Online booking is a Neekah Pro feature and off site-wide by default;
+    // these vendors take it, so the couple's booking flow is live.
+    enableOnlineBooking();
 
     $this->seed(CategorySeeder::class);
     $this->customer = User::factory()->create();
-    $this->vendor = Vendor::factory()->for(Category::first())->create();
+    $this->vendor = Vendor::factory()->for(Category::first())->takingOnlineBookings()->create();
     $this->package = Package::factory()->for($this->vendor)->create(['name' => 'Premium Package', 'price' => 2500]);
 });
 

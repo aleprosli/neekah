@@ -8,11 +8,17 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-#[Fillable(['vendor_id', 'date', 'reason'])]
+#[Fillable(['vendor_id', 'date', 'reason', 'source', 'external_uid', 'slots'])]
 class VendorUnavailableDate extends Model
 {
     /** @use HasFactory<VendorUnavailableDateFactory> */
     use HasFactory;
+
+    /** Closed by the vendor by hand. */
+    public const SOURCE_MANUAL = 'manual';
+
+    /** Imported from the vendor's Google Calendar; replaced on every import. */
+    public const SOURCE_ICAL = 'ical';
 
     /**
      * @return array<string, string>
@@ -21,6 +27,7 @@ class VendorUnavailableDate extends Model
     {
         return [
             'date' => 'date',
+            'slots' => 'integer',
         ];
     }
 

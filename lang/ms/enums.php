@@ -2,6 +2,39 @@
 
 return [
 
+    'boost_token_reason' => [
+        'welcome' => 'Hadiah selamat datang',
+        'pro_monthly' => 'Token bulanan Pro',
+        'purchase' => 'Pembelian token',
+        'admin' => 'Pelarasan admin',
+        'spend' => 'Boost kategori',
+        'refund' => 'Pemulangan',
+    ],
+
+    'vendor_feature' => [
+        'boost' => 'Boost',
+        'online_booking' => 'Tempahan Online',
+        'packages' => 'Pakej',
+        'portfolio' => 'Portfolio',
+        'calendar' => 'Kalendar & Tempahan Online',
+        'bookings' => 'Tempahan',
+        'enquiries' => 'Enquiry',
+        'reviews' => 'Review',
+        'points' => 'Point & Ranking',
+    ],
+
+    'vendor_feature_desc' => [
+        'boost' => 'Guna token untuk naikkan profil ke atas kategori anda.',
+        'online_booking' => 'Pengantin tempah tarikh dan bayar deposit terus di halaman vendor.',
+        'packages' => 'Urus pakej dan harga yang dipaparkan di halaman awam.',
+        'portfolio' => 'Muat naik dan susun gambar portfolio.',
+        'calendar' => 'Tutup tarikh, terima tempahan online dengan deposit dan sync Google Calendar.',
+        'bookings' => 'Rekod dan urus tempahan pelanggan.',
+        'enquiries' => 'Terima dan balas enquiry daripada pengantin.',
+        'reviews' => 'Lihat, balas dan laporkan review pelanggan.',
+        'points' => 'Lihat point, tahap dan kedudukan ranking.',
+    ],
+
     'announcement_audience' => [
         'everyone' => 'Semua pengguna',
         'customers' => 'Pengantin sahaja',
@@ -86,6 +119,12 @@ return [
     'price_unit' => [
         'package' => 'pakej',
         'pax' => 'pax',
+    ],
+
+    'camera_album_filter' => [
+        'active' => 'Aktif',
+        'reported' => 'Ada laporan',
+        'purged' => 'Tamat',
     ],
 
     'review_filter' => [
@@ -184,4 +223,61 @@ return [
         'custom' => 'Pilih pengguna satu per satu, atau taip alamat emel sendiri.',
     ],
 
+    'vendor_plan' => [
+        'monthly' => 'Bulanan',
+        'yearly' => 'Tahunan',
+    ],
+
+    'subscription_status' => [
+        'pending' => 'Belum dibayar',
+        'paid' => 'Dibayar',
+        'failed' => 'Gagal',
+    ],
+
+    'booking_source' => [
+        'vendor' => 'Direkod vendor',
+        'online' => 'Tempahan online',
+    ],
+
+    'deposit_channel' => [
+        'herepay' => 'Herepay (FPX)',
+        'manual' => 'Pindahan bank',
+    ],
+
+    'cancellation_reason' => [
+        'couple' => 'Dibatalkan pengantin',
+        'vendor' => 'Dibatalkan vendor',
+        'expired' => 'Deposit tidak dibayar',
+    ],
+
+    'deposit_type' => [
+        'percent' => 'Peratus harga pakej',
+        'fixed' => 'Jumlah tetap (RM)',
+    ],
+
+    'day_status' => [
+        'open' => 'Kosong',
+        'full' => 'Penuh',
+        'closed' => 'Ditutup',
+        'weekday_off' => 'Tidak dibuka',
+        'too_soon' => 'Terlalu dekat',
+        'too_far' => 'Belum dibuka',
+        'past' => 'Sudah lepas',
+    ],
+
+    'online_booking_state' => [
+        'open' => 'Aktif: pengantin boleh tempah terus',
+        'globally_off' => 'Tempahan online belum dibuka oleh Neekah',
+        'not_approved' => 'Akaun belum diluluskan',
+        'feature_off' => 'Tempahan online untuk vendor Neekah Pro',
+        'switched_off' => 'Dimatikan oleh anda',
+        'no_packages' => 'Tiada pakej aktif',
+        'no_payment_path' => 'Tiada cara bayar deposit: sambung Herepay atau isi butiran bank',
+        'calendar_stale' => 'Dijeda: sahkan kalendar anda',
+    ],
+
+    'camera_tier' => [
+        'basic' => 'Basic',
+        'pro' => 'Pro',
+    ],
 ];

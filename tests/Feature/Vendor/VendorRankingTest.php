@@ -17,12 +17,12 @@ use App\Models\VendorPoint;
 use Database\Seeders\CategorySeeder;
 
 beforeEach(function () {
-    // Booking through the platform is off by default; these cover the flow
-    // itself, which vendors still use and which returns when it is switched on.
-    config(['neekah.bookings_enabled' => true]);
+    // Online booking is a Neekah Pro feature and off site-wide by default;
+    // these vendors take it, so the couple's booking flow is live.
+    enableOnlineBooking();
 
     $this->seed(CategorySeeder::class);
-    $this->vendor = Vendor::factory()->for(Category::first())->create();
+    $this->vendor = Vendor::factory()->for(Category::first())->takingOnlineBookings()->create();
     $this->customer = User::factory()->create();
     $this->recalculate = app(RecalculateVendorStats::class);
 });
@@ -34,8 +34,10 @@ it('awards the kertas kerja points across a full booking lifecycle', function ()
         ->post(route('vendors.bookings.store', $this->vendor), ['package_id' => $package->id, 'event_date' => now()->addMonths(3)->toDateString()])
         ->assertRedirect();
 
+    // An online booking only holds its date until the deposit is paid: a
+    // hold that lapses must not have earned anything.
     $booking = Booking::sole();
-    expect($this->vendor->fresh()->points_total)->toBe(PointReason::PlatformBooking->points());
+    expect($this->vendor->fresh()->points_total)->toBe(0);
 
     $this->actingAs($this->customer)->post(route('bookings.payments.store', $booking), [
         'amount' => 2500,

@@ -34,6 +34,8 @@ return [
         'password_confirm' => 'Confirm your password',
         'email' => 'Email',
         'password' => 'Password',
+        'access_code' => 'Access code',
+        'access_code_help' => 'This site is open to the internal team only for now.',
     ],
 
     'links' => [

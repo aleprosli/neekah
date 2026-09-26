@@ -48,6 +48,32 @@ return [
         'measurement_id' => env('GOOGLE_ANALYTICS_ID'),
     ],
 
+    // Neekah Pro checkout. Empty keys leave the checkout switched off.
+    // Payment links for Neekah Pro. UAT is https://uat.herepay.org, production
+    // https://app.herepay.org. The secret key authenticates link creation; the
+    // private key verifies the checksum on each callback. Admin → Tetapan →
+    // Gateway bayaran switches it on, and refuses to while either is missing.
+    'herepay' => [
+        'base_url' => env('HEREPAY_BASE_URL'),
+        'secret_key' => env('HEREPAY_SECRET_KEY'),
+        'private_key' => env('HEREPAY_PRIVATE_KEY'),
+        // Where a vendor opens their own merchant account, and the guide to
+        // their API keys, both linked from the online booking setup.
+        'register_url' => env('HEREPAY_REGISTER_URL', 'https://app.herepay.org/register'),
+        'keys_guide_url' => env('HEREPAY_KEYS_GUIDE_URL', 'https://herepay.readme.io/reference/how-to-get-your-api-key'),
+    ],
+
+    // Optional. When set, Kamera Majlis strips the metadata (a phone's GPS
+    // location included) from guests' videos before keeping them.
+    'cloudflare' => [
+        'zone_id' => env('CLOUDFLARE_ZONE_ID'),
+        'api_token' => env('CLOUDFLARE_PURGE_TOKEN'),
+    ],
+
+    'ffmpeg' => [
+        'path' => env('FFMPEG_BINARY'),
+    ],
+
     'turnstile' => [
         'site_key' => env('TURNSTILE_SITE_KEY'),
         'secret_key' => env('TURNSTILE_SECRET_KEY'),

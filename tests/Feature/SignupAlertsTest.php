@@ -29,6 +29,7 @@ function registerVendor(): void
         'business_name' => 'ABC Wedding Photography',
         'category_id' => Category::first()->id,
         'city' => 'Alor Setar',
+        'district' => 'Kota Setar',
         'state' => 'Kedah',
         'name' => 'Ahmad Bakri',
         'phone' => '012-345 6789',

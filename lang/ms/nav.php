@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'pro_locked' => 'Dikunci, perlu Neekah Pro',
 
     'find_vendors' => 'Cari Vendor',
     'how_it_works' => 'Cara Ia Berfungsi',
@@ -28,4 +29,5 @@ return [
     'language' => 'Bahasa',
 
     'switch_to' => 'Tukar ke :language',
+    'close_menu' => 'Tutup menu',
 ];

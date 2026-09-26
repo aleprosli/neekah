@@ -4,6 +4,7 @@
     $pendingVendors = \App\Models\Vendor::where('status', \App\Enums\VendorStatus::Pending)->count();
     $openViolations = \App\Models\VendorViolation::where('status', \App\Enums\ViolationStatus::Open)->count();
     $reportedReviews = \App\Models\Review::whereNotNull('reported_at')->whereNull('hidden_at')->count();
+    $reportedCamera = \App\Models\CameraMedia::whereNotNull('reported_at')->count();
     $item = fn (string $label, string $icon, string $route, string $pattern, ?int $badge = null): array => [
         'label' => $label, 'icon' => $icon, 'href' => route($route), 'active' => App\Support\Locales::routeIs($pattern), 'badge' => $badge ?: null,
     ];
@@ -18,6 +19,7 @@
             $item(__('pages.sidebar_admin.tempahan'), 'receipt', 'admin.bookings.index', 'admin.bookings.*'),
             $item(__('pages.sidebar_admin.kewangan'), 'wallet', 'admin.transactions.index', 'admin.transactions.*'),
             $item(__('pages.sidebar_admin.review'), 'star', 'admin.reviews.index', 'admin.reviews.*', $reportedReviews),
+            $item(__('pages.sidebar_admin.kamera'), 'camera', 'admin.camera.index', 'admin.camera.*', $reportedCamera),
             $item(__('pages.sidebar_admin.laporan'), 'alert', 'admin.violations.index', 'admin.violations.*', $openViolations),
         ]],
         ['label' => __('pages.sidebar_admin.pengguna'), 'items' => [

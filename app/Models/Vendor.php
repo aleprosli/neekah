@@ -5,12 +5,14 @@ namespace App\Models;
 use App\Actions\StoreOptimizedImage;
 use App\Enums\BookingStatus;
 use App\Enums\PriceUnit;
+use App\Enums\VendorFeature;
 use App\Enums\VendorStatus;
 use App\Enums\VendorTier;
 use App\Support\ContentVersion;
 use App\Support\PhoneNumber;
 use App\Support\SocialLinks;
 use App\Support\States;
+use App\Support\VendorAvailability;
 use Database\Factories\VendorFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Scope;
@@ -20,14 +22,17 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 
 #[Fillable([
-    'user_id', 'category_id', 'name', 'slug', 'tagline', 'description', 'city', 'state', 'service_states',
+    'user_id', 'category_id', 'name', 'slug', 'tagline', 'description', 'city', 'district', 'state', 'service_states',
     'phone', 'whatsapp', 'social_links', 'price_from', 'price_unit', 'cover_image', 'logo', 'cover_tone',
     'status', 'tier', 'rating_avg', 'reviews_count', 'completed_bookings_count',
     'response_rate', 'completion_rate', 'score', 'points_total', 'tier_locked', 'penalty_points', 'violations_count', 'approved_at',
+    'pro_until', 'views_30d', 'trending_at',
 ])]
 class Vendor extends Model
 {
@@ -50,6 +55,10 @@ class Vendor extends Model
             'score' => 'decimal:2',
             'tier_locked' => 'boolean',
             'approved_at' => 'datetime',
+            'pro_until' => 'datetime',
+            'views_30d' => 'integer',
+            'trending_at' => 'datetime',
+            'boost_tokens' => 'integer',
         ];
     }
 
@@ -76,6 +85,16 @@ class Vendor extends Model
      *
      * @return BelongsToMany<Category, $this>
      */
+    public function boosts(): HasMany
+    {
+        return $this->hasMany(VendorBoost::class);
+    }
+
+    public function boostEntries(): HasMany
+    {
+        return $this->hasMany(VendorBoostEntry::class);
+    }
+
     public function categories(): BelongsToMany
     {
         return $this->belongsToMany(Category::class)->orderBy('sort_order')->orderBy('name');
@@ -159,6 +178,20 @@ class Vendor extends Model
         return $this->hasMany(PortfolioItem::class)->orderBy('sort_order');
     }
 
+    public function bookingSettings(): HasOne
+    {
+        return $this->hasOne(VendorBookingSetting::class);
+    }
+
+    /**
+     * The saved settings, or an unsaved row with the defaults, so a vendor who
+     * never opened the page reads the same as one who kept every default.
+     */
+    public function bookingSettingsOrDefault(): VendorBookingSetting
+    {
+        return $this->bookingSettings ?? $this->bookingSettings()->make();
+    }
+
     public function unavailableDates(): HasMany
     {
         return $this->hasMany(VendorUnavailableDate::class);
@@ -198,6 +231,58 @@ class Vendor extends Model
     public function points(): HasMany
     {
         return $this->hasMany(VendorPoint::class);
+    }
+
+    public function subscriptions(): HasMany
+    {
+        return $this->hasMany(VendorSubscription::class)->latest();
+    }
+
+    public function dailyStats(): HasMany
+    {
+        return $this->hasMany(VendorDailyStat::class)->orderBy('date');
+    }
+
+    /**
+     * Whether the vendor has a paid Pro plan running. Pro buys online
+     * booking, monthly boost tokens, the analytics and the badge; it never
+     * touches the tier or the score.
+     */
+    public function isPro(): bool
+    {
+        return $this->pro_until !== null && $this->pro_until->isFuture();
+    }
+
+    /**
+     * Whether this vendor can use a part of the vendor area: everything
+     * Basic has, plus the Pro features while Pro is running.
+     */
+    public function hasFeature(VendorFeature $feature): bool
+    {
+        return ! $feature->requiresPro() || $this->isPro();
+    }
+
+    /**
+     * Add one to today's counter: a profile view, or a tap on WhatsApp or the
+     * phone number.
+     */
+    public function recordStat(string $counter): void
+    {
+        if (! in_array($counter, VendorDailyStat::COUNTERS, true)) {
+            return;
+        }
+
+        $date = today()->toDateString();
+
+        // Two visitors on the same second both try to start the day's row; the
+        // loser reads the winner's rather than failing the page.
+        try {
+            $today = $this->dailyStats()->firstOrCreate(['date' => $date]);
+        } catch (QueryException) {
+            $today = $this->dailyStats()->where('date', $date)->firstOrFail();
+        }
+
+        $today->increment($counter);
     }
 
     /**
@@ -326,6 +411,32 @@ class Vendor extends Model
         });
     }
 
+    /**
+     * The "Disyorkan" order with boosted vendors first: those with a boost
+     * running in this category, or in any category when the list is not
+     * narrowed to one. Selects `boosted` so the card can say so.
+     */
+    #[Scope]
+    protected function boostedFirst(Builder $query, ?Category $category = null): Builder
+    {
+        $running = VendorBoost::query()
+            ->selectRaw('1')
+            ->whereColumn('vendor_boosts.vendor_id', 'vendors.id')
+            ->where('vendor_boosts.starts_at', '<=', now())
+            ->where('vendor_boosts.ends_at', '>', now())
+            ->when($category, fn (Builder $boosts, Category $category) => $boosts->where('vendor_boosts.category_id', $category->getKey()));
+
+        return $query->select('vendors.*')
+            ->selectRaw('exists('.$running->toSql().') as boosted', $running->getBindings())
+            ->orderByDesc('boosted');
+    }
+
+    #[Scope]
+    protected function pro(Builder $query): Builder
+    {
+        return $query->where('pro_until', '>', now());
+    }
+
     #[Scope]
     protected function approved(Builder $query): Builder
     {
@@ -357,6 +468,15 @@ class Vendor extends Model
     public function isApproved(): bool
     {
         return $this->status === VendorStatus::Approved;
+    }
+
+    /**
+     * Still waiting for an admin to look at the application. Until then the
+     * vendor area is only the setup guide on the dashboard.
+     */
+    public function isAwaitingApproval(): bool
+    {
+        return $this->status === VendorStatus::Pending;
     }
 
     public function isRecommended(): bool
@@ -434,19 +554,11 @@ class Vendor extends Model
     }
 
     /**
-     * Whether the vendor can take a booking on the given date.
+     * Whether there is room for one more booking that day. The rules live in
+     * VendorAvailability, together with the online-only ones.
      */
     public function isAvailableOn(\DateTimeInterface|string $date): bool
     {
-        $date = Carbon::parse($date)->toDateString();
-
-        if ($this->unavailableDates()->whereDate('date', $date)->exists()) {
-            return false;
-        }
-
-        return ! $this->bookings()
-            ->whereDate('event_date', $date)
-            ->whereIn('status', [BookingStatus::PendingPayment, BookingStatus::Confirmed])
-            ->exists();
+        return VendorAvailability::for($this)->hasCapacityOn(Carbon::parse($date));
     }
 }

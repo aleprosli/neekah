@@ -26,6 +26,9 @@ return [
     ],
 
     'enquiry_received' => [
+        'locked_title' => 'Ada enquiry baharu untuk anda',
+        'locked_body' => 'Seorang pengantin menghantar enquiry. Naik taraf ke Neekah Pro untuk membaca dan membalasnya.',
+        'locked_action' => 'Naik taraf ke Pro',
         'title' => 'Enquiry baharu daripada :name',
         'body' => 'Balas dalam 24 jam untuk mengekalkan response rate anda.',
         'subject' => 'Enquiry baharu daripada :name',
@@ -41,6 +44,11 @@ return [
     ],
 
     'booking_cancelled' => [
+        'note_prefix' => 'Dibatalkan:',
+        'system' => 'Sistem Neekah',
+        'expired_intro' => 'Tempahan :reference dibatalkan kerana deposit tidak dibayar dalam masa yang ditetapkan.',
+        'expired_body' => 'Deposit untuk :package tidak dibayar; tarikh telah dibuka semula.',
+        'vendor_refunds' => 'Deposit yang sudah dibayar akan dipulangkan oleh vendor terus kepada anda, mengikut terma vendor.',
         'title' => 'Booking :reference dibatalkan',
         'body' => ':name membatalkan tempahan :package.',
         'subject' => 'Booking :reference dibatalkan',
@@ -157,4 +165,95 @@ return [
         'expires' => 'Pautan ini sah selama :days hari. Jika anda tidak mengenali jemputan ini, abaikan emel ini.',
     ],
 
+    'pro_activated' => [
+        'title' => 'Neekah Pro aktif',
+        'body' => 'Pro anda aktif sehingga :date.',
+        'subject' => 'Resit Neekah Pro',
+        'thanks' => 'Terima kasih! :vendor kini vendor Pro di Neekah.',
+        'receipt' => 'Rujukan :reference · Pelan :plan · RM:amount',
+        'until' => 'Pro anda aktif sehingga :date.',
+    ],
+
+    'pro_expiring' => [
+        'title' => 'Neekah Pro tamat dalam :days hari',
+        'body' => 'Pro anda akan tamat pada :date.',
+        'subject' => '{1} Neekah Pro tamat esok|[2,*] Neekah Pro tamat dalam :days hari',
+        'renew' => 'Bayar semula untuk kekalkan tempahan online, token boost bulanan, analitik dan lencana Pro. Baki masa anda tidak hilang, tempoh baharu disambung selepasnya.',
+        'action' => 'Sambung Pro',
+    ],
+
+    'booking_held' => [
+        'title' => 'Tempahan :reference menunggu deposit',
+        'subject' => 'Bayar deposit untuk :vendor',
+        'intro' => 'Tarikh anda dengan :vendor sedang dipegang.',
+        'body' => 'Bayar deposit :deposit sebelum :deadline, atau tarikh akan dilepaskan.',
+        'pay_online' => 'Bayar melalui halaman tempahan anda (FPX). Wang terus ke akaun vendor.',
+        'pay_transfer' => 'Pindahkan deposit ke akaun bank vendor (butiran di halaman tempahan), kemudian rekod bayaran dengan resit.',
+    ],
+
+    'deposit_refund' => [
+        'title' => 'Deposit :reference perlu dipulangkan',
+        'subject' => 'Deposit perlu dipulangkan: :reference',
+        'body' => 'Deposit :amount untuk :vendor pada :date diterima selepas tempoh pegang tamat, dan tarikh itu sudah diambil. Vendor akan memulangkan deposit ini terus kepada pengantin.',
+    ],
+
+    'calendar_reminder' => [
+        'weekly_title' => 'Kalendar anda masih terkini?',
+        'weekly_body' => 'Ada tempahan luar minggu ini (WhatsApp, walk-in)? Tutup tarikhnya di Neekah supaya tiada pengantin menempah tarikh yang sama, kemudian sahkan kalendar.',
+        'pausing_title' => 'Tempahan online akan dijeda dalam 2 hari',
+        'pausing_body' => 'Kalendar anda belum disahkan. Sahkan sekarang supaya pengantin masih boleh menempah anda secara online.',
+        'paused_title' => 'Tempahan online dijeda',
+        'paused_body' => 'Kalendar anda tidak disahkan dalam tempoh yang ditetapkan, jadi borang tempahan disembunyikan. Semak kalendar dan sahkan untuk membukanya semula.',
+        'action' => 'Buka kalendar',
+    ],
+
+    'deposit_waiting' => [
+        'title' => 'Resit deposit :reference menunggu anda',
+        'body' => 'Pengantin telah merekod deposit :amount dua hari lalu. Semak akaun anda dan sahkan (atau tolak) supaya tempahan tidak tergantung.',
+    ],
+
+    'ical_failed' => [
+        'title' => 'Google Calendar anda tidak dapat diimport',
+        'body' => 'Beberapa import terakhir gagal (:reason). Tarikh yang sudah diimport kekal ditutup, tetapi tempahan baru di kalendar anda tidak masuk ke Neekah.',
+        'action' => 'Semak tetapan',
+    ],
+
+    'camera_activated' => [
+        'title' => 'Neekah Kenangan :tier sudah aktif',
+        'body' => 'Kongsi pautan atau QR dengan tetamu. Album disimpan sehingga :date.',
+        'receipt' => 'Resit :reference · RM:amount',
+        'action' => 'Buka Neekah Kenangan',
+    ],
+
+    'camera_export' => [
+        'title' => 'ZIP Neekah Kenangan anda sedia',
+        'body' => 'Muat turun semua gambar dan video sebelum album dipadam pada :date.',
+    ],
+
+    'camera_retention' => [
+        'after_event_title' => 'Terima kasih kerana guna Neekah Kenangan',
+        'after_event_body' => 'Tetamu berkongsi :count gambar dan video. Muat turun ZIP sebelum album dipadam pada :date.',
+        'expiring_7_title' => 'Album Neekah Kenangan dipadam dalam 7 hari',
+        'expiring_7_body' => 'Semua gambar dan video akan dipadam pada :date. Muat turun ZIP sekarang.',
+        'expiring_1_title' => 'Album Neekah Kenangan dipadam esok',
+        'expiring_1_body' => 'Ini peringatan terakhir: semua gambar dan video akan dipadam pada :date.',
+        'purged_title' => 'Album Neekah Kenangan telah dipadam',
+        'purged_body' => 'Tempoh simpanan sudah tamat dan semua gambar serta video telah dipadam dari Neekah.',
+        'action' => 'Buka Neekah Kenangan',
+    ],
+
+    'boost_tokens' => [
+        'title' => ':count token boost masuk ke akaun anda',
+        'welcome' => 'Selamat datang ke Neekah! Ini hadiah token boost untuk anda. Baki: :balance token.',
+        'pro_monthly' => 'Token boost bulanan Neekah Pro anda sudah masuk. Baki: :balance token.',
+        'purchase' => 'Terima kasih atas pembelian anda. Baki: :balance token.',
+        'admin' => 'Admin Neekah menambah token boost untuk anda. Baki: :balance token.',
+        'how' => 'Satu token menaikkan profil anda ke atas senarai Disyorkan dalam kategori pilihan anda selama sehari.',
+        'action' => 'Guna token boost',
+    ],
+    'boost_ending' => [
+        'title' => 'Boost :category tamat esok',
+        'body' => 'Boost anda tamat pada :date. Tambah hari jika mahu kekal di atas.',
+        'action' => 'Sambung boost',
+    ],
 ];

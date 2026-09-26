@@ -15,6 +15,7 @@ use App\Support\ContentVersion;
 use App\Support\Seo;
 use App\Support\SeoSettings;
 use App\Support\States;
+use App\Support\VendorAvailability;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -36,6 +37,9 @@ class VendorController extends Controller
     /** Other vendors suggested at the foot of a profile. */
     private const RELATED_VENDORS = 3;
 
+    /** User agents that fetch a page without a person reading it. */
+    private const NOT_A_VISITOR = ['bot', 'crawler', 'spider', 'facebookexternalhit', 'whatsapp', 'preview', 'lighthouse', 'headless'];
+
     /**
      * The orders the list can be put in. A method rather than a constant: the
      * labels are translated, and a constant cannot hold a function call.
@@ -50,6 +54,7 @@ class VendorController extends Controller
             'price_asc' => __('marketplace.sorts.price_asc'),
             'price_desc' => __('marketplace.sorts.price_desc'),
             'reviews' => __('marketplace.sorts.reviews'),
+            'popular' => __('marketplace.sorts.popular'),
         ];
     }
 
@@ -133,6 +138,9 @@ class VendorController extends Controller
      * What is cached is the page's rows and its three counters, not the
      * paginator - see categories() for why nothing here may be an object.
      *
+     * The hour is in the key too: boosts start and end on the hour, so one
+     * that runs out leaves the top without anything having to save.
+     *
      * @param  array<string, mixed>  $filters
      * @return LengthAwarePaginator<int, Vendor>
      */
@@ -142,25 +150,17 @@ class VendorController extends Controller
         $key = md5(serialize([$filters, $page, $request->url()]));
 
         $cached = Cache::remember(
-            'marketplace:list:'.$key.':'.ContentVersion::global(),
+            'marketplace:list:'.$key.':'.now()->format('YmdH').':'.ContentVersion::global(),
             ContentVersion::TTL,
             function () use ($filters, $activeCategory): array {
-                $paginator = Vendor::query()
-                    ->approved()
-                    ->with('category')
-                    ->when($filters['q'], fn (Builder $query, string $keyword) => $query->matching($keyword))
-                    ->when($activeCategory, fn (Builder $query, Category $category) => $query->inCategory($category))
-                    ->when($filters['state'], fn (Builder $query, string $state) => $query->servingState($state))
-                    ->when($filters['min_price'] !== null, fn (Builder $query) => $query->where('price_from', '>=', $filters['min_price']))
-                    ->when($filters['max_price'] !== null, fn (Builder $query) => $query->where('price_from', '<=', $filters['max_price']))
-                    ->when($filters['min_rating'] !== null, fn (Builder $query) => $query->where('rating_avg', '>=', $filters['min_rating']))
-                    ->when($filters['tier'], fn (Builder $query, string $tier) => $query->where('tier', $tier))
+                $paginator = self::filtered($filters, $activeCategory)
                     ->tap(fn (Builder $query) => match ($filters['sort']) {
                         'rating' => $query->orderByDesc('rating_avg')->orderByDesc('reviews_count'),
                         'price_asc' => $query->orderBy('price_from'),
                         'price_desc' => $query->orderByDesc('price_from'),
                         'reviews' => $query->orderByDesc('reviews_count'),
-                        default => $query->orderByDesc('score'),
+                        'popular' => $query->orderByDesc('views_30d'),
+                        default => $query->boostedFirst($activeCategory)->orderByDesc('score'),
                     })
                     ->orderBy('id')
                     ->paginate(self::PER_PAGE);
@@ -179,6 +179,26 @@ class VendorController extends Controller
             $page,
             ['path' => Paginator::resolveCurrentPath(), 'pageName' => 'page'],
         ))->withQueryString();
+    }
+
+    /**
+     * Approved vendors matching the visitor's filters, before any ordering.
+     *
+     * @param  array<string, mixed>  $filters
+     * @return Builder<Vendor>
+     */
+    private static function filtered(array $filters, ?Category $activeCategory): Builder
+    {
+        return Vendor::query()
+            ->approved()
+            ->with('category')
+            ->when($filters['q'], fn (Builder $query, string $keyword) => $query->matching($keyword))
+            ->when($activeCategory, fn (Builder $query, Category $category) => $query->inCategory($category))
+            ->when($filters['state'], fn (Builder $query, string $state) => $query->servingState($state))
+            ->when($filters['min_price'] !== null, fn (Builder $query) => $query->where('price_from', '>=', $filters['min_price']))
+            ->when($filters['max_price'] !== null, fn (Builder $query) => $query->where('price_from', '<=', $filters['max_price']))
+            ->when($filters['min_rating'] !== null, fn (Builder $query) => $query->where('rating_avg', '>=', $filters['min_rating']))
+            ->when($filters['tier'], fn (Builder $query, string $tier) => $query->where('tier', $tier));
     }
 
     /**
@@ -228,6 +248,8 @@ class VendorController extends Controller
 
         $related = $this->related($vendor);
 
+        $this->countView($request, $vendor);
+
         $description = $vendor->tagline ?: Str::of((string) $vendor->description)->squish()->value();
 
         $seo->title(__('seo.marketplace.vendor_title', ['name' => $vendor->name, 'category' => $vendor->category->name, 'city' => $vendor->city]))
@@ -273,7 +295,69 @@ class VendorController extends Controller
             'extraCategories' => $vendor->extraCategories(),
             'related' => $related,
             'defaultEventDate' => $request->user()?->weddings()->latest('event_date')->first()?->event_date->toDateString(),
+            'onlineBooking' => $this->onlineBooking($vendor),
         ]);
+    }
+
+    /**
+     * What the booking form needs when this vendor takes online bookings, or
+     * null to leave the contact card. Worked out on every request and never
+     * cached with the page: it moves with today's date and every booking.
+     *
+     * @return array<string, mixed>|null
+     */
+    private function onlineBooking(Vendor $vendor): ?array
+    {
+        $availability = VendorAvailability::for($vendor);
+
+        if (! $availability->acceptsOnlineBookings()) {
+            return null;
+        }
+
+        $settings = $availability->settings();
+
+        return [
+            'channel' => $availability->paymentChannel(),
+            'terms' => $settings->deposit_terms,
+            'packages' => $vendor->packages->map(fn (Package $package): array => [
+                'id' => $package->id,
+                'name' => $package->name,
+                'price' => (float) $package->price,
+                'deposit' => $settings->depositFor((float) $package->price),
+            ])->values(),
+            'nextOpen' => $availability->nextOpenDays(6),
+            'availabilityUrl' => route('vendors.availability', $vendor),
+        ];
+    }
+
+    /**
+     * One view for the vendor's analytics. Once per visitor per session, so a
+     * couple flicking between photos is one look, not ten; and never the vendor
+     * themselves, an admin, or a crawler.
+     *
+     * Views also order "Paling ramai dilihat", so one address counts once a
+     * day per vendor as well: clearing cookies and reloading does not climb.
+     */
+    private function countView(Request $request, Vendor $vendor): void
+    {
+        $user = $request->user();
+
+        if ($user?->isAdmin() || ($user && $user->getKey() === $vendor->user_id)
+            || Str::contains(Str::lower((string) $request->userAgent()), self::NOT_A_VISITOR)) {
+            return;
+        }
+
+        $key = 'vendor-viewed.'.$vendor->getKey();
+
+        if (! $request->hasSession() || $request->session()->has($key)) {
+            return;
+        }
+
+        $request->session()->put($key, true);
+
+        if (Cache::add('vendor-view:'.$vendor->getKey().':'.sha1((string) $request->ip()).':'.today()->toDateString(), true, now()->endOfDay())) {
+            $vendor->recordStat('profile_views');
+        }
     }
 
     /**

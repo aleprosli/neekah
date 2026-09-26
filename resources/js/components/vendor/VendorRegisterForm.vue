@@ -4,8 +4,10 @@
  * a couple's existing account switching to vendor, so only the phone is asked.
  */
 import { computed, ref } from 'vue';
+import UiDistrictSelect from '../ui/UiDistrictSelect.vue';
 import UiField from '../ui/UiField.vue';
 import UiFlagSelect from '../ui/UiFlagSelect.vue';
+import UiPhoneField from '../ui/UiPhoneField.vue';
 import UiSelect from '../ui/UiSelect.vue';
 import UiTurnstile from '../ui/UiTurnstile.vue';
 
@@ -15,9 +17,13 @@ const props = defineProps({
     csrf: { type: String, required: true },
     categories: { type: Array, required: true },
     states: { type: Array, required: true },
+    /** { [negeri]: { label, options: [daerah] } } */
+    districts: { type: Object, required: true },
     old: { type: Object, default: () => ({}) },
     errors: { type: Object, default: () => ({}) },
     turnstileSiteKey: { type: String, default: null },
+    /** { name, label, help } while NEEKAH_ACCESS_CODE closes the site. */
+    accessCode: { type: Object, default: null },
     convertUrl: { type: String, default: null },
     account: { type: Object, default: null },
 });
@@ -27,6 +33,7 @@ const form = ref({
     category_id: '',
     state: '',
     city: '',
+    district: '',
     tagline: '',
     name: '',
     phone: '',
@@ -57,11 +64,14 @@ const categoryOptions = computed(() => props.categories.map((c) => ({ value: c.i
             <UiField v-model="form.business_name" :label="$t('vendor_signup.business_name')" name="business_name" :placeholder="$t('vendor_signup.abc_wedding_photography')" :error="errors.business_name" required />
 
             <div class="grid gap-4 sm:grid-cols-2">
-                <UiSelect v-model="form.category_id" :label="$t('vendor_signup.category')" name="category_id" :options="categoryOptions" :placeholder="$t('vendor_signup.category_placeholder')" :error="errors.category_id" required />
-                <UiFlagSelect v-model="form.state" :label="$t('vendor_signup.state')" name="state" :options="states" :placeholder="$t('vendor_signup.state_placeholder')" :error="errors.state" required />
+                <UiSelect v-model="form.category_id" :label="$t('vendor_signup.category')" name="category_id" :options="categoryOptions" :placeholder="$t('vendor_signup.category_placeholder')" :error="errors.category_id" :help="$t('vendor_signup.category_help')" required />
+                <UiFlagSelect v-model="form.state" :label="$t('vendor_signup.state')" name="state" :options="states" :placeholder="$t('vendor_signup.state_placeholder')" :error="errors.state" :help="$t('vendor_signup.state_help')" required />
             </div>
 
-            <UiField v-model="form.city" :label="$t('vendor_signup.city')" name="city" :placeholder="$t('vendor_signup.alor_setar')" :error="errors.city" required />
+            <div class="grid gap-4 sm:grid-cols-2">
+                <UiDistrictSelect v-model="form.district" :state="form.state" :districts="districts" :error="errors.district" required />
+                <UiField v-model="form.city" :label="$t('vendor_signup.city')" name="city" :placeholder="$t('vendor_signup.alor_setar')" :error="errors.city" :help="$t('vendor_signup.city_help')" required />
+            </div>
             <UiField v-model="form.tagline" :label="$t('vendor_signup.tagline')" name="tagline" :placeholder="$t('vendor_signup.candid_natural_light_wedding_photography')" :error="errors.tagline" :help="$t('vendor_signup.tagline_help')" />
         </section>
 
@@ -69,7 +79,7 @@ const categoryOptions = computed(() => props.categories.map((c) => ({ value: c.i
             <h2 class="font-display text-xl font-semibold">{{ $t('vendor_signup.owner_heading') }}</h2>
             <p class="min-w-0 break-words text-sm text-ink-muted">{{ account.name }} · {{ account.email }}</p>
 
-            <UiField v-model="form.phone" :label="$t('vendor_signup.phone')" name="phone" type="tel" autocomplete="tel" placeholder="012-345 6789" :error="errors.phone" :help="$t('vendor_signup.phone_help')" required />
+            <UiPhoneField v-model="form.phone" :label="$t('vendor_signup.phone')" name="phone" :error="errors.phone" :help="$t('vendor_signup.phone_help')" required />
         </section>
 
         <section v-else class="flex flex-col gap-4 rounded-3xl border border-line bg-surface-raised p-6 sm:p-8">
@@ -77,7 +87,7 @@ const categoryOptions = computed(() => props.categories.map((c) => ({ value: c.i
 
             <div class="grid gap-4 sm:grid-cols-2">
                 <UiField v-model="form.name" :label="$t('vendor_signup.full_name')" name="name" autocomplete="name" :error="errors.name" required />
-                <UiField v-model="form.phone" :label="$t('vendor_signup.nombor_telefon')" name="phone" type="tel" autocomplete="tel" placeholder="012-345 6789" :error="errors.phone" required />
+                <UiPhoneField v-model="form.phone" :label="$t('vendor_signup.nombor_telefon')" name="phone" :error="errors.phone" required />
             </div>
 
             <UiField v-model="form.email" :label="$t('vendor_signup.email')" name="email" type="email" autocomplete="email" :error="errors.email" required />
@@ -86,6 +96,10 @@ const categoryOptions = computed(() => props.categories.map((c) => ({ value: c.i
                 <UiField :label="$t('vendor_signup.password')" name="password" type="password" autocomplete="new-password" :error="errors.password" required />
                 <UiField :label="$t('vendor_signup.confirm_password')" name="password_confirmation" type="password" autocomplete="new-password" required />
             </div>
+        </section>
+
+        <section v-if="accessCode && !account" class="flex flex-col gap-4 rounded-3xl border border-line bg-surface-raised p-6 sm:p-8">
+            <UiField :label="accessCode.label" :name="accessCode.name" type="password" autocomplete="off" :help="accessCode.help" :error="errors[accessCode.name]" required />
         </section>
 
         <div class="flex flex-col items-center gap-3">

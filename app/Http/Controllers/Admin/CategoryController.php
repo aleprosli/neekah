@@ -71,7 +71,7 @@ class CategoryController extends Controller
             $category->update(['image' => $storeImage->handle($request->file('image'), 'categories/'.$category->id)]);
         }
 
-        return $this->redirectOrJson($request, route('admin.categories.index'), 'Kategori ditambah.');
+        return $this->redirectOrJson($request, route('admin.categories.index'), __('flash.admin.category_added'));
     }
 
     public function update(StoreCategoryRequest $request, Category $category, StoreOptimizedImage $storeImage): RedirectResponse|JsonResponse
@@ -90,7 +90,7 @@ class CategoryController extends Controller
 
         $category->update($attributes);
 
-        return $this->redirectOrJson($request, route('admin.categories.index'), 'Kategori dikemas kini.');
+        return $this->redirectOrJson($request, route('admin.categories.index'), __('flash.admin.category_updated'));
     }
 
     public function destroy(Category $category, StoreOptimizedImage $storeImage): RedirectResponse

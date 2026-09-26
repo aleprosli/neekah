@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\VendorBookingSetting;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreUnavailableDateRequest extends FormRequest
@@ -20,6 +21,7 @@ class StoreUnavailableDateRequest extends FormRequest
             'from' => ['required', 'date', 'after_or_equal:today'],
             'to' => ['nullable', 'date', 'after_or_equal:from'],
             'reason' => ['nullable', 'string', 'max:120'],
+            'slots' => ['nullable', 'integer', 'min:1', 'max:'.VendorBookingSetting::MAX_PER_DAY],
         ];
     }
 
@@ -32,6 +34,7 @@ class StoreUnavailableDateRequest extends FormRequest
             'from' => __('fields.tarikh_mula'),
             'to' => __('fields.tarikh_akhir'),
             'reason' => __('fields.sebab'),
+            'slots' => __('fields.slot_ditempah'),
         ];
     }
 }
