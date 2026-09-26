@@ -350,11 +350,13 @@ onMounted(load);
 </script>
 
 <template>
-    <div class="flex min-w-0 flex-col gap-4">
+    <!-- The whole table is one white card — toolbar, chips, rows, pager —
+         so it reads as one thing against the page's ivory. -->
+    <div class="flex min-w-0 flex-col overflow-clip rounded-3xl border border-line bg-surface-raised shadow-sm">
         <!-- One toolbar: search, one button per filter, columns, export. Ten
              filters stay on one line (wrapping on a phone); each opens a
              checklist, so a filter can take several values. -->
-        <div v-if="!isStatic || filters.length || $slots.actions" class="flex min-w-0 flex-col gap-3">
+        <div v-if="!isStatic || filters.length || $slots.actions" class="flex min-w-0 flex-col gap-3 border-b border-line p-4 sm:p-5">
             <div class="flex min-w-0 flex-wrap items-center gap-2">
                 <label v-if="!isStatic" class="relative w-full min-w-0 sm:w-64">
                     <span class="sr-only">{{ searchPlaceholder }}</span>
@@ -422,7 +424,7 @@ onMounted(load);
 
         <!-- What the ticked rows can be done to, shown only once something is
              ticked so it never sits in the way. -->
-        <div v-if="selectable && picked.length" class="sticky top-3 z-20 flex flex-wrap items-center gap-3 rounded-2xl border border-brand-300 bg-brand-50 px-4 py-3 shadow-sm">
+        <div v-if="selectable && picked.length" class="sticky top-0 z-20 flex flex-wrap items-center gap-3 border-b border-brand-200 bg-brand-50 px-4 py-3 sm:px-5">
             <p class="text-sm font-semibold text-brand-900">{{ picked.length }} dipilih</p>
             <div class="flex flex-wrap gap-2">
                 <UiConfirm
@@ -449,7 +451,7 @@ onMounted(load);
             <button type="button" class="ml-auto text-xs font-medium text-ink-muted underline underline-offset-4 hover:text-ink" @click="picked = []">{{ $t('common.clear_selection') }}</button>
         </div>
 
-        <p v-if="failed" class="rounded-xl bg-brand-50 px-4 py-3 text-sm text-brand-800">
+        <p v-if="failed" class="border-b border-line bg-brand-50 px-5 py-3 text-sm text-brand-800">
             Senarai tidak dapat dimuatkan. Muat semula halaman untuk cuba lagi.
         </p>
 
@@ -457,8 +459,8 @@ onMounted(load);
              unreadable on a 390px screen however far it scrolls. -->
         <!-- min-w-0 the whole way down: a flex child sizes to its content by
              default, so one long business name pushes the card past the screen. -->
-        <ul v-if="rows.length" class="flex min-w-0 flex-col gap-3 md:hidden">
-            <li v-for="row in table.getRowModel().rows" :key="`card-${row.id}`" class="min-w-0 rounded-2xl border border-line bg-surface-raised p-4">
+        <ul v-if="rows.length" class="flex min-w-0 flex-col divide-y divide-line md:hidden">
+            <li v-for="row in table.getRowModel().rows" :key="`card-${row.id}`" class="min-w-0 p-4">
                 <label v-if="selectable && row.original.id" class="mb-3 flex items-center gap-2 text-xs font-medium text-ink-muted">
                     <input type="checkbox" class="size-4 accent-brand-600" :checked="picked.includes(row.original.id)" @change="togglePick(row.original.id)">
                     Pilih
@@ -525,14 +527,14 @@ onMounted(load);
             </li>
         </ul>
 
-        <p v-else-if="loading" class="rounded-2xl border border-dashed border-line p-8 text-center text-sm text-ink-muted md:hidden">{{ $t('common.memuatkan') }}…</p>
+        <p v-else-if="loading" class="p-8 text-center text-sm text-ink-muted md:hidden">{{ $t('common.memuatkan') }}…</p>
 
-        <div v-else class="rounded-2xl border border-dashed border-line p-8 text-center md:hidden">
+        <div v-else class="p-8 text-center md:hidden">
             <p class="font-medium">{{ emptyTitle ?? $t('common.tiada_rekod') }}</p>
             <p class="mt-1 text-sm text-ink-muted">{{ emptyMessage ?? $t('common.tiada_untuk_dipaparkan') }}</p>
         </div>
 
-        <div class="hidden min-w-0 overflow-x-auto rounded-2xl border border-line md:block">
+        <div class="hidden min-w-0 overflow-x-auto md:block">
             <table class="w-full min-w-[640px] text-left text-sm">
                 <thead class="border-b border-line bg-surface-muted/60">
                     <tr>
@@ -550,7 +552,7 @@ onMounted(load);
                             v-for="header in table.getHeaderGroups()[0].headers"
                             :key="header.id"
                             scope="col"
-                            :class="['px-4 py-3 font-medium whitespace-nowrap', header.column.columnDef.meta.align === 'right' ? 'text-right' : '']"
+                            :class="['px-4 py-3 text-xs font-semibold tracking-wide whitespace-nowrap text-ink-muted uppercase', header.column.columnDef.meta.align === 'right' ? 'text-right' : '']"
                         >
                             <button
                                 v-if="header.column.columnDef.meta.sortable && !isStatic"
@@ -645,7 +647,7 @@ onMounted(load);
             </table>
         </div>
 
-        <div v-if="!isStatic && meta.total" class="flex flex-wrap items-center justify-between gap-3">
+        <div v-if="!isStatic && meta.total" class="flex flex-wrap items-center justify-between gap-3 border-t border-line px-4 py-3 sm:px-5">
             <div class="flex items-center gap-3 text-xs text-ink-muted">
                 <span v-if="range">{{ $t('common.range_of', range) }}</span>
                 <label class="flex items-center gap-2">
