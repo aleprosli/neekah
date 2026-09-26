@@ -19,7 +19,7 @@ Before planning or editing, find the row whose globs match the file's path and r
 | app/Enums/UserSegment.php, app/Enums/VendorFeature.php | .ai/rules/enums.md |
 | resources/views/errors/** | .ai/rules/errors.md |
 | ** | .ai/rules/general.md |
-| app/Support/Herepay/** | .ai/rules/herepay.md |
+| app/Support/Herepay/**, app/Support/Payments/**, app/Actions/SettlePayment.php, app/Actions/StartPayment.php, app/Actions/RequeryPayment.php, app/Http/Controllers/Payments/**, app/Models/Payment.php, app/Models/PaymentEvent.php | .ai/rules/herepay.md |
 | app/Jobs/**, app/Jobs/ProcessCameraMedia.php | .ai/rules/jobs.md |
 | resources/js/**, resources/js/navigation.js | .ai/rules/js.md |
 | lang/** | .ai/rules/lang.md |

@@ -2,46 +2,27 @@
 
 use App\Actions\ActivateCameraAlbum;
 use App\Enums\CameraTier;
-use App\Enums\SubscriptionStatus;
+use App\Enums\PaymentPurpose;
+use App\Enums\PaymentStatus;
 use App\Models\CameraAlbum;
-use App\Models\CameraPurchase;
+use App\Models\Payment;
 use App\Models\User;
 use App\Models\Wedding;
 use App\Notifications\CameraActivated;
 use App\Support\CameraSettings;
-use App\Support\HerepaySettings;
 use Illuminate\Http\Client\Request as ClientRequest;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\URL;
-use Illuminate\Testing\TestResponse;
 
 beforeEach(function () {
-    config()->set('services.herepay', ['base_url' => 'https://uat.herepay.org', 'secret_key' => 'neekah-secret', 'private_key' => 'neekah-private']);
-    app(HerepaySettings::class)->save(['enabled' => true]);
+    fakeHerepayKeys();
     app(CameraSettings::class)->save(['enabled' => true]);
 
     $this->couple = User::factory()->create();
     $this->wedding = Wedding::factory()->for($this->couple)->create(['event_date' => now()->addMonths(2)->toDateString()]);
-    Http::fake(['uat.herepay.org/*' => Http::response(['status' => 200, 'data' => ['pay_url' => 'https://uat.herepay.org/herepay/pay/CAM']])]);
+    fakeHerepayLink('https://uat.herepay.org/herepay/pay/CAM');
 });
-
-/**
- * Herepay's callback for a camera purchase, checksummed with Neekah's key.
- *
- * @param  array<string, string>  $fields
- */
-function cameraCallback(CameraPurchase $purchase, array $fields = []): TestResponse
-{
-    $fields = ['payment_code' => 'PAY-C', 'status_code' => '00', 'amount' => (string) $purchase->amount, ...$fields];
-    $sorted = $fields;
-    ksort($sorted);
-
-    return test()->post(URL::signedRoute('webhooks.herepay.camera', ['ref' => $purchase->reference], absolute: false), [
-        ...$fields,
-        'checksum' => hash_hmac('sha256', implode(',', $sorted), 'neekah-private'),
-    ]);
-}
 
 it('offers both tiers at the admin prices before anything is bought', function () {
     $props = $this->actingAs($this->couple)->get(route('camera.index'))->assertOk()->viewData('props');
@@ -60,26 +41,30 @@ it('sends the couple to pay on Neekah own Herepay account at todays price', func
         ->post(route('camera.checkout', $this->wedding), ['tier' => 'pro'])
         ->assertRedirect('https://uat.herepay.org/herepay/pay/CAM');
 
-    $purchase = CameraPurchase::sole();
+    $payment = Payment::sole();
 
-    expect($purchase->status)->toBe(SubscriptionStatus::Pending)
-        ->and((float) $purchase->amount)->toBe(99.0);
+    expect($payment->status)->toBe(PaymentStatus::Pending)
+        ->and($payment->purpose)->toBe(PaymentPurpose::Kenangan)
+        ->and($payment->merchant)->toBe('neekah')
+        ->and($payment->detail('tier'))->toBe('pro')
+        ->and((float) $payment->amount)->toBe(99.0);
 
-    Http::assertSent(fn (ClientRequest $request): bool => $request->hasHeader('SecretKey', 'neekah-secret')
-        && $request['redirect_url'] === route('camera.done', ['ref' => $purchase->reference])
-        && str_contains($request['callback_url'], '/webhooks/herepay/kamera'));
+    Http::assertSent(fn (ClientRequest $request): bool => $request->hasHeader('SecretKey', 'test-secret')
+        && $request['redirect_url'] === route('payments.return', $payment)
+        && str_contains($request['callback_url'], '/webhooks/herepay?ref='.$payment->reference));
 });
 
 it('opens the album on a verified callback, once however often it comes', function () {
     Notification::fake();
-    $purchase = CameraPurchase::factory()->for($this->wedding)->create();
+    $payment = Payment::factory()->kenangan()->create(['wedding_id' => $this->wedding->id]);
 
-    cameraCallback($purchase)->assertOk();
-    cameraCallback($purchase)->assertOk();
+    herepayCallback($payment)->assertOk();
+    herepayCallback($payment)->assertOk();
 
     $album = CameraAlbum::sole();
 
-    expect($purchase->fresh()->isPaid())->toBeTrue()
+    expect($payment->fresh()->isPaid())->toBeTrue()
+        ->and($payment->fresh()->camera_album_id)->toBe($album->id)
         ->and($album->tier)->toBe(CameraTier::Basic)
         ->and($album->isActive())->toBeTrue()
         ->and(strlen($album->token))->toBe(12)
@@ -94,11 +79,11 @@ it('charges the difference to upgrade, keeps the QR address, and never sells a t
     $this->actingAs($this->couple)->post(route('camera.checkout', $this->wedding), ['tier' => 'basic', 'album' => $album->id])->assertSessionHasErrors('tier');
     $this->actingAs($this->couple)->post(route('camera.checkout', $this->wedding), ['tier' => 'pro', 'album' => $album->id]);
 
-    $upgrade = CameraPurchase::sole();
+    $upgrade = Payment::sole();
     expect((float) $upgrade->amount)->toBe(70.0)
-        ->and($upgrade->kind)->toBe(CameraPurchase::KIND_UPGRADE);
+        ->and($upgrade->detail('kind'))->toBe('upgrade');
 
-    cameraCallback($upgrade)->assertOk();
+    herepayCallback($upgrade)->assertOk();
 
     expect($album->fresh()->tier)->toBe(CameraTier::Pro)
         ->and($album->fresh()->token)->toBe($album->token)
@@ -114,14 +99,15 @@ it('opens another album for another majlis, with its own name, date and QR', fun
         ->post(route('camera.checkout', $this->wedding), ['tier' => 'basic', 'title' => 'Majlis Bertandang', 'event_date' => $date])
         ->assertRedirect('https://uat.herepay.org/herepay/pay/CAM');
 
-    $purchase = CameraPurchase::sole();
-    expect($purchase->kind)->toBe(CameraPurchase::KIND_NEW)
-        ->and((float) $purchase->amount)->toBe(29.0)
-        ->and($purchase->camera_album_id)->toBeNull();
+    $payment = Payment::sole();
+    expect($payment->detail('kind'))->toBe('new')
+        ->and($payment->detail('album_title'))->toBe('Majlis Bertandang')
+        ->and((float) $payment->amount)->toBe(29.0)
+        ->and($payment->camera_album_id)->toBeNull();
 
-    cameraCallback($purchase)->assertOk();
+    herepayCallback($payment)->assertOk();
 
-    $second = $purchase->fresh()->album;
+    $second = $payment->fresh()->album;
     expect($this->wedding->cameraAlbums()->count())->toBe(2)
         ->and($second->is($first))->toBeFalse()
         ->and($second->title)->toBe('Majlis Bertandang')
@@ -136,14 +122,14 @@ it('will not upgrade an album of another wedding', function () {
         ->post(route('camera.checkout', $this->wedding), ['tier' => 'pro', 'album' => $other->id])
         ->assertSessionHasErrors('album');
 
-    expect(CameraPurchase::count())->toBe(0);
+    expect(Payment::count())->toBe(0);
 });
 
 it('refuses a callback it cannot verify or that underpays', function () {
-    $purchase = CameraPurchase::factory()->for($this->wedding)->pro()->create();
+    $payment = Payment::factory()->kenangan(CameraTier::Pro)->create(['wedding_id' => $this->wedding->id]);
 
-    cameraCallback($purchase, ['amount' => '1.00'])->assertStatus(422);
-    $this->post(URL::signedRoute('webhooks.herepay.camera', ['ref' => $purchase->reference], absolute: false), ['status_code' => '00', 'checksum' => 'forged'])->assertForbidden();
+    herepayCallback($payment, ['amount' => '1.00'])->assertStatus(422);
+    $this->post(URL::signedRoute('payments.webhook', ['gateway' => 'herepay', 'ref' => $payment->reference], absolute: false), ['status_code' => '00', 'checksum' => 'forged'])->assertForbidden();
 
     expect(CameraAlbum::count())->toBe(0);
 });

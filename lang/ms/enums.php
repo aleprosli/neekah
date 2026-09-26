@@ -101,6 +101,32 @@ return [
         'paid' => 'Dibayar',
         'failed' => 'Gagal',
         'refunded' => 'Dipulangkan',
+        'expired' => 'Tamat tempoh',
+    ],
+
+    'payment_purpose' => [
+        'booking' => 'Tempahan',
+        'vendor_pro' => 'Neekah Pro',
+        'boost_tokens' => 'Token boost',
+        'kenangan' => 'Neekah Kenangan',
+    ],
+
+    'payment_merchant' => [
+        'neekah' => 'Akaun Neekah',
+        'vendor' => 'Akaun vendor',
+    ],
+
+    'payment_event' => [
+        'link_created' => 'Link bayaran dicipta',
+        'link_failed' => 'Link bayaran gagal dicipta',
+        'callback' => 'Callback gateway',
+        'return' => 'Pembayar kembali',
+        'requery' => 'Semakan semula',
+        'manual_recorded' => 'Direkod secara manual',
+        'manual_verified' => 'Disahkan',
+        'manual_rejected' => 'Ditolak',
+        'invoice_attached' => 'Kod invois dipautkan',
+        'settled' => 'Diselesaikan',
     ],
 
     'point_reason' => [
@@ -226,12 +252,6 @@ return [
     'vendor_plan' => [
         'monthly' => 'Bulanan',
         'yearly' => 'Tahunan',
-    ],
-
-    'subscription_status' => [
-        'pending' => 'Belum dibayar',
-        'paid' => 'Dibayar',
-        'failed' => 'Gagal',
     ],
 
     'booking_source' => [

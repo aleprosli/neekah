@@ -147,6 +147,7 @@ return [
     'butiran_bank' => 'bank details',
     'herepay_secret_key' => 'Herepay Secret Key',
     'herepay_private_key' => 'Herepay Private Key',
+    'herepay_api_key' => 'Herepay API Key',
     'slot_ditempah' => 'places taken',
     'tempoh_pegang' => 'hold time (hours)',
     'tempoh_sah_kalendar' => 'calendar valid for (days)',

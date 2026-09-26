@@ -32,7 +32,7 @@ it('lets an admin give a vendor Pro for free, and end it early', function () {
 
     $vendor = $this->basic->fresh();
     expect($vendor->isPro())->toBeTrue()
-        ->and((float) $vendor->subscriptions()->sole()->amount)->toBe(0.0);
+        ->and((float) $vendor->proPayments()->sole()->amount)->toBe(0.0);
     $this->actingAs($vendor->user)->get(route('vendor.bookings.index'))->assertOk();
 
     $this->actingAs($this->admin)->delete(route('admin.vendors.pro.end', $vendor))->assertRedirect();

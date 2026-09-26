@@ -18,8 +18,7 @@ use App\Http\Requests\UpdateTurnstileSettingsRequest;
 use App\Support\BoostSettings;
 use App\Support\CameraSettings;
 use App\Support\ContactSettings;
-use App\Support\Herepay\HerepayClient;
-use App\Support\Herepay\PaymentLinkGateway;
+use App\Support\Herepay\HerepayGateway;
 use App\Support\HerepaySettings;
 use App\Support\ImageSettings;
 use App\Support\Locales;
@@ -57,7 +56,7 @@ class SettingController extends Controller
      * than one form (Neekah Pro holds the plan and the gateway that takes its
      * payments); each form still posts on its own and comes back here.
      */
-    public function edit(ContactSettings $contact, SeoSettings $seo, TurnstileSettings $turnstile, TelegramSettings $telegram, ImageSettings $images, PaymentSettings $payments, ProSettings $pro, HerepaySettings $herepay, HerepayClient $herepayClient, OnlineBookingSettings $onlineBooking, CameraSettings $camera, BoostSettings $boost, string $section = self::SECTIONS[0]): View
+    public function edit(ContactSettings $contact, SeoSettings $seo, TurnstileSettings $turnstile, TelegramSettings $telegram, ImageSettings $images, PaymentSettings $payments, ProSettings $pro, HerepaySettings $herepay, HerepayGateway $herepayClient, OnlineBookingSettings $onlineBooking, CameraSettings $camera, BoostSettings $boost, string $section = self::SECTIONS[0]): View
     {
         $pages = [
             'perhubungan' => [$this->contactSection($contact->all())],
@@ -347,7 +346,7 @@ class SettingController extends Controller
      *
      * @return array<string, mixed>
      */
-    private function boostSection(BoostSettings $settings, PaymentLinkGateway $gateway): array
+    private function boostSection(BoostSettings $settings, HerepayGateway $gateway): array
     {
         $values = $settings->all();
         $open = $settings->isEnabled() && $gateway->isConfigured();
@@ -389,7 +388,7 @@ class SettingController extends Controller
         ];
     }
 
-    private function cameraSection(CameraSettings $settings, PaymentLinkGateway $gateway): array
+    private function cameraSection(CameraSettings $settings, HerepayGateway $gateway): array
     {
         $values = $settings->all();
         $open = $settings->isEnabled() && $gateway->isConfigured();
@@ -440,12 +439,14 @@ class SettingController extends Controller
      *
      * @return array<string, mixed>
      */
-    private function herepaySection(HerepaySettings $settings, HerepayClient $client): array
+    private function herepaySection(HerepaySettings $settings, HerepayGateway $client): array
     {
         $missing = $client->missingKeys();
         $live = $client->isConfigured();
-        $keys = collect(HerepayClient::KEYS)
+        $keys = collect(HerepayGateway::KEYS)
             ->map(fn (string $env): string => (in_array($env, $missing, true) ? '✗ ' : '✓ ').'<code>'.e($env).'</code>')
+            // Optional: only asking Herepay about a payment again needs it.
+            ->push(($client->canRequeryNeekah() ? '✓ ' : '– ').'<code>HEREPAY_API_KEY</code> '.e(__('props.admin.herepay_api_key_hint')))
             ->join('<br>');
 
         return [
@@ -477,7 +478,7 @@ class SettingController extends Controller
      *
      * @return array<string, mixed>
      */
-    private function proSection(ProSettings $pro, PaymentLinkGateway $gateway): array
+    private function proSection(ProSettings $pro, HerepayGateway $gateway): array
     {
         $values = $pro->all();
         $open = $pro->isEnabled() && $gateway->isConfigured();

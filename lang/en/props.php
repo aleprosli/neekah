@@ -163,6 +163,7 @@ return [
         'herepay_keys_missing' => 'Keys incomplete',
         'herepay_off' => 'Off',
         'herepay_note' => 'Environment: :environment. Keys in .env (run php artisan config:cache after changing them):',
+        'herepay_api_key_hint' => '(optional: to requery a payment whose callback never came)',
         'pro' => 'Pro',
         'pro_description' => 'The paid vendor plan: online booking, monthly boost tokens, profile analytics and a Pro badge. Tiers and score are unaffected.',
         'pro_submit' => 'Save Pro settings',

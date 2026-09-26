@@ -2,8 +2,10 @@
 
 namespace App\Notifications;
 
-use App\Models\VendorSubscription;
+use App\Enums\VendorPlan;
+use App\Models\Payment;
 use App\Support\NeekahMail;
+use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -16,7 +18,7 @@ class ProActivated extends Notification implements ShouldQueue
 {
     use Queueable;
 
-    public function __construct(public VendorSubscription $subscription) {}
+    public function __construct(public Payment $payment) {}
 
     /**
      * @return array<int, string>
@@ -36,7 +38,7 @@ class ProActivated extends Notification implements ShouldQueue
             'title_key' => 'notifications.pro_activated.title',
             'title_params' => [],
             'body_key' => 'notifications.pro_activated.body',
-            'body_params' => ['date' => $this->subscription->ends_at->translatedFormat('j F Y')],
+            'body_params' => ['date' => $this->endsAt()],
             'url' => route('vendor.pro.index'),
         ];
     }
@@ -45,13 +47,18 @@ class ProActivated extends Notification implements ShouldQueue
     {
         return NeekahMail::to($notifiable)
             ->subject(__('notifications.pro_activated.subject'))
-            ->line(__('notifications.pro_activated.thanks', ['vendor' => $this->subscription->vendor->name]))
+            ->line(__('notifications.pro_activated.thanks', ['vendor' => $this->payment->vendor->name]))
             ->line(__('notifications.pro_activated.receipt', [
-                'reference' => $this->subscription->reference,
-                'plan' => $this->subscription->plan->label(),
-                'amount' => number_format((float) $this->subscription->amount, 2),
+                'reference' => $this->payment->reference,
+                'plan' => VendorPlan::from((string) $this->payment->detail('plan'))->label(),
+                'amount' => number_format((float) $this->payment->amount, 2),
             ]))
-            ->line(__('notifications.pro_activated.until', ['date' => $this->subscription->ends_at->translatedFormat('j F Y')]))
+            ->line(__('notifications.pro_activated.until', ['date' => $this->endsAt()]))
             ->action(__('notifications.actions.open_dashboard'), route('vendor.pro.index'));
+    }
+
+    private function endsAt(): string
+    {
+        return Carbon::parse($this->payment->detail('ends_at'))->translatedFormat('j F Y');
     }
 }

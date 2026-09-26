@@ -5,7 +5,7 @@ use App\Enums\CameraMediaStatus;
 use App\Jobs\PurgeCdnUrls;
 use App\Models\CameraAlbum;
 use App\Models\CameraMedia;
-use App\Models\CameraPurchase;
+use App\Models\Payment;
 use App\Models\User;
 use App\Models\Wedding;
 use App\Notifications\CameraRetentionNotice;
@@ -48,7 +48,7 @@ it('deletes every file of an expired album but keeps the album and its purchase 
         'photos_count' => 1, 'bytes_used' => 11, 'export_paths' => ['camera/x/export/part1.zip'],
     ]);
     $album->update(['export_paths' => ["camera/{$album->id}/export/part1.zip"]]);
-    $purchase = CameraPurchase::factory()->for($album->wedding)->create();
+    $purchase = Payment::factory()->kenangan()->paid()->create(['wedding_id' => $album->wedding_id, 'camera_album_id' => $album->id]);
     $media = CameraMedia::factory()->for($album, 'album')->create(['path' => "camera/{$album->id}/photo.webp"]);
     $disk = Storage::disk('public');
     $disk->put($media->path, 'photo');

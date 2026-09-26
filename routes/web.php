@@ -14,15 +14,13 @@ use App\Http\Controllers\CameraGuestController;
 use App\Http\Controllers\Customer as CustomerArea;
 use App\Http\Controllers\Customer\BookingController;
 use App\Http\Controllers\Customer\PaymentController;
-use App\Http\Controllers\HerepayBookingWebhookController;
-use App\Http\Controllers\HerepayBoostWebhookController;
-use App\Http\Controllers\HerepayCameraWebhookController;
-use App\Http\Controllers\HerepayWebhookController;
 use App\Http\Controllers\InvitationAcceptanceController;
 use App\Http\Controllers\InvitationPreviewController;
 use App\Http\Controllers\LandingController;
 use App\Http\Controllers\NfcCardController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\Payments\ReturnController as PaymentReturnController;
+use App\Http\Controllers\Payments\WebhookController as PaymentWebhookController;
 use App\Http\Controllers\PublicSiteController;
 use App\Http\Controllers\ReportVendorController;
 use App\Http\Controllers\RsvpController;
@@ -35,6 +33,7 @@ use App\Http\Controllers\VendorContactController;
 use App\Http\Controllers\VendorController;
 use App\Http\Controllers\VendorReviewController;
 use App\Support\Locales;
+use App\Support\Payments\PaymentGateways;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -391,8 +390,14 @@ $site = function (): void {
         Route::get('/bookings', [AdminArea\BookingController::class, 'index'])->name('bookings.index');
         Route::get('/bookings/data', [AdminArea\BookingController::class, 'data'])->name('bookings.data');
         Route::get('/bookings/{booking}', [AdminArea\BookingController::class, 'show'])->name('bookings.show');
-        Route::get('/transactions', [AdminArea\TransactionController::class, 'index'])->name('transactions.index');
-        Route::get('/transactions/data', [AdminArea\TransactionController::class, 'data'])->name('transactions.data');
+        // Kewangan: every payment in one ledger, and each with its gateway log.
+        Route::get('/kewangan', [AdminArea\PaymentController::class, 'index'])->name('payments.index');
+        Route::get('/kewangan/data', [AdminArea\PaymentController::class, 'data'])->name('payments.data');
+        Route::get('/kewangan/{payment}', [AdminArea\PaymentController::class, 'show'])->name('payments.show');
+        Route::post('/kewangan/{payment}/semak', [AdminArea\PaymentController::class, 'requery'])->middleware('throttle:20,1')->name('payments.requery');
+        Route::post('/kewangan/{payment}/invois', [AdminArea\PaymentController::class, 'invoice'])->middleware('throttle:20,1')->name('payments.invoice');
+        Route::post('/kewangan/{payment}/dibayar', [AdminArea\PaymentController::class, 'markPaid'])->name('payments.paid');
+        Route::redirect('/transactions', '/admin/kewangan', 301);
         Route::post('/users/{user}/impersonate', [AdminArea\ImpersonationController::class, 'store'])->name('users.impersonate');
         Route::get('/violations', [AdminArea\ViolationController::class, 'index'])->name('violations.index');
         Route::get('/violations/data', [AdminArea\ViolationController::class, 'data'])->name('violations.data');
@@ -425,27 +430,26 @@ foreach (Locales::codes() as $locale) {
         ->group($site);
 }
 
-// Herepay calls this server to server. Once, outside the language sets, and
-// outside CSRF (bootstrap/app.php): the signature is what it is checked by.
-Route::post('/webhooks/herepay', HerepayWebhookController::class)
-    ->middleware('throttle:60,1')
-    ->name('webhooks.herepay');
+// Payment gateways call this server to server, for every kind of payment.
+// Once, outside the language sets, and outside CSRF (bootstrap/app.php): the
+// signed ref and the gateway's checksum are what it is checked by.
+Route::post('/webhooks/{gateway}', PaymentWebhookController::class)
+    ->whereIn('gateway', array_keys(PaymentGateways::DRIVERS))
+    ->middleware('throttle:120,1')
+    ->name('payments.webhook');
 
-// A booking deposit, paid on the vendor's own Herepay account. Its own route,
-// so the route name in the signed callback URL says which kind it is.
-// A Kamera Majlis purchase, on Neekah's own Herepay account.
-Route::post('/webhooks/herepay/kamera', HerepayCameraWebhookController::class)
-    ->middleware('throttle:60,1')
-    ->name('webhooks.herepay.camera');
+// Links made before the payments were unified call back here.
+foreach (['kamera', 'boost', 'tempahan'] as $legacy) {
+    Route::post('/webhooks/herepay/'.$legacy, PaymentWebhookController::class)
+        ->defaults('gateway', 'herepay')
+        ->middleware('throttle:120,1');
+}
 
-// A boost token pack, on Neekah's own Herepay account.
-Route::post('/webhooks/herepay/boost', HerepayBoostWebhookController::class)
-    ->middleware('throttle:60,1')
-    ->name('webhooks.herepay.boost');
-
-Route::post('/webhooks/herepay/tempahan', HerepayBookingWebhookController::class)
-    ->middleware('throttle:60,1')
-    ->name('webhooks.herepay.booking');
+// Where a gateway sends the payer back; its signed answer can settle the
+// payment when the callback is late. Not signed by us: see ReturnController.
+Route::get('/bayaran/{payment}/kembali', PaymentReturnController::class)
+    ->middleware('throttle:30,1')
+    ->name('payments.return');
 
 // One sitemap for the whole site, which lists both languages itself.
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->middleware('locale')->name('sitemap.index');

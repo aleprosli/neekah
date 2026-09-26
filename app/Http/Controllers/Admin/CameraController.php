@@ -7,11 +7,12 @@ use App\Actions\DeleteCameraMedia;
 use App\Actions\PurgeCameraAlbum;
 use App\Enums\CameraAlbumFilter;
 use App\Enums\CameraTier;
-use App\Enums\SubscriptionStatus;
+use App\Enums\PaymentPurpose;
+use App\Enums\PaymentStatus;
 use App\Http\Controllers\Controller;
 use App\Models\CameraAlbum;
 use App\Models\CameraMedia;
-use App\Models\CameraPurchase;
+use App\Models\Payment;
 use App\Models\User;
 use App\Models\Wedding;
 use App\Support\TableFilter;
@@ -67,7 +68,7 @@ class CameraController extends Controller
                     ['label' => __('pages.admin_camera.stat_active'), 'value' => (string) $active->clone()->count()],
                     ['label' => __('pages.admin_camera.stat_media'), 'value' => number_format((int) $active->clone()->sum('photos_count') + (int) $active->clone()->sum('videos_count'))],
                     ['label' => __('pages.admin_camera.stat_storage'), 'value' => Number::fileSize((int) $active->clone()->sum('bytes_used'), 1)],
-                    ['label' => __('pages.admin_camera.stat_revenue'), 'value' => 'RM'.number_format((float) CameraPurchase::where('status', SubscriptionStatus::Paid)->sum('amount'), 2)],
+                    ['label' => __('pages.admin_camera.stat_revenue'), 'value' => 'RM'.number_format((float) Payment::query()->for(PaymentPurpose::Kenangan)->where('status', PaymentStatus::Paid)->sum('amount'), 2)],
                 ],
                 'table' => [
                     'dataUrl' => route('admin.camera.data'),
@@ -101,7 +102,7 @@ class CameraController extends Controller
 
         $albums = $matching->clone()
             ->with(['wedding.user'])
-            ->withSum(['purchases as paid_total' => fn ($query) => $query->where('status', SubscriptionStatus::Paid)], 'amount')
+            ->withSum(['purchases as paid_total' => fn ($query) => $query->where('status', PaymentStatus::Paid)], 'amount')
             ->when($filter, fn ($query) => $filter->apply($query))
             ->orderBy($sort, $direction)
             ->paginate(min($request->integer('per_page', 20), 100));

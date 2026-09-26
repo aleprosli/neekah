@@ -3,9 +3,11 @@
 namespace App\Actions;
 
 use App\Enums\CameraTier;
-use App\Enums\SubscriptionStatus;
+use App\Enums\PaymentPurpose;
+use App\Enums\PaymentStatus;
 use App\Models\CameraAlbum;
-use App\Models\CameraPurchase;
+use App\Models\Payment;
+use App\Models\PaymentEvent;
 use App\Models\User;
 use App\Models\Wedding;
 use App\Notifications\CameraActivated;
@@ -14,84 +16,70 @@ use Carbon\CarbonInterface;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Mark a Neekah Kenangan purchase paid and open its album: a new album for a
- * new purchase (a wedding may hold one per majlis), or a higher tier for the
- * album an upgrade names. The one place that does it, for the Herepay
- * callback and an admin's manual record alike. Safe to call twice: Herepay
- * retries its callback.
+ * What a paid Neekah Kenangan payment buys: a new album (a wedding may hold
+ * one per majlis) or a higher tier for the album an upgrade names.
  *
  * An album only moves up a tier, keeps its token (printed QR cards keep
  * working), and is kept until retention_days after its event.
  */
 class ActivateCameraAlbum
 {
-    public function handle(CameraPurchase $purchase, ?string $gatewayReference = null): CameraPurchase
+    /**
+     * Open the album a paid payment bought: a new one for a new purchase,
+     * or the higher tier for the album an upgrade names. SettlePayment calls
+     * it once, inside its lock.
+     */
+    public function fulfil(Payment $payment): void
     {
-        $activated = DB::transaction(function () use ($purchase, $gatewayReference): bool {
-            $purchase = CameraPurchase::query()->lockForUpdate()->findOrFail($purchase->getKey());
-
-            if ($purchase->isPaid()) {
-                return false;
-            }
-
-            $wedding = Wedding::query()->findOrFail($purchase->wedding_id);
-            $album = $purchase->camera_album_id
-                ? CameraAlbum::query()->lockForUpdate()->where('wedding_id', $wedding->id)->findOrFail($purchase->camera_album_id)
-                : new CameraAlbum([
-                    'wedding_id' => $wedding->id,
-                    'token' => CameraAlbum::freshToken(),
-                    'tier' => $purchase->tier,
-                    'title' => $purchase->album_title,
-                    'event_date' => $purchase->album_event_date,
-                ]);
-
-            if ($purchase->tier->rank() > $album->tier->rank()) {
-                $album->tier = $purchase->tier;
-            }
-
-            $album->activated_at ??= now();
-            $album->purged_at = null;
-            $album->expires_at = self::expiryFor($album->event_date ?? $wedding->event_date);
-            $album->save();
-
-            $purchase->update([
-                'camera_album_id' => $album->id,
-                'status' => SubscriptionStatus::Paid,
-                'gateway_reference' => $gatewayReference ?? $purchase->gateway_reference,
-                'paid_at' => now(),
+        $wedding = Wedding::query()->findOrFail($payment->wedding_id);
+        $tier = CameraTier::from((string) $payment->detail('tier', CameraTier::Basic->value));
+        $album = $payment->camera_album_id
+            ? CameraAlbum::query()->lockForUpdate()->where('wedding_id', $wedding->id)->findOrFail($payment->camera_album_id)
+            : new CameraAlbum([
+                'wedding_id' => $wedding->id,
+                'token' => CameraAlbum::freshToken(),
+                'tier' => $tier,
+                'title' => $payment->detail('album_title'),
+                'event_date' => $payment->detail('album_event_date'),
             ]);
 
-            return true;
-        });
-
-        $purchase->refresh();
-
-        if ($activated) {
-            $purchase->wedding->members->each(fn (User $member) => $member->notify(new CameraActivated($purchase)));
+        if ($tier->rank() > $album->tier->rank()) {
+            $album->tier = $tier;
         }
 
-        return $purchase;
+        $album->activated_at ??= now();
+        $album->purged_at = null;
+        $album->expires_at = self::expiryFor($album->event_date ?? $wedding->event_date);
+        $album->save();
+
+        $payment->update(['camera_album_id' => $album->id]);
+
+        DB::afterCommit(fn () => $wedding->members->each(fn (User $member) => $member->notify(new CameraActivated($payment->fresh()))));
     }
 
     /**
-     * An admin recording a bank transfer or a gift, without Herepay: a new
-     * album, or a higher tier for $album.
+     * An admin recording a bank transfer or a gift, without a gateway: a new
+     * album, or a higher tier for $album. It settles like any other payment.
      */
-    public function recordManually(Wedding $wedding, CameraTier $tier, User $admin, ?float $amount = null, ?string $note = null, ?CameraAlbum $album = null): CameraPurchase
+    public function recordManually(Wedding $wedding, CameraTier $tier, User $admin, ?float $amount = null, ?string $note = null, ?CameraAlbum $album = null): Payment
     {
-        $purchase = $wedding->cameraPurchases()->create([
+        $payment = Payment::query()->create([
+            'purpose' => PaymentPurpose::Kenangan,
+            'wedding_id' => $wedding->id,
             'camera_album_id' => $album?->id,
-            'reference' => CameraPurchase::generateReference(),
-            'tier' => $tier,
-            'kind' => $album ? CameraPurchase::KIND_UPGRADE : CameraPurchase::KIND_NEW,
+            'recorded_by' => $admin->id,
             'amount' => $amount ?? app(CameraSettings::class)->price($tier),
-            'status' => SubscriptionStatus::Pending,
-            'gateway' => CameraPurchase::GATEWAY_MANUAL,
-            'added_by' => $admin->id,
+            'status' => PaymentStatus::Pending,
+            'gateway' => Payment::GATEWAY_MANUAL,
+            'method' => 'manual',
             'note' => $note,
+            'details' => ['tier' => $tier->value, 'kind' => $album ? 'upgrade' : 'new'],
         ]);
 
-        return $this->handle($purchase);
+        PaymentEvent::record($payment, Payment::GATEWAY_MANUAL, PaymentEvent::MANUAL_RECORDED, meta: ['note' => $note]);
+        app(SettlePayment::class)->markPaid($payment);
+
+        return $payment->fresh();
     }
 
     /**

@@ -163,6 +163,7 @@ return [
         'herepay_keys_missing' => 'Kunci belum lengkap',
         'herepay_off' => 'Tidak aktif',
         'herepay_note' => 'Persekitaran: :environment. Kunci dalam .env (jalankan php artisan config:cache selepas mengubahnya):',
+        'herepay_api_key_hint' => '(pilihan: untuk semak semula bayaran yang tiada callback)',
         'pro' => 'Pro',
         'pro_description' => 'Pelan berbayar vendor: tempahan online, token boost bulanan, analitik profil dan lencana Pro. Tier dan skor tidak terjejas.',
         'pro_submit' => 'Simpan tetapan Pro',

@@ -2,22 +2,24 @@
 
 namespace App\Http\Controllers\Vendor;
 
+use App\Actions\StartPayment;
 use App\Actions\StartVendorBoost;
-use App\Enums\SubscriptionStatus;
+use App\Enums\PaymentPurpose;
+use App\Enums\PaymentStatus;
 use App\Http\Controllers\Controller;
-use App\Models\BoostPurchase;
 use App\Models\Category;
+use App\Models\Payment;
 use App\Models\VendorBoost;
 use App\Models\VendorBoostEntry;
 use App\Support\BoostSettings;
-use App\Support\Herepay\BoostPaymentGateway;
+use App\Support\Herepay\HerepayGateway;
 use App\Support\VueProps;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
-use Throwable;
+use RuntimeException;
 
 /**
  * A vendor's boost tokens: the balance, lifting a category, the history,
@@ -28,7 +30,7 @@ class BoostController extends Controller
     /** History lines shown on the page, newest first. */
     public const HISTORY = 30;
 
-    public function index(Request $request, BoostSettings $settings, BoostPaymentGateway $gateway): View
+    public function index(Request $request, BoostSettings $settings, HerepayGateway $gateway): View
     {
         $vendor = $request->user()->vendor;
         $running = $vendor->boosts()->where('ends_at', '>', now())->with('category')->orderBy('ends_at')->get();
@@ -91,55 +93,49 @@ class BoostController extends Controller
         ]));
     }
 
-    public function checkout(Request $request, BoostSettings $settings, BoostPaymentGateway $gateway): RedirectResponse
+    public function checkout(Request $request, BoostSettings $settings, HerepayGateway $gateway, StartPayment $start): RedirectResponse
     {
         abort_unless($settings->isEnabled() && $gateway->isConfigured(), 404);
 
         $packName = $request->validate(['pack' => ['required', Rule::in(BoostSettings::PACKS)]])['pack'];
         $pack = $settings->pack($packName);
-        $vendor = $request->user()->vendor;
 
-        $purchase = BoostPurchase::query()->create([
-            'vendor_id' => $vendor->id,
-            'user_id' => $request->user()->id,
-            'reference' => BoostPurchase::generateReference(),
-            'pack' => $packName,
-            'tokens' => $pack['tokens'],
+        $payment = Payment::query()->create([
+            'purpose' => PaymentPurpose::BoostTokens,
+            'vendor_id' => $request->user()->vendor->id,
+            'recorded_by' => $request->user()->id,
             'amount' => $pack['price'],
-            'status' => SubscriptionStatus::Pending,
-            'gateway' => BoostPurchase::GATEWAY_HEREPAY,
+            'status' => PaymentStatus::Pending,
+            'gateway' => $gateway->name(),
+            'details' => ['pack' => $packName, 'tokens' => $pack['tokens']],
         ]);
 
         try {
-            $url = $gateway->createPaymentLink($purchase, $request->user());
-        } catch (Throwable $exception) {
+            return redirect()->away($start->handle($payment, $request->user()));
+        } catch (RuntimeException $exception) {
             report($exception);
-            $purchase->update(['status' => SubscriptionStatus::Failed]);
 
             return back()->withErrors(['pack' => __('flash.vendor.boost_checkout_failed')]);
         }
-
-        $purchase->update(['payment_url' => $url]);
-
-        return redirect()->away($url);
     }
 
     /**
-     * Where Herepay sends the vendor back. The callback, not this visit,
-     * credits the tokens; this only reports what is known.
+     * Where the vendor lands after paying. The gateway's callback, or its
+     * signed return, credits the tokens; this only reports it.
      */
     public function done(Request $request): View
     {
-        $purchase = BoostPurchase::query()
+        $payment = Payment::query()
+            ->for(PaymentPurpose::BoostTokens)
             ->where('reference', $request->string('ref')->toString())
             ->where('vendor_id', $request->user()->vendor->id)
             ->firstOrFail();
 
         return view('vendor.boost.done', [
-            'purchase' => $purchase,
-            'state' => match ($purchase->status) {
-                SubscriptionStatus::Paid => 'paid',
-                SubscriptionStatus::Failed => 'failed',
+            'payment' => $payment,
+            'state' => match ($payment->status) {
+                PaymentStatus::Paid => 'paid',
+                PaymentStatus::Failed, PaymentStatus::Expired => 'failed',
                 default => 'waiting',
             },
         ]);

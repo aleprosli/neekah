@@ -35,7 +35,7 @@ const STORE_KEY = 'neekah:calendar-return';
 const STEPS = ['deposit', 'rules', 'calendar', 'live'];
 const ERROR_PLACES = {
     kalendar: ['from', 'to', 'reason', 'slots'],
-    deposit: ['herepay_secret_key', 'herepay_private_key', 'manual_instructions'],
+    deposit: ['herepay_secret_key', 'herepay_private_key', 'herepay_api_key', 'manual_instructions'],
     rules: ['deposit_type', 'deposit_value', 'available_weekdays', 'max_per_day', 'min_lead_days', 'max_advance_months', 'deposit_terms'],
     calendar: ['ical_url'],
     live: ['enabled'],
@@ -416,6 +416,11 @@ const stepSummary = computed(() => ({
                                     <label class="flex min-w-0 flex-col gap-1.5">
                                         <span class="text-xs font-medium">{{ $t('calendar.herepay_private') }}</span>
                                         <input type="password" name="herepay_private_key" autocomplete="off" required :class="input">
+                                    </label>
+                                    <label class="flex min-w-0 flex-col gap-1.5 sm:col-span-2">
+                                        <span class="text-xs font-medium">{{ $t('calendar.herepay_api_key') }}</span>
+                                        <input type="password" name="herepay_api_key" autocomplete="off" :class="input">
+                                        <span class="text-xs text-ink-muted">{{ $t('calendar.herepay_api_key_help') }}</span>
                                     </label>
                                 </div>
                                 <span v-if="errors.herepay_secret_key || errors.herepay_private_key" class="-mt-2 text-xs text-brand-700">{{ errors.herepay_secret_key || errors.herepay_private_key }}</span>

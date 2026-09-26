@@ -48,15 +48,18 @@ return [
         'measurement_id' => env('GOOGLE_ANALYTICS_ID'),
     ],
 
-    // Neekah Pro checkout. Empty keys leave the checkout switched off.
-    // Payment links for Neekah Pro. UAT is https://uat.herepay.org, production
-    // https://app.herepay.org. The secret key authenticates link creation; the
-    // private key verifies the checksum on each callback. Admin → Tetapan →
-    // Gateway bayaran switches it on, and refuses to while either is missing.
+    // Neekah's own Herepay account: Pro, boost packs and Neekah Kenangan. UAT
+    // is https://uat.herepay.org, production https://app.herepay.org. The
+    // secret key authenticates link creation; the private key verifies the
+    // checksum on each callback and return. The API key (XApiKey) is only for
+    // asking Herepay about a payment again, and may be left empty. Admin →
+    // Tetapan → Gateway bayaran switches it on, and refuses to while the
+    // first three are missing.
     'herepay' => [
         'base_url' => env('HEREPAY_BASE_URL'),
         'secret_key' => env('HEREPAY_SECRET_KEY'),
         'private_key' => env('HEREPAY_PRIVATE_KEY'),
+        'api_key' => env('HEREPAY_API_KEY'),
         // Where a vendor opens their own merchant account, and the guide to
         // their API keys, both linked from the online booking setup.
         'register_url' => env('HEREPAY_REGISTER_URL', 'https://app.herepay.org/register'),

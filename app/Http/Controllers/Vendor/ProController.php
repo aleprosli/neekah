@@ -2,18 +2,21 @@
 
 namespace App\Http\Controllers\Vendor;
 
-use App\Enums\SubscriptionStatus;
+use App\Actions\StartPayment;
+use App\Enums\PaymentPurpose;
+use App\Enums\PaymentStatus;
 use App\Enums\VendorPlan;
 use App\Http\Controllers\Controller;
-use App\Models\VendorSubscription;
-use App\Support\Herepay\PaymentLinkGateway;
+use App\Models\Payment;
+use App\Support\Herepay\HerepayGateway;
 use App\Support\ProSettings;
 use App\Support\VendorAnalytics;
+use Carbon\Carbon;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
-use Throwable;
+use RuntimeException;
 
 /**
  * Neekah Pro from the vendor's side: what it gives, what it costs, whether it
@@ -21,7 +24,7 @@ use Throwable;
  */
 class ProController extends Controller
 {
-    public function index(Request $request, ProSettings $settings, PaymentLinkGateway $gateway): View
+    public function index(Request $request, ProSettings $settings, HerepayGateway $gateway): View
     {
         $vendor = $request->user()->vendor;
         $analytics = new VendorAnalytics($vendor);
@@ -33,17 +36,25 @@ class ProController extends Controller
                 'price' => $settings->price($plan),
             ]),
             'canCheckout' => $settings->isEnabled() && $gateway->isConfigured() && $vendor->isApproved(),
-            'subscriptions' => $vendor->subscriptions()->where('status', '!=', SubscriptionStatus::Pending)->limit(12)->get(),
+            // Unpaid checkouts are abandoned carts; the history is what happened.
+            'history' => $vendor->proPayments()->whereNot('status', PaymentStatus::Pending)->limit(12)->get()
+                ->map(fn (Payment $payment): array => [
+                    'reference' => $payment->reference,
+                    'plan' => VendorPlan::tryFrom((string) $payment->detail('plan'))?->label(),
+                    'amount' => number_format((float) $payment->amount, 2),
+                    'status' => $payment->status->label(),
+                    'until' => $payment->detail('ends_at') ? Carbon::parse($payment->detail('ends_at'))->translatedFormat('j M Y') : null,
+                ]),
             'totals' => $analytics->totals($vendor->isPro() ? VendorAnalytics::DAYS : VendorAnalytics::TEASER_DAYS),
             'daily' => $vendor->isPro() ? $analytics->dailyViews() : [],
         ]);
     }
 
     /**
-     * Start a purchase and send the vendor to pay. The price is stamped now,
-     * so the amount charged is the one they saw.
+     * Start a purchase and send the vendor to pay, on Neekah's account. The
+     * price is stamped now, so the amount charged is the one they saw.
      */
-    public function checkout(Request $request, ProSettings $settings, PaymentLinkGateway $gateway): RedirectResponse
+    public function checkout(Request $request, ProSettings $settings, HerepayGateway $gateway, StartPayment $start): RedirectResponse
     {
         $validated = $request->validate([
             'plan' => ['required', Rule::enum(VendorPlan::class)],
@@ -54,32 +65,28 @@ class ProController extends Controller
         abort_unless($settings->isEnabled() && $gateway->isConfigured() && $vendor->isApproved(), 404);
 
         $plan = VendorPlan::from($validated['plan']);
-
-        $subscription = $vendor->subscriptions()->create([
-            'reference' => VendorSubscription::generateReference(),
-            'plan' => $plan,
+        $payment = Payment::query()->create([
+            'purpose' => PaymentPurpose::VendorPro,
+            'vendor_id' => $vendor->id,
+            'recorded_by' => $request->user()->id,
             'amount' => $settings->price($plan),
-            'status' => SubscriptionStatus::Pending,
-            'gateway' => VendorSubscription::GATEWAY_HEREPAY,
+            'status' => PaymentStatus::Pending,
+            'gateway' => $gateway->name(),
+            'details' => ['plan' => $plan->value],
         ]);
 
         try {
-            $url = $gateway->createPaymentLink($subscription, $request->user());
-        } catch (Throwable $exception) {
+            return redirect()->away($start->handle($payment, $request->user()));
+        } catch (RuntimeException $exception) {
             report($exception);
-            $subscription->update(['status' => SubscriptionStatus::Failed]);
 
             return back()->withErrors(['plan' => __('flash.vendor.pro_checkout_failed')]);
         }
-
-        $subscription->update(['payment_url' => $url]);
-
-        return redirect()->away($url);
     }
 
     /**
-     * Where the gateway sends the vendor back. The callback, not this page,
-     * is what activates Pro, so this only reports what is known so far.
+     * Where the vendor lands after paying. The gateway's callback, or its
+     * signed return, is what activates Pro; this only reports it.
      */
     public function done(Request $request): View
     {
@@ -87,8 +94,7 @@ class ProController extends Controller
 
         return view('vendor.pro.done', [
             'vendor' => $vendor,
-            'subscription' => $vendor->subscriptions()
-                ->where('gateway', VendorSubscription::GATEWAY_HEREPAY)
+            'payment' => $vendor->proPayments()
                 ->when($request->string('ref')->toString(), fn ($query, string $reference) => $query->where('reference', $reference))
                 ->first(),
         ]);

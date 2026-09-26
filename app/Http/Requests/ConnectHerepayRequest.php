@@ -19,6 +19,8 @@ class ConnectHerepayRequest extends FormRequest
         return [
             'herepay_secret_key' => ['required', 'string', 'min:8', 'max:255'],
             'herepay_private_key' => ['required', 'string', 'min:8', 'max:255'],
+            // Optional: only asking Herepay about a deposit again needs it.
+            'herepay_api_key' => ['nullable', 'string', 'min:8', 'max:255'],
         ];
     }
 

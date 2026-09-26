@@ -6,6 +6,7 @@ use App\Enums\BookingStatus;
 use App\Enums\PaymentStatus;
 use App\Enums\PointReason;
 use App\Models\Payment;
+use App\Models\PaymentEvent;
 use App\Models\User;
 use App\Notifications\BookingConfirmed;
 use App\Notifications\PaymentReceived;
@@ -32,6 +33,7 @@ class VerifyManualPayment
                 'verified_at' => now(),
                 'verified_by' => $verifier->id,
             ]);
+            PaymentEvent::record($payment, Payment::GATEWAY_MANUAL, PaymentEvent::MANUAL_VERIFIED, outcome: 'paid');
 
             $booking = $payment->booking->fresh();
             $vendor = $booking->vendor;
@@ -73,6 +75,7 @@ class VerifyManualPayment
             'verified_at' => now(),
             'verified_by' => $verifier->id,
         ]);
+        PaymentEvent::record($payment, Payment::GATEWAY_MANUAL, PaymentEvent::MANUAL_REJECTED, outcome: 'failed');
 
         $booking = $payment->booking;
 

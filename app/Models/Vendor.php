@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Actions\StoreOptimizedImage;
 use App\Enums\BookingStatus;
+use App\Enums\PaymentPurpose;
 use App\Enums\PriceUnit;
 use App\Enums\VendorFeature;
 use App\Enums\VendorStatus;
@@ -233,9 +234,10 @@ class Vendor extends Model
         return $this->hasMany(VendorPoint::class);
     }
 
-    public function subscriptions(): HasMany
+    /** What this vendor paid Neekah for Pro, newest first. */
+    public function proPayments(): HasMany
     {
-        return $this->hasMany(VendorSubscription::class)->latest();
+        return $this->hasMany(Payment::class)->where('purpose', PaymentPurpose::VendorPro)->latest('id');
     }
 
     public function dailyStats(): HasMany

@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests;
 
-use App\Support\Herepay\HerepayClient;
+use App\Support\Herepay\HerepayGateway;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Validator;
 
@@ -33,7 +33,7 @@ class UpdateHerepaySettingsRequest extends FormRequest
     {
         return [
             function (Validator $validator): void {
-                $missing = app(HerepayClient::class)->missingKeys();
+                $missing = app(HerepayGateway::class)->missingKeys();
 
                 if ($this->boolean('enabled') && $missing !== []) {
                     $validator->errors()->add('enabled', __('validation.custom.herepay_keys_missing', ['keys' => implode(', ', $missing)]));

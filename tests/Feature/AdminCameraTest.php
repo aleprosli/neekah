@@ -2,10 +2,11 @@
 
 use App\Enums\CameraMediaStatus;
 use App\Enums\CameraTier;
-use App\Enums\SubscriptionStatus;
+use App\Enums\PaymentStatus;
 use App\Jobs\SendTelegramAlert;
 use App\Models\CameraAlbum;
 use App\Models\CameraMedia;
+use App\Models\Payment;
 use App\Models\User;
 use App\Models\Wedding;
 use App\Support\TelegramSettings;
@@ -38,10 +39,11 @@ it('records a purchase paid outside Herepay for the couple of an email', functio
     $this->actingAs($this->admin)->post(route('admin.camera.store'), ['email' => $couple->email, 'tier' => 'pro', 'amount' => '0', 'note' => 'Hadiah'])
         ->assertSessionHasNoErrors();
 
-    $purchase = $wedding->cameraPurchases()->sole();
-    expect($purchase->status)->toBe(SubscriptionStatus::Paid)
+    $purchase = $wedding->kenanganPayments()->sole();
+    expect($purchase->status)->toBe(PaymentStatus::Paid)
         ->and((float) $purchase->amount)->toBe(0.0)
-        ->and($purchase->added_by)->toBe($this->admin->id)
+        ->and($purchase->recorded_by)->toBe($this->admin->id)
+        ->and($purchase->gateway)->toBe(Payment::GATEWAY_MANUAL)
         ->and($wedding->cameraAlbums()->sole()->tier)->toBe(CameraTier::Pro);
 
     $this->actingAs($this->admin)->post(route('admin.camera.store'), ['email' => 'tiada@neekah.my', 'tier' => 'basic'])
@@ -101,11 +103,11 @@ it('sets a couple\'s Kamera Majlis from their account page: on for free, down a 
     $album = $wedding->cameraAlbums()->sole();
     expect($camera()['current'])->toBe('pro')
         ->and($camera()['album']['url'])->toBe($album->url())
-        ->and((float) $wedding->cameraPurchases()->sole()->amount)->toBe(0.0);
+        ->and((float) $wedding->kenanganPayments()->sole()->amount)->toBe(0.0);
 
     $set('basic');
     expect($album->fresh()->tier)->toBe(CameraTier::Basic)
-        ->and($wedding->cameraPurchases()->count())->toBe(1);
+        ->and($wedding->kenanganPayments()->count())->toBe(1);
 
     Storage::disk('public')->put("camera/{$album->id}/a.webp", 'photo');
     $set('off');

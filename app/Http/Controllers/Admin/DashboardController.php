@@ -44,7 +44,7 @@ class DashboardController extends Controller
                     ['label' => __('props.admin.pengantin_2'), 'value' => number_format($stats['customers']), 'hint' => __('props.admin.akaun_customer'), 'href' => route('admin.users.index', ['role' => 'customer'])],
                     ['label' => __('props.admin.vendor_2'), 'value' => number_format($stats['vendors']), 'hint' => __('props.units.awaiting_approval', ['count' => $stats['pending_vendors']]), 'href' => route('admin.vendors.index')],
                     ['label' => __('props.admin.tempahan'), 'value' => number_format($stats['bookings']), 'hint' => __('props.units.active_completed', ['active' => $stats['active_bookings'], 'completed' => $stats['completed_bookings']]), 'href' => route('admin.bookings.index')],
-                    ['label' => __('props.admin.komisen_platform'), 'value' => 'RM'.number_format($stats['commission'], 2), 'hint' => __('props.admin.gtv_rm').number_format($stats['gross'], 2), 'href' => route('admin.transactions.index')],
+                    ['label' => __('props.admin.komisen_platform'), 'value' => 'RM'.number_format($stats['commission'], 2), 'hint' => __('props.admin.gtv_rm').number_format($stats['gross'], 2), 'href' => route('admin.payments.index')],
                 ],
                 'alert' => $stats['open_violations'] > 0 ? [
                     'count' => $stats['open_violations'],
