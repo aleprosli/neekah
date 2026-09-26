@@ -179,6 +179,7 @@ class BookingController extends Controller
                             'note' => $payment->note,
                             'recorded_by' => $payment->recorder?->name ?? $booking->user->name,
                             'receipt_url' => $payment->receiptUrl(),
+                            'document_url' => $payment->isPaid() ? route('payments.document', $payment) : null,
                             'status_label' => $payment->status->label(),
                             'status_tone' => $payment->status->tone(),
                             'awaiting' => $payment->isAwaitingVerification(),

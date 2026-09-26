@@ -19,6 +19,7 @@ use App\Http\Controllers\InvitationPreviewController;
 use App\Http\Controllers\LandingController;
 use App\Http\Controllers\NfcCardController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\Payments\PaymentController as PaymentPageController;
 use App\Http\Controllers\Payments\ReturnController as PaymentReturnController;
 use App\Http\Controllers\Payments\WebhookController as PaymentWebhookController;
 use App\Http\Controllers\PublicSiteController;
@@ -232,6 +233,10 @@ $site = function (): void {
         Route::post('/vendor/tukar-akaun', [VendorArea\AccountConversionController::class, 'store']);
         Route::post('/impersonate/stop', [AdminArea\ImpersonationController::class, 'destroy'])->name('impersonate.stop');
 
+        // Shared: every payment's outcome and its receipt, for the payer, whoever it concerns and the admin.
+        Route::get('/bayaran/{payment}', [PaymentPageController::class, 'show'])->name('payments.show');
+        Route::get('/bayaran/{payment}/resit', [PaymentPageController::class, 'document'])->name('payments.document');
+
         // Shared: a vendor opening a booking link is sent on to their own view of it.
         Route::get('/bookings/{booking}', [BookingController::class, 'show'])->name('bookings.show');
 
@@ -396,6 +401,8 @@ $site = function (): void {
         Route::get('/kewangan/{payment}', [AdminArea\PaymentController::class, 'show'])->name('payments.show');
         Route::post('/kewangan/{payment}/semak', [AdminArea\PaymentController::class, 'requery'])->middleware('throttle:20,1')->name('payments.requery');
         Route::post('/kewangan/{payment}/invois', [AdminArea\PaymentController::class, 'invoice'])->middleware('throttle:20,1')->name('payments.invoice');
+        Route::get('/kewangan/{payment}/emel', [AdminArea\PaymentController::class, 'email'])->name('payments.email');
+        Route::post('/kewangan/{payment}/hantar-resit', [AdminArea\PaymentController::class, 'sendReceipt'])->middleware('throttle:10,1')->name('payments.receipt');
         Route::post('/kewangan/{payment}/dibayar', [AdminArea\PaymentController::class, 'markPaid'])->name('payments.paid');
         Route::redirect('/transactions', '/admin/kewangan', 301);
         Route::post('/users/{user}/impersonate', [AdminArea\ImpersonationController::class, 'store'])->name('users.impersonate');
@@ -419,6 +426,7 @@ $site = function (): void {
         Route::put('/settings/tempahan-online', [AdminArea\SettingController::class, 'updateOnlineBooking'])->name('settings.online-booking');
         Route::put('/settings/kamera', [AdminArea\SettingController::class, 'updateCamera'])->name('settings.camera');
         Route::put('/settings/boost', [AdminArea\SettingController::class, 'updateBoost'])->name('settings.boost');
+        Route::put('/settings/invois', [AdminArea\SettingController::class, 'updateInvoice'])->name('settings.invoice');
     });
 
 };

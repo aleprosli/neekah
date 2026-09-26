@@ -17,7 +17,7 @@
             <p class="font-script text-3xl text-brand-600 sm:text-4xl">{{ __('pages.gallery_page.kad_kahwin_digital') }}</p>
             <h1 class="mt-2 font-display text-3xl font-semibold tracking-tight text-balance sm:text-5xl">{{ __('pages.gallery_page.kad_jemputan_yang_terasa_seperti') }}</h1>
             <x-site.ornament name="divider-floral" class="mx-auto mt-5 h-6 w-44" color="var(--color-gold-500)" color2="var(--color-gold-300)" />
-            <p class="mx-auto mt-4 max-w-xl text-ink-muted">{{ __('pages.gallery_page.sampul_yang_dibuka_kertas_bertekstur') }}<span class="font-medium text-ink">{{ __('pages.gallery_page.template_untuk_dipilih', ['count' => $templates->count()]) }}</span>{{ __('pages.gallery_page.percuma') }}</p>
+            <p class="mx-auto mt-4 max-w-xl text-ink-muted">{{ __('pages.gallery_page.sampul_yang_dibuka_kertas_bertekstur') }} <span class="font-medium text-ink">{{ __('pages.gallery_page.template_untuk_dipilih', ['count' => $templates->count()]) }}</span>{{ __('pages.gallery_page.percuma') }}</p>
             <a href="{{ $startUrl }}" class="mt-7 inline-flex rounded-full bg-brand-600 px-7 py-3 text-sm font-semibold text-white shadow-lg shadow-brand-600/20 transition hover:bg-brand-700">
                 {{ auth()->check() ? __('pages.gallery_page.cipta_kad_saya') : __('pages.gallery_page.daftar_cipta_kad_percuma') }}
             </a>

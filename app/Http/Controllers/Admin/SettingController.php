@@ -9,6 +9,7 @@ use App\Http\Requests\UpdateCameraSettingsRequest;
 use App\Http\Requests\UpdateContactSettingsRequest;
 use App\Http\Requests\UpdateHerepaySettingsRequest;
 use App\Http\Requests\UpdateImageSettingsRequest;
+use App\Http\Requests\UpdateInvoiceSettingsRequest;
 use App\Http\Requests\UpdateOnlineBookingSettingsRequest;
 use App\Http\Requests\UpdatePaymentSettingsRequest;
 use App\Http\Requests\UpdateProSettingsRequest;
@@ -21,6 +22,7 @@ use App\Support\ContactSettings;
 use App\Support\Herepay\HerepayGateway;
 use App\Support\HerepaySettings;
 use App\Support\ImageSettings;
+use App\Support\InvoiceSettings;
 use App\Support\Locales;
 use App\Support\OnlineBookingSettings;
 use App\Support\PaymentSettings;
@@ -45,18 +47,18 @@ class SettingController extends Controller
     public const MENU = [
         'laman' => ['perhubungan', 'seo', 'gambar'],
         'sistem' => ['keselamatan', 'telegram'],
-        'wang' => ['pro', 'boost', 'tempahan', 'kamera', 'bayaran'],
+        'wang' => ['pro', 'boost', 'tempahan', 'kamera', 'bayaran', 'invois'],
     ];
 
     /** Every page, in menu order; the first is the default. */
-    public const SECTIONS = ['perhubungan', 'seo', 'gambar', 'keselamatan', 'telegram', 'pro', 'boost', 'tempahan', 'kamera', 'bayaran'];
+    public const SECTIONS = ['perhubungan', 'seo', 'gambar', 'keselamatan', 'telegram', 'pro', 'boost', 'tempahan', 'kamera', 'bayaran', 'invois'];
 
     /**
      * One page at a time, with the menu of the others. A page can hold more
      * than one form (Neekah Pro holds the plan and the gateway that takes its
      * payments); each form still posts on its own and comes back here.
      */
-    public function edit(ContactSettings $contact, SeoSettings $seo, TurnstileSettings $turnstile, TelegramSettings $telegram, ImageSettings $images, PaymentSettings $payments, ProSettings $pro, HerepaySettings $herepay, HerepayGateway $herepayClient, OnlineBookingSettings $onlineBooking, CameraSettings $camera, BoostSettings $boost, string $section = self::SECTIONS[0]): View
+    public function edit(ContactSettings $contact, SeoSettings $seo, TurnstileSettings $turnstile, TelegramSettings $telegram, ImageSettings $images, PaymentSettings $payments, ProSettings $pro, HerepaySettings $herepay, HerepayGateway $herepayClient, OnlineBookingSettings $onlineBooking, CameraSettings $camera, BoostSettings $boost, InvoiceSettings $invoice, string $section = self::SECTIONS[0]): View
     {
         $pages = [
             'perhubungan' => [$this->contactSection($contact->all())],
@@ -69,6 +71,7 @@ class SettingController extends Controller
             'tempahan' => [$this->onlineBookingSection($onlineBooking)],
             'kamera' => [$this->cameraSection($camera, $herepayClient)],
             'bayaran' => [$this->paymentSection($payments)],
+            'invois' => [$this->invoiceSection($invoice->all())],
         ];
 
         abort_unless(isset($pages[$section]), 404);
@@ -116,6 +119,47 @@ class SettingController extends Controller
                 ['name' => 'facebook', 'label' => __('props.admin.facebook'), 'type' => 'url', 'value' => $values['facebook'], 'placeholder' => 'https://facebook.com/neekahmy'],
                 ['name' => 'instagram', 'label' => __('props.admin.instagram'), 'type' => 'url', 'value' => $values['instagram'], 'placeholder' => 'https://instagram.com/neekahmy'],
                 ['name' => 'tiktok', 'label' => __('props.admin.tiktok'), 'type' => 'url', 'value' => $values['tiktok'], 'placeholder' => 'https://tiktok.com/@neekahmy'],
+            ],
+        ];
+    }
+
+    /**
+     * Who Neekah is on its own invoices and receipts. Booking deposits are
+     * issued in the vendor's name instead, since the money is theirs.
+     *
+     * @param  array<string, mixed>  $values
+     * @return array<string, mixed>
+     */
+    private function invoiceSection(array $values): array
+    {
+        $notes = collect(InvoiceSettings::localisedKeys('note'))->map(fn (string $key, string $code): array => [
+            'name' => $key,
+            'label' => __('props.admin.invoice_note_language', ['language' => Locales::label($code)]),
+            'type' => 'textarea',
+            'rows' => 2,
+            'wide' => true,
+            'value' => $values[$key],
+            'placeholder' => __('props.admin.invoice_note_placeholder'),
+            'help' => $code === Locales::DEFAULT ? null : __('props.admin.bahasa_kedua_pilihan'),
+        ])->values()->all();
+
+        return [
+            'id' => 'invois',
+            'icon' => '🧾',
+            'label' => __('props.admin.invoice_label'),
+            'title' => __('props.admin.invoice_title'),
+            'description' => __('props.admin.invoice_description'),
+            'action' => route('admin.settings.invoice'),
+            'submit' => __('props.admin.invoice_submit'),
+            'columns' => true,
+            'fields' => [
+                ['name' => 'company_name', 'label' => __('props.admin.invoice_company_name'), 'value' => $values['company_name'], 'placeholder' => config('app.name')],
+                ['name' => 'registration_no', 'label' => __('props.admin.invoice_registration_no'), 'value' => $values['registration_no'], 'placeholder' => '202601012345 (1234567-X)'],
+                ['name' => 'tax_no', 'label' => __('props.admin.invoice_tax_no'), 'value' => $values['tax_no'], 'help' => __('props.admin.invoice_tax_no_help')],
+                ['name' => 'phone', 'label' => __('props.admin.nombor_telefon'), 'type' => 'tel', 'value' => $values['phone'], 'help' => __('props.admin.invoice_fallback_help')],
+                ['name' => 'email', 'label' => __('props.admin.emel'), 'type' => 'email', 'value' => $values['email'], 'help' => __('props.admin.invoice_fallback_help')],
+                ['name' => 'address', 'label' => __('props.admin.alamat'), 'type' => 'textarea', 'rows' => 2, 'wide' => true, 'value' => $values['address'], 'help' => __('props.admin.invoice_fallback_help')],
+                ...$notes,
             ],
         ];
     }
@@ -543,6 +587,13 @@ class SettingController extends Controller
         $contact->save($request->settings());
 
         return $this->saved(__('flash.admin.contact_saved'));
+    }
+
+    public function updateInvoice(UpdateInvoiceSettingsRequest $request, InvoiceSettings $invoice): RedirectResponse
+    {
+        $invoice->save($request->settings());
+
+        return $this->saved(__('flash.admin.invoice_saved'));
     }
 
     public function updateSeo(UpdateSeoSettingsRequest $request, SeoSettings $seo): RedirectResponse

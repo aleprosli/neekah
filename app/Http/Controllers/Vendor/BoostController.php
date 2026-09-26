@@ -123,7 +123,8 @@ class BoostController extends Controller
      * Where the vendor lands after paying. The gateway's callback, or its
      * signed return, credits the tokens; this only reports it.
      */
-    public function done(Request $request): View
+    /** Links made before the shared payment page still land somewhere useful. */
+    public function done(Request $request): RedirectResponse
     {
         $payment = Payment::query()
             ->for(PaymentPurpose::BoostTokens)
@@ -131,13 +132,6 @@ class BoostController extends Controller
             ->where('vendor_id', $request->user()->vendor->id)
             ->firstOrFail();
 
-        return view('vendor.boost.done', [
-            'payment' => $payment,
-            'state' => match ($payment->status) {
-                PaymentStatus::Paid => 'paid',
-                PaymentStatus::Failed, PaymentStatus::Expired => 'failed',
-                default => 'waiting',
-            },
-        ]);
+        return redirect()->route('payments.show', $payment);
     }
 }

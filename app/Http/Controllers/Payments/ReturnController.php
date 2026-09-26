@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Payments;
 
 use App\Actions\SettlePayment;
-use App\Enums\PaymentPurpose;
 use App\Http\Controllers\Controller;
 use App\Models\Payment;
 use App\Models\PaymentEvent;
@@ -35,11 +34,6 @@ class ReturnController extends Controller
             ], $result->verified, $outcome);
         }
 
-        return redirect()->to(match ($payment->purpose) {
-            PaymentPurpose::Booking => route('bookings.payment.done', $payment->booking),
-            PaymentPurpose::VendorPro => route('vendor.pro.done', ['ref' => $payment->reference]),
-            PaymentPurpose::BoostTokens => route('vendor.boost.done', ['ref' => $payment->reference]),
-            PaymentPurpose::Kenangan => route('camera.done', ['ref' => $payment->reference]),
-        });
+        return redirect()->route('payments.show', $payment);
     }
 }

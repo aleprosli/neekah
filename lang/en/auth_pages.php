@@ -59,6 +59,11 @@ return [
         'subtitle' => 'Enter your email and we will send you a link to set a new password.',
     ],
 
+    'reset' => [
+        'title' => 'Set a new password',
+        'subtitle' => 'Choose a new password for your account.',
+    ],
+
     'phone' => [
         'title' => 'One more step',
         'subtitle' => 'Enter your phone number so vendors can reach you after you book.',

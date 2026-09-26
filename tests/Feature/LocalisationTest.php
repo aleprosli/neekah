@@ -15,6 +15,7 @@ use App\Support\StoredNotification;
 use Database\Seeders\CategorySeeder;
 use Database\Seeders\ChecklistSeeder;
 use Database\Seeders\SiteTemplateSeeder;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\URL;
 
@@ -487,4 +488,19 @@ it('writes a validation error entirely in one language', function () {
     // previous request left behind.
     $this->actingAs($couple)->post('/weddings', [])
         ->assertSessionHasErrors(['title' => 'Medan nama majlis wajib diisi.']);
+});
+
+it('writes every translation as plain text, since {{ }} and $t() print an entity as it is', function () {
+    $withEntities = collect(Locales::codes())
+        ->flatMap(fn (string $locale): array => glob(lang_path($locale.'/*.php')))
+        // Laravel's own pagination views print these two with {!! !!}.
+        ->reject(fn (string $file): bool => basename($file) === 'pagination.php')
+        ->flatMap(fn (string $file): array => collect(Arr::dot(require $file))
+            ->filter(fn (mixed $text): bool => is_string($text) && preg_match('/&(#\d+|#x[0-9a-f]+|[a-z]+);/i', $text) === 1)
+            ->keys()
+            ->map(fn (string $key): string => basename(dirname($file)).'/'.basename($file, '.php').'.'.$key)
+            ->all())
+        ->all();
+
+    expect($withEntities)->toBe([]);
 });

@@ -68,7 +68,7 @@ const note = ref('');
 
             <div v-else class="flex flex-col gap-2 rounded-2xl border border-line bg-surface-raised p-5 text-sm">
                 <h2 class="font-semibold">{{ violation.status }}</h2>
-                <p v-if="violation.action">{{ $t('admin_violation.tindakan') }}<strong>{{ violation.action }}</strong> (pelanggaran ke-{{ violation.offence_number }})</p>
+                <p v-if="violation.action">{{ $t('admin_violation.tindakan') }} <strong>{{ violation.action }}</strong> {{ $t('admin_violation.offence_number', { number: violation.offence_number }) }}</p>
                 <p v-if="violation.admin_note" class="text-ink-muted">{{ violation.admin_note }}</p>
                 <p class="text-xs text-ink-muted">Diselesaikan oleh {{ violation.resolver }} pada {{ violation.resolved_at }}</p>
             </div>

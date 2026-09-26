@@ -13,6 +13,19 @@ use Illuminate\Support\Str;
 class SeedWeddingChecklist
 {
     /**
+     * How a new wedding's budget is spread across categories, by slug, from the
+     * worked example in the kertas kerja. The create-wedding form previews the
+     * same split, so what the couple is shown is what they get.
+     *
+     * @var array<string, float>
+     */
+    public const BUDGET_SHARES = [
+        'catering' => 0.33, 'venue' => 0.17, 'decoration' => 0.13, 'pelamin' => 0.10,
+        'photography' => 0.08, 'videography' => 0.08, 'makeup' => 0.05, 'bridal' => 0.03,
+        'invitation' => 0.01, 'cake' => 0.01, 'emcee' => 0.01,
+    ];
+
+    /**
      * Copy the master checklist (Admin -> Checklist) onto a wedding, and fill a
      * budget row per category on a brand new one.
      *
@@ -128,18 +141,12 @@ class SeedWeddingChecklist
         /** @var Collection<string, int> $categories */
         $categories = Category::active()->pluck('id', 'slug');
 
-        $shares = [
-            'catering' => 0.33, 'venue' => 0.17, 'decoration' => 0.13, 'pelamin' => 0.10,
-            'photography' => 0.08, 'videography' => 0.08, 'makeup' => 0.05, 'bridal' => 0.03,
-            'invitation' => 0.01, 'cake' => 0.01, 'emcee' => 0.01,
-        ];
-
         $budget = (float) $wedding->budget;
 
         foreach ($categories as $slug => $categoryId) {
             $wedding->budgetItems()->create([
                 'category_id' => $categoryId,
-                'planned_amount' => round($budget * ($shares[$slug] ?? 0), 2),
+                'planned_amount' => round($budget * (self::BUDGET_SHARES[$slug] ?? 0), 2),
             ]);
         }
     }

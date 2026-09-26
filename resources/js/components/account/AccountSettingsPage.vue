@@ -27,7 +27,7 @@ const button = 'self-start rounded-full bg-brand-600 px-6 py-2.5 text-sm font-se
 
             <h2 class="font-semibold">{{ $t('account.maklumat_peribadi') }}</h2>
 
-            <p v-if="profileUrl" class="text-sm text-ink-muted">{{ $t('account.ini_maklumat_anda_sebagai_pemilik') }}<a :href="profileUrl" class="font-medium text-brand-600 underline underline-offset-4">{{ $t('account.profil') }}</a>.
+            <p v-if="profileUrl" class="text-sm text-ink-muted">{{ $t('account.ini_maklumat_anda_sebagai_pemilik') }} <a :href="profileUrl" class="font-medium text-brand-600 underline underline-offset-4">{{ $t('account.profil') }}</a>.
             </p>
 
             <UiField :model-value="user.name" :label="$t('account.nama_penuh')" name="name" autocomplete="name" :error="errors.name" required />

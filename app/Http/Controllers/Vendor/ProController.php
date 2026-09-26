@@ -44,6 +44,8 @@ class ProController extends Controller
                     'amount' => number_format((float) $payment->amount, 2),
                     'status' => $payment->status->label(),
                     'until' => $payment->detail('ends_at') ? Carbon::parse($payment->detail('ends_at'))->translatedFormat('j M Y') : null,
+                    'url' => route('payments.show', $payment),
+                    'document_url' => $payment->isPaid() ? route('payments.document', $payment) : null,
                 ]),
             'totals' => $analytics->totals($vendor->isPro() ? VendorAnalytics::DAYS : VendorAnalytics::TEASER_DAYS),
             'daily' => $vendor->isPro() ? $analytics->dailyViews() : [],
@@ -88,15 +90,13 @@ class ProController extends Controller
      * Where the vendor lands after paying. The gateway's callback, or its
      * signed return, is what activates Pro; this only reports it.
      */
-    public function done(Request $request): View
+    /** Links made before the shared payment page still land somewhere useful. */
+    public function done(Request $request): RedirectResponse
     {
-        $vendor = $request->user()->vendor;
+        $payment = $request->user()->vendor->proPayments()
+            ->when($request->string('ref')->toString(), fn ($query, string $reference) => $query->where('reference', $reference))
+            ->first();
 
-        return view('vendor.pro.done', [
-            'vendor' => $vendor,
-            'payment' => $vendor->proPayments()
-                ->when($request->string('ref')->toString(), fn ($query, string $reference) => $query->where('reference', $reference))
-                ->first(),
-        ]);
+        return $payment ? redirect()->route('payments.show', $payment) : redirect()->route('vendor.pro.index');
     }
 }

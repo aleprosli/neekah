@@ -31,6 +31,17 @@ class SocialLinks
     private const BLOCKED_HOSTS = ['wa.me', 'wa.link', 'whatsapp.com', 't.me', 'telegram.me'];
 
     /**
+     * The name a visitor reads beside the platform's icon. Brand names are the
+     * same in every language; only the website needs translating.
+     */
+    public static function label(string $platform): string
+    {
+        return $platform === 'website'
+            ? __('pages.profile.laman_web')
+            : (self::PLATFORMS[$platform]['label'] ?? $platform);
+    }
+
+    /**
      * What the vendor typed, as the link it will be stored and shown as.
      * "@kedai", "kedai" and a pasted address all end up as one https link.
      * Returns null for an empty value and leaves anything unrecognisable as it

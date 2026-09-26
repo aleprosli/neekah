@@ -89,7 +89,7 @@
                 <form method="POST" action="{{ route('weddings.invitations.store', $wedding) }}" class="flex flex-col gap-2">
                     @csrf
                     <label class="sr-only" for="partner-email">{{ __('pages.couple.emel_pasangan') }}</label>
-                    <input id="partner-email" type="email" name="email" value="{{ old('email') }}" placeholder="emel pasangan anda" required class="rounded-xl border border-line bg-surface px-4 py-2.5 text-sm focus:border-brand-400 focus:outline-none">
+                    <input id="partner-email" type="email" name="email" value="{{ old('email') }}" placeholder="{{ __('pages.couple.emel_pasangan_anda') }}" required class="rounded-xl border border-line bg-surface px-4 py-2.5 text-sm focus:border-brand-400 focus:outline-none">
                     <button type="submit" class="rounded-full bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700">{{ __('pages.couple.jemput_pasangan') }}</button>
                 </form>
             @else

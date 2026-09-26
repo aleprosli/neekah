@@ -53,7 +53,7 @@ defineProps({
             <section class="flex min-w-0 flex-col gap-4">
                 <h2 class="font-display text-xl font-semibold">{{ $t('customer.your_vendors') }}</h2>
 
-                <p v-if="!bookings.length" class="rounded-2xl border border-dashed border-line p-6 text-sm text-ink-muted">{{ $t('customer.belum_ada_vendor_ditempah') }}<a :href="findVendorsUrl" class="font-medium text-brand-600 underline underline-offset-4">{{ $t('common.find_vendors') }}</a> untuk mula.
+                <p v-if="!bookings.length" class="rounded-2xl border border-dashed border-line p-6 text-sm text-ink-muted">{{ $t('customer.belum_ada_vendor_ditempah') }} <a :href="findVendorsUrl" class="font-medium text-brand-600 underline underline-offset-4">{{ $t('common.find_vendors') }}</a> {{ $t('customer.untuk_mula') }}
                 </p>
 
                 <ul v-else class="divide-y divide-line rounded-2xl border border-line">

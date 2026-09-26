@@ -46,7 +46,7 @@ it('lists guests and both headcount numbers separately', function () {
         ->assertSee('Kak Ani')
         ->assertSee('Abang Mie')
         ->assertSee('2 orang')
-        ->assertSee('sehingga 5 orang');
+        ->assertSee('Sehingga 5 orang');
 });
 
 it('imports a pasted list and reports the rows it could not use', function () {

@@ -21,6 +21,9 @@ return [
     ],
 
     'admin' => [
+        'invoice_saved' => 'Invoice & receipt details saved.',
+        'receipt_sent' => 'Receipt sent again to :email.',
+        'receipt_not_sent' => 'The receipt could not be sent: this payment has no payer with an email.',
         'pro_ended' => 'Pro for :vendor has ended. The vendor is on Basic now.',
         'boost_tokens_changed' => 'Boost tokens for :vendor updated. Balance: :balance.',
         'boost_saved' => 'Boost settings saved.',

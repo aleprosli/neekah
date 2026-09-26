@@ -12,18 +12,30 @@ use App\Support\ImageSettings;
 use App\Support\Locales;
 use App\Support\VueProps;
 use Illuminate\Contracts\View\View;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 
 class CategoryController extends Controller
 {
     /**
      * The whole list, unpaged: an admin drags categories into the order the
      * marketplace shows them in, which only works while every row is on screen.
+     *
+     * A form that failed validation comes back open, on the category it was
+     * editing, with what the admin typed — the page is one island, so without
+     * `old` a typo in the English name would wipe the whole form.
      */
-    public function index(ImageSettings $images): View
+    public function index(Request $request, ImageSettings $images): View
     {
-        $categories = Category::withCount('vendors')->ordered()->get();
+        $categories = Category::query()
+            ->withCount(['vendors', 'vendors as approved_vendors_count' => fn (Builder $vendors) => $vendors->approved()])
+            ->ordered()
+            ->get();
+
+        $active = $categories->where('is_active', true)->count();
+        $empty = $categories->where('vendors_count', 0)->count();
 
         return view('admin.categories.index', [
             'props' => VueProps::for([
@@ -32,17 +44,25 @@ class CategoryController extends Controller
                 'locales' => collect(Locales::codes())
                     ->map(fn (string $code): array => ['code' => $code, 'label' => Locales::label($code)])
                     ->all(),
-                'imageHint' => $images->uploadHint('512 × 512px, latar lutsinar'),
+                'imageHint' => $images->uploadHint(__('props.admin.category_image_size')),
+                'old' => $request->session()->hasOldInput() ? [
+                    'category_id' => $request->old('category_id'),
+                    'name' => $request->old('name', []),
+                    'icon' => $request->old('icon', ''),
+                    'examples' => $request->old('examples', []),
+                    'is_active' => (bool) $request->old('is_active', true),
+                ] : null,
                 'stats' => [
-                    ['label' => __('props.admin.jumlah_kategori'), 'value' => $categories->count()],
-                    ['label' => __('props.admin.jumlah_vendor'), 'value' => Vendor::count()],
-                    ['label' => __('props.admin.kategori_aktif'), 'value' => $categories->where('is_active', true)->count()],
-                    ['label' => __('props.admin.tidak_aktif'), 'value' => $categories->where('is_active', false)->count()],
+                    ['label' => __('props.admin.jumlah_kategori'), 'value' => $categories->count(), 'hint' => __('props.admin.category_stat_order')],
+                    ['label' => __('props.admin.kategori_aktif'), 'value' => $active, 'hint' => __('props.admin.category_stat_inactive', ['count' => $categories->count() - $active])],
+                    ['label' => __('props.admin.jumlah_vendor'), 'value' => Vendor::count(), 'hint' => __('props.admin.category_stat_approved', ['count' => Vendor::approved()->count()])],
+                    ['label' => __('props.admin.category_stat_empty'), 'value' => $empty, 'hint' => __('props.admin.category_stat_empty_hint')],
                 ],
                 'categories' => $categories
                     ->map(fn (Category $category): array => [
                         'id' => $category->id,
                         'name' => $category->name,
+                        'slug' => $category->slug,
                         // Every language side by side, so an admin can fill in
                         // the one that is missing without leaving the row.
                         'names' => Translatable::all($category, 'name'),
@@ -53,6 +73,9 @@ class CategoryController extends Controller
                         'examples_all' => Translatable::all($category, 'examples'),
                         'is_active' => $category->is_active,
                         'vendors_count' => $category->vendors_count,
+                        'vendors_label' => trans_choice('props.admin.category_vendors', $category->vendors_count, ['count' => $category->vendors_count]),
+                        'approved_label' => __('props.admin.category_vendors_approved', ['count' => $category->approved_vendors_count]),
+                        'marketplace_url' => $category->is_active ? route('vendors.index', ['category' => $category->slug]) : null,
                         'update_url' => route('admin.categories.update', $category),
                         'destroy_url' => route('admin.categories.destroy', $category),
                     ])->values(),
