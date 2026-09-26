@@ -124,7 +124,7 @@ const detailEntries = Object.entries(props.payment.details ?? {});
                     <input type="hidden" name="_token" :value="csrf">
                     <label class="flex flex-col gap-1.5 text-sm">
                         <span class="font-medium">{{ $t('payments.invoice_label') }}</span>
-                        <input name="invoice" required maxlength="100" placeholder="HP-INV-…" class="rounded-xl border border-line bg-surface px-3 py-2 font-mono text-sm">
+                        <input name="invoice" required maxlength="100" placeholder="HP-PAY-…" class="rounded-xl border border-line bg-surface px-3 py-2 font-mono text-sm">
                         <span class="text-xs text-ink-muted">{{ $t('payments.invoice_help') }}</span>
                         <span v-if="errors.invoice" class="text-xs text-brand-700">{{ errors.invoice }}</span>
                     </label>

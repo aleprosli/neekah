@@ -27,8 +27,8 @@ class RequeryPayments extends Command
 
     /**
      * A callback can be lost (our server down, theirs retrying and giving
-     * up). Every pending online payment whose invoice we know is asked about
-     * again until it settles or grows too old; one whose link ran out long
+     * up). Every pending online payment whose gateway code we know is asked about
+     * again (by its payment code) until it settles or grows too old; one whose link ran out long
      * ago is marked expired, so the ledger does not keep it pending forever.
      */
     public function handle(RequeryPayment $requery): int
@@ -38,7 +38,7 @@ class RequeryPayments extends Command
         Payment::query()
             ->where('status', PaymentStatus::Pending)
             ->whereNot('gateway', Payment::GATEWAY_MANUAL)
-            ->whereNotNull('gateway_invoice')
+            ->where(fn ($query) => $query->whereNotNull('gateway_reference')->orWhereNotNull('gateway_invoice'))
             ->where('created_at', '<', now()->subMinutes(self::AFTER_MINUTES))
             ->where('created_at', '>', now()->subDays(self::FOR_DAYS))
             ->where(fn ($query) => $query->whereNull('last_checked_at')->orWhere('last_checked_at', '<', now()->subMinutes(self::EVERY_MINUTES)))

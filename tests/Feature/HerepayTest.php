@@ -158,15 +158,17 @@ it('changes nothing on a return it cannot verify', function () {
         ->and(PaymentEvent::sole()->verified)->toBeFalse();
 });
 
-it('asks Herepay again about a payment whose callback was lost, and settles it', function () {
-    $payment = ($this->payment)(['gateway_invoice' => 'HP-INV-9', 'created_at' => now()->subMinutes(20)]);
-    Http::fake(['uat.herepay.org/api/v1/herepay/transactions/HP-INV-9' => Http::response(['status' => 200, 'data' => [
+it('asks Herepay again, by its payment code, about a payment whose callback was lost, and settles it', function () {
+    // Herepay's lookup finds a payment by payment_code (HP-PAY-…), not by the invoice its docs name.
+    $payment = ($this->payment)(['gateway_reference' => 'HP-PAY-9', 'gateway_invoice' => 'HP-INV-9', 'created_at' => now()->subMinutes(20)]);
+    Http::fake(['uat.herepay.org/api/v1/herepay/transactions/HP-PAY-9' => Http::response(['status' => 200, 'data' => [
         'status' => 'Completed', 'status_code' => '1', 'amount' => '49.00', 'reference_code' => 'HP-INV-9', 'payment_code' => 'PGW-9', 'fpx_transaction_id' => '999',
     ]])]);
 
     Artisan::call('neekah:requery-payments');
 
-    Http::assertSent(fn (ClientRequest $request): bool => $request->hasHeader('SecretKey', 'test-secret') && $request->hasHeader('XApiKey', 'test-api-key'));
+    Http::assertSent(fn (ClientRequest $request): bool => str_ends_with($request->url(), '/transactions/HP-PAY-9')
+        && $request->hasHeader('SecretKey', 'test-secret') && $request->hasHeader('XApiKey', 'test-api-key'));
     expect($payment->fresh()->status)->toBe(PaymentStatus::Paid)
         ->and($payment->fresh()->last_checked_at)->not->toBeNull()
         ->and($this->vendor->fresh()->isPro())->toBeTrue()
