@@ -75,19 +75,19 @@ class PaymentController extends Controller
                     'dataUrl' => route('admin.payments.data'),
                     'columns' => self::columns(),
                     'filters' => [
-                        TableFilter::fromEnum('purpose', PaymentPurpose::cases(), PaymentPurpose::tryFrom($request->string('purpose')->toString())?->value, label: __('pages.payments.filter_purpose')),
-                        TableFilter::fromEnum('status', PaymentStatus::cases(), PaymentStatus::tryFrom($request->string('status')->toString())?->value, label: __('pages.payments.filter_status')),
+                        TableFilter::fromEnum('purpose', PaymentPurpose::cases(), TableFilter::requested($request, 'purpose', array_column(PaymentPurpose::cases(), 'value')), label: __('pages.payments.filter_purpose')),
+                        TableFilter::fromEnum('status', PaymentStatus::cases(), TableFilter::requested($request, 'status', array_column(PaymentStatus::cases(), 'value')), label: __('pages.payments.filter_status')),
                         [
                             'key' => 'gateway',
                             'label' => __('pages.payments.filter_gateway'),
-                            'value' => $request->string('gateway')->toString(),
-                            'options' => collect([...array_keys(PaymentGateways::DRIVERS), Payment::GATEWAY_MANUAL])
+                            'value' => TableFilter::requested($request, 'gateway', self::gateways()),
+                            'options' => collect(self::gateways())
                                 ->map(fn (string $gateway): array => ['value' => $gateway, 'label' => self::gatewayLabel($gateway)])->all(),
                         ],
                         [
                             'key' => 'merchant',
                             'label' => __('pages.payments.filter_merchant'),
-                            'value' => $request->string('merchant')->toString(),
+                            'value' => TableFilter::requested($request, 'merchant', [PaymentMerchant::NEEKAH, PaymentMerchant::VENDOR]),
                             'options' => collect([PaymentMerchant::NEEKAH, PaymentMerchant::VENDOR])
                                 ->map(fn (string $merchant): array => ['value' => $merchant, 'label' => __('enums.payment_merchant.'.$merchant)])->all(),
                         ],
@@ -102,10 +102,10 @@ class PaymentController extends Controller
     {
         $sort = in_array($request->string('sort')->toString(), ['reference', 'amount', 'created_at'], true) ? $request->string('sort')->toString() : 'id';
         $direction = $request->string('direction')->toString() === 'asc' ? 'asc' : 'desc';
-        $purpose = PaymentPurpose::tryFrom($request->string('purpose')->toString());
-        $status = PaymentStatus::tryFrom($request->string('status')->toString());
-        $gateway = $request->string('gateway')->toString();
-        $merchant = $request->string('merchant')->toString();
+        $purposes = TableFilter::requestedEnums($request, 'purpose', PaymentPurpose::class);
+        $statuses = TableFilter::requestedEnums($request, 'status', PaymentStatus::class);
+        $gateways = TableFilter::requested($request, 'gateway', self::gateways());
+        $merchants = TableFilter::requested($request, 'merchant', [PaymentMerchant::NEEKAH, PaymentMerchant::VENDOR]);
 
         $matching = Payment::query()->when($request->string('search')->trim()->toString(), function ($query, string $keyword): void {
             $like = '%'.$keyword.'%';
@@ -120,10 +120,10 @@ class PaymentController extends Controller
         });
 
         $filtered = $matching->clone()
-            ->when($purpose, fn ($query) => $query->where('purpose', $purpose))
-            ->when($status, fn ($query) => $query->where('status', $status))
-            ->when($gateway !== '', fn ($query) => $query->where('gateway', $gateway))
-            ->when($merchant !== '', fn ($query) => $query->where('merchant', $merchant));
+            ->when($purposes, fn ($query) => $query->whereIn('purpose', $purposes))
+            ->when($statuses, fn ($query) => $query->whereIn('status', $statuses))
+            ->when($gateways, fn ($query) => $query->whereIn('gateway', $gateways))
+            ->when($merchants, fn ($query) => $query->whereIn('merchant', $merchants));
 
         $payments = $filtered->clone()
             ->with(['vendor', 'wedding', 'booking', 'album.wedding', 'recorder'])
@@ -308,6 +308,16 @@ class PaymentController extends Controller
                 },
             ])
             ->all();
+    }
+
+    /**
+     * Every gateway a payment can name.
+     *
+     * @return list<string>
+     */
+    private static function gateways(): array
+    {
+        return [...array_keys(PaymentGateways::DRIVERS), Payment::GATEWAY_MANUAL];
     }
 
     private static function gatewayLabel(string $gateway): string

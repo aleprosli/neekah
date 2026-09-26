@@ -430,6 +430,12 @@ return [
     ],
 
     'common' => [
+        'filter_status' => 'Status',
+        'filter_plan' => 'Plan',
+        'filter_setup' => 'Setup',
+        'filter_role' => 'Role',
+        'filter_segment' => 'Segment',
+        'filter_album' => 'Album',
         'all' => 'All',
         'none' => 'None',
         'over' => 'Over',

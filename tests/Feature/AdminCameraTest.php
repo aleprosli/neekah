@@ -30,6 +30,10 @@ it('lists every album for an admin only, filtered by what state it is in', funct
         ->and($response->json('filters.filter'))->toMatchArray(['' => 2, 'active' => 1, 'purged' => 1]);
 
     $this->actingAs(User::factory()->create())->get(route('admin.camera.index'))->assertForbidden();
+
+    // Ticking two states widens the list to either.
+    $both = $this->actingAs($this->admin)->getJson(route('admin.camera.data', ['filter' => 'active,purged']))->assertOk();
+    expect($both->json('meta.total'))->toBe(2);
 });
 
 it('records a purchase paid outside Herepay for the couple of an email', function () {

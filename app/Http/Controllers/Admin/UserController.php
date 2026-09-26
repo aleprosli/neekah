@@ -74,7 +74,8 @@ class UserController extends Controller
                 [
                     'key' => 'role',
                     'exclusive' => true,
-                    'value' => $segment ? null : UserRole::tryFrom($request->string('role')->toString())?->value,
+                    'label' => __('props.common.filter_role'),
+                    'value' => $segment ? [] : TableFilter::requested($request, 'role', array_column(UserRole::cases(), 'value')),
                     'allLabel' => __('props.common.all'),
                     'allCount' => $counts->sum(),
                     'options' => array_map(fn (UserRole $case): array => [
@@ -86,6 +87,8 @@ class UserController extends Controller
                 [
                     'key' => 'segment',
                     'exclusive' => true,
+                    // One view at a time: each segment brings its own columns.
+                    'multiple' => false,
                     'label' => __('props.admin.perlu_diikuti'),
                     'value' => $segment?->value,
                     'allLabel' => __('props.common.none'),
@@ -127,7 +130,7 @@ class UserController extends Controller
     public function data(Request $request): JsonResponse
     {
         $segment = UserSegment::tryFrom($request->string('segment')->toString());
-        $role = $segment ? null : UserRole::tryFrom($request->string('role')->toString());
+        $roles = $segment ? [] : TableFilter::requestedEnums($request, 'role', UserRole::class);
         $sort = in_array($request->string('sort')->toString(), ['name', 'email', 'created_at'], true)
             ? $request->string('sort')->toString()
             : 'id';
@@ -143,7 +146,7 @@ class UserController extends Controller
             ->withCount(['bookings', 'weddings'])
             ->when($segment, fn ($query) => $segment->apply($query))
             ->when($segment, fn ($query) => $query->with($this->segmentRelations($segment)))
-            ->when($role, fn ($query) => $query->where('role', $role))
+            ->when($roles, fn ($query) => $query->whereIn('role', $roles))
             ->when($request->string('search')->trim()->toString(), function ($query, string $keyword): void {
                 $like = '%'.$keyword.'%';
                 $query->where(fn ($query) => $query->where('name', 'like', $like)->orWhere('email', 'like', $like));

@@ -9,7 +9,9 @@
  */
 import { FlexRender, getCoreRowModel, useVueTable } from '@tanstack/vue-table';
 import { computed, h, onMounted, ref, watch } from 'vue';
+import UiColumnToggle from './UiColumnToggle.vue';
 import UiConfirm from './UiConfirm.vue';
+import UiFacetedFilter from './UiFacetedFilter.vue';
 
 const props = defineProps({
     /**
@@ -22,11 +24,14 @@ const props = defineProps({
     /** [{ key, label, sortable?, align?, type? }] — type "html" renders trusted markup from the server. */
     columns: { type: Array, required: true },
     /**
-     * Chip filters shown above the table, each group
-     * { key, label?, value, allLabel?, exclusive?, options: [{ value, label, count?, description? }] }.
-     * Choosing one reloads the rows in place. Groups narrow each other —
-     * "menunggu kelulusan" AND "setup lengkap" — unless a group is marked
-     * exclusive, which clears the others as the users page needs.
+     * Filters shown above the table, each a button opening a checklist
+     * (UiFacetedFilter), each group
+     * { key, label?, value, exclusive?, multiple?, hint?, options: [{ value, label, count?, description? }] }.
+     * `value` is what is chosen now: an array, or a comma-separated string.
+     * Several values of one group widen it (paid OR pending); groups narrow
+     * each other (Pro AND paid) unless a group is marked exclusive, which
+     * clears the others as the users page needs. The server is sent
+     * key=a,b and reads it with App\Support\TableFilter::requested().
      */
     filters: { type: Array, default: () => [] },
     searchPlaceholder: { type: String, default: 'Cari…' },
@@ -73,10 +78,13 @@ const sort = ref(props.initialSort);
 const direction = ref('desc');
 const page = ref(1);
 
-const selected = ref(Object.fromEntries(props.filters.map((group) => [group.key, group.value ?? ''])));
+/** What a group's value arrived as — an array, "a,b", or nothing — as an array. */
+const asList = (value) => (Array.isArray(value) ? value : String(value ?? '').split(',')).map(String).filter(Boolean);
+
+const selected = ref(Object.fromEntries(props.filters.map((group) => [group.key, asList(group.value)])));
 const liveCounts = ref(null);
 
-/** What a chip shows: the freshest count the endpoint gave, else the one it was born with. */
+/** The freshest count the endpoint gave for one value, else the one it was born with. */
 const countFor = (group, value) => {
     const live = liveCounts.value?.[group.key];
 
@@ -84,50 +92,97 @@ const countFor = (group, value) => {
         return live[value];
     }
 
-    if (value === '') {
-        return group.allCount ?? null;
-    }
-
     return group.options.find((option) => option.value === value)?.count ?? null;
 };
+
+/** A group's options with their live counts, for its checklist. */
+const optionsOf = (group) => group.options.map((option) => ({ ...option, count: countFor(group, option.value) }));
 
 /**
  * Groups narrow each other, so a status and a setup state can be asked for at
  * once. An exclusive group (the users page's role and segment, which the
  * server reads one of) clears the rest instead.
  */
-const chooseFilter = (group, value) => {
-    if (group.exclusive) {
+const chooseFilter = (group, values) => {
+    if (group.exclusive && values.length) {
         Object.keys(selected.value).forEach((key) => {
-            selected.value[key] = key === group.key ? value : '';
+            if (key !== group.key) selected.value[key] = [];
         });
-    } else {
-        selected.value[group.key] = value;
     }
 
+    selected.value[group.key] = values;
     page.value = 1;
     load();
     rememberFilters();
 };
 
-const activeOption = (group) => group.options.find((option) => option.value === selected.value[group.key]);
+/** Every value chosen, as a removable chip under the toolbar. */
+const activeChips = computed(() =>
+    props.filters.flatMap((group) =>
+        (selected.value[group.key] ?? []).map((value) => ({
+            group,
+            value,
+            label: group.options.find((option) => option.value === value)?.label ?? value,
+        })),
+    ),
+);
+
+const removeChip = (chip) => chooseFilter(chip.group, selected.value[chip.group.key].filter((one) => one !== chip.value));
+
+const resetFilters = () => {
+    Object.keys(selected.value).forEach((key) => (selected.value[key] = []));
+    search.value = '';
+    page.value = 1;
+    load();
+    rememberFilters();
+};
+
+/** The filters as query parameters: key=a,b for each group with a choice. */
+const filterQuery = () => Object.fromEntries(Object.entries(selected.value).filter(([, values]) => values.length).map(([key, values]) => [key, values.join(',')]));
 
 /** Keep the address bar in step, so a refresh or a shared link filters too. */
 const rememberFilters = () => {
     const url = new URL(window.location.href);
-    props.filters.forEach((group) => {
-        const value = selected.value[group.key];
-        if (value) {
-            url.searchParams.set(group.key, value);
-        } else {
-            url.searchParams.delete(group.key);
-        }
-    });
-    window.history.replaceState({}, '', url);
+    const query = filterQuery();
+    props.filters.forEach((group) => (query[group.key] ? url.searchParams.set(group.key, query[group.key]) : url.searchParams.delete(group.key)));
+    window.history.replaceState(window.history.state, '', url);
+};
+
+/**
+ * Which columns show, remembered per list in this browser. Storage can be
+ * missing or refuse (a private window); the table then shows everything.
+ */
+const visibilityKey = computed(() => `nk-table-columns:${props.dataUrl ? new URL(props.dataUrl, window.location.origin).pathname : window.location.pathname}`);
+const readVisibility = () => {
+    try {
+        return JSON.parse(localStorage.getItem(visibilityKey.value) ?? '{}') ?? {};
+    } catch {
+        return {};
+    }
+};
+const hidden = ref(readVisibility());
+const toggleColumn = (key) => {
+    hidden.value = { ...hidden.value, [key]: !hidden.value[key] };
+    try {
+        localStorage.setItem(visibilityKey.value, JSON.stringify(hidden.value));
+    } catch {
+        // Not remembered, still applied.
+    }
+};
+const visibleColumns = computed(() => activeColumns.value.filter((column) => !hidden.value[column.key]));
+const columnChoices = computed(() => activeColumns.value.map((column) => ({ key: column.key, label: column.label, visible: !hidden.value[column.key] })));
+
+/** Rows per page, chosen from a short list; the first is the page's own default. */
+const pageSize = ref(props.perPage);
+const pageSizes = computed(() => [...new Set([props.perPage, 25, 50, 100])].sort((a, b) => a - b));
+const setPageSize = (size) => {
+    pageSize.value = Number(size);
+    page.value = 1;
+    load();
 };
 
 const columnDefs = computed(() =>
-    activeColumns.value.map((column) => ({
+    visibleColumns.value.map((column) => ({
         accessorKey: column.key,
         header: column.label,
         meta: column,
@@ -160,14 +215,14 @@ const load = async () => {
     const url = new URL(props.dataUrl, window.location.origin);
     const query = {
         page: page.value,
-        per_page: props.perPage,
-        ...Object.fromEntries(Object.entries(selected.value).filter(([, value]) => value)),
+        per_page: pageSize.value,
+        ...filterQuery(),
         ...(search.value ? { search: search.value } : {}),
         ...(sort.value ? { sort: sort.value, direction: direction.value } : {}),
     };
     Object.entries(query).forEach(([key, value]) => url.searchParams.set(key, value));
     props.filters.forEach((group) => {
-        if (!selected.value[group.key]) {
+        if (!query[group.key]) {
             url.searchParams.delete(group.key);
         }
     });
@@ -222,9 +277,9 @@ const openRow = (row) => {
 };
 
 const cardColumns = computed(() => {
-    const last = activeColumns.value.at(-1);
+    const last = visibleColumns.value.at(-1);
 
-    return activeColumns.value.filter(
+    return visibleColumns.value.filter(
         (column, at) => at !== 0 && !(column === last && last.type === 'html'),
     );
 });
@@ -260,12 +315,20 @@ const exportHref = computed(() => {
     }
 
     const url = new URL(props.exportUrl, window.location.origin);
-    Object.entries(selected.value).forEach(([key, value]) => value && url.searchParams.set(key, value));
+    Object.entries(filterQuery()).forEach(([key, value]) => url.searchParams.set(key, value));
     if (search.value) {
         url.searchParams.set('search', search.value);
     }
 
     return url.toString();
+});
+
+/** "16–30 daripada 412", for the footer. */
+const range = computed(() => {
+    if (!meta.value.total) return null;
+    const from = (meta.value.current_page - 1) * (meta.value.per_page ?? pageSize.value) + 1;
+
+    return { from, to: Math.min(meta.value.total, from + rows.value.length - 1), total: meta.value.total };
 });
 
 const go = (to) => {
@@ -288,97 +351,73 @@ onMounted(load);
 
 <template>
     <div class="flex min-w-0 flex-col gap-4">
-        <!-- Filters swap the rows in place. They were links that reloaded the
-             page, and the reload carried the filter in the endpoint's own
-             query, where it collided with paging. -->
-        <div v-for="group in filters" :key="group.key" class="flex min-w-0 flex-col gap-2">
-            <p v-if="group.label" class="font-display text-xs tracking-[0.18em] text-gold uppercase">{{ group.label }}</p>
-            <div class="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4 lg:mx-0 lg:flex-wrap lg:px-0">
-                <button
-                    type="button"
-                    :class="[
-                        'shrink-0 rounded-full border px-4 py-1.5 text-sm font-medium whitespace-nowrap transition',
-                        selected[group.key] ? 'border-line hover:border-brand-400' : 'border-brand-600 bg-brand-600 text-white',
-                    ]"
-                    :aria-pressed="!selected[group.key]"
-                    @click="chooseFilter(group, '')"
-                >
-                    {{ group.allLabel || 'Semua' }}
-                    <span
-                        v-if="countFor(group, '') !== null"
-                        :class="[
-                            'ml-2 rounded-full px-2 py-0.5 text-xs font-semibold tabular-nums',
-                            selected[group.key] ? 'bg-surface-muted text-ink-muted' : 'bg-white/20',
-                        ]"
-                    >{{ countFor(group, '') }}</span>
-                </button>
+        <!-- One toolbar: search, one button per filter, columns, export. Ten
+             filters stay on one line (wrapping on a phone); each opens a
+             checklist, so a filter can take several values. -->
+        <div v-if="!isStatic || filters.length || $slots.actions" class="flex min-w-0 flex-col gap-3">
+            <div class="flex min-w-0 flex-wrap items-center gap-2">
+                <label v-if="!isStatic" class="relative w-full min-w-0 sm:w-64">
+                    <span class="sr-only">{{ searchPlaceholder }}</span>
+                    <svg class="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
+                    <input
+                        v-model="search"
+                        type="search"
+                        :placeholder="searchPlaceholder"
+                        class="h-9 w-full rounded-full border border-line bg-surface pr-4 pl-9 text-sm focus:border-brand-400 focus:ring-2 focus:ring-brand-400/40 focus:outline-none"
+                    >
+                </label>
 
-                <button
-                    v-for="option in group.options"
-                    :key="option.value"
-                    type="button"
-                    :title="option.description"
-                    :class="[
-                        'flex shrink-0 items-center gap-2 rounded-full border px-4 py-1.5 text-sm font-medium whitespace-nowrap transition',
-                        selected[group.key] === option.value ? 'border-brand-600 bg-brand-600 text-white' : 'border-line hover:border-brand-400',
-                    ]"
-                    :aria-pressed="selected[group.key] === option.value"
-                    @click="chooseFilter(group, option.value)"
-                >
-                    {{ option.label }}
-                    <span
-                        v-if="countFor(group, option.value) !== null"
-                        :class="[
-                            'rounded-full px-2 py-0.5 text-xs font-semibold tabular-nums',
-                            selected[group.key] === option.value ? 'bg-white/20' : 'bg-surface-muted text-ink-muted',
-                        ]"
-                    >{{ countFor(group, option.value) }}</span>
-                </button>
+                <UiFacetedFilter
+                    v-for="group in filters"
+                    :key="group.key"
+                    :label="group.label || group.key"
+                    :options="optionsOf(group)"
+                    :model-value="selected[group.key]"
+                    :multiple="group.multiple !== false"
+                    :hint="group.hint"
+                    @update:model-value="chooseFilter(group, $event)"
+                />
+
+                <button v-if="activeChips.length || search" type="button" class="h-9 shrink-0 rounded-full px-3 text-sm font-medium text-ink-muted transition hover:bg-surface-muted hover:text-ink" @click="resetFilters">{{ $t('common.filter_reset') }} ✕</button>
+
+                <div class="ml-auto flex shrink-0 items-center gap-2">
+                    <slot name="actions" />
+                    <!-- The card layout has no headers to click, so it sorts from a select. -->
+                    <label v-if="sortableColumns.length && !isStatic" class="min-w-0 md:hidden">
+                        <span class="sr-only">{{ $t('common.sort_by') }}</span>
+                        <select
+                            class="nk-select h-9 w-full rounded-full border border-line bg-surface px-3 pr-9 text-sm focus:border-brand-400 focus:outline-none"
+                            :value="`${sort}:${direction}`"
+                            @change="sortFromSelect($event.target.value)"
+                        >
+                            <option v-if="!sort" :value="`${sort}:${direction}`" disabled>{{ $t('common.sort_by') }}</option>
+                            <option v-for="column in sortableColumns" :key="column.key" :value="`${sortKey(column)}:desc`">{{ column.label }} ↓</option>
+                            <option v-for="column in sortableColumns" :key="`${column.key}-asc`" :value="`${sortKey(column)}:asc`">{{ column.label }} ↑</option>
+                        </select>
+                    </label>
+                    <span v-if="activeColumns.length > 3" class="hidden md:inline-flex"><UiColumnToggle :columns="columnChoices" @toggle="toggleColumn" /></span>
+                    <!-- Downloads exactly what is on screen: same filters, same search. -->
+                    <a
+                        v-if="exportHref"
+                        :href="exportHref"
+                        class="inline-flex h-9 items-center gap-2 rounded-full border border-line px-3.5 text-sm font-medium transition hover:border-brand-400 hover:text-brand-700"
+                    >
+                        <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 11l5 5 5-5M5 21h14"/></svg>
+                        CSV
+                    </a>
+                </div>
             </div>
-            <p v-if="group.hint || activeOption(group)?.description" class="text-sm text-ink-muted">
-                {{ activeOption(group)?.description || group.hint }}
-            </p>
-        </div>
 
-        <div v-if="!isStatic || $slots.actions" class="flex flex-wrap items-center gap-3">
-            <label v-if="!isStatic" class="relative min-w-0 flex-1 sm:max-w-xs">
-                <span class="sr-only">{{ searchPlaceholder }}</span>
-                <input
-                    v-model="search"
-                    type="search"
-                    :placeholder="searchPlaceholder"
-                    class="w-full rounded-xl border border-line bg-surface px-4 py-2.5 text-sm focus:border-brand-400 focus:ring-2 focus:ring-brand-400/40 focus:outline-none"
-                >
-            </label>
-            <!-- w-full, because a select is otherwise as wide as its longest
-                 option, and "Nama perniagaan ↓" is wider than a phone. -->
-            <label v-if="sortableColumns.length && !isStatic" class="min-w-0 flex-1 md:hidden">
-                <span class="sr-only">{{ $t('common.sort_by') }}</span>
-                <select
-                    class="nk-select w-full rounded-xl border border-line bg-surface px-3 py-2.5 pr-9 text-sm focus:border-brand-400 focus:outline-none"
-                    :value="`${sort}:${direction}`"
-                    @change="sortFromSelect($event.target.value)"
-                >
-                    <option v-for="column in sortableColumns" :key="column.key" :value="`${sortKey(column)}:desc`">{{ column.label }} ↓</option>
-                    <option v-for="column in sortableColumns" :key="`${column.key}-asc`" :value="`${sortKey(column)}:asc`">{{ column.label }} ↑</option>
-                </select>
-            </label>
-
-            <p v-if="!isStatic" class="text-xs text-ink-muted" aria-live="polite">
-                <span v-if="loading">{{ $t('common.memuatkan') }}…</span>
-                <span v-else>{{ meta.total }} rekod</span>
-            </p>
-            <slot name="actions" />
-
-            <!-- Downloads exactly what is on screen: same chips, same search. -->
-            <a
-                v-if="exportHref"
-                :href="exportHref"
-                class="ml-auto inline-flex items-center gap-2 rounded-full border border-line px-4 py-2 text-xs font-semibold transition hover:border-brand-400 hover:text-brand-700"
-            >
-                <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 11l5 5 5-5M5 21h14"/></svg>
-                Muat turun CSV
-            </a>
+            <div v-if="activeChips.length || !isStatic" class="flex min-w-0 flex-wrap items-center gap-2">
+                <span v-for="chip in activeChips" :key="`${chip.group.key}:${chip.value}`" class="inline-flex max-w-full items-center gap-1.5 rounded-full bg-brand-50 py-1 pr-1 pl-3 text-xs font-medium text-brand-800">
+                    <span class="truncate"><span class="text-brand-600/80">{{ chip.group.label || chip.group.key }}:</span> {{ chip.label }}</span>
+                    <button type="button" class="flex size-5 shrink-0 items-center justify-center rounded-full hover:bg-brand-100" :aria-label="$t('common.filter_remove', { label: chip.label })" @click="removeChip(chip)">✕</button>
+                </span>
+                <p v-if="!isStatic" class="text-xs text-ink-muted" aria-live="polite">
+                    <span v-if="loading">{{ $t('common.memuatkan') }}…</span>
+                    <span v-else>{{ $t('common.records', { count: meta.total }) }}</span>
+                </p>
+            </div>
         </div>
 
         <!-- What the ticked rows can be done to, shown only once something is
@@ -431,12 +470,12 @@ onMounted(load);
                 >
                     <div class="flex min-w-0 items-start justify-between gap-3">
                         <p class="min-w-0 font-medium break-words">
-                            <slot :name="`cell-${activeColumns[0].key}`" :row="row.original">
-                                <span v-if="activeColumns[0].type === 'html'" v-html="row.original[activeColumns[0].key]"></span>
-                                <span v-else>{{ row.original[activeColumns[0].key] }}</span>
+                            <slot :name="`cell-${visibleColumns[0].key}`" :row="row.original">
+                                <span v-if="visibleColumns[0].type === 'html'" v-html="row.original[visibleColumns[0].key]"></span>
+                                <span v-else>{{ row.original[visibleColumns[0].key] }}</span>
                             </slot>
                         </p>
-                        <span v-if="activeColumns.at(-1).type === 'html'" class="shrink-0" v-html="row.original[activeColumns.at(-1).key]"></span>
+                        <span v-if="visibleColumns.at(-1).type === 'html'" class="shrink-0" v-html="row.original[visibleColumns.at(-1).key]"></span>
                     </div>
 
                     <dl class="flex min-w-0 flex-col gap-1 text-sm">
@@ -530,10 +569,10 @@ onMounted(load);
 
                 <tbody class="divide-y divide-line">
                     <tr v-if="loading && !rows.length">
-                        <td :colspan="activeColumns.length + (rowAction || $slots.action ? 1 : 0) + (selectable ? 1 : 0)" class="px-4 py-10 text-center text-ink-muted">{{ $t('common.memuatkan') }}…</td>
+                        <td :colspan="visibleColumns.length + (rowAction || $slots.action ? 1 : 0) + (selectable ? 1 : 0)" class="px-4 py-10 text-center text-ink-muted">{{ $t('common.memuatkan') }}…</td>
                     </tr>
                     <tr v-else-if="!rows.length">
-                        <td :colspan="activeColumns.length + (rowAction || $slots.action ? 1 : 0) + (selectable ? 1 : 0)" class="px-4 py-12 text-center">
+                        <td :colspan="visibleColumns.length + (rowAction || $slots.action ? 1 : 0) + (selectable ? 1 : 0)" class="px-4 py-12 text-center">
                             <p class="font-medium">{{ emptyTitle }}</p>
                             <p class="mt-1 text-ink-muted">{{ emptyMessage }}</p>
                         </td>
@@ -606,11 +645,22 @@ onMounted(load);
             </table>
         </div>
 
-        <div v-if="meta.last_page > 1" class="flex flex-wrap items-center justify-between gap-3">
-            <p class="text-xs text-ink-muted">{{ $t('common.halaman_x_daripada_y', { current: meta.current_page, last: meta.last_page }) }}</p>
-            <div class="flex gap-2">
-                <button type="button" class="rounded-full border border-line px-4 py-2 text-sm font-medium transition hover:border-brand-400 disabled:opacity-40" :disabled="meta.current_page <= 1" @click="go(meta.current_page - 1)">{{ $t('common.previous') }}</button>
-                <button type="button" class="rounded-full border border-line px-4 py-2 text-sm font-medium transition hover:border-brand-400 disabled:opacity-40" :disabled="meta.current_page >= meta.last_page" @click="go(meta.current_page + 1)">{{ $t('common.next') }}</button>
+        <div v-if="!isStatic && meta.total" class="flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center gap-3 text-xs text-ink-muted">
+                <span v-if="range">{{ $t('common.range_of', range) }}</span>
+                <label class="flex items-center gap-2">
+                    <span class="hidden sm:inline">{{ $t('common.per_page') }}</span>
+                    <select class="nk-select h-8 rounded-full border border-line bg-surface px-3 pr-8 text-xs focus:border-brand-400 focus:outline-none" :value="pageSize" @change="setPageSize($event.target.value)">
+                        <option v-for="size in pageSizes" :key="size" :value="size">{{ size }}</option>
+                    </select>
+                </label>
+            </div>
+            <div v-if="meta.last_page > 1" class="flex items-center gap-1">
+                <button type="button" class="flex size-9 items-center justify-center rounded-full border border-line text-sm transition hover:border-brand-400 disabled:opacity-40" :disabled="meta.current_page <= 1" :aria-label="$t('common.first_page')" @click="go(1)">«</button>
+                <button type="button" class="flex size-9 items-center justify-center rounded-full border border-line text-sm transition hover:border-brand-400 disabled:opacity-40" :disabled="meta.current_page <= 1" :aria-label="$t('common.previous')" @click="go(meta.current_page - 1)">‹</button>
+                <span class="px-3 text-xs text-ink-muted tabular-nums">{{ $t('common.halaman_x_daripada_y', { current: meta.current_page, last: meta.last_page }) }}</span>
+                <button type="button" class="flex size-9 items-center justify-center rounded-full border border-line text-sm transition hover:border-brand-400 disabled:opacity-40" :disabled="meta.current_page >= meta.last_page" :aria-label="$t('common.next')" @click="go(meta.current_page + 1)">›</button>
+                <button type="button" class="flex size-9 items-center justify-center rounded-full border border-line text-sm transition hover:border-brand-400 disabled:opacity-40" :disabled="meta.current_page >= meta.last_page" :aria-label="$t('common.last_page')" @click="go(meta.last_page)">»</button>
             </div>
         </div>
     </div>

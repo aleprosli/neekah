@@ -59,7 +59,6 @@ class CameraController extends Controller
 
     public function index(Request $request): View
     {
-        $filter = CameraAlbumFilter::tryFrom($request->string('filter')->toString());
         $active = CameraAlbumFilter::Active->apply(CameraAlbum::query());
 
         return view('admin.camera', [
@@ -73,7 +72,7 @@ class CameraController extends Controller
                 'table' => [
                     'dataUrl' => route('admin.camera.data'),
                     'columns' => self::columns(),
-                    'filters' => [TableFilter::fromEnum('filter', CameraAlbumFilter::cases(), $filter?->value)],
+                    'filters' => [TableFilter::fromEnum('filter', CameraAlbumFilter::cases(), TableFilter::requested($request, 'filter', array_column(CameraAlbumFilter::cases(), 'value')), label: __('props.common.filter_album'))],
                 ],
                 'reported' => $this->reported(),
                 'tiers' => array_map(fn (CameraTier $tier): array => ['value' => $tier->value, 'label' => $tier->label()], CameraTier::cases()),
@@ -84,7 +83,7 @@ class CameraController extends Controller
 
     public function data(Request $request): JsonResponse
     {
-        $filter = CameraAlbumFilter::tryFrom($request->string('filter')->toString());
+        $filters = TableFilter::requestedEnums($request, 'filter', CameraAlbumFilter::class);
         $sort = in_array($request->string('sort')->toString(), ['photos_count', 'bytes_used', 'expires_at'], true)
             ? $request->string('sort')->toString()
             : 'created_at';
@@ -103,7 +102,12 @@ class CameraController extends Controller
         $albums = $matching->clone()
             ->with(['wedding.user'])
             ->withSum(['purchases as paid_total' => fn ($query) => $query->where('status', PaymentStatus::Paid)], 'amount')
-            ->when($filter, fn ($query) => $filter->apply($query))
+            // Several states widen the list: active OR reported.
+            ->when($filters, fn ($query) => $query->where(function ($query) use ($filters): void {
+                foreach ($filters as $filter) {
+                    $query->orWhere(fn ($query) => $filter->apply($query));
+                }
+            }))
             ->orderBy($sort, $direction)
             ->paginate(min($request->integer('per_page', 20), 100));
 

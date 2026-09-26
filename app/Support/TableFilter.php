@@ -4,10 +4,12 @@ namespace App\Support;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 
 /**
- * A chip filter for resources/js/components/ui/DataTable.vue.
+ * A filter of resources/js/components/ui/DataTable.vue (UiFacetedFilter): its
+ * options and counts, and reading the values the table asks for.
  *
  * The chips used to be links that reloaded the page with the filter in the
  * table's own endpoint url, where it collided with paging. They belong to the
@@ -44,12 +46,12 @@ class TableFilter
      * @param  Collection<string, int>|null  $counts  keyed by the case value
      * @return array<string, mixed>
      */
-    public static function fromEnum(string $key, array $cases, ?string $value, ?Collection $counts = null, ?string $label = null): array
+    public static function fromEnum(string $key, array $cases, array|string|null $value, ?Collection $counts = null, ?string $label = null): array
     {
         return [
             'key' => $key,
             'label' => $label,
-            'value' => $value,
+            'value' => array_values(array_filter((array) $value, fn (mixed $one): bool => filled($one))),
             // The count rides on the chip as a badge, kept up to date by the
             // table from what the endpoint counted.
             'allLabel' => __('props.common.all'),
@@ -60,5 +62,37 @@ class TableFilter
                 'count' => $counts?->get($case->value, 0),
             ], $cases),
         ];
+    }
+
+    /**
+     * The values asked for under $key, as the table sends them ("a,b") or as
+     * an array (key[]=a), kept to those in $allowed. An empty list means no
+     * filter.
+     *
+     * @param  list<string>  $allowed
+     * @return list<string>
+     */
+    public static function requested(Request $request, string $key, array $allowed): array
+    {
+        $raw = $request->query($key, $request->input($key));
+        $values = is_array($raw) ? $raw : explode(',', (string) $raw);
+
+        return array_values(array_unique(array_intersect(array_map(fn (mixed $value): string => trim((string) $value), $values), $allowed)));
+    }
+
+    /**
+     * The enum cases asked for under $key.
+     *
+     * @template T of \BackedEnum
+     *
+     * @param  class-string<T>  $enum
+     * @return list<T>
+     */
+    public static function requestedEnums(Request $request, string $key, string $enum): array
+    {
+        return array_map(
+            fn (string $value): \BackedEnum => $enum::from($value),
+            self::requested($request, $key, array_map(fn (\BackedEnum $case): string => (string) $case->value, $enum::cases())),
+        );
     }
 }
