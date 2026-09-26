@@ -9,7 +9,7 @@ return [
         'password_reset' => 'Your password has been updated. Please log in.',
         'reset_link_sent' => 'If that email is registered, we have sent it a password reset link.',
         'phone_saved' => 'Thank you! Your phone number has been saved.',
-        'google_not_configured' => 'Google sign-in has not been configured.',
+        'google_not_configured' => 'Google sign-in is not available.',
         'google_failed' => 'Google sign-in was cancelled or failed. Please try again.',
         'google_no_email' => 'Your Google account did not share an email address.',
         'welcome' => 'Welcome to Neekah, :name!',

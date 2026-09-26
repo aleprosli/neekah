@@ -3,6 +3,7 @@
 namespace App\Support;
 
 use App\Enums\AuthAudience;
+use App\Rules\AccessCode;
 use Illuminate\Http\Request;
 
 /**
@@ -26,6 +27,40 @@ class AuthForm
             ...$props,
             'turnstileSiteKey' => ($props['captcha'] ?? false) && $turnstile->isEnabled() ? $turnstile->siteKey() : null,
         ]);
+    }
+
+    /**
+     * The access code field, for the forms that sign someone in or up while
+     * NEEKAH_ACCESS_CODE closes the site. An empty list when it is open.
+     *
+     * @return list<array<string, mixed>>
+     */
+    public static function accessCodeFields(): array
+    {
+        if (! AccessCode::isRequired()) {
+            return [];
+        }
+
+        return [
+            ['name' => 'access_code', 'label' => __('auth_pages.fields.access_code'), 'type' => 'password', 'autocomplete' => 'off', 'help' => __('auth_pages.fields.access_code_help'), 'required' => true],
+        ];
+    }
+
+    /**
+     * Google sign-in is off when it is not configured, and when an access
+     * code closes the site, since signing in through Google never asks for it.
+     */
+    public static function offersGoogle(): bool
+    {
+        return filled(config('services.google.client_id')) && ! AccessCode::isRequired();
+    }
+
+    /**
+     * Where "Teruskan dengan Google" leads, or null to leave the button off.
+     */
+    public static function googleUrl(): ?string
+    {
+        return self::offersGoogle() ? route('auth.google') : null;
     }
 
     /**

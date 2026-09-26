@@ -7,6 +7,7 @@ use App\Enums\AuthAudience;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\RegisterVendorRequest;
 use App\Models\Category;
+use App\Support\AuthForm;
 use App\Support\Seo;
 use App\Support\States;
 use App\Support\TurnstileSettings;
@@ -34,6 +35,7 @@ class RegisterController extends Controller
                 'districts' => States::districtOptions(),
                 'old' => old(),
                 'turnstileSiteKey' => $turnstile->isEnabled() ? $turnstile->siteKey() : null,
+                'accessCode' => AuthForm::accessCodeFields()[0] ?? null,
             ]),
         ]);
     }

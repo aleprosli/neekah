@@ -227,6 +227,7 @@ return [
 
         'turnstile_missing' => 'Sila lengkapkan semakan keselamatan.',
         'turnstile_failed' => 'Semakan keselamatan gagal. Sila cuba sekali lagi.',
+        'access_code' => 'Kod akses tidak sah.',
 
         'credentials' => 'Emel atau kata laluan tidak sepadan dengan rekod kami.',
         'too_many_attempts' => 'Terlalu banyak percubaan. Cuba lagi dalam :minutes minit.',
