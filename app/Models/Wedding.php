@@ -39,21 +39,30 @@ class Wedding extends Model
     }
 
     /**
-     * Moving the event date moves when the Kamera Majlis album is deleted,
-     * which is counted from the event.
+     * Moving the event date moves when each Neekah Kenangan album that
+     * follows it is deleted, which is counted from the event. An album with a
+     * date of its own (another majlis) keeps its own.
      */
     protected static function booted(): void
     {
         static::updated(function (Wedding $wedding): void {
-            if ($wedding->wasChanged('event_date') && ($album = $wedding->cameraAlbum()->first()) && $album->purged_at === null && $album->activated_at !== null) {
-                $album->update(['expires_at' => ActivateCameraAlbum::expiryFor($wedding->event_date)]);
+            if (! $wedding->wasChanged('event_date')) {
+                return;
             }
+
+            $wedding->cameraAlbums()
+                ->whereNull('event_date')
+                ->whereNull('purged_at')
+                ->whereNotNull('activated_at')
+                ->get()
+                ->each(fn (CameraAlbum $album) => $album->update(['expires_at' => ActivateCameraAlbum::expiryFor($wedding->event_date)]));
         });
     }
 
-    public function cameraAlbum(): HasOne
+    /** Neekah Kenangan albums, one per majlis the couple bought one for. */
+    public function cameraAlbums(): HasMany
     {
-        return $this->hasOne(CameraAlbum::class);
+        return $this->hasMany(CameraAlbum::class);
     }
 
     public function cameraPurchases(): HasMany

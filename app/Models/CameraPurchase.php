@@ -12,11 +12,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Str;
 
 /**
- * One Kamera Majlis purchase: a checkout started, or a payment an admin
- * recorded by hand. Only ActivateCameraAlbum marks one paid.
+ * One Neekah Kenangan purchase: a checkout started, or a payment an admin
+ * recorded by hand. A new album's title and date wait here until the payment
+ * creates it; an upgrade names its album from the start. Only
+ * ActivateCameraAlbum marks one paid.
  */
 #[Fillable([
-    'wedding_id', 'user_id', 'reference', 'tier', 'kind', 'amount', 'status', 'gateway',
+    'wedding_id', 'camera_album_id', 'user_id', 'reference', 'tier', 'kind', 'album_title', 'album_event_date', 'amount', 'status', 'gateway',
     'gateway_reference', 'payment_url', 'added_by', 'note', 'paid_at',
 ])]
 class CameraPurchase extends Model
@@ -42,12 +44,19 @@ class CameraPurchase extends Model
             'status' => SubscriptionStatus::class,
             'amount' => 'decimal:2',
             'paid_at' => 'datetime',
+            'album_event_date' => 'date',
         ];
     }
 
     public function wedding(): BelongsTo
     {
         return $this->belongsTo(Wedding::class);
+    }
+
+    /** The album this purchase opened or upgraded; empty until a new one is paid. */
+    public function album(): BelongsTo
+    {
+        return $this->belongsTo(CameraAlbum::class, 'camera_album_id');
     }
 
     public function user(): BelongsTo

@@ -183,7 +183,9 @@ return [
 
     'custom' => [
         'camera_album_closed' => 'This album is not taking photos right now.',
-        'camera_video_not_allowed' => 'Videos are for Kamera Majlis Pro only.',
+        'camera_video_not_allowed' => 'Videos are for Neekah Moments Pro only.',
+        'camera_wish_limit' => 'You have already sent many wishes to this album. Thank you!',
+        'camera_voice_unreadable' => 'This recording could not be read. Please record it again.',
         'camera_file_type' => 'This file is not a supported photo or video.',
         'camera_file_too_large' => 'Files must be :mb MB or less.',
         'camera_video_too_long' => 'Videos must be :minutes minutes or less.',

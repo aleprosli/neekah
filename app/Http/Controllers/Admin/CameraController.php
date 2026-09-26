@@ -165,6 +165,16 @@ class CameraController extends Controller
         ]));
     }
 
+    /**
+     * The album the switch on an account's page acts on: the newest one still
+     * open. A wedding may hold several; the others are managed by the couple.
+     */
+    public static function activeAlbumOf(Wedding $wedding): ?CameraAlbum
+    {
+        return $wedding->cameraAlbums()->whereNotNull('activated_at')->whereNull('purged_at')->latest('id')->get()
+            ->first(fn (CameraAlbum $album): bool => $album->isActive());
+    }
+
     /** The wedding a purchase recorded for this person goes to: their newest. */
     public static function weddingOf(User $user): ?Wedding
     {
@@ -184,8 +194,7 @@ class CameraController extends Controller
         }
 
         $wedding = self::weddingOf($user);
-        $album = $wedding?->cameraAlbum()->first();
-        $active = $album?->isActive() ? $album : null;
+        $active = $wedding ? self::activeAlbumOf($wedding) : null;
 
         return [
             'wedding' => $wedding?->title,
@@ -217,8 +226,7 @@ class CameraController extends Controller
             throw ValidationException::withMessages(['tier' => __('validation.custom.camera_no_wedding')]);
         }
 
-        $album = $wedding->cameraAlbum()->first();
-        $active = $album?->isActive() ? $album : null;
+        $active = self::activeAlbumOf($wedding);
 
         if ($choice === self::OFF) {
             if ($active) {
@@ -234,7 +242,7 @@ class CameraController extends Controller
         if ($active && $tier->rank() <= $active->tier->rank()) {
             $active->update(['tier' => $tier]);
         } else {
-            $activate->recordManually($wedding, $tier, $request->user(), 0, __('pages.admin_camera.free_note'));
+            $activate->recordManually($wedding, $tier, $request->user(), 0, __('pages.admin_camera.free_note'), $active);
         }
 
         return back()->with('status', __('flash.admin.camera_activated', ['wedding' => $wedding->title, 'tier' => $tier->label()]));

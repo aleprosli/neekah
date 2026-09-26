@@ -14,12 +14,14 @@ use Carbon\CarbonInterface;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Mark a Kamera Majlis purchase paid and open (or upgrade) the wedding's
- * album. The one place that does it, for the Herepay callback and an admin's
- * manual record alike. Safe to call twice: Herepay retries its callback.
+ * Mark a Neekah Kenangan purchase paid and open its album: a new album for a
+ * new purchase (a wedding may hold one per majlis), or a higher tier for the
+ * album an upgrade names. The one place that does it, for the Herepay
+ * callback and an admin's manual record alike. Safe to call twice: Herepay
+ * retries its callback.
  *
  * An album only moves up a tier, keeps its token (printed QR cards keep
- * working), and is kept until retention_days after the event.
+ * working), and is kept until retention_days after its event.
  */
 class ActivateCameraAlbum
 {
@@ -33,8 +35,15 @@ class ActivateCameraAlbum
             }
 
             $wedding = Wedding::query()->findOrFail($purchase->wedding_id);
-            $album = CameraAlbum::query()->lockForUpdate()->where('wedding_id', $wedding->id)->first()
-                ?? new CameraAlbum(['wedding_id' => $wedding->id, 'token' => CameraAlbum::freshToken(), 'tier' => $purchase->tier]);
+            $album = $purchase->camera_album_id
+                ? CameraAlbum::query()->lockForUpdate()->where('wedding_id', $wedding->id)->findOrFail($purchase->camera_album_id)
+                : new CameraAlbum([
+                    'wedding_id' => $wedding->id,
+                    'token' => CameraAlbum::freshToken(),
+                    'tier' => $purchase->tier,
+                    'title' => $purchase->album_title,
+                    'event_date' => $purchase->album_event_date,
+                ]);
 
             if ($purchase->tier->rank() > $album->tier->rank()) {
                 $album->tier = $purchase->tier;
@@ -42,10 +51,11 @@ class ActivateCameraAlbum
 
             $album->activated_at ??= now();
             $album->purged_at = null;
-            $album->expires_at = self::expiryFor($wedding->event_date);
+            $album->expires_at = self::expiryFor($album->event_date ?? $wedding->event_date);
             $album->save();
 
             $purchase->update([
+                'camera_album_id' => $album->id,
                 'status' => SubscriptionStatus::Paid,
                 'gateway_reference' => $gatewayReference ?? $purchase->gateway_reference,
                 'paid_at' => now(),
@@ -63,13 +73,17 @@ class ActivateCameraAlbum
         return $purchase;
     }
 
-    /** An admin recording a bank transfer or a gift, without Herepay. */
-    public function recordManually(Wedding $wedding, CameraTier $tier, User $admin, ?float $amount = null, ?string $note = null): CameraPurchase
+    /**
+     * An admin recording a bank transfer or a gift, without Herepay: a new
+     * album, or a higher tier for $album.
+     */
+    public function recordManually(Wedding $wedding, CameraTier $tier, User $admin, ?float $amount = null, ?string $note = null, ?CameraAlbum $album = null): CameraPurchase
     {
         $purchase = $wedding->cameraPurchases()->create([
+            'camera_album_id' => $album?->id,
             'reference' => CameraPurchase::generateReference(),
             'tier' => $tier,
-            'kind' => $wedding->cameraAlbum?->isActive() ? CameraPurchase::KIND_UPGRADE : CameraPurchase::KIND_NEW,
+            'kind' => $album ? CameraPurchase::KIND_UPGRADE : CameraPurchase::KIND_NEW,
             'amount' => $amount ?? app(CameraSettings::class)->price($tier),
             'status' => SubscriptionStatus::Pending,
             'gateway' => CameraPurchase::GATEWAY_MANUAL,

@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Storage;
 
 #[Fillable([
-    'camera_album_id', 'type', 'status', 'incoming_path', 'path', 'poster_path', 'bytes', 'declared_bytes',
+    'camera_album_id', 'type', 'status', 'incoming_path', 'path', 'display_path', 'poster_path', 'bytes', 'declared_bytes',
     'mime', 'width', 'height', 'duration_seconds', 'uploader_name', 'device_hash', 'reported_at', 'report_reason',
 ])]
 class CameraMedia extends Model
@@ -43,6 +43,12 @@ class CameraMedia extends Model
     public function url(): ?string
     {
         return $this->path ? Storage::disk('public')->url($this->path) : null;
+    }
+
+    /** What the full-screen viewer shows: the display copy, or the original when there is none. */
+    public function displayUrl(): ?string
+    {
+        return $this->display_path ? Storage::disk('public')->url($this->display_path) : $this->url();
     }
 
     public function thumbnailUrl(): ?string

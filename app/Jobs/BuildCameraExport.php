@@ -3,8 +3,10 @@
 namespace App\Jobs;
 
 use App\Enums\CameraMediaType;
+use App\Enums\CameraWishType;
 use App\Models\CameraAlbum;
 use App\Models\CameraMedia;
+use App\Models\CameraWish;
 use App\Models\User;
 use App\Notifications\CameraExportReady;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
@@ -17,7 +19,7 @@ use RuntimeException;
 use ZipArchive;
 
 /**
- * Everything in a Kamera Majlis album as ZIP files the couple can keep
+ * Everything in a Neekah Kenangan album, wishes included, as ZIP files the couple can keep
  * before the album is deleted. Photos and videos are already compressed, so
  * they are stored, not deflated; a large album is split into parts so no
  * single download is unmanageable. Built in the queue, one at a time per
@@ -84,13 +86,22 @@ class BuildCameraExport implements ShouldBeUnique, ShouldQueue
 
                 $tmp = "{$local}/".Str::random(16);
                 file_put_contents($tmp, $disk->readStream($media->path));
-                $name = ($media->type === CameraMediaType::Photo ? 'Gambar/' : 'Video/')
-                    .$media->created_at->format('Ymd-His').'-'.Str::slug($media->uploader_name ?: 'tetamu').'-'.$media->id.'.'.pathinfo($media->path, PATHINFO_EXTENSION);
+                $name = self::entryName($media);
                 $zip->addFile($tmp, $name);
                 $zip->setCompressionName($name, ZipArchive::CM_STORE);
                 $size += $media->bytes;
                 $this->pending[] = $tmp;
             });
+
+            if ($album->wishes()->exists()) {
+                if ($zip === null) {
+                    $number++;
+                    $zip = new ZipArchive;
+                    $zip->open("{$local}/part{$number}.zip", ZipArchive::CREATE | ZipArchive::OVERWRITE);
+                }
+
+                $this->addWishes($zip, $album, $local);
+            }
 
             if ($zip) {
                 $parts[] = $this->finish($zip, $local, $number, $album);
@@ -111,6 +122,52 @@ class BuildCameraExport implements ShouldBeUnique, ShouldQueue
     public function failed(): void
     {
         Cache::forget(self::buildingKey($this->album));
+    }
+
+    /**
+     * Where a photo or video sits inside a ZIP: by type, then when it was
+     * taken and by whom, so the files sort in the order of the day.
+     */
+    public static function entryName(CameraMedia $media): string
+    {
+        return ($media->type === CameraMediaType::Photo ? 'Gambar/' : 'Video/')
+            .$media->created_at->format('Ymd-His').'-'.Str::slug($media->uploader_name ?: 'tetamu').'-'.$media->id.'.'.pathinfo((string) $media->path, PATHINFO_EXTENSION);
+    }
+
+    /**
+     * The written wishes as one text file, and each recording beside it, in
+     * the last part.
+     */
+    private function addWishes(ZipArchive $zip, CameraAlbum $album, string $local): void
+    {
+        $disk = Storage::disk('public');
+        $lines = [];
+
+        $album->wishes()->orderBy('id')->lazyById()->each(function (CameraWish $wish) use ($zip, $disk, $local, &$lines): void {
+            $by = $wish->guest_name ?: __('pages.camera.export_guest');
+            $at = $wish->created_at->translatedFormat('j M Y, g:i A');
+
+            if ($wish->type === CameraWishType::Text) {
+                $lines[] = "{$by} · {$at}\n{$wish->message}\n";
+
+                return;
+            }
+
+            if (! $wish->audio_path || ! $disk->exists($wish->audio_path)) {
+                return;
+            }
+
+            $tmp = "{$local}/".Str::random(16);
+            file_put_contents($tmp, $disk->readStream($wish->audio_path));
+            $name = __('pages.camera.export_voice_folder').'/'.$wish->created_at->format('Ymd-His').'-'.Str::slug($wish->guest_name ?: 'tetamu').'-'.$wish->id.'.'.pathinfo($wish->audio_path, PATHINFO_EXTENSION);
+            $zip->addFile($tmp, $name);
+            $zip->setCompressionName($name, ZipArchive::CM_STORE);
+            $this->pending[] = $tmp;
+        });
+
+        if ($lines !== []) {
+            $zip->addFromString(__('pages.camera.export_wishes_file'), implode("\n", $lines));
+        }
     }
 
     /** @var list<string> files copied down for the part being written */

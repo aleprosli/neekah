@@ -8,7 +8,7 @@ class UpdateCameraAlbumRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()?->can('update', $this->route('wedding')) ?? false;
+        return $this->user()?->can('update', $this->route('album')?->wedding) ?? false;
     }
 
     /**
@@ -18,6 +18,8 @@ class UpdateCameraAlbumRequest extends FormRequest
     {
         return [
             'title' => ['nullable', 'string', 'max:120'],
+            // Blank follows the wedding's date.
+            'event_date' => ['nullable', 'date'],
             'welcome_message' => ['nullable', 'string', 'max:300'],
             'guests_can_view' => ['nullable', 'boolean'],
             'uploads_open' => ['nullable', 'boolean'],
@@ -34,6 +36,7 @@ class UpdateCameraAlbumRequest extends FormRequest
     {
         return [
             'title' => __('fields.camera_album_title'),
+            'event_date' => __('fields.camera_event_date'),
             'welcome_message' => __('fields.camera_welcome'),
             'passcode' => __('fields.camera_passcode'),
         ];

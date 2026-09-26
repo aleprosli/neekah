@@ -219,27 +219,27 @@ return [
     ],
 
     'camera_activated' => [
-        'title' => 'Kamera Majlis :tier is live',
+        'title' => 'Neekah Moments :tier is live',
         'body' => 'Share the link or QR with your guests. The album is kept until :date.',
         'receipt' => 'Receipt :reference · RM:amount',
-        'action' => 'Open Kamera Majlis',
+        'action' => 'Open Neekah Moments',
     ],
 
     'camera_export' => [
-        'title' => 'Your Kamera Majlis ZIP is ready',
+        'title' => 'Your Neekah Moments ZIP is ready',
         'body' => 'Download every photo and video before the album is deleted on :date.',
     ],
 
     'camera_retention' => [
-        'after_event_title' => 'Thank you for using Kamera Majlis',
+        'after_event_title' => 'Thank you for using Neekah Moments',
         'after_event_body' => 'Your guests shared :count photos and videos. Download the ZIP before the album is deleted on :date.',
-        'expiring_7_title' => 'Your Kamera Majlis album is deleted in 7 days',
+        'expiring_7_title' => 'Your Neekah Moments album is deleted in 7 days',
         'expiring_7_body' => 'Every photo and video will be deleted on :date. Download the ZIP now.',
-        'expiring_1_title' => 'Your Kamera Majlis album is deleted tomorrow',
+        'expiring_1_title' => 'Your Neekah Moments album is deleted tomorrow',
         'expiring_1_body' => 'Last reminder: every photo and video will be deleted on :date.',
-        'purged_title' => 'Your Kamera Majlis album has been deleted',
+        'purged_title' => 'Your Neekah Moments album has been deleted',
         'purged_body' => 'Its storage period has ended and every photo and video has been deleted from Neekah.',
-        'action' => 'Open Kamera Majlis',
+        'action' => 'Open Neekah Moments',
     ],
 
     'boost_tokens' => [

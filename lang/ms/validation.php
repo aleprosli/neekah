@@ -183,7 +183,9 @@ return [
 
     'custom' => [
         'camera_album_closed' => 'Album ini tidak menerima gambar sekarang.',
-        'camera_video_not_allowed' => 'Video hanya untuk Kamera Majlis Pro.',
+        'camera_video_not_allowed' => 'Video hanya untuk Neekah Kenangan Pro.',
+        'camera_wish_limit' => 'Anda sudah menghantar banyak ucapan untuk album ini. Terima kasih!',
+        'camera_voice_unreadable' => 'Rakaman ini tidak dapat dibaca. Cuba rakam semula.',
         'camera_file_type' => 'Fail ini bukan gambar atau video yang disokong.',
         'camera_file_too_large' => 'Fail mesti :mb MB atau kurang.',
         'camera_video_too_long' => 'Video mesti :minutes minit atau kurang.',

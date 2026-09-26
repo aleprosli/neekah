@@ -88,6 +88,7 @@ $site = function (): void {
     Route::get('/k/{album}/galeri', [CameraGuestController::class, 'gallery'])->middleware('throttle:120,1')->name('camera.gallery');
     Route::delete('/k/{album}/media/{media}', [CameraGuestController::class, 'destroy'])->middleware('throttle:60,1')->name('camera.media.destroy');
     Route::post('/k/{album}/media/{media}/lapor', [CameraGuestController::class, 'report'])->middleware('throttle:10,60')->name('camera.media.report');
+    Route::post('/k/{album}/ucapan', [CameraGuestController::class, 'wish'])->middleware('throttle:10,10')->name('camera.guest.wish');
     Route::get('/vendors/{vendor}/ketersediaan', VendorAvailabilityController::class)->middleware('throttle:60,1')->name('vendors.availability');
     // Open to everyone, signed in or not, so the throttle is what stands between
     // a profile and someone with a script.
@@ -287,16 +288,25 @@ $site = function (): void {
             Route::put('/weddings/{wedding}/kad/publish', [CustomerArea\WeddingSiteController::class, 'publish'])->name('weddings.site.publish');
 
             Route::get('/budget', [CustomerArea\WeddingBudgetController::class, 'index'])->middleware('wedding')->name('budget.index');
+            // Neekah Kenangan: every album of the wedding (one per majlis), and
+            // each album's own page. Albums are addressed by id here; the
+            // token is the guests' address and changes when rotated.
             Route::get('/kamera', [CustomerArea\CameraController::class, 'index'])->middleware('wedding')->name('camera.index');
             Route::post('/weddings/{wedding}/kamera/checkout', [CustomerArea\CameraController::class, 'checkout'])->middleware('throttle:10,1')->name('camera.checkout');
             Route::get('/kamera/bayaran-selesai', [CustomerArea\CameraController::class, 'done'])->name('camera.done');
-            Route::put('/weddings/{wedding}/kamera', [CustomerArea\CameraController::class, 'update'])->name('camera.update');
-            Route::post('/weddings/{wedding}/kamera/pautan', [CustomerArea\CameraController::class, 'rotate'])->name('camera.rotate');
-            Route::put('/weddings/{wedding}/kamera/reka-bentuk', [CustomerArea\CameraController::class, 'design'])->name('camera.design');
-            Route::get('/weddings/{wedding}/kamera/media', [CustomerArea\CameraController::class, 'media'])->name('camera.media');
-            Route::post('/weddings/{wedding}/kamera/media/padam', [CustomerArea\CameraController::class, 'destroyMedia'])->name('camera.media.bulk');
-            Route::post('/weddings/{wedding}/kamera/zip', [CustomerArea\CameraController::class, 'export'])->middleware('throttle:5,1')->name('camera.export');
-            Route::get('/weddings/{wedding}/kamera/zip/{part}', [CustomerArea\CameraController::class, 'downloadExport'])->whereNumber('part')->name('camera.export.download');
+            Route::prefix('/kamera/{album:id}')->whereNumber('album')->group(function (): void {
+                Route::get('/', [CustomerArea\CameraController::class, 'show'])->name('camera.album');
+                Route::put('/', [CustomerArea\CameraController::class, 'update'])->name('camera.update');
+                Route::post('/pautan', [CustomerArea\CameraController::class, 'rotate'])->name('camera.rotate');
+                Route::put('/reka-bentuk', [CustomerArea\CameraController::class, 'design'])->name('camera.design');
+                Route::get('/media', [CustomerArea\CameraController::class, 'media'])->name('camera.media');
+                Route::post('/media/padam', [CustomerArea\CameraController::class, 'destroyMedia'])->name('camera.media.bulk');
+                Route::post('/zip', [CustomerArea\CameraController::class, 'export'])->middleware('throttle:5,1')->name('camera.export');
+                Route::post('/zip-pilihan', [CustomerArea\CameraController::class, 'exportSelected'])->middleware('throttle:10,1')->name('camera.export.selected');
+                Route::get('/zip/{part}', [CustomerArea\CameraController::class, 'downloadExport'])->whereNumber('part')->name('camera.export.download');
+                Route::get('/ucapan', [CustomerArea\CameraController::class, 'wishes'])->name('camera.wishes');
+                Route::delete('/ucapan/{wish}', [CustomerArea\CameraController::class, 'destroyWish'])->whereNumber('wish')->name('camera.wishes.destroy');
+            });
             Route::put('/weddings/{wedding}/budget', [CustomerArea\WeddingBudgetController::class, 'update'])->name('weddings.budget.update');
 
             Route::get('/enquiries', [CustomerArea\EnquiryController::class, 'index'])->name('enquiries.index');
