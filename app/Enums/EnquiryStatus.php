@@ -16,4 +16,14 @@ enum EnquiryStatus: string
             self::Closed => __('enums.enquiry_status.closed'),
         };
     }
+
+    /** The palette key the badge components use, in Blade, in Vue and in the app. */
+    public function tone(): string
+    {
+        return match ($this) {
+            self::Open => 'brand',
+            self::Replied => 'emerald',
+            self::Closed => 'muted',
+        };
+    }
 }

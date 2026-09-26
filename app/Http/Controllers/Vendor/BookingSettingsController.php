@@ -3,13 +3,13 @@
 namespace App\Http\Controllers\Vendor;
 
 use App\Actions\ImportVendorIcal;
+use App\Actions\SwitchOnlineBooking;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ConnectHerepayRequest;
 use App\Http\Requests\UpdateBookingSettingsRequest;
 use App\Models\VendorUnavailableDate;
 use App\Support\Herepay\HerepayCredentials;
 use App\Support\Herepay\HerepayGateway;
-use App\Support\VendorAvailability;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use RuntimeException;
@@ -37,16 +37,11 @@ class BookingSettingsController extends Controller
      * would have no way to pay the deposit, so the switch never promises a
      * form that cannot take a booking.
      */
-    public function toggle(Request $request): RedirectResponse
+    public function toggle(Request $request, SwitchOnlineBooking $switch): RedirectResponse
     {
-        $enabled = $request->validate(['enabled' => ['required', 'boolean']])['enabled'];
-        $vendor = $request->user()->vendor;
+        $enabled = (bool) $request->validate(['enabled' => ['required', 'boolean']])['enabled'];
 
-        if ($enabled && VendorAvailability::for($vendor)->paymentChannel() === null) {
-            return back()->withErrors(['enabled' => __('flash.vendor.online_needs_payment')]);
-        }
-
-        $vendor->bookingSettings()->updateOrCreate([], ['enabled' => (bool) $enabled]);
+        $switch->handle($request->user()->vendor, $enabled);
 
         return back()->with('status', $enabled ? __('flash.vendor.online_on') : __('flash.vendor.online_off'));
     }

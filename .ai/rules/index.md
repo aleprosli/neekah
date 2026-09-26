@@ -6,6 +6,7 @@ Before planning or editing, find the row whose globs match the file's path and r
 | --- | --- |
 | app/Actions/SeedWeddingChecklist.php, app/Actions/StoreOptimizedImage.php, app/Actions/ImportVendorIcal.php, app/Actions/ActivateCameraAlbum.php, app/Actions/PurgeCameraAlbum.php | .ai/rules/actions.md |
 | app/Http/Controllers/Admin/**, app/Http/Controllers/Admin/SettingController.php | .ai/rules/admin.md |
+| app/Http/Controllers/Api/** | .ai/rules/api.md |
 | app/** | .ai/rules/app.md |
 | app/Support/Card/** | .ai/rules/card.md |
 | app/Console/Commands/UpdateVendorPopularity.php | .ai/rules/commands.md |
