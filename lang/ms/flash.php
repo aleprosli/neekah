@@ -9,7 +9,7 @@ return [
         'password_reset' => 'Kata laluan anda telah dikemas kini. Sila log masuk.',
         'reset_link_sent' => 'Jika emel tersebut berdaftar, kami telah menghantar pautan set semula kata laluan.',
         'phone_saved' => 'Terima kasih! Nombor telefon anda disimpan.',
-        'google_not_configured' => 'Log masuk Google belum dikonfigurasi.',
+        'google_not_configured' => 'Log masuk dengan Google tidak tersedia.',
         'google_failed' => 'Log masuk Google dibatalkan atau gagal. Sila cuba lagi.',
         'google_no_email' => 'Akaun Google anda tidak berkongsi alamat emel.',
         'welcome' => 'Selamat datang ke Neekah, :name!',

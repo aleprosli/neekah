@@ -24,6 +24,17 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Access code
+    |--------------------------------------------------------------------------
+    | When set, signing in and signing up ask for this code, and Google sign-in
+    | is switched off because it would walk straight past it. For staging, so
+    | only the team can get in. Leave empty in production.
+    */
+
+    'access_code' => env('NEEKAH_ACCESS_CODE'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Brand artwork
     |--------------------------------------------------------------------------
     | Every logo on the site reads from here, so swapping the brand is a change

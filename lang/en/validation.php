@@ -227,6 +227,7 @@ return [
 
         'turnstile_missing' => 'Please complete the security check.',
         'turnstile_failed' => 'The security check did not pass. Please try again.',
+        'access_code' => 'That access code is not valid.',
 
         'credentials' => 'That email and password do not match our records.',
         'too_many_attempts' => 'Too many attempts. Try again in :minutes minutes.',

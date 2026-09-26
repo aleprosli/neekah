@@ -22,6 +22,8 @@ const props = defineProps({
     old: { type: Object, default: () => ({}) },
     errors: { type: Object, default: () => ({}) },
     turnstileSiteKey: { type: String, default: null },
+    /** { name, label, help } while NEEKAH_ACCESS_CODE closes the site. */
+    accessCode: { type: Object, default: null },
     convertUrl: { type: String, default: null },
     account: { type: Object, default: null },
 });
@@ -94,6 +96,10 @@ const categoryOptions = computed(() => props.categories.map((c) => ({ value: c.i
                 <UiField :label="$t('vendor_signup.password')" name="password" type="password" autocomplete="new-password" :error="errors.password" required />
                 <UiField :label="$t('vendor_signup.confirm_password')" name="password_confirmation" type="password" autocomplete="new-password" required />
             </div>
+        </section>
+
+        <section v-if="accessCode && !account" class="flex flex-col gap-4 rounded-3xl border border-line bg-surface-raised p-6 sm:p-8">
+            <UiField :label="accessCode.label" :name="accessCode.name" type="password" autocomplete="off" :help="accessCode.help" :error="errors[accessCode.name]" required />
         </section>
 
         <div class="flex flex-col items-center gap-3">

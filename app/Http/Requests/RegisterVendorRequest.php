@@ -6,6 +6,7 @@ use App\Enums\UserRole;
 use App\Models\Category;
 use App\Models\User;
 use App\Models\Vendor;
+use App\Rules\AccessCode;
 use App\Rules\Turnstile;
 use App\Support\PhoneNumber;
 use App\Support\States;
@@ -38,6 +39,7 @@ class RegisterVendorRequest extends FormRequest
             'district' => ['required', 'string', Rule::in(States::districts($this->input('state')))],
             'state' => ['required', Rule::in(States::names())],
             'tagline' => ['nullable', 'string', 'max:160'],
+            'access_code' => [new AccessCode],
             'cf-turnstile-response' => [app(Turnstile::class)],
         ];
     }
