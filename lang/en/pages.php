@@ -1040,7 +1040,7 @@ return [
         'payment_url' => 'Payment link',
         'gateway_manual' => 'Manual',
         'requery_done' => 'The gateway was asked: :outcome.',
-        'requery_unavailable' => 'This payment cannot be requeried: no invoice code or API key.',
+        'requery_unavailable' => 'This payment cannot be requeried: no gateway payment code or API key.',
         'marked_paid' => 'Payment :reference marked paid.',
         'tokens' => ':count tokens',
         'link_vendor' => 'Vendor: :name',

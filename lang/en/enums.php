@@ -125,7 +125,7 @@ return [
         'manual_recorded' => 'Recorded by hand',
         'manual_verified' => 'Verified',
         'manual_rejected' => 'Rejected',
-        'invoice_attached' => 'Invoice code attached',
+        'invoice_attached' => 'Gateway code attached',
         'settled' => 'Settled',
     ],
 

@@ -4,6 +4,7 @@ namespace App\Actions;
 
 use App\Models\Payment;
 use App\Models\PaymentEvent;
+use App\Support\Herepay\HerepayGateway;
 use App\Support\Payments\GatewayResult;
 use App\Support\Payments\PaymentGateways;
 use Throwable;
@@ -42,7 +43,7 @@ class RequeryPayment
         $payment->update(['last_checked_at' => now()]);
 
         PaymentEvent::record($payment, $gateway->name(), PaymentEvent::REQUERY, $result->raw ?: null, [
-            'invoice' => $payment->gateway_invoice,
+            'code' => HerepayGateway::lookupCode($payment) ?? $payment->gateway_invoice,
             'error' => $result->error,
         ], $result->verified, $outcome, $result->httpStatus);
 

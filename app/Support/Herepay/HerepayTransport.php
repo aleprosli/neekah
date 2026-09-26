@@ -43,15 +43,16 @@ class HerepayTransport
     }
 
     /**
-     * Herepay's word on a transaction, asked by its invoice (reference_code).
-     * Our own authenticated call, so its answer needs no checksum.
+     * Herepay's word on a transaction, asked by its payment_code (HP-PAY-…;
+     * see HerepayGateway::lookupCode). Our own authenticated call, so its
+     * answer needs no checksum.
      */
-    public function transaction(HerepayCredentials $credentials, string $invoice): GatewayResult
+    public function transaction(HerepayCredentials $credentials, string $code): GatewayResult
     {
         $response = $this->client()
             ->withHeaders(['SecretKey' => $credentials->secretKey, 'XApiKey' => $credentials->apiKey])
             ->timeout(15)
-            ->get('/api/v1/herepay/transactions/'.rawurlencode($invoice));
+            ->get('/api/v1/herepay/transactions/'.rawurlencode($code));
 
         return $this->fromTransaction($response);
     }

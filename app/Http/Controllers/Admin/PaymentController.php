@@ -234,10 +234,11 @@ class PaymentController extends Controller
     public function invoice(Request $request, Payment $payment, RequeryPayment $requery): RedirectResponse
     {
         abort_if($payment->isPaid() || ! $payment->isOnline(), 404);
-        $invoice = trim($request->validate(['invoice' => ['required', 'string', 'max:100', 'regex:/^[A-Za-z0-9_\-]+$/']])['invoice']);
+        $code = trim($request->validate(['invoice' => ['required', 'string', 'max:100', 'regex:/^[A-Za-z0-9_\-]+$/']])['invoice']);
 
-        $payment->update(['gateway_invoice' => $invoice]);
-        PaymentEvent::record($payment, $payment->gateway, PaymentEvent::INVOICE_ATTACHED, meta: ['invoice' => $invoice]);
+        // Either of Herepay's codes may be pasted; the payment code (HP-PAY-…) is the one a lookup finds.
+        $payment->update(str_starts_with(strtoupper($code), 'HP-INV') ? ['gateway_invoice' => $code] : ['gateway_reference' => $code]);
+        PaymentEvent::record($payment, $payment->gateway, PaymentEvent::INVOICE_ATTACHED, meta: ['code' => $code]);
 
         $outcome = $requery->handle($payment);
 

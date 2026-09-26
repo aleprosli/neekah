@@ -125,7 +125,7 @@ return [
         'manual_recorded' => 'Direkod secara manual',
         'manual_verified' => 'Disahkan',
         'manual_rejected' => 'Ditolak',
-        'invoice_attached' => 'Kod invois dipautkan',
+        'invoice_attached' => 'Kod gateway dipautkan',
         'settled' => 'Diselesaikan',
     ],
 

@@ -1040,7 +1040,7 @@ return [
         'payment_url' => 'Link bayaran',
         'gateway_manual' => 'Manual',
         'requery_done' => 'Gateway telah disemak: :outcome.',
-        'requery_unavailable' => 'Bayaran ini tidak boleh disemak semula: tiada kod invois atau API key.',
+        'requery_unavailable' => 'Bayaran ini tidak boleh disemak semula: tiada kod bayaran gateway atau API key.',
         'marked_paid' => 'Bayaran :reference ditandakan dibayar.',
         'tokens' => ':count token',
         'link_vendor' => 'Vendor: :name',

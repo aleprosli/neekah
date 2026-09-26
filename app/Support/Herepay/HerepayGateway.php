@@ -133,18 +133,29 @@ class HerepayGateway implements PaymentGateway
 
     public function canRequery(Payment $payment): bool
     {
-        return filled($payment->gateway_invoice) && (bool) $this->credentialsFor($payment)?->canRequery();
+        return self::lookupCode($payment) !== null && (bool) $this->credentialsFor($payment)?->canRequery();
     }
 
     public function requery(Payment $payment): GatewayResult
     {
         if (! $this->canRequery($payment)) {
-            return GatewayResult::unverified(blank($payment->gateway_invoice)
-                ? 'No Herepay invoice (reference_code) is known for this payment yet.'
+            return GatewayResult::unverified(self::lookupCode($payment) === null
+                ? 'No Herepay payment code (HP-PAY-…) is known for this payment yet.'
                 : 'No Herepay API key for this account.');
         }
 
-        return $this->transport->transaction($this->credentialsOrFail($payment), (string) $payment->gateway_invoice);
+        return $this->transport->transaction($this->credentialsOrFail($payment), (string) self::lookupCode($payment));
+    }
+
+    /**
+     * What Herepay's transaction lookup finds a payment by. Its documentation
+     * says the invoice (reference_code, HP-INV-…), but UAT answers 404 for
+     * that and finds the payment by its payment_code (HP-PAY-…), so that
+     * comes first and the invoice is only a fallback.
+     */
+    public static function lookupCode(Payment $payment): ?string
+    {
+        return $payment->gateway_reference ?: ($payment->gateway_invoice ?: null);
     }
 
     /**

@@ -49,8 +49,8 @@ it('shows one payment with everything that passed with its gateway', function ()
 });
 
 it('asks the gateway again from the payment page', function () {
-    $payment = Payment::factory()->kenangan()->create(['gateway_invoice' => 'HP-INV-5', 'amount' => 29]);
-    Http::fake(['uat.herepay.org/api/v1/herepay/transactions/HP-INV-5' => Http::response(['status' => 200, 'data' => ['status' => 'Success', 'status_code' => '00', 'amount' => '29.00', 'reference_code' => 'HP-INV-5']])]);
+    $payment = Payment::factory()->kenangan()->create(['gateway_reference' => 'HP-PAY-5', 'amount' => 29]);
+    Http::fake(['uat.herepay.org/api/v1/herepay/transactions/HP-PAY-5' => Http::response(['status' => 200, 'data' => ['status' => 'Success', 'status_code' => '00', 'amount' => '29.00', 'payment_code' => 'HP-PAY-5']])]);
 
     $this->actingAs($this->admin)->post(route('admin.payments.requery', $payment))->assertRedirect()->assertSessionHas('status');
 
@@ -58,14 +58,14 @@ it('asks the gateway again from the payment page', function () {
         ->and($payment->fresh()->album)->not->toBeNull();
 });
 
-it('ties a payment to the invoice from the gateway dashboard, then asks about it', function () {
+it('ties a payment to the payment code from the gateway dashboard, then asks about it', function () {
     $payment = Payment::factory()->boostPack(tokens: 5, amount: 10)->create(['vendor_id' => $this->vendor->id]);
-    Http::fake(['uat.herepay.org/api/v1/herepay/transactions/HP-INV-77' => Http::response(['status' => 200, 'data' => ['status' => 'Pending', 'status_code' => '29', 'amount' => '10.00']])]);
+    Http::fake(['uat.herepay.org/api/v1/herepay/transactions/HP-PAY-77' => Http::response(['status' => 200, 'data' => ['status' => 'Pending', 'status_code' => '29', 'amount' => '10.00']])]);
 
-    $this->actingAs($this->admin)->post(route('admin.payments.invoice', $payment), ['invoice' => 'HP-INV-77'])->assertRedirect();
+    $this->actingAs($this->admin)->post(route('admin.payments.invoice', $payment), ['invoice' => 'HP-PAY-77'])->assertRedirect();
     $this->actingAs($this->admin)->post(route('admin.payments.invoice', $payment), ['invoice' => 'bad invoice; drop'])->assertSessionHasErrors('invoice');
 
-    expect($payment->fresh()->gateway_invoice)->toBe('HP-INV-77')
+    expect($payment->fresh()->gateway_reference)->toBe('HP-PAY-77')
         ->and($payment->fresh()->status)->toBe(PaymentStatus::Pending)
         ->and($payment->events()->pluck('type')->all())->toBe([PaymentEvent::INVOICE_ATTACHED, PaymentEvent::REQUERY]);
 });
