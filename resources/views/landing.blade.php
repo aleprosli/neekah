@@ -123,6 +123,52 @@
             </div>
         </section>
 
+        {{-- Neekah Kenangan: shown once an admin opens it (LandingController). --}}
+        @if ($kenangan)
+            <section id="kenangan" class="relative overflow-hidden border-y border-gold-300/60 bg-surface-raised">
+                <x-site.ornament name="corner-peony" class="absolute -top-14 -right-14 size-64 opacity-40 sm:size-80" color="var(--color-brand-200)" color2="var(--color-gold-300)" />
+                <x-site.ornament name="corner-wildflower" class="absolute -bottom-14 -left-14 size-56 rotate-180 opacity-35 sm:size-72" color="var(--color-gold-300)" color2="var(--color-brand-100)" />
+
+                <div class="relative mx-auto grid max-w-7xl gap-12 px-4 py-20 sm:px-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:px-8">
+                    <div class="flex min-w-0 flex-col gap-5">
+                        <p class="text-sm font-semibold tracking-[0.2em] text-gold-600 uppercase">{{ __('pages.landing.kenangan.eyebrow') }}</p>
+                        <h2 class="font-display text-3xl font-semibold tracking-tight text-balance sm:text-4xl">{{ __('pages.landing.kenangan.title') }}</h2>
+                        <p class="text-lg text-ink-muted">{{ __('pages.landing.kenangan.body') }}</p>
+                        <ol class="mt-2 flex flex-col gap-3">
+                            @foreach (['scan', 'share', 'wish', 'keep'] as $step)
+                                <li class="flex min-w-0 items-start gap-3">
+                                    <span class="flex size-8 shrink-0 items-center justify-center rounded-full border border-gold-500 bg-ivory font-display text-sm font-semibold text-brand-700">{{ $loop->iteration }}</span>
+                                    <span class="min-w-0 pt-1 text-sm"><span class="font-semibold">{{ __('pages.landing.kenangan.steps.'.$step.'.title') }}</span> <span class="text-ink-muted">{{ __('pages.landing.kenangan.steps.'.$step.'.body', ['days' => $kenangan['retention']]) }}</span></span>
+                                </li>
+                            @endforeach
+                        </ol>
+                    </div>
+
+                    <div class="grid min-w-0 gap-5 sm:grid-cols-2">
+                        @foreach ($kenangan['tiers'] as $tier)
+                            <article @class([
+                                'relative flex min-w-0 flex-col gap-4 overflow-hidden rounded-3xl border p-6',
+                                'border-brand-300 bg-linear-to-b from-brand-50 to-surface-raised shadow-lg shadow-brand-900/5' => $tier['pro'],
+                                'border-line bg-ivory' => ! $tier['pro'],
+                            ])>
+                                <div>
+                                    <h3 class="font-display text-xl font-semibold">{{ $tier['label'] }}</h3>
+                                    <p class="mt-1 font-display text-3xl font-semibold">RM{{ rtrim(rtrim(number_format($tier['price'], 2), '0'), '.') }}</p>
+                                    <p class="text-xs text-ink-muted">{{ __('pages.landing.kenangan.per_album') }}</p>
+                                </div>
+                                <ul class="flex flex-col gap-2 text-sm">
+                                    @foreach ($tier['features'] as $feature)
+                                        <li class="flex items-start gap-2"><x-nav-icon name="check" class="mt-0.5 size-4 shrink-0 text-gold-600" /><span>{{ $feature }}</span></li>
+                                    @endforeach
+                                </ul>
+                            </article>
+                        @endforeach
+                        <a href="{{ route('camera.index') }}" class="inline-flex w-fit items-center rounded-full bg-brand-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-brand-700 sm:col-span-2">{{ __('pages.landing.kenangan.cta') }}</a>
+                    </div>
+                </div>
+            </section>
+        @endif
+
         {{-- Marketplace preview --}}
         <section id="marketplace" class="relative overflow-hidden bg-ivory-deep">
             <x-site.ornament name="garland" class="absolute -top-2 left-1/2 h-14 w-[36rem] max-w-full -translate-x-1/2 opacity-50" color="var(--color-gold-400)" color2="var(--color-brand-300)" />
@@ -245,6 +291,9 @@
                         @endforeach
                     </ul>
                     <p class="text-xs text-brand-200">{{ __('pages.landing.tier_note') }}</p>
+                    @if ($plans && $plans['elite'] !== null)
+                        <a href="#elite" class="inline-flex w-fit items-center gap-2 rounded-full border border-gold-300 bg-linear-to-r from-ink to-brand-800 px-3 py-1 text-sm font-semibold text-gold-300">✦ Pro Elite <span class="text-xs font-normal text-brand-100">{{ __('pages.landing.elite.chip') }}</span></a>
+                    @endif
 
                     <a href="{{ route('vendor.register') }}" class="mt-4 inline-flex w-fit items-center rounded-full bg-gold-400 px-6 py-3 font-semibold text-brand-900 transition hover:bg-gold-300">{{ __('pages.landing.daftar_sebagai_vendor') }}</a>
                 </div>
@@ -263,6 +312,92 @@
                 </div>
             </div>
         </section>
+
+        {{-- Basic, Pro, Pro Elite and boost: what a vendor can buy, and what
+             stays earned. Shown once Pro (and boost) are on sale. --}}
+        @if ($plans || $boost)
+            <section id="pro" class="relative overflow-hidden bg-ivory-deep">
+                <x-site.ornament name="corner-rose" class="absolute -top-10 -left-10 size-48 opacity-40 sm:size-64" color="var(--color-brand-300)" color2="var(--color-brand-100)" />
+                <x-site.ornament name="corner-tropical" class="absolute -right-12 -bottom-12 size-56 rotate-180 opacity-30 sm:size-72" color="var(--color-gold-300)" color2="var(--color-brand-100)" />
+
+                <div class="relative mx-auto flex max-w-7xl flex-col gap-12 px-4 py-20 sm:px-6 lg:px-8">
+                    <div class="max-w-2xl">
+                        <p class="text-sm font-semibold tracking-[0.2em] text-gold-600 uppercase">{{ __('pages.landing.plans.eyebrow') }}</p>
+                        <h2 class="mt-2 font-display text-3xl font-semibold tracking-tight sm:text-4xl">{{ __('pages.landing.plans.title') }}</h2>
+                        <p class="mt-4 text-lg text-ink-muted">{{ __('pages.landing.plans.body') }}</p>
+                    </div>
+
+                    @if ($plans)
+                        <div class="grid min-w-0 gap-6 lg:grid-cols-2">
+                            <article class="flex min-w-0 flex-col gap-4 rounded-3xl border border-line bg-surface-raised p-6 sm:p-8">
+                                <div>
+                                    <h3 class="font-display text-2xl font-semibold">Basic</h3>
+                                    <p class="mt-1 font-display text-3xl font-semibold">{{ __('pages.landing.plans.free') }}</p>
+                                    <p class="text-sm text-ink-muted">{{ __('pages.landing.plans.basic_body') }}</p>
+                                </div>
+                                <ul class="flex flex-col gap-3 text-sm">
+                                    @foreach ($plans['basic'] as $feature)
+                                        <li class="flex items-start gap-2"><x-nav-icon name="check" class="mt-0.5 size-4 shrink-0 text-gold-600" /><span><span class="font-semibold">{{ $feature['label'] }}</span> <span class="text-ink-muted">· {{ $feature['description'] }}</span></span></li>
+                                    @endforeach
+                                </ul>
+                            </article>
+
+                            <article class="relative flex min-w-0 flex-col gap-4 overflow-hidden rounded-3xl border border-brand-300 bg-linear-to-b from-brand-50 to-surface-raised p-6 shadow-lg shadow-brand-900/5 sm:p-8">
+                                <x-site.ornament name="corner-blossom" class="absolute -top-6 -right-6 size-32 opacity-40" color="var(--color-brand-200)" />
+                                <div class="relative">
+                                    <h3 class="flex items-center gap-2 font-display text-2xl font-semibold">Neekah Pro <x-vendors.pro-badge /></h3>
+                                    <p class="mt-1 font-display text-3xl font-semibold">RM{{ rtrim(rtrim(number_format($plans['monthly'], 2), '0'), '.') }}<span class="text-base font-normal text-ink-muted"> {{ __('pages.landing.plans.per_month') }}</span></p>
+                                    <p class="text-sm text-ink-muted">{{ __('pages.landing.plans.pro_yearly', ['price' => 'RM'.rtrim(rtrim(number_format($plans['yearly'], 2), '0'), '.')]) }}</p>
+                                </div>
+                                <p class="relative text-sm font-medium">{{ __('pages.landing.plans.pro_includes') }}</p>
+                                <ul class="relative flex flex-col gap-3 text-sm">
+                                    @foreach ($plans['pro'] as $feature)
+                                        <li class="flex items-start gap-2"><x-nav-icon name="check" class="mt-0.5 size-4 shrink-0 text-brand-600" /><span><span class="font-semibold">{{ $feature['label'] }}</span> <span class="text-ink-muted">· {{ $feature['description'] }}</span></span></li>
+                                    @endforeach
+                                    @if ($boost)
+                                        <li class="flex items-start gap-2"><x-nav-icon name="check" class="mt-0.5 size-4 shrink-0 text-brand-600" /><span><span class="font-semibold">{{ __('pages.landing.plans.pro_tokens_title') }}</span> <span class="text-ink-muted">· {{ __('pages.landing.plans.pro_tokens', ['count' => $boost['pro_monthly']]) }}</span></span></li>
+                                    @endif
+                                </ul>
+                                <p class="relative text-xs text-ink-muted">{{ __('pages.landing.plans.deposit_note') }}</p>
+                            </article>
+                        </div>
+                    @endif
+
+                    <div class="grid min-w-0 gap-6 lg:grid-cols-2">
+                        @if ($boost)
+                            <article id="boost" class="flex min-w-0 scroll-mt-24 flex-col gap-4 rounded-3xl border border-gold-300 bg-surface-raised p-6 sm:p-8">
+                                <p class="text-sm font-semibold tracking-[0.2em] text-gold-600 uppercase">🚀 {{ __('pages.landing.boost.eyebrow') }}</p>
+                                <h3 class="font-display text-2xl font-semibold">{{ __('pages.landing.boost.title') }}</h3>
+                                <p class="text-sm text-ink-muted">{{ __('pages.landing.boost.body') }}</p>
+                                <ul class="flex flex-col gap-2 text-sm">
+                                    <li class="flex items-start gap-2"><x-nav-icon name="check" class="mt-0.5 size-4 shrink-0 text-gold-600" /><span>{{ __('pages.landing.boost.welcome', ['count' => $boost['welcome']]) }}</span></li>
+                                    <li class="flex items-start gap-2"><x-nav-icon name="check" class="mt-0.5 size-4 shrink-0 text-gold-600" /><span>{{ __('pages.landing.boost.pro', ['count' => $boost['pro_monthly']]) }}</span></li>
+                                    @foreach ($boost['packs'] as $pack)
+                                        <li class="flex items-start gap-2"><x-nav-icon name="check" class="mt-0.5 size-4 shrink-0 text-gold-600" /><span>{{ __('pages.landing.boost.pack', ['count' => $pack['tokens'], 'price' => rtrim(rtrim(number_format($pack['price'], 2), '0'), '.')]) }}</span></li>
+                                    @endforeach
+                                </ul>
+                                <p class="text-xs text-ink-muted">{{ __('pages.landing.boost.fair') }}</p>
+                            </article>
+                        @endif
+
+                        @if ($plans && $plans['elite'] !== null)
+                            <article id="elite" class="relative flex min-w-0 scroll-mt-24 flex-col gap-4 overflow-hidden rounded-3xl border border-gold-300/70 bg-linear-to-br from-ink via-brand-900 to-ink p-6 text-surface sm:p-8">
+                                <x-site.ornament name="corner-filigree" class="absolute -top-6 -right-6 size-36 opacity-40" color="var(--color-gold-400)" color2="var(--color-gold-600)" />
+                                <p class="relative text-sm font-semibold tracking-[0.2em] text-gold-300 uppercase">✦ Pro Elite</p>
+                                <h3 class="relative font-display text-2xl font-semibold">{{ __('pages.landing.elite.title') }}</h3>
+                                <p class="relative text-sm text-surface/75">{{ __('pages.landing.elite.body') }}</p>
+                                <ul class="relative flex flex-col gap-2 text-sm">
+                                    @foreach (['badge', 'row', 'order', 'tokens'] as $perk)
+                                        <li class="flex items-start gap-2"><span class="text-gold-300" aria-hidden="true">✦</span><span><span class="font-semibold text-gold-300">{{ __('pages.pro.elite.perks.'.$perk.'.title') }}</span> <span class="text-surface/75">· {{ __('pages.pro.elite.perks.'.$perk.'.body', ['count' => $plans['elite']]) }}</span></span></li>
+                                    @endforeach
+                                </ul>
+                                <p class="relative text-xs text-surface/60">{{ __('pages.landing.elite.fair') }}</p>
+                            </article>
+                        @endif
+                    </div>
+                </div>
+            </section>
+        @endif
 
         {{-- CTA --}}
         <section id="cta" class="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">

@@ -99,7 +99,7 @@ const tones = {
         <form :action="importUrl" method="POST" class="flex flex-col gap-3 rounded-2xl border border-line bg-surface-raised p-5">
             <input type="hidden" name="_token" :value="csrf">
             <h2 class="font-display text-lg font-semibold">{{ $t('guests.tampal_senarai_sedia_ada') }}</h2>
-            <p class="text-sm text-ink-muted">{{ $t('guests.satu_tetamu_satu_baris') }}<code class="text-xs">nama, telefon, pihak, kumpulan, pax</code>. Medan selepas nama boleh dikosongkan.</p>
+            <p class="text-sm text-ink-muted">{{ $t('guests.satu_tetamu_satu_baris') }}<code class="text-xs">{{ $t('copy.guest_columns') }}</code>. {{ $t('copy.guest_columns_optional') }}</p>
 
             <textarea
                 name="rows"

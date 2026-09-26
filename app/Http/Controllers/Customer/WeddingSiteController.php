@@ -100,7 +100,7 @@ class WeddingSiteController extends Controller
                     'guests_url' => route('guests.index'),
                     'insights_url' => route('site.insights'),
                     'publish_url' => route('weddings.site.publish', $wedding),
-                    'draft_note' => 'Kad anda akan berada di '.$site->subdomain.'.'.config('neekah.site_domain').' selepas disiarkan.',
+                    'draft_note' => __('props.copy.card_draft_note', ['address' => $site->subdomain.'.'.config('neekah.site_domain')]),
                 ] : null,
                 'gallery' => $site->exists ? [
                     'store_url' => route('weddings.site.photos.store', $wedding),
@@ -225,7 +225,7 @@ class WeddingSiteController extends Controller
         return response()->json([
             'subdomain' => $subdomain,
             'available' => $available,
-            'message' => $available ? 'Tersedia! Kad anda akan berada di '.$subdomain.'.'.config('neekah.site_domain') : $validator->errors()->first('subdomain'),
+            'message' => $available ? __('props.copy.card_address_free', ['address' => $subdomain.'.'.config('neekah.site_domain')]) : $validator->errors()->first('subdomain'),
             'suggestions' => $available || $subdomain === '' ? [] : WeddingSite::suggestSubdomains(
                 $subdomain,
                 $wedding->event_date->year,

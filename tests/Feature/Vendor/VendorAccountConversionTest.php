@@ -22,6 +22,7 @@ function businessDetails(array $overrides = []): array
         'business_name' => 'ABC Wedding Photography',
         'category_id' => Category::first()->id,
         'city' => 'Alor Setar',
+        'district' => 'Kota Setar',
         'state' => 'Kedah',
         'phone' => '012-345 6789',
         ...$overrides,
@@ -42,7 +43,7 @@ it('switches a couple account with no activity to a pending vendor', function ()
 
     expect($vendor->user_id)->toBe($user->id)
         ->and($vendor->status)->toBe(VendorStatus::Pending)
-        ->and($vendor->phone)->toBe('012-345 6789')
+        ->and($vendor->phone)->toBe('+60123456789')
         ->and($user->fresh()->role)->toBe(UserRole::Vendor);
 
     $this->get(route('vendor.dashboard'))->assertOk();

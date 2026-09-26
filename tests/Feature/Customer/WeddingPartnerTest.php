@@ -14,9 +14,9 @@ use Database\Seeders\CategorySeeder;
 use Illuminate\Support\Facades\Notification;
 
 beforeEach(function () {
-    // Booking through the platform is off by default; these cover the flow
-    // itself, which vendors still use and which returns when it is switched on.
-    config(['neekah.bookings_enabled' => true]);
+    // Online booking is a Neekah Pro feature and off site-wide by default;
+    // these vendors take it, so the couple's booking flow is live.
+    enableOnlineBooking();
 
     $this->seed(CategorySeeder::class);
     $this->aina = User::factory()->create(['name' => 'Aina Zulkifli', 'email' => 'aina@example.com']);
@@ -118,7 +118,7 @@ it('shows the shareable link and connected state on the dashboard', function () 
 });
 
 it('shows both partners the same wedding, bookings and budget', function () {
-    $vendor = Vendor::factory()->for(Category::first())->create(['name' => 'ABC Wedding Photography']);
+    $vendor = Vendor::factory()->for(Category::first())->takingOnlineBookings()->create(['name' => 'ABC Wedding Photography']);
     $package = Package::factory()->for($vendor)->create(['price' => 2500]);
     $this->wedding->addMember($this->hakim, WeddingRole::Partner);
 

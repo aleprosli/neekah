@@ -13,7 +13,7 @@ beforeEach(function () {
     $this->seed(CategorySeeder::class);
     $this->aina = User::factory()->create();
     $this->wedding = Wedding::factory()->for($this->aina)->create(['title' => 'Aina & Hakim']);
-    $this->vendor = Vendor::factory()->for(Category::first())->create(['name' => 'ABC Wedding Photography']);
+    $this->vendor = Vendor::factory()->pro()->for(Category::first())->create(['name' => 'ABC Wedding Photography']);
     $this->booking = Booking::factory()->confirmed()->for($this->aina)->for($this->vendor)->create(['wedding_id' => $this->wedding->id]);
 });
 
@@ -44,7 +44,7 @@ it('assigns a booked vendor to a slot and rejects one that is not booked', funct
 
     expect(WeddingTimelineItem::sole()->vendor_id)->toBe($this->vendor->id);
 
-    $stranger = Vendor::factory()->for(Category::first())->create();
+    $stranger = Vendor::factory()->pro()->for(Category::first())->create();
 
     $this->actingAs($this->aina)
         ->post(route('weddings.timeline.store', $this->wedding), ['starts_at' => '11:00', 'title' => 'X', 'vendor_id' => $stranger->id])

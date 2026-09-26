@@ -223,9 +223,9 @@ it('offers no booking form while booking through the platform is off', function 
 });
 
 it('brings the booking form back when booking is switched on', function () {
-    config(['neekah.bookings_enabled' => true]);
+    enableOnlineBooking();
 
-    $vendor = Vendor::factory()->for($this->photography)->create();
+    $vendor = Vendor::factory()->for($this->photography)->takingOnlineBookings()->create();
     Package::factory()->for($vendor)->create();
 
     $this->get(route('vendors.show', $vendor))->assertOk()->assertSee('Log masuk untuk tempah');
@@ -261,7 +261,9 @@ it('shows the vendor\'s WhatsApp and phone only to a signed-in visitor', functio
     $this->actingAs(User::factory()->create())
         ->get(route('vendors.show', $vendor))
         ->assertSee('WhatsApp vendor')
-        ->assertSee('https://wa.me/60123456789', false)
+        // Through the redirect that counts the tap for the vendor's analytics;
+        // VendorReachTest follows it on to wa.me.
+        ->assertSee(route('vendors.contact.whatsapp', $vendor), false)
         ->assertSee('012-345 6789');
 });
 

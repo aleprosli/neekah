@@ -6,6 +6,7 @@ use App\Enums\PaymentMethod;
 use App\Enums\PaymentStatus;
 use App\Models\Booking;
 use App\Models\Payment;
+use App\Models\PaymentEvent;
 use App\Models\User;
 use App\Notifications\PaymentRecorded;
 use Illuminate\Support\Facades\DB;
@@ -36,6 +37,8 @@ class RecordManualPayment
                 'gateway' => 'manual',
                 'status' => PaymentStatus::AwaitingVerification,
             ]);
+
+            PaymentEvent::record($payment, Payment::GATEWAY_MANUAL, PaymentEvent::MANUAL_RECORDED, meta: ['note' => $payment->note, 'receipt' => $payment->receipt_image]);
 
             $booking->vendor->user->notify(new PaymentRecorded($payment));
 

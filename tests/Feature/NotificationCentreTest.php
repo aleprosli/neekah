@@ -11,13 +11,13 @@ use App\Support\StoredNotification;
 use Database\Seeders\CategorySeeder;
 
 beforeEach(function () {
-    // Booking through the platform is off by default; these cover the flow
-    // itself, which vendors still use and which returns when it is switched on.
-    config(['neekah.bookings_enabled' => true]);
+    // Online booking is a Neekah Pro feature and off site-wide by default;
+    // these vendors take it, so the couple's booking flow is live.
+    enableOnlineBooking();
 
     $this->seed(CategorySeeder::class);
     $this->customer = User::factory()->create();
-    $this->vendor = Vendor::factory()->for(Category::first())->create();
+    $this->vendor = Vendor::factory()->for(Category::first())->takingOnlineBookings()->create();
     $this->package = Package::factory()->for($this->vendor)->create(['price' => 2500]);
 });
 
@@ -33,10 +33,10 @@ it('stores a notification for both sides when a booking is made', function () {
     // switches language sees their whole history in it.
     $notification = $this->customer->notifications()->first();
     expect($notification->data)->toHaveKeys(['icon', 'title_key', 'url'])
-        ->and(StoredNotification::render($notification->data)['title'])->toContain('dibuat');
+        ->and(StoredNotification::render($notification->data)['title'])->toContain('menunggu deposit');
 
     app()->setLocale('en');
-    expect(StoredNotification::render($notification->data)['title'])->toContain('created');
+    expect(StoredNotification::render($notification->data)['title'])->toContain('waiting for its deposit');
     app()->setLocale('ms');
 });
 
@@ -56,7 +56,7 @@ it('shows an unread badge in the header and lists notifications', function () {
 
     expect($props['unreadCount'])->toBe(1)
         ->and($props['notifications'][0]['unread'])->toBeTrue()
-        ->and($props['notifications'][0]['title'])->toContain('Booking');
+        ->and($props['notifications'][0]['title'])->toContain('Tempahan');
 });
 
 it('marks one notification read and follows it to its target', function () {

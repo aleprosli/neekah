@@ -1,6 +1,7 @@
 ---
 paths:
   - 'app/Jobs/**'
+  - app/Jobs/ProcessCameraMedia.php
 ---
 
 # Jobs
@@ -14,3 +15,6 @@ Admin -> Pengumuman writes an Announcement row and dispatches SendAnnouncement, 
 The audience query is the single place that decides who is reached: admins are excluded (an announcement is what the platform says to its users) and so is any deactivated_at account, which EnsureAccountIsActive would sign straight back out. Keep both exclusions in the enum, not in the job.
 
 The job marks the row Sending -> Sent with recipients_count and sent_at, and failed() drops it back to Draft so a run that died never reads as delivered. Body is plain text, one MailMessage line per paragraph, with an optional action button that needs both label and URL. "Hantar ujian kepada saya" passes mailOnly: true and records nothing. Covered by Admin/AnnouncementTest.
+
+## Kenangan photos get a light thumbnail and a display copy; listings send ETags
+Viewing an album must never download Pro originals (2880px+, 1–4 MB). ProcessCameraMedia stores a 480px grid thumbnail and a 1600px "-display" copy (camera_media.display_path) at quality 78; viewers use display_url, only the download button fetches the original. Both media listings (couple camera.media, guest camera.gallery) answer 304 via ETag = CameraAlbum::contentsTag(), built from the album's counters, so any change that affects a listing must move a counter. The guest page reloads the gallery once per batch (onIdle), not per file. A chosen-files ZIP is built synchronously (≤100 files, ≤300 MB); the whole album stays a queued export.

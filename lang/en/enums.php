@@ -2,6 +2,40 @@
 
 return [
 
+    'boost_token_reason' => [
+        'welcome' => 'Welcome gift',
+        'pro_monthly' => 'Pro monthly tokens',
+        'elite_monthly' => 'Monthly Elite bonus',
+        'purchase' => 'Token purchase',
+        'admin' => 'Admin adjustment',
+        'spend' => 'Category boost',
+        'refund' => 'Refund',
+    ],
+
+    'vendor_feature' => [
+        'boost' => 'Boost',
+        'online_booking' => 'Online Booking',
+        'packages' => 'Packages',
+        'portfolio' => 'Portfolio',
+        'calendar' => 'Calendar & Online Booking',
+        'bookings' => 'Bookings',
+        'enquiries' => 'Enquiries',
+        'reviews' => 'Reviews',
+        'points' => 'Points & Ranking',
+    ],
+
+    'vendor_feature_desc' => [
+        'boost' => 'Spend tokens to lift your profile to the top of your category.',
+        'online_booking' => 'Couples book a date and pay the deposit right on the vendor page.',
+        'packages' => 'Manage the packages and prices shown on the public page.',
+        'portfolio' => 'Upload and arrange portfolio photos.',
+        'calendar' => 'Block dates, take online bookings with a deposit and sync Google Calendar.',
+        'bookings' => 'Record and manage customer bookings.',
+        'enquiries' => 'Receive and reply to enquiries from couples.',
+        'reviews' => 'See, reply to and report customer reviews.',
+        'points' => 'See points, tier and ranking position.',
+    ],
+
     'announcement_audience' => [
         'everyone' => 'Everyone',
         'customers' => 'Couples only',
@@ -68,6 +102,32 @@ return [
         'paid' => 'Paid',
         'failed' => 'Failed',
         'refunded' => 'Refunded',
+        'expired' => 'Expired',
+    ],
+
+    'payment_purpose' => [
+        'booking' => 'Booking',
+        'vendor_pro' => 'Neekah Pro',
+        'boost_tokens' => 'Boost tokens',
+        'kenangan' => 'Neekah Moments',
+    ],
+
+    'payment_merchant' => [
+        'neekah' => 'Neekah account',
+        'vendor' => 'Vendor account',
+    ],
+
+    'payment_event' => [
+        'link_created' => 'Payment link created',
+        'link_failed' => 'Payment link failed',
+        'callback' => 'Gateway callback',
+        'return' => 'Payer returned',
+        'requery' => 'Requery',
+        'manual_recorded' => 'Recorded by hand',
+        'manual_verified' => 'Verified',
+        'manual_rejected' => 'Rejected',
+        'invoice_attached' => 'Gateway code attached',
+        'settled' => 'Settled',
     ],
 
     'point_reason' => [
@@ -86,6 +146,12 @@ return [
     'price_unit' => [
         'package' => 'package',
         'pax' => 'pax',
+    ],
+
+    'camera_album_filter' => [
+        'active' => 'Active',
+        'reported' => 'Reported',
+        'purged' => 'Ended',
     ],
 
     'review_filter' => [
@@ -184,4 +250,55 @@ return [
         'custom' => 'Pick users one by one, or type an email address yourself.',
     ],
 
+    'vendor_plan' => [
+        'monthly' => 'Monthly',
+        'yearly' => 'Yearly',
+    ],
+
+    'booking_source' => [
+        'vendor' => 'Recorded by vendor',
+        'online' => 'Online booking',
+    ],
+
+    'deposit_channel' => [
+        'herepay' => 'Herepay (FPX)',
+        'manual' => 'Bank transfer',
+    ],
+
+    'cancellation_reason' => [
+        'couple' => 'Cancelled by the couple',
+        'vendor' => 'Cancelled by the vendor',
+        'expired' => 'Deposit not paid',
+    ],
+
+    'deposit_type' => [
+        'percent' => 'Percentage of the package price',
+        'fixed' => 'Fixed amount (RM)',
+    ],
+
+    'day_status' => [
+        'open' => 'Available',
+        'full' => 'Full',
+        'closed' => 'Closed',
+        'weekday_off' => 'Not open',
+        'too_soon' => 'Too soon',
+        'too_far' => 'Not open yet',
+        'past' => 'Past',
+    ],
+
+    'online_booking_state' => [
+        'open' => 'Live: couples can book directly',
+        'globally_off' => 'Neekah has not opened online booking yet',
+        'not_approved' => 'Account not approved yet',
+        'feature_off' => 'Online booking is for Neekah Pro vendors',
+        'switched_off' => 'Switched off by you',
+        'no_packages' => 'No active package',
+        'no_payment_path' => 'No way to pay the deposit: connect Herepay or add bank details',
+        'calendar_stale' => 'Paused: confirm your calendar',
+    ],
+
+    'camera_tier' => [
+        'basic' => 'Basic',
+        'pro' => 'Pro',
+    ],
 ];

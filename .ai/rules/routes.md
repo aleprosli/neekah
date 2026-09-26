@@ -22,3 +22,6 @@ NEVER use request()->routeIs() or $route->getName() comparisons: the registered 
 The card subdomain group and the sitemaps stay outside the per-language registration: one sitemap lists both languages, and the wedding card is the couple's own artifact, still Malay only.
 
 config/app.php locale is now 'ms' and fallback is 'ms' too, so an English string nobody has written yet prints Malay rather than a bare key. Prod caches config and routes — a deploy touching either MUST run config:cache and route:cache.
+
+## Couple routes sit behind the `couple` middleware
+Every couple page and action (dashboard, weddings, checklist, tetamu, timeline, kad, budget, bookings index/cancel/payments/review, enquiries, booking and enquiry creation, invitation acceptance) is inside Route::middleware('couple'), EnsureUserIsCouple. A vendor or admin opening one by GET is redirected to User::homeRoute(); any write is 403. Only truly shared routes stay outside it: account, phone, notifications, logout, vendor.convert, impersonate.stop, vendor contact taps, vendor report, and bookings.show (a vendor following a booking link is forwarded to vendor.bookings.show). A new couple route goes inside the group. Other role areas keep plain `role:` with 403. Covered by CoupleAreaAccessTest.

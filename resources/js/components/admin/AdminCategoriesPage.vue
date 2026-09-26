@@ -142,7 +142,7 @@ const saveOrder = async () => {
                         <span class="shrink-0 rounded-full bg-surface-muted px-2.5 py-1 text-xs font-semibold text-ink-muted">{{ row.vendors_count }} vendor</span>
 
                         <span :class="['hidden shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold sm:inline-flex', row.is_active ? 'bg-emerald-100 text-emerald-800' : 'bg-surface-muted text-ink-muted']">
-                            {{ row.is_active ? 'Aktif' : 'Tidak aktif' }}
+                            {{ row.is_active ? $t('copy.active') : $t('copy.inactive') }}
                         </span>
 
                         <div class="flex shrink-0 items-center gap-1">

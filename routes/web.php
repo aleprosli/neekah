@@ -10,6 +10,7 @@ use App\Http\Controllers\Auth\PhoneNumberController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\CalendarController;
+use App\Http\Controllers\CameraGuestController;
 use App\Http\Controllers\Customer as CustomerArea;
 use App\Http\Controllers\Customer\BookingController;
 use App\Http\Controllers\Customer\PaymentController;
@@ -18,16 +19,21 @@ use App\Http\Controllers\InvitationPreviewController;
 use App\Http\Controllers\LandingController;
 use App\Http\Controllers\NfcCardController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\Payments\ReturnController as PaymentReturnController;
+use App\Http\Controllers\Payments\WebhookController as PaymentWebhookController;
 use App\Http\Controllers\PublicSiteController;
 use App\Http\Controllers\ReportVendorController;
 use App\Http\Controllers\RsvpController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\SiteTemplatePreviewController;
 use App\Http\Controllers\Vendor as VendorArea;
+use App\Http\Controllers\VendorAvailabilityController;
 use App\Http\Controllers\VendorComparisonController;
+use App\Http\Controllers\VendorContactController;
 use App\Http\Controllers\VendorController;
 use App\Http\Controllers\VendorReviewController;
 use App\Support\Locales;
+use App\Support\Payments\PaymentGateways;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -69,6 +75,20 @@ $site = function (): void {
     Route::get('/', [VendorController::class, 'index'])->name('vendors.index');
     Route::get('/compare', VendorComparisonController::class)->name('vendors.compare');
     Route::get('/vendors/{vendor}', [VendorController::class, 'show'])->name('vendors.show');
+    // Kamera Majlis: the guest page the QR opens. No account needed; the
+    // unguessable token is the key.
+    Route::get('/k/{album}', [CameraGuestController::class, 'show'])->middleware('throttle:60,1')->name('camera.show');
+    Route::post('/k/{album}/masuk', [CameraGuestController::class, 'enter'])->middleware('throttle:20,1')->name('camera.enter');
+    Route::post('/k/{album}/nama', [CameraGuestController::class, 'name'])->middleware('throttle:20,1')->name('camera.name');
+    Route::post('/k/{album}/muat-naik', [CameraGuestController::class, 'reserve'])->middleware('throttle:120,1')->name('camera.upload.reserve');
+    Route::put('/k/{album}/muat-naik/{media}/fail', [CameraGuestController::class, 'receive'])->middleware(['signed', 'throttle:120,1'])->name('camera.upload.file');
+    Route::post('/k/{album}/muat-naik/{media}/selesai', [CameraGuestController::class, 'complete'])->middleware('throttle:120,1')->name('camera.upload.complete');
+    Route::post('/k/{album}/muat-naik-biasa', [CameraGuestController::class, 'fallbackUpload'])->middleware('throttle:30,1')->name('camera.upload.fallback');
+    Route::get('/k/{album}/galeri', [CameraGuestController::class, 'gallery'])->middleware('throttle:120,1')->name('camera.gallery');
+    Route::delete('/k/{album}/media/{media}', [CameraGuestController::class, 'destroy'])->middleware('throttle:60,1')->name('camera.media.destroy');
+    Route::post('/k/{album}/media/{media}/lapor', [CameraGuestController::class, 'report'])->middleware('throttle:10,60')->name('camera.media.report');
+    Route::post('/k/{album}/ucapan', [CameraGuestController::class, 'wish'])->middleware('throttle:10,10')->name('camera.guest.wish');
+    Route::get('/vendors/{vendor}/ketersediaan', VendorAvailabilityController::class)->middleware('throttle:60,1')->name('vendors.availability');
     // Open to everyone, signed in or not, so the throttle is what stands between
     // a profile and someone with a script.
     Route::post('/vendors/{vendor}/reviews', [VendorReviewController::class, 'store'])
@@ -110,33 +130,92 @@ $site = function (): void {
 
     Route::middleware(['auth', 'role:vendor'])->prefix('vendor')->name('vendor.')->group(function (): void {
         Route::get('/', VendorArea\DashboardController::class)->name('dashboard');
-        Route::get('/profile', [VendorArea\ProfileController::class, 'edit'])->name('profile.edit');
-        Route::put('/profile', [VendorArea\ProfileController::class, 'update'])->name('profile.update');
-        Route::resource('packages', VendorArea\PackageController::class)->except('show');
-        Route::get('/portfolio', [VendorArea\PortfolioItemController::class, 'index'])->name('portfolio.index');
-        Route::post('/portfolio', [VendorArea\PortfolioItemController::class, 'store'])->name('portfolio.store');
-        Route::put('/portfolio/order', [VendorArea\PortfolioItemController::class, 'reorder'])->name('portfolio.reorder');
-        Route::delete('/portfolio/{item}', [VendorArea\PortfolioItemController::class, 'destroy'])->name('portfolio.destroy');
-        Route::get('/availability', [VendorArea\UnavailableDateController::class, 'index'])->name('availability.index');
-        Route::post('/availability', [VendorArea\UnavailableDateController::class, 'store'])->name('availability.store');
-        Route::delete('/availability/{date}', [VendorArea\UnavailableDateController::class, 'destroy'])->name('availability.destroy');
-        Route::get('/bookings', [VendorArea\BookingController::class, 'index'])->name('bookings.index');
-        Route::get('/bookings/data', [VendorArea\BookingController::class, 'data'])->name('bookings.data');
-        Route::get('/bookings/create', [VendorArea\BookingController::class, 'create'])->name('bookings.create');
-        Route::post('/bookings', [VendorArea\BookingController::class, 'store'])->name('bookings.store');
-        Route::get('/bookings/{booking}', [VendorArea\BookingController::class, 'show'])->name('bookings.show');
-        Route::post('/bookings/{booking}/complete', [VendorArea\BookingCompletionController::class, 'store'])->name('bookings.complete');
-        Route::post('/bookings/{booking}/payments/{payment}/verify', [VendorArea\PaymentVerificationController::class, 'store'])->name('bookings.payments.verify')->scopeBindings();
-        Route::delete('/bookings/{booking}/payments/{payment}/verify', [VendorArea\PaymentVerificationController::class, 'destroy'])->name('bookings.payments.reject')->scopeBindings();
-        Route::get('/reviews', [VendorArea\ReviewController::class, 'index'])->name('reviews.index');
-        Route::post('/reviews', [VendorArea\ReviewController::class, 'store'])->name('reviews.store');
-        Route::delete('/reviews/{review}', [VendorArea\ReviewController::class, 'destroy'])->name('reviews.destroy');
-        Route::post('/reviews/{review}/reply', [VendorArea\ReviewController::class, 'reply'])->name('reviews.reply');
-        Route::post('/reviews/{review}/report', [VendorArea\ReviewController::class, 'report'])->name('reviews.report');
-        Route::get('/points', [VendorArea\PointController::class, 'index'])->name('points.index');
-        Route::get('/enquiries', [VendorArea\EnquiryController::class, 'index'])->name('enquiries.index');
-        Route::get('/enquiries/{enquiry}', [VendorArea\EnquiryController::class, 'show'])->name('enquiries.show');
-        Route::put('/enquiries/{enquiry}', [VendorArea\EnquiryController::class, 'update'])->name('enquiries.update');
+        Route::put('/persediaan/profil', [VendorArea\SetupController::class, 'profile'])->name('setup.profile');
+        Route::post('/persediaan/gambar-utama', [VendorArea\SetupController::class, 'cover'])->name('setup.cover');
+
+        // Open to a vendor still waiting for approval too: the setup page uses
+        // them. EnsureVendorHasFeature lets a pending vendor through.
+        Route::middleware('vendor.feature:packages')->group(function (): void {
+            Route::post('/packages', [VendorArea\PackageController::class, 'store'])->name('packages.store');
+            Route::delete('/packages/{package}', [VendorArea\PackageController::class, 'destroy'])->name('packages.destroy');
+        });
+        Route::middleware('vendor.feature:portfolio')->group(function (): void {
+            Route::post('/portfolio', [VendorArea\PortfolioItemController::class, 'store'])->name('portfolio.store');
+            Route::delete('/portfolio/{item}', [VendorArea\PortfolioItemController::class, 'destroy'])->name('portfolio.destroy');
+        });
+
+        Route::middleware('vendor.approved')->group(function (): void {
+            // Always open, whatever the plan: the profile, and the Pro page
+            // where a closed feature is bought.
+            Route::get('/profile', [VendorArea\ProfileController::class, 'edit'])->name('profile.edit');
+            Route::put('/profile', [VendorArea\ProfileController::class, 'update'])->name('profile.update');
+            Route::get('/pro', [VendorArea\ProController::class, 'index'])->name('pro.index');
+            Route::post('/pro/checkout', [VendorArea\ProController::class, 'checkout'])->middleware('throttle:10,1')->name('pro.checkout');
+            Route::get('/pro/selesai', [VendorArea\ProController::class, 'done'])->name('pro.done');
+
+            // Each feature is open to every vendor or only on Pro
+            // (VendorFeature::requiresPro).
+            Route::middleware('vendor.feature:packages')->group(function (): void {
+                Route::resource('packages', VendorArea\PackageController::class)->except('show', 'store', 'destroy');
+            });
+            Route::middleware('vendor.feature:portfolio')->group(function (): void {
+                Route::get('/portfolio', [VendorArea\PortfolioItemController::class, 'index'])->name('portfolio.index');
+                Route::put('/portfolio/order', [VendorArea\PortfolioItemController::class, 'reorder'])->name('portfolio.reorder');
+            });
+            Route::middleware('vendor.feature:calendar')->group(function (): void {
+                Route::get('/availability', [VendorArea\CalendarController::class, 'index'])->name('availability.index');
+                Route::post('/availability', [VendorArea\UnavailableDateController::class, 'store'])->name('availability.store');
+                Route::delete('/availability/{date}', [VendorArea\UnavailableDateController::class, 'destroy'])->name('availability.destroy');
+            });
+            Route::middleware('vendor.feature:bookings')->group(function (): void {
+                Route::get('/bookings', [VendorArea\BookingController::class, 'index'])->name('bookings.index');
+                Route::get('/bookings/data', [VendorArea\BookingController::class, 'data'])->name('bookings.data');
+                Route::get('/bookings/create', [VendorArea\BookingController::class, 'create'])->name('bookings.create');
+                Route::post('/bookings', [VendorArea\BookingController::class, 'store'])->name('bookings.store');
+                Route::get('/bookings/{booking}', [VendorArea\BookingController::class, 'show'])->name('bookings.show');
+                Route::post('/bookings/{booking}/complete', [VendorArea\BookingCompletionController::class, 'store'])->name('bookings.complete');
+                Route::post('/bookings/{booking}/batal', [VendorArea\BookingCancellationController::class, 'store'])->name('bookings.cancel');
+                Route::post('/bookings/{booking}/payments/{payment}/dipulangkan', [VendorArea\BookingCancellationController::class, 'refunded'])->name('bookings.payments.refunded')->scopeBindings();
+                Route::post('/bookings/{booking}/payments/{payment}/verify', [VendorArea\PaymentVerificationController::class, 'store'])->name('bookings.payments.verify')->scopeBindings();
+                Route::delete('/bookings/{booking}/payments/{payment}/verify', [VendorArea\PaymentVerificationController::class, 'destroy'])->name('bookings.payments.reject')->scopeBindings();
+            });
+            Route::middleware('vendor.feature:reviews')->group(function (): void {
+                Route::get('/reviews', [VendorArea\ReviewController::class, 'index'])->name('reviews.index');
+                Route::post('/reviews', [VendorArea\ReviewController::class, 'store'])->name('reviews.store');
+                Route::delete('/reviews/{review}', [VendorArea\ReviewController::class, 'destroy'])->name('reviews.destroy');
+                Route::post('/reviews/{review}/reply', [VendorArea\ReviewController::class, 'reply'])->name('reviews.reply');
+                Route::post('/reviews/{review}/report', [VendorArea\ReviewController::class, 'report'])->name('reviews.report');
+            });
+            Route::middleware('vendor.feature:points')->group(function (): void {
+                Route::get('/points', [VendorArea\PointController::class, 'index'])->name('points.index');
+            });
+            Route::middleware('vendor.feature:boost')->group(function (): void {
+                Route::get('/boost', [VendorArea\BoostController::class, 'index'])->name('boost.index');
+                Route::post('/boost', [VendorArea\BoostController::class, 'store'])->middleware('throttle:20,1')->name('boost.store');
+                Route::post('/boost/beli', [VendorArea\BoostController::class, 'checkout'])->middleware('throttle:10,1')->name('boost.checkout');
+                Route::get('/boost/selesai', [VendorArea\BoostController::class, 'done'])->name('boost.done');
+            });
+            Route::middleware('vendor.feature:online_booking')->group(function (): void {
+                // The settings moved onto the calendar page; old links still land there.
+                Route::redirect('/tempahan-online', '/vendor/availability?tab=tempahan')->name('booking-settings.edit');
+                Route::put('/tempahan-online', [VendorArea\BookingSettingsController::class, 'update'])->name('booking-settings.update');
+                Route::put('/tempahan-online/status', [VendorArea\BookingSettingsController::class, 'toggle'])->name('booking-settings.toggle');
+                Route::put('/tempahan-online/bank', [VendorArea\BookingSettingsController::class, 'manual'])->name('booking-settings.manual');
+                Route::put('/tempahan-online/herepay', [VendorArea\BookingSettingsController::class, 'connect'])->middleware('throttle:5,1')->name('booking-settings.herepay.connect');
+                Route::delete('/tempahan-online/herepay', [VendorArea\BookingSettingsController::class, 'disconnect'])->name('booking-settings.herepay.disconnect');
+                Route::post('/tempahan-online/kalendar', [VendorArea\BookingSettingsController::class, 'confirmCalendar'])->name('booking-settings.calendar');
+                Route::put('/tempahan-online/ical', [VendorArea\BookingSettingsController::class, 'connectIcal'])->middleware('throttle:10,1')->name('booking-settings.ical.connect');
+                Route::post('/tempahan-online/ical/segerak', [VendorArea\BookingSettingsController::class, 'syncIcal'])->middleware('throttle:10,1')->name('booking-settings.ical.sync');
+                Route::delete('/tempahan-online/ical', [VendorArea\BookingSettingsController::class, 'disconnectIcal'])->name('booking-settings.ical.disconnect');
+            });
+            // Open to Basic too: it shows how many enquiries are waiting,
+            // locked, as the reason to take Pro.
+            Route::get('/enquiries', [VendorArea\EnquiryController::class, 'index'])->name('enquiries.index');
+            Route::middleware('vendor.feature:enquiries')->group(function (): void {
+                Route::get('/enquiries/{enquiry}', [VendorArea\EnquiryController::class, 'show'])->name('enquiries.show');
+                Route::put('/enquiries/{enquiry}', [VendorArea\EnquiryController::class, 'update'])->name('enquiries.update');
+            });
+        });
     });
 
     Route::middleware('auth')->group(function (): void {
@@ -153,59 +232,96 @@ $site = function (): void {
         Route::post('/vendor/tukar-akaun', [VendorArea\AccountConversionController::class, 'store']);
         Route::post('/impersonate/stop', [AdminArea\ImpersonationController::class, 'destroy'])->name('impersonate.stop');
 
-        Route::post('/vendors/{vendor}/bookings', [BookingController::class, 'store'])->name('vendors.bookings.store');
-        Route::get('/bookings', [BookingController::class, 'index'])->name('bookings.index');
+        // Shared: a vendor opening a booking link is sent on to their own view of it.
         Route::get('/bookings/{booking}', [BookingController::class, 'show'])->name('bookings.show');
-        Route::post('/bookings/{booking}/cancel', [CustomerArea\BookingCancellationController::class, 'store'])->name('bookings.cancel');
-        Route::post('/bookings/{booking}/payments', [PaymentController::class, 'store'])->name('bookings.payments.store');
-        Route::delete('/bookings/{booking}/payments/{payment}', [PaymentController::class, 'destroy'])->name('bookings.payments.destroy')->scopeBindings();
-        Route::post('/bookings/{booking}/review', [CustomerArea\ReviewController::class, 'store'])->name('bookings.review.store');
 
-        Route::get('/dashboard', CustomerArea\DashboardController::class)->name('dashboard');
-        Route::get('/weddings/create', [CustomerArea\WeddingController::class, 'create'])->name('weddings.create');
-        Route::post('/weddings', [CustomerArea\WeddingController::class, 'store'])->name('weddings.store');
-        Route::get('/weddings/{wedding}/edit', [CustomerArea\WeddingController::class, 'edit'])->name('weddings.edit');
-        Route::put('/weddings/{wedding}', [CustomerArea\WeddingController::class, 'update'])->name('weddings.update');
-        Route::post('/weddings/{wedding}/invitations', [CustomerArea\WeddingInvitationController::class, 'store'])->name('weddings.invitations.store');
-        Route::delete('/weddings/{wedding}/invitations/{invitation}', [CustomerArea\WeddingInvitationController::class, 'destroy'])->name('weddings.invitations.destroy');
-        Route::delete('/weddings/{wedding}/members/{member}', [CustomerArea\WeddingMemberController::class, 'destroy'])->name('weddings.members.destroy');
-        Route::post('/invitations/{invitation}', [InvitationAcceptanceController::class, 'store'])->name('invitations.accept');
+        // The couple's side of the app. A vendor or an admin typing one of
+        // these addresses is sent to their own dashboard (EnsureUserIsCouple).
+        Route::middleware('couple')->group(function (): void {
+            Route::post('/vendors/{vendor}/bookings', [BookingController::class, 'store'])->name('vendors.bookings.store');
+            Route::get('/bookings', [BookingController::class, 'index'])->name('bookings.index');
+            Route::post('/bookings/{booking}/cancel', [CustomerArea\BookingCancellationController::class, 'store'])->name('bookings.cancel');
+            Route::post('/bookings/{booking}/deposit', [BookingController::class, 'payDeposit'])->middleware('throttle:10,1')->name('bookings.deposit.pay');
+            Route::get('/tempahan/{booking}/bayaran-selesai', [BookingController::class, 'paymentDone'])->name('bookings.payment.done');
+            Route::post('/bookings/{booking}/payments', [PaymentController::class, 'store'])->name('bookings.payments.store');
+            Route::delete('/bookings/{booking}/payments/{payment}', [PaymentController::class, 'destroy'])->name('bookings.payments.destroy')->scopeBindings();
+            Route::post('/bookings/{booking}/review', [CustomerArea\ReviewController::class, 'store'])->name('bookings.review.store');
 
-        Route::get('/checklist', [CustomerArea\WeddingTaskController::class, 'index'])->middleware('wedding')->name('checklist.index');
-        Route::post('/weddings/{wedding}/tasks', [CustomerArea\WeddingTaskController::class, 'store'])->name('weddings.tasks.store');
-        Route::put('/weddings/{wedding}/tasks', [CustomerArea\WeddingTaskController::class, 'update'])->name('weddings.tasks.update');
-        Route::delete('/weddings/{wedding}/tasks/{task}', [CustomerArea\WeddingTaskController::class, 'destroy'])->name('weddings.tasks.destroy');
+            Route::get('/dashboard', CustomerArea\DashboardController::class)->name('dashboard');
+            Route::get('/weddings/create', [CustomerArea\WeddingController::class, 'create'])->name('weddings.create');
+            Route::post('/weddings', [CustomerArea\WeddingController::class, 'store'])->name('weddings.store');
+            Route::get('/weddings/{wedding}/edit', [CustomerArea\WeddingController::class, 'edit'])->name('weddings.edit');
+            Route::put('/weddings/{wedding}', [CustomerArea\WeddingController::class, 'update'])->name('weddings.update');
+            Route::post('/weddings/{wedding}/invitations', [CustomerArea\WeddingInvitationController::class, 'store'])->name('weddings.invitations.store');
+            Route::delete('/weddings/{wedding}/invitations/{invitation}', [CustomerArea\WeddingInvitationController::class, 'destroy'])->name('weddings.invitations.destroy');
+            Route::delete('/weddings/{wedding}/members/{member}', [CustomerArea\WeddingMemberController::class, 'destroy'])->name('weddings.members.destroy');
+            Route::post('/invitations/{invitation}', [InvitationAcceptanceController::class, 'store'])->name('invitations.accept');
 
-        Route::get('/tetamu', [CustomerArea\WeddingGuestController::class, 'index'])->middleware('wedding')->name('guests.index');
-        Route::post('/weddings/{wedding}/guests', [CustomerArea\WeddingGuestController::class, 'store'])->name('weddings.guests.store');
-        Route::put('/weddings/{wedding}/guests/{guest}', [CustomerArea\WeddingGuestController::class, 'update'])->name('weddings.guests.update');
-        Route::delete('/weddings/{wedding}/guests/{guest}', [CustomerArea\WeddingGuestController::class, 'destroy'])->name('weddings.guests.destroy');
-        Route::post('/weddings/{wedding}/guests/import', [CustomerArea\WeddingGuestImportController::class, 'store'])->name('weddings.guests.import');
-        Route::post('/weddings/{wedding}/guests/{guest}/share', [CustomerArea\WeddingGuestShareController::class, 'store'])->name('weddings.guests.share');
-        Route::delete('/weddings/{wedding}/guests/{guest}/share', [CustomerArea\WeddingGuestShareController::class, 'destroy'])->name('weddings.guests.share.destroy');
-        Route::put('/weddings/{wedding}/rsvps/{rsvp}', [CustomerArea\WeddingRsvpController::class, 'update'])->name('weddings.rsvps.update');
+            Route::get('/checklist', [CustomerArea\WeddingTaskController::class, 'index'])->middleware('wedding')->name('checklist.index');
+            Route::post('/weddings/{wedding}/tasks', [CustomerArea\WeddingTaskController::class, 'store'])->name('weddings.tasks.store');
+            Route::put('/weddings/{wedding}/tasks', [CustomerArea\WeddingTaskController::class, 'update'])->name('weddings.tasks.update');
+            Route::delete('/weddings/{wedding}/tasks/{task}', [CustomerArea\WeddingTaskController::class, 'destroy'])->name('weddings.tasks.destroy');
 
-        Route::get('/timeline', [CustomerArea\WeddingTimelineController::class, 'index'])->middleware('wedding')->name('timeline.index');
-        Route::post('/weddings/{wedding}/timeline', [CustomerArea\WeddingTimelineController::class, 'store'])->name('weddings.timeline.store');
-        Route::put('/weddings/{wedding}/timeline/{item}', [CustomerArea\WeddingTimelineController::class, 'update'])->name('weddings.timeline.update');
-        Route::delete('/weddings/{wedding}/timeline/{item}', [CustomerArea\WeddingTimelineController::class, 'destroy'])->name('weddings.timeline.destroy');
+            Route::get('/tetamu', [CustomerArea\WeddingGuestController::class, 'index'])->middleware('wedding')->name('guests.index');
+            Route::post('/weddings/{wedding}/guests', [CustomerArea\WeddingGuestController::class, 'store'])->name('weddings.guests.store');
+            Route::put('/weddings/{wedding}/guests/{guest}', [CustomerArea\WeddingGuestController::class, 'update'])->name('weddings.guests.update');
+            Route::delete('/weddings/{wedding}/guests/{guest}', [CustomerArea\WeddingGuestController::class, 'destroy'])->name('weddings.guests.destroy');
+            Route::post('/weddings/{wedding}/guests/import', [CustomerArea\WeddingGuestImportController::class, 'store'])->name('weddings.guests.import');
+            Route::post('/weddings/{wedding}/guests/{guest}/share', [CustomerArea\WeddingGuestShareController::class, 'store'])->name('weddings.guests.share');
+            Route::delete('/weddings/{wedding}/guests/{guest}/share', [CustomerArea\WeddingGuestShareController::class, 'destroy'])->name('weddings.guests.share.destroy');
+            Route::put('/weddings/{wedding}/rsvps/{rsvp}', [CustomerArea\WeddingRsvpController::class, 'update'])->name('weddings.rsvps.update');
 
-        Route::get('/kad', [CustomerArea\WeddingSiteController::class, 'edit'])->middleware('wedding')->name('site.edit');
-        Route::get('/kad/preview', [CustomerArea\WeddingSiteController::class, 'preview'])->middleware('wedding')->name('site.preview');
-        Route::get('/kad/alamat', [CustomerArea\WeddingSiteController::class, 'checkSubdomain'])->middleware(['wedding', 'throttle:60,1'])->name('site.subdomain');
-        Route::get('/kad/reka-bentuk', [CustomerArea\WeddingSiteController::class, 'designs'])->middleware(['wedding', 'throttle:120,1'])->name('site.designs');
-        Route::get('/kad/statistik', CustomerArea\WeddingSiteInsightsController::class)->middleware('wedding')->name('site.insights');
-        Route::put('/weddings/{wedding}/kad', [CustomerArea\WeddingSiteController::class, 'update'])->name('weddings.site.update');
-        Route::post('/weddings/{wedding}/kad/galeri', [CustomerArea\WeddingSitePhotoController::class, 'store'])->name('weddings.site.photos.store');
-        Route::delete('/weddings/{wedding}/kad/galeri/{photo}', [CustomerArea\WeddingSitePhotoController::class, 'destroy'])->name('weddings.site.photos.destroy');
-        Route::put('/weddings/{wedding}/kad/publish', [CustomerArea\WeddingSiteController::class, 'publish'])->name('weddings.site.publish');
+            Route::get('/timeline', [CustomerArea\WeddingTimelineController::class, 'index'])->middleware('wedding')->name('timeline.index');
+            Route::post('/weddings/{wedding}/timeline', [CustomerArea\WeddingTimelineController::class, 'store'])->name('weddings.timeline.store');
+            Route::put('/weddings/{wedding}/timeline/{item}', [CustomerArea\WeddingTimelineController::class, 'update'])->name('weddings.timeline.update');
+            Route::delete('/weddings/{wedding}/timeline/{item}', [CustomerArea\WeddingTimelineController::class, 'destroy'])->name('weddings.timeline.destroy');
 
-        Route::get('/budget', [CustomerArea\WeddingBudgetController::class, 'index'])->middleware('wedding')->name('budget.index');
-        Route::put('/weddings/{wedding}/budget', [CustomerArea\WeddingBudgetController::class, 'update'])->name('weddings.budget.update');
+            Route::get('/kad', [CustomerArea\WeddingSiteController::class, 'edit'])->middleware('wedding')->name('site.edit');
+            Route::get('/kad/preview', [CustomerArea\WeddingSiteController::class, 'preview'])->middleware('wedding')->name('site.preview');
+            Route::get('/kad/alamat', [CustomerArea\WeddingSiteController::class, 'checkSubdomain'])->middleware(['wedding', 'throttle:60,1'])->name('site.subdomain');
+            Route::get('/kad/reka-bentuk', [CustomerArea\WeddingSiteController::class, 'designs'])->middleware(['wedding', 'throttle:120,1'])->name('site.designs');
+            Route::get('/kad/statistik', CustomerArea\WeddingSiteInsightsController::class)->middleware('wedding')->name('site.insights');
+            Route::put('/weddings/{wedding}/kad', [CustomerArea\WeddingSiteController::class, 'update'])->name('weddings.site.update');
+            Route::post('/weddings/{wedding}/kad/galeri', [CustomerArea\WeddingSitePhotoController::class, 'store'])->name('weddings.site.photos.store');
+            Route::delete('/weddings/{wedding}/kad/galeri/{photo}', [CustomerArea\WeddingSitePhotoController::class, 'destroy'])->name('weddings.site.photos.destroy');
+            Route::put('/weddings/{wedding}/kad/publish', [CustomerArea\WeddingSiteController::class, 'publish'])->name('weddings.site.publish');
 
-        Route::get('/enquiries', [CustomerArea\EnquiryController::class, 'index'])->name('enquiries.index');
-        Route::get('/enquiries/{enquiry}', [CustomerArea\EnquiryController::class, 'show'])->name('enquiries.show');
-        Route::post('/vendors/{vendor}/enquiries', [CustomerArea\EnquiryController::class, 'store'])->name('vendors.enquiries.store');
+            Route::get('/budget', [CustomerArea\WeddingBudgetController::class, 'index'])->middleware('wedding')->name('budget.index');
+            // Neekah Kenangan: every album of the wedding (one per majlis), and
+            // each album's own page. Albums are addressed by id here; the
+            // token is the guests' address and changes when rotated.
+            Route::get('/kamera', [CustomerArea\CameraController::class, 'index'])->middleware('wedding')->name('camera.index');
+            Route::post('/weddings/{wedding}/kamera/checkout', [CustomerArea\CameraController::class, 'checkout'])->middleware('throttle:10,1')->name('camera.checkout');
+            Route::get('/kamera/bayaran-selesai', [CustomerArea\CameraController::class, 'done'])->name('camera.done');
+            Route::prefix('/kamera/{album:id}')->whereNumber('album')->group(function (): void {
+                Route::get('/', [CustomerArea\CameraController::class, 'show'])->name('camera.album');
+                Route::put('/', [CustomerArea\CameraController::class, 'update'])->name('camera.update');
+                Route::post('/pautan', [CustomerArea\CameraController::class, 'rotate'])->name('camera.rotate');
+                Route::put('/reka-bentuk', [CustomerArea\CameraController::class, 'design'])->name('camera.design');
+                Route::get('/media', [CustomerArea\CameraController::class, 'media'])->name('camera.media');
+                Route::post('/media/padam', [CustomerArea\CameraController::class, 'destroyMedia'])->name('camera.media.bulk');
+                Route::post('/zip', [CustomerArea\CameraController::class, 'export'])->middleware('throttle:5,1')->name('camera.export');
+                Route::post('/zip-pilihan', [CustomerArea\CameraController::class, 'exportSelected'])->middleware('throttle:10,1')->name('camera.export.selected');
+                Route::get('/zip/{part}', [CustomerArea\CameraController::class, 'downloadExport'])->whereNumber('part')->name('camera.export.download');
+                Route::get('/ucapan', [CustomerArea\CameraController::class, 'wishes'])->name('camera.wishes');
+                Route::delete('/ucapan/{wish}', [CustomerArea\CameraController::class, 'destroyWish'])->whereNumber('wish')->name('camera.wishes.destroy');
+            });
+            Route::put('/weddings/{wedding}/budget', [CustomerArea\WeddingBudgetController::class, 'update'])->name('weddings.budget.update');
+
+            Route::get('/enquiries', [CustomerArea\EnquiryController::class, 'index'])->name('enquiries.index');
+            Route::get('/enquiries/{enquiry}', [CustomerArea\EnquiryController::class, 'show'])->name('enquiries.show');
+            Route::post('/vendors/{vendor}/enquiries', [CustomerArea\EnquiryController::class, 'store'])->name('vendors.enquiries.store');
+        });
+
+        // Signed-in only, like the number itself. WhatsApp goes through a
+        // redirect that counts the tap; a tel: link cannot, so the page reports
+        // that one with a beacon.
+        Route::get('/vendors/{vendor}/whatsapp', [VendorContactController::class, 'whatsapp'])
+            ->middleware('throttle:30,1')
+            ->name('vendors.contact.whatsapp');
+        Route::post('/vendors/{vendor}/telefon', [VendorContactController::class, 'phone'])
+            ->middleware('throttle:30,1')
+            ->name('vendors.contact.phone');
 
         Route::get('/vendors/{vendor}/report', [ReportVendorController::class, 'create'])->name('vendors.report.create');
         Route::post('/vendors/{vendor}/report', [ReportVendorController::class, 'store'])->name('vendors.report.store');
@@ -221,6 +337,16 @@ $site = function (): void {
         Route::post('/vendors/status', [AdminArea\VendorApprovalController::class, 'bulk'])->name('vendors.bulk-status');
         Route::post('/vendors/{vendor}/status', [AdminArea\VendorApprovalController::class, 'store'])->name('vendors.status');
         Route::put('/vendors/{vendor}/tier', [AdminArea\VendorTierController::class, 'update'])->name('vendors.tier');
+        Route::post('/vendors/{vendor}/pro', [AdminArea\VendorProController::class, 'store'])->name('vendors.pro');
+        Route::delete('/vendors/{vendor}/pro', [AdminArea\VendorProController::class, 'destroy'])->name('vendors.pro.end');
+        Route::post('/vendors/{vendor}/boost', [AdminArea\VendorBoostController::class, 'store'])->name('vendors.boost');
+        Route::put('/users/{user}/kamera', [AdminArea\CameraController::class, 'updateForUser'])->name('users.camera');
+        Route::get('/kamera', [AdminArea\CameraController::class, 'index'])->name('camera.index');
+        Route::get('/kamera/data', [AdminArea\CameraController::class, 'data'])->name('camera.data');
+        Route::post('/kamera', [AdminArea\CameraController::class, 'store'])->name('camera.store');
+        Route::delete('/kamera/media/{media}', [AdminArea\CameraController::class, 'destroyMedia'])->name('camera.media.destroy');
+        Route::post('/kamera/media/{media}/abaikan', [AdminArea\CameraController::class, 'dismissReport'])->name('camera.media.dismiss');
+        Route::delete('/kamera/{album}', [AdminArea\CameraController::class, 'destroy'])->name('camera.destroy');
         Route::get('/reviews', [AdminArea\ReviewController::class, 'index'])->name('reviews.index');
         Route::get('/reviews/data', [AdminArea\ReviewController::class, 'data'])->name('reviews.data');
         Route::post('/reviews', [AdminArea\ReviewController::class, 'store'])->name('reviews.store');
@@ -264,8 +390,14 @@ $site = function (): void {
         Route::get('/bookings', [AdminArea\BookingController::class, 'index'])->name('bookings.index');
         Route::get('/bookings/data', [AdminArea\BookingController::class, 'data'])->name('bookings.data');
         Route::get('/bookings/{booking}', [AdminArea\BookingController::class, 'show'])->name('bookings.show');
-        Route::get('/transactions', [AdminArea\TransactionController::class, 'index'])->name('transactions.index');
-        Route::get('/transactions/data', [AdminArea\TransactionController::class, 'data'])->name('transactions.data');
+        // Kewangan: every payment in one ledger, and each with its gateway log.
+        Route::get('/kewangan', [AdminArea\PaymentController::class, 'index'])->name('payments.index');
+        Route::get('/kewangan/data', [AdminArea\PaymentController::class, 'data'])->name('payments.data');
+        Route::get('/kewangan/{payment}', [AdminArea\PaymentController::class, 'show'])->name('payments.show');
+        Route::post('/kewangan/{payment}/semak', [AdminArea\PaymentController::class, 'requery'])->middleware('throttle:20,1')->name('payments.requery');
+        Route::post('/kewangan/{payment}/invois', [AdminArea\PaymentController::class, 'invoice'])->middleware('throttle:20,1')->name('payments.invoice');
+        Route::post('/kewangan/{payment}/dibayar', [AdminArea\PaymentController::class, 'markPaid'])->name('payments.paid');
+        Route::redirect('/transactions', '/admin/kewangan', 301);
         Route::post('/users/{user}/impersonate', [AdminArea\ImpersonationController::class, 'store'])->name('users.impersonate');
         Route::get('/violations', [AdminArea\ViolationController::class, 'index'])->name('violations.index');
         Route::get('/violations/data', [AdminArea\ViolationController::class, 'data'])->name('violations.data');
@@ -273,13 +405,20 @@ $site = function (): void {
         Route::put('/violations/{violation}', [AdminArea\ViolationController::class, 'update'])->name('violations.update');
         Route::resource('posts', AdminArea\PostController::class)->except('show');
         Route::post('/posts/images', AdminArea\PostImageController::class)->middleware('throttle:30,1')->name('posts.images.store');
-        Route::get('/settings', [AdminArea\SettingController::class, 'edit'])->name('settings.edit');
+        Route::get('/settings/{section?}', [AdminArea\SettingController::class, 'edit'])
+            ->whereIn('section', AdminArea\SettingController::SECTIONS)
+            ->name('settings.edit');
         Route::put('/settings', [AdminArea\SettingController::class, 'update'])->name('settings.update');
         Route::put('/settings/contact', [AdminArea\SettingController::class, 'updateContact'])->name('settings.contact');
         Route::put('/settings/seo', [AdminArea\SettingController::class, 'updateSeo'])->name('settings.seo');
         Route::put('/settings/telegram', [AdminArea\SettingController::class, 'updateTelegram'])->name('settings.telegram');
         Route::put('/settings/turnstile', [AdminArea\SettingController::class, 'updateTurnstile'])->name('settings.turnstile');
         Route::put('/settings/payments', [AdminArea\SettingController::class, 'updatePayments'])->name('settings.payments');
+        Route::put('/settings/pro', [AdminArea\SettingController::class, 'updatePro'])->name('settings.pro');
+        Route::put('/settings/herepay', [AdminArea\SettingController::class, 'updateHerepay'])->name('settings.herepay');
+        Route::put('/settings/tempahan-online', [AdminArea\SettingController::class, 'updateOnlineBooking'])->name('settings.online-booking');
+        Route::put('/settings/kamera', [AdminArea\SettingController::class, 'updateCamera'])->name('settings.camera');
+        Route::put('/settings/boost', [AdminArea\SettingController::class, 'updateBoost'])->name('settings.boost');
     });
 
 };
@@ -290,6 +429,27 @@ foreach (Locales::codes() as $locale) {
         ->middleware('locale:'.$locale)
         ->group($site);
 }
+
+// Payment gateways call this server to server, for every kind of payment.
+// Once, outside the language sets, and outside CSRF (bootstrap/app.php): the
+// signed ref and the gateway's checksum are what it is checked by.
+Route::post('/webhooks/{gateway}', PaymentWebhookController::class)
+    ->whereIn('gateway', array_keys(PaymentGateways::DRIVERS))
+    ->middleware('throttle:120,1')
+    ->name('payments.webhook');
+
+// Links made before the payments were unified call back here.
+foreach (['kamera', 'boost', 'tempahan'] as $legacy) {
+    Route::post('/webhooks/herepay/'.$legacy, PaymentWebhookController::class)
+        ->defaults('gateway', 'herepay')
+        ->middleware('throttle:120,1');
+}
+
+// Where a gateway sends the payer back; its signed answer can settle the
+// payment when the callback is late. Not signed by us: see ReturnController.
+Route::get('/bayaran/{payment}/kembali', PaymentReturnController::class)
+    ->middleware('throttle:30,1')
+    ->name('payments.return');
 
 // One sitemap for the whole site, which lists both languages itself.
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->middleware('locale')->name('sitemap.index');
