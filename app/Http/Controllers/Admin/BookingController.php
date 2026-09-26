@@ -42,8 +42,9 @@ class BookingController extends Controller
             'filters' => [TableFilter::fromEnum(
                 'status',
                 BookingStatus::cases(),
-                BookingStatus::tryFrom($request->string('status')->toString())?->value,
+                TableFilter::requested($request, 'status', array_column(BookingStatus::cases(), 'value')),
                 Booking::selectRaw('status, count(*) as total')->groupBy('status')->pluck('total', 'status'),
+                label: __('props.common.filter_status'),
             )],
         ]);
     }
@@ -54,7 +55,7 @@ class BookingController extends Controller
      */
     public function data(Request $request): JsonResponse
     {
-        $status = BookingStatus::tryFrom($request->string('status')->toString());
+        $statuses = TableFilter::requestedEnums($request, 'status', BookingStatus::class);
         $sort = in_array($request->string('sort')->toString(), ['reference', 'event_date', 'total_amount'], true)
             ? $request->string('sort')->toString()
             : 'id';
@@ -73,7 +74,7 @@ class BookingController extends Controller
 
         $bookings = $matching->clone()
             ->with(['vendor', 'user', 'payments'])
-            ->when($status, fn ($query) => $query->where('status', $status))
+            ->when($statuses, fn ($query) => $query->whereIn('status', $statuses))
             ->orderBy($sort, $direction)
             ->paginate(min($request->integer('per_page', 15), 100));
 

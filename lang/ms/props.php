@@ -430,6 +430,12 @@ return [
     ],
 
     'common' => [
+        'filter_status' => 'Status',
+        'filter_plan' => 'Pelan',
+        'filter_setup' => 'Setup',
+        'filter_role' => 'Peranan',
+        'filter_segment' => 'Segmen',
+        'filter_album' => 'Album',
         'all' => 'Semua',
         'none' => 'Tiada',
         'over' => 'Lebih',

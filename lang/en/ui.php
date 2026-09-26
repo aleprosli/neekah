@@ -10,6 +10,18 @@ return [
     ],
 
     'common' => [
+        'filter_selected' => ':count selected',
+        'filter_search' => 'Search :label…',
+        'filter_none' => 'No matching options',
+        'filter_clear' => 'Clear filter',
+        'filter_reset' => 'Reset',
+        'filter_remove' => 'Remove :label',
+        'columns' => 'Columns',
+        'records' => ':count records',
+        'range_of' => ':from–:to of :total',
+        'per_page' => 'Per page',
+        'first_page' => 'First page',
+        'last_page' => 'Last page',
         'halaman_x_daripada_y' => 'Page :current of :last',
         'memuat_naik' => 'Uploading…',
         'simpan' => 'Save',

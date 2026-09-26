@@ -33,6 +33,14 @@ it('lists every kind of payment in one table, filtered by any mix of type, statu
         ->and($filtered->json('data.0.url'))->toBe(route('admin.payments.show', $pro));
 
     $this->actingAs($this->admin)->getJson(route('admin.payments.data', ['search' => 'Studio Aina']))->assertJsonPath('meta.total', 3);
+
+    // Several values of one filter widen it; values it does not know are ignored.
+    $this->actingAs($this->admin)->getJson(route('admin.payments.data', ['purpose' => 'vendor_pro,boost_tokens,bogus']))->assertJsonPath('meta.total', 2);
+    $this->actingAs($this->admin)->getJson(route('admin.payments.data', ['purpose' => 'vendor_pro,boost_tokens', 'status' => 'paid']))->assertJsonPath('meta.total', 1);
+    $this->actingAs($this->admin)->getJson(route('admin.payments.data', ['purpose' => ['kenangan', 'booking']]))->assertJsonPath('meta.total', 2);
+
+    $props = $this->actingAs($this->admin)->get(route('admin.payments.index', ['status' => 'paid,pending']))->viewData('props');
+    expect(collect($props['table']['filters'])->firstWhere('key', 'status')['value'])->toBe(['paid', 'pending']);
 });
 
 it('shows one payment with everything that passed with its gateway', function () {

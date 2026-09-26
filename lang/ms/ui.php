@@ -10,6 +10,18 @@ return [
     ],
 
     'common' => [
+        'filter_selected' => ':count dipilih',
+        'filter_search' => 'Cari :label…',
+        'filter_none' => 'Tiada pilihan sepadan',
+        'filter_clear' => 'Kosongkan penapis',
+        'filter_reset' => 'Reset',
+        'filter_remove' => 'Buang :label',
+        'columns' => 'Lajur',
+        'records' => ':count rekod',
+        'range_of' => ':from–:to daripada :total',
+        'per_page' => 'Setiap halaman',
+        'first_page' => 'Halaman pertama',
+        'last_page' => 'Halaman terakhir',
         'halaman_x_daripada_y' => 'Halaman :current daripada :last',
         'memuat_naik' => 'Memuat naik…',
         'simpan' => 'Simpan',

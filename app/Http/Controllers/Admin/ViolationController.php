@@ -43,8 +43,9 @@ class ViolationController extends Controller
             'filters' => [TableFilter::fromEnum(
                 'status',
                 ViolationStatus::cases(),
-                ViolationStatus::tryFrom($request->string('status')->toString())?->value,
+                TableFilter::requested($request, 'status', array_column(ViolationStatus::cases(), 'value')),
                 VendorViolation::selectRaw('status, count(*) as total')->groupBy('status')->pluck('total', 'status'),
+                label: __('props.common.filter_status'),
             )],
         ]);
     }
@@ -54,7 +55,7 @@ class ViolationController extends Controller
      */
     public function data(Request $request): JsonResponse
     {
-        $status = ViolationStatus::tryFrom($request->string('status')->toString());
+        $statuses = TableFilter::requestedEnums($request, 'status', ViolationStatus::class);
 
         $matching = VendorViolation::query()
             ->when($request->string('search')->trim()->toString(), function ($query, string $keyword): void {
@@ -65,7 +66,7 @@ class ViolationController extends Controller
 
         $violations = $matching->clone()
             ->with(['vendor', 'reporter', 'booking'])
-            ->when($status, fn ($query) => $query->where('status', $status))
+            ->when($statuses, fn ($query) => $query->whereIn('status', $statuses))
             ->orderByRaw("case when status = 'open' then 0 else 1 end")
             ->orderByDesc('id')
             ->paginate(min($request->integer('per_page', 20), 100));
