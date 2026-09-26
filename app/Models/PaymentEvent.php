@@ -63,6 +63,19 @@ class PaymentEvent extends Model
             $payload = ['truncated' => true, 'keys' => array_slice(array_keys($payload), 0, 50)];
         }
 
+        // The last word from the gateway also rides on the payment, readable
+        // straight off its row. Unverified data is kept here too, labelled,
+        // but nothing reads a code or status from it.
+        if ($payment && $payload !== null && in_array($type, [self::CALLBACK, self::RETURN, self::REQUERY], true)) {
+            $payment->forceFill(['gateway_payload' => [
+                'source' => $type,
+                'verified' => $verified,
+                'outcome' => $outcome,
+                'received_at' => now()->toIso8601String(),
+                'data' => $payload,
+            ]])->saveQuietly();
+        }
+
         return self::query()->create([
             'payment_id' => $payment?->id,
             'gateway' => $gateway,

@@ -191,6 +191,7 @@ class PaymentController extends Controller
                         __('pages.payments.payment_url') => $payment->payment_url,
                     ]),
                     'details' => self::details($payment) ?: (object) [],
+                    'gateway_payload' => $payment->gateway_payload,
                     'note' => $payment->note,
                     'receipt_url' => $payment->receiptUrl(),
                 ],

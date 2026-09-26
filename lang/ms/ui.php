@@ -1351,6 +1351,7 @@ return [
         'verified' => 'Sah',
         'unverified' => 'Tidak sah',
         'raw' => 'Data mentah',
+        'last_payload' => 'Data terakhir dari gateway (JSON)',
         'requery_title' => 'Semak dengan gateway',
         'requery_help' => 'Tanya gateway status terkini bayaran ini. Jika sudah dibayar, ia diselesaikan seperti callback.',
         'requery_unavailable' => 'Tiada kod bayaran gateway atau API key. Pautkan kod dari dashboard gateway di bawah.',

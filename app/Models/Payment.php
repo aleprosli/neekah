@@ -25,7 +25,7 @@ use Illuminate\Support\Str;
 #[Fillable([
     'reference', 'purpose', 'merchant', 'booking_id', 'vendor_id', 'wedding_id', 'camera_album_id', 'recorded_by',
     'amount', 'currency', 'paid_on', 'method', 'receipt_image', 'note', 'details', 'status',
-    'gateway', 'gateway_reference', 'gateway_invoice', 'gateway_transaction_id', 'gateway_status',
+    'gateway', 'gateway_reference', 'gateway_invoice', 'gateway_transaction_id', 'gateway_status', 'gateway_payload',
     'paid_at', 'verified_at', 'verified_by', 'payment_url', 'expires_at', 'last_checked_at',
 ])]
 class Payment extends Model
@@ -47,6 +47,7 @@ class Payment extends Model
             'amount' => 'decimal:2',
             'status' => PaymentStatus::class,
             'details' => 'array',
+            'gateway_payload' => 'array',
             'paid_at' => 'datetime',
             'paid_on' => 'date',
             'verified_at' => 'datetime',
