@@ -1,4 +1,4 @@
-<x-auth-card title="Set kata laluan baharu" subtitle="Pilih kata laluan baharu untuk akaun anda.">
+<x-auth-card :title="__('auth_pages.reset.title')" :subtitle="__('auth_pages.reset.subtitle')">
     {{-- resources/js/components/auth/AuthForm.vue --}}
     <div data-vue="auth-form" data-props="@vueProps($props)"></div>
 </x-auth-card>

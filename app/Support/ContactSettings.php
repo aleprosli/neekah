@@ -72,14 +72,14 @@ class ContactSettings extends SettingGroup
     /**
      * Every social account that has been filled in, ready to render.
      *
-     * @return array<int, array{label: string, url: string}>
+     * @return array<int, array{platform: string, label: string, url: string}>
      */
     public function socialLinks(): array
     {
         $labels = ['facebook' => 'Facebook', 'instagram' => 'Instagram', 'tiktok' => 'TikTok'];
 
         return collect($labels)
-            ->map(fn (string $label, string $key): array => ['label' => $label, 'url' => $this->string($key)])
+            ->map(fn (string $label, string $key): array => ['platform' => $key, 'label' => $label, 'url' => $this->string($key)])
             ->filter(fn (array $link): bool => $link['url'] !== '')
             ->values()
             ->all();

@@ -59,7 +59,7 @@ const remove = (at) => {
     <div class="flex min-w-0 flex-col gap-2">
         <span class="text-xs font-semibold tracking-wide uppercase">
             {{ label }}
-            <span class="font-normal normal-case opacity-70">(pilihan, sehingga {{ max }})</span>
+            <span class="font-normal normal-case opacity-70">{{ $t('common.optional_up_to', { count: max }) }}</span>
         </span>
 
         <ul v-if="chosen.length" class="flex flex-wrap gap-2">
@@ -80,7 +80,7 @@ const remove = (at) => {
             v-show="chosen.length < max"
             class="flex w-full cursor-pointer items-center justify-center rounded-xl border border-dashed border-line px-4 py-3 text-sm text-ink-muted transition hover:border-brand-400 sm:w-auto sm:self-start sm:px-6"
         >
-            <span>{{ chosen.length ? $t('portfolio.tambah_gambar_lagi') : $t('portfolio.pilih_gambar') }}</span>
+            <span>{{ chosen.length ? $t('photo_picker.add_more') : $t('photo_picker.pick') }}</span>
             <input
                 ref="input"
                 type="file"

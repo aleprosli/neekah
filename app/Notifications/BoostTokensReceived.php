@@ -20,11 +20,14 @@ class BoostTokensReceived extends Notification implements ShouldQueue
     public function __construct(public int $tokens, public BoostTokenReason $reason, public int $balance) {}
 
     /**
+     * A pack bought is emailed as its receipt (PaymentReceipt), so it only
+     * rings the bell here.
+     *
      * @return array<int, string>
      */
     public function via(object $notifiable): array
     {
-        return ['mail', 'database'];
+        return $this->reason === BoostTokenReason::Purchase ? ['database'] : ['mail', 'database'];
     }
 
     /**

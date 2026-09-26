@@ -33,7 +33,7 @@
     {{ $slot }}
 
     @unless ($preview)
-        <p class="bg-surface py-6 text-center text-xs text-ink-muted">{{ __('pages.card_shell.kad_jemputan_digital_oleh') }}<a href="{{ route('landing') }}" class="font-medium underline underline-offset-4">{{ __('pages.card_shell.neekah') }}</a>
+        <p class="bg-surface py-6 text-center text-xs text-ink-muted">{{ __('pages.card_shell.kad_jemputan_digital_oleh') }} <a href="{{ route('landing') }}" class="font-medium underline underline-offset-4">{{ __('pages.card_shell.neekah') }}</a>
         </p>
     @endunless
 </x-layouts.app>

@@ -99,8 +99,15 @@ class Post extends Model
         return max(1, (int) ceil(count($words) / self::WORDS_PER_MINUTE));
     }
 
+    /**
+     * The body as the words a reader sees. The editor stores entities (&amp;,
+     * &nbsp;), which are decoded here so a summary printed with {{ }} or handed
+     * to Vue is escaped once, not shown as "&amp;".
+     */
     private function plainText(): string
     {
-        return Str::of(strip_tags(str_replace('<', ' <', (string) $this->body)))->squish()->value();
+        $text = html_entity_decode(strip_tags(str_replace('<', ' <', (string) $this->body)), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+
+        return Str::of(str_replace("\u{00A0}", ' ', $text))->squish()->value();
     }
 }

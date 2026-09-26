@@ -101,9 +101,16 @@ return [
     'payment_received' => [
         'title' => 'Payment of :amount confirmed',
         'body' => 'The vendor confirmed your payment for booking :reference.',
-        'subject' => 'Payment :reference confirmed',
-        'intro' => ':vendor confirmed a payment of :amount for booking :reference.',
-        'detail' => 'Wedding: :date · Payment reference: :reference',
+    ],
+
+    'payment_receipt' => [
+        'subject' => 'Receipt :number · :app',
+        'intro' => 'Thank you! We have received your payment. Here is your official receipt.',
+        'next_pro' => 'Your Neekah Pro is now active until :date.',
+        'next_boost' => ':count boost tokens have been added to your account.',
+        'next_kenangan' => 'Your Neekah Kenangan album is active and ready to share with your guests.',
+        'next_booking' => 'Your booking with :vendor is confirmed.',
+        'action' => 'View & print receipt',
     ],
 
     'payment_rejected' => [
@@ -168,10 +175,6 @@ return [
     'pro_activated' => [
         'title' => 'Neekah Pro is active',
         'body' => 'Your Pro plan runs until :date.',
-        'subject' => 'Your Neekah Pro receipt',
-        'thanks' => 'Thank you! :vendor is now a Pro vendor on Neekah.',
-        'receipt' => 'Reference :reference · :plan plan · RM:amount',
-        'until' => 'Your Pro plan runs until :date.',
     ],
 
     'pro_expiring' => [

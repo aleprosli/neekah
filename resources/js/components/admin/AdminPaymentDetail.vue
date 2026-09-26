@@ -4,7 +4,8 @@
  * stands, every exchange with its gateway as it happened (the link we asked
  * for, each callback and return with its raw payload, each requery), and the
  * three ways to put it right: ask the gateway again, tie it to the invoice
- * the gateway's dashboard shows, or settle it by hand.
+ * the gateway's dashboard shows, or settle it by hand. Its invoice or receipt
+ * and the receipt email can be previewed, and the email sent again.
  */
 import { ref } from 'vue';
 
@@ -12,6 +13,8 @@ const props = defineProps({
     payment: { type: Object, required: true },
     events: { type: Array, default: () => [] },
     actions: { type: Object, required: true },
+    /** { is_receipt, number, sent_at, recipient, document_url, email_url, send_url } */
+    receipt: { type: Object, required: true },
     csrf: { type: String, required: true },
     errors: { type: Object, default: () => ({}) },
 });
@@ -117,6 +120,28 @@ const detailEntries = Object.entries(props.payment.details ?? {});
 
         <!-- Putting it right. -->
         <aside class="flex min-w-0 flex-col gap-5 lg:sticky lg:top-6 lg:self-start">
+            <section class="flex flex-col gap-3 rounded-2xl border border-line bg-surface-raised p-5">
+                <div class="flex items-center justify-between gap-2">
+                    <h2 class="font-display text-base font-semibold">{{ receipt.is_receipt ? $t('payments.document_receipt') : $t('payments.document_invoice') }}</h2>
+                    <span v-if="receipt.number" class="font-mono text-xs font-semibold">{{ receipt.number }}</span>
+                </div>
+                <p v-if="receipt.is_receipt" class="text-xs text-ink-muted">
+                    {{ receipt.sent_at ? $t('payments.receipt_sent', { email: receipt.recipient ?? '—', date: receipt.sent_at }) : $t('payments.receipt_not_sent') }}
+                </p>
+                <div class="grid gap-2">
+                    <a :href="receipt.document_url" target="_blank" rel="noopener" class="inline-flex items-center justify-center gap-2 rounded-full border border-line px-4 py-2 text-sm font-medium transition hover:border-brand-400">
+                        {{ receipt.is_receipt ? $t('payments.preview_receipt') : $t('payments.preview_invoice') }} ↗
+                    </a>
+                    <a v-if="receipt.email_url" :href="receipt.email_url" target="_blank" rel="noopener" class="inline-flex items-center justify-center gap-2 rounded-full border border-line px-4 py-2 text-sm font-medium transition hover:border-brand-400">
+                        {{ $t('payments.preview_email') }} ↗
+                    </a>
+                    <form v-if="receipt.send_url" :action="receipt.send_url" method="POST">
+                        <input type="hidden" name="_token" :value="csrf">
+                        <button type="submit" class="w-full rounded-full bg-ink px-4 py-2.5 text-sm font-semibold text-white transition hover:opacity-90">✉ {{ receipt.sent_at ? $t('payments.resend_receipt') : $t('payments.send_receipt') }}</button>
+                    </form>
+                </div>
+            </section>
+
             <section v-if="payment.links.length" class="flex flex-col gap-2 rounded-2xl border border-line bg-surface-raised p-5 text-sm">
                 <a v-for="link in payment.links" :key="link.url" :href="link.url" class="font-medium text-brand-700 hover:underline">{{ link.label }} →</a>
             </section>

@@ -146,7 +146,7 @@ it('settles from the payer\'s signed return when the callback never came', funct
 
     $this->actingAs($this->owner)
         ->get(route('payments.return', [$payment, ...herepayFields($payment)]))
-        ->assertRedirect(route('vendor.pro.done', ['ref' => $payment->reference]));
+        ->assertRedirect(route('payments.show', $payment));
 
     expect($payment->fresh()->status)->toBe(PaymentStatus::Paid)
         ->and($this->vendor->fresh()->isPro())->toBeTrue()
@@ -158,7 +158,7 @@ it('changes nothing on a return it cannot verify', function () {
 
     $this->actingAs($this->owner)
         ->get(route('payments.return', [$payment, ...herepayFields($payment, key: 'forged')]))
-        ->assertRedirect(route('vendor.pro.done', ['ref' => $payment->reference]));
+        ->assertRedirect(route('payments.show', $payment));
 
     expect($payment->fresh()->status)->toBe(PaymentStatus::Pending)
         ->and(PaymentEvent::sole()->verified)->toBeFalse();

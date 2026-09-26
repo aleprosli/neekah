@@ -30,6 +30,15 @@ it('gives a vendor page taking online bookings the date picker strings', functio
     expect($dictionary['date_picker']['status_open'] ?? null)->toBe(__('ui.date_picker.status_open'));
 });
 
+it('gives the review form on a vendor page the photo picker labels', function () {
+    $this->seed(CategorySeeder::class);
+    $vendor = Vendor::factory()->for(Category::first())->create();
+
+    $dictionary = clientDictionary($this->get(route('vendors.show', $vendor))->assertOk());
+
+    expect($dictionary['photo_picker']['pick'] ?? null)->toBe(__('ui.photo_picker.pick'));
+});
+
 it('gives the sign-in page the show and hide password labels', function () {
     $dictionary = clientDictionary($this->get(route('login'))->assertOk());
 
