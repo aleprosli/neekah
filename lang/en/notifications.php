@@ -246,6 +246,7 @@ return [
         'title' => ':count boost tokens landed in your account',
         'welcome' => 'Welcome to Neekah! Here are some boost tokens on us. Balance: :balance tokens.',
         'pro_monthly' => 'Your Neekah Pro monthly boost tokens are in. Balance: :balance tokens.',
+        'elite_monthly' => 'Your Pro Elite bonus: extra tokens for performing at the Top or Recommended tier. Balance: :balance tokens.',
         'purchase' => 'Thank you for your purchase. Balance: :balance tokens.',
         'admin' => 'The Neekah team added boost tokens for you. Balance: :balance tokens.',
         'how' => 'One token lifts your profile to the top of the Recommended list in a category you choose, for a day.',

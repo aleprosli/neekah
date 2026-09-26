@@ -136,6 +136,8 @@ return [
 
     'pro_monthly_price' => 'harga bulanan (RM)',
     'pro_yearly_price' => 'harga tahunan (RM)',
+    'pro_elite_bonus_tokens' => 'token bonus Elite sebulan',
+    'pro_elite_row_size' => 'bilangan vendor dalam baris Pilihan Elite',
 
     'terma_deposit' => 'terma deposit',
     'jenis_deposit' => 'jenis deposit',

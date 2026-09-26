@@ -2,8 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\CameraTier;
+use App\Enums\VendorFeature;
+use App\Enums\VendorPlan;
 use App\Models\Category;
 use App\Models\Vendor;
+use App\Support\BoostSettings;
+use App\Support\CameraSettings;
 use App\Support\Card\SampleCard;
 use App\Support\ContactSettings;
 use App\Support\ProSettings;
@@ -33,6 +38,11 @@ class LandingController extends Controller
             'vendors' => Vendor::query()->approved()->with('category')->orderByDesc('score')->orderBy('id')->limit(6)->get(),
             'features' => $this->features(),
             'vendorBenefits' => $this->vendorBenefits(),
+            // What Neekah sells, each only once an admin has opened it, so the
+            // page never advertises something nobody can buy yet.
+            'kenangan' => $this->kenangan(),
+            'plans' => $this->plans(),
+            'boost' => $this->boost(),
             'helpUrl' => $contact->whatsappUrl(__('pages.landing.whatsapp_message')),
         ]);
     }
@@ -83,10 +93,90 @@ class LandingController extends Controller
             __('pages.landing.benefits.listing'),
             __('pages.landing.benefits.whatsapp'),
             __('pages.landing.benefits.packages'),
-            __('pages.landing.benefits.calendar'),
-            __('pages.landing.benefits.enquiries'),
-            // Only once a vendor can actually buy it.
-            ...(app(ProSettings::class)->isEnabled() ? [__('pages.landing.benefits.pro')] : []),
+            // Calendar and enquiries are Pro once Pro is on sale; the plans
+            // section below lists them there instead.
+            ...(app(ProSettings::class)->isEnabled() ? [__('pages.landing.benefits.pro')] : [__('pages.landing.benefits.calendar'), __('pages.landing.benefits.enquiries')]),
+        ];
+    }
+
+    /**
+     * Neekah Kenangan's two packages, for couples.
+     *
+     * @return array{tiers: list<array{label: string, price: float, pro: bool, features: list<string>}>, retention: int}|null
+     */
+    private function kenangan(): ?array
+    {
+        $settings = app(CameraSettings::class);
+
+        if (! $settings->isEnabled()) {
+            return null;
+        }
+
+        return [
+            'retention' => $settings->retentionDays(),
+            'tiers' => array_map(function (CameraTier $tier) use ($settings): array {
+                $limits = $settings->limitsFor($tier);
+
+                return [
+                    'label' => $tier->label(),
+                    'price' => $settings->price($tier),
+                    'pro' => $tier === CameraTier::Pro,
+                    'features' => array_values(array_filter([
+                        $limits->maxPhotos ? __('ui.camera.feature_photos_capped', ['count' => $limits->maxPhotos]) : __('ui.camera.feature_photos_unlimited'),
+                        __($limits->photoPixels >= 3000 ? 'ui.camera.feature_full_hd' : 'ui.camera.feature_hd'),
+                        $limits->allowsVideo
+                            ? __('ui.camera.feature_video', ['mb' => $limits->videoMaxMegabytes, 'minutes' => (int) round($limits->videoMaxSeconds / 60)])
+                            : null,
+                        __('ui.camera.feature_messages'),
+                        $tier === CameraTier::Pro ? __('ui.camera.feature_voice') : null,
+                        __('ui.camera.feature_qr'),
+                    ])),
+                ];
+            }, CameraTier::cases()),
+        ];
+    }
+
+    /**
+     * Basic against Pro for vendors, from the features each plan opens.
+     *
+     * @return array{basic: list<array{label: string, description: string}>, pro: list<array{label: string, description: string}>, monthly: float, yearly: float, elite: int|null}|null
+     */
+    private function plans(): ?array
+    {
+        $pro = app(ProSettings::class);
+
+        if (! $pro->isEnabled()) {
+            return null;
+        }
+
+        $describe = fn (VendorFeature $feature): array => ['label' => $feature->label(), 'description' => $feature->description()];
+
+        return [
+            'basic' => array_values(array_map($describe, array_filter(VendorFeature::cases(), fn (VendorFeature $feature): bool => ! $feature->requiresPro()))),
+            'pro' => array_values(array_map($describe, array_filter(VendorFeature::cases(), fn (VendorFeature $feature): bool => $feature->requiresPro()))),
+            'monthly' => $pro->price(VendorPlan::Monthly),
+            'yearly' => $pro->price(VendorPlan::Yearly),
+            'elite' => $pro->eliteEnabled() ? $pro->eliteBonusTokens() : null,
+        ];
+    }
+
+    /**
+     * How boost tokens lift a vendor, and where tokens come from.
+     *
+     * @return array{welcome: int, pro_monthly: int, packs: list<array{tokens: int, price: float}>}|null
+     */
+    private function boost(): ?array
+    {
+        $settings = app(BoostSettings::class);
+
+        if (! $settings->isEnabled()) {
+            return null;
+        }
+
+        return [
+            'welcome' => $settings->welcomeTokens(),
+            'pro_monthly' => $settings->proMonthlyTokens(),
+            'packs' => array_values(array_map(fn (string $pack): array => $settings->pack($pack), BoostSettings::PACKS)),
         ];
     }
 }

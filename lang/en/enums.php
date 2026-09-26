@@ -5,6 +5,7 @@ return [
     'boost_token_reason' => [
         'welcome' => 'Welcome gift',
         'pro_monthly' => 'Pro monthly tokens',
+        'elite_monthly' => 'Monthly Elite bonus',
         'purchase' => 'Token purchase',
         'admin' => 'Admin adjustment',
         'spend' => 'Category boost',

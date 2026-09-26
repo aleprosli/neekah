@@ -12,6 +12,7 @@ use App\Models\User;
 use App\Models\Vendor;
 use App\Support\ContactSettings;
 use App\Support\ContentVersion;
+use App\Support\ProSettings;
 use App\Support\Seo;
 use App\Support\SeoSettings;
 use App\Support\States;
@@ -80,11 +81,13 @@ class VendorController extends Controller
         $activeCategory = $filters['category'] ? $categories->firstWhere('slug', $filters['category']) : null;
 
         $vendors = $this->listing($filters, $activeCategory, $request);
+        $elite = $filters['sort'] === 'recommended' && $vendors->currentPage() === 1 ? $this->eliteRow($filters, $activeCategory) : collect();
 
         $this->describeListing($seo, $request, $activeCategory, $filters);
 
         return view('vendors.index', [
             'vendors' => $vendors,
+            'elite' => $elite,
             'filters' => $filters,
             'categories' => $categories,
             'activeCategory' => $activeCategory,
@@ -147,7 +150,7 @@ class VendorController extends Controller
     private function listing(array $filters, ?Category $activeCategory, Request $request): LengthAwarePaginator
     {
         $page = $request->integer('page', 1) ?: 1;
-        $key = md5(serialize([$filters, $page, $request->url()]));
+        $key = md5(serialize([$filters, $page, $request->url(), app(ProSettings::class)->eliteEnabled()]));
 
         $cached = Cache::remember(
             'marketplace:list:'.$key.':'.now()->format('YmdH').':'.ContentVersion::global(),
@@ -160,7 +163,7 @@ class VendorController extends Controller
                         'price_desc' => $query->orderByDesc('price_from'),
                         'reviews' => $query->orderByDesc('reviews_count'),
                         'popular' => $query->orderByDesc('views_30d'),
-                        default => $query->boostedFirst($activeCategory)->orderByDesc('score'),
+                        default => $query->boostedFirst($activeCategory)->eliteFirst()->orderByDesc('score'),
                     })
                     ->orderBy('id')
                     ->paginate(self::PER_PAGE);
@@ -179,6 +182,31 @@ class VendorController extends Controller
             $page,
             ['path' => Paginator::resolveCurrentPath(), 'pageName' => 'page'],
         ))->withQueryString();
+    }
+
+    /**
+     * "Pilihan Elite": the best Elite vendors matching what the visitor asked
+     * for, above the list on its first page of the "Disyorkan" order. Cached
+     * like the listing, and by the hour, since Pro and tiers change over time.
+     *
+     * @param  array<string, mixed>  $filters
+     * @return Collection<int, Vendor>
+     */
+    private function eliteRow(array $filters, ?Category $activeCategory): Collection
+    {
+        $settings = app(ProSettings::class);
+
+        if (! $settings->eliteEnabled() || $settings->eliteRowSize() === 0) {
+            return collect();
+        }
+
+        $rows = Cache::remember(
+            'marketplace:elite:'.md5(serialize($filters)).':'.now()->format('YmdH').':'.ContentVersion::global(),
+            ContentVersion::TTL,
+            fn (): array => self::vendorRows(self::filtered($filters, $activeCategory)->elite()->orderByDesc('score')->orderBy('id')->limit($settings->eliteRowSize())->get()),
+        );
+
+        return self::hydrateVendors($rows);
     }
 
     /**

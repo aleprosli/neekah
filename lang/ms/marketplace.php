@@ -58,6 +58,8 @@ return [
         'trending' => 'Trending',
         'pro' => 'Pro',
         'pro_title' => 'Vendor Neekah Pro',
+        'elite' => 'Elite',
+        'elite_title' => 'Pro Elite: vendor Neekah Pro yang mencapai tier Top atau Disyorkan melalui prestasi sebenar',
         'recommended' => 'Disyorkan',
         'top' => 'Vendor terbaik',
         'new' => 'Baru',
@@ -80,4 +82,10 @@ return [
         'limit' => 'Maksimum 4 vendor sahaja.',
     ],
 
+    'elite' => [
+        'eyebrow' => 'Pilihan Elite',
+        'title' => 'Vendor Pro dengan prestasi tertinggi',
+        'body' => 'Ahli Neekah Pro yang mencapai tier Top atau Disyorkan melalui rating, tempahan selesai dan respons sebenar. Status ini tidak boleh dibeli.',
+        'what' => 'Apa itu Elite?',
+    ],
 ];

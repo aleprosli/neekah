@@ -11,6 +11,7 @@ use App\Enums\VendorStatus;
 use App\Enums\VendorTier;
 use App\Support\ContentVersion;
 use App\Support\PhoneNumber;
+use App\Support\ProSettings;
 use App\Support\SocialLinks;
 use App\Support\States;
 use App\Support\VendorAvailability;
@@ -437,6 +438,50 @@ class Vendor extends Model
     protected function pro(Builder $query): Builder
     {
         return $query->where('pro_until', '>', now());
+    }
+
+    /**
+     * Pro Elite: approved Pro vendors whose earned tier is one of these. The
+     * tier is computed from performance alone, so money gates Elite but can
+     * never buy it (.ai/rules/app.md).
+     */
+    public const ELITE_TIERS = [VendorTier::Top, VendorTier::Recommended];
+
+    public function isElite(): bool
+    {
+        return app(ProSettings::class)->eliteEnabled()
+            && $this->status === VendorStatus::Approved
+            && $this->isPro()
+            && in_array($this->tier, self::ELITE_TIERS, true);
+    }
+
+    #[Scope]
+    protected function elite(Builder $query): Builder
+    {
+        if (! app(ProSettings::class)->eliteEnabled()) {
+            return $query->whereRaw('1 = 0');
+        }
+
+        return $query->pro()
+            ->where('vendors.status', VendorStatus::Approved)
+            ->whereIn('vendors.tier', array_map(fn (VendorTier $tier): string => $tier->value, self::ELITE_TIERS));
+    }
+
+    /**
+     * The "Disyorkan" order's second key, after running boosts: Elite vendors
+     * before the rest. Selects `elite` so the listing can tell.
+     */
+    #[Scope]
+    protected function eliteFirst(Builder $query): Builder
+    {
+        if (! app(ProSettings::class)->eliteEnabled()) {
+            return $query;
+        }
+
+        $tiers = array_map(fn (VendorTier $tier): string => $tier->value, self::ELITE_TIERS);
+
+        return $query->selectRaw('(vendors.pro_until > ? and vendors.tier in ('.implode(', ', array_fill(0, count($tiers), '?')).')) as elite', [now(), ...$tiers])
+            ->orderByDesc('elite');
     }
 
     #[Scope]

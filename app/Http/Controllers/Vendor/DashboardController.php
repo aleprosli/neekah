@@ -14,6 +14,7 @@ use App\Models\Vendor;
 use App\Support\ContactSettings;
 use App\Support\ImageSettings;
 use App\Support\PhoneNumber;
+use App\Support\ProSettings;
 use App\Support\VendorAnalytics;
 use App\Support\VendorAvailability;
 use App\Support\VueProps;
@@ -69,6 +70,12 @@ class DashboardController extends Controller
                     'trending' => $vendor->trending_at !== null,
                     'boostedUntil' => $boostEnds ? Carbon::parse($boostEnds)->translatedFormat('j M, g:i A') : null,
                     'pointsUrl' => $isPro ? route('vendor.points.index') : null,
+                    // Pro Elite: where the vendor stands on the way to it.
+                    'elite' => app(ProSettings::class)->eliteEnabled() ? match (true) {
+                        $vendor->isElite() => 'elite',
+                        $isPro => 'need_tier',
+                        default => 'need_pro',
+                    } : null,
                 ],
                 'locked' => $isPro ? [] : collect([VendorFeature::Calendar, VendorFeature::Bookings, VendorFeature::Enquiries, VendorFeature::Points])
                     ->map(fn (VendorFeature $feature): array => ['label' => $feature->label(), 'description' => $feature->description()])

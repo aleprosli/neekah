@@ -68,7 +68,7 @@
                 <div class="flex items-center gap-4 py-6">
                     <x-vendor-avatar :vendor="$vendor" class="size-12 text-lg" />
                     <div class="min-w-0">
-                        <p class="flex items-center gap-2 font-semibold">{{ __('pages.profile.run_by', ['name' => $vendor->name]) }}@if ($vendor->isPro())<x-vendors.pro-badge />@endif</p>
+                        <p class="flex items-center gap-2 font-semibold">{{ __('pages.profile.run_by', ['name' => $vendor->name]) }}@if ($vendor->isElite())<x-vendors.elite-badge />@elseif ($vendor->isPro())<x-vendors.pro-badge />@endif</p>
                         <p class="text-sm text-ink-muted">@if ($vendor->tier === VendorTier::Recommended)🏆 @endif{{ $vendor->tier->label() }} Vendor · Response rate {{ $vendor->responseRateLabel() }}</p>
                     </div>
                 </div>

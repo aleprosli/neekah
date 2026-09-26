@@ -186,6 +186,13 @@ const tones = {
                             <dd class="font-semibold">{{ standing.views30 }}</dd>
                         </div>
                     </dl>
+                    <!-- Pro Elite, and what stands between the vendor and it. -->
+                    <div v-if="standing.elite === 'elite'" class="rounded-xl bg-linear-to-r from-ink to-brand-900 px-3 py-2.5 text-xs text-surface">
+                        <p class="font-semibold text-gold-300">✦ {{ $t('vendor_home.elite_yes') }}</p>
+                        <p class="mt-0.5 text-surface/75">{{ $t('vendor_home.elite_yes_body') }}</p>
+                    </div>
+                    <p v-else-if="standing.elite === 'need_tier'" class="rounded-xl border border-gold-300/60 bg-gold-300/10 px-3 py-2.5 text-xs text-ink-muted">✦ {{ $t('vendor_home.elite_need_tier') }}</p>
+                    <a v-else-if="standing.elite === 'need_pro'" :href="vendor.proUrl" class="rounded-xl border border-gold-300/60 bg-gold-300/10 px-3 py-2.5 text-xs text-ink-muted hover:border-gold-500">✦ {{ $t('vendor_home.elite_need_pro') }}</a>
                     <p v-if="standing.trending" class="rounded-xl bg-brand-50 px-3 py-2 text-xs font-medium text-brand-800">🔥 {{ $t('vendor_home.trending') }}</p>
                     <p v-if="standing.boostedUntil" class="rounded-xl bg-gold-300/30 px-3 py-2 text-xs font-medium text-brand-900">🚀 {{ $t('vendor_home.boosted_until', { date: standing.boostedUntil }) }}</p>
                     <a v-if="standing.pointsUrl" :href="standing.pointsUrl" class="text-sm font-medium text-brand-700 hover:underline">{{ $t('vendor_home.see_ranking') }} →</a>

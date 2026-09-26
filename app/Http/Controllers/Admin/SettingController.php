@@ -501,6 +501,9 @@ class SettingController extends Controller
                 ['name' => 'enabled', 'label' => __('props.admin.pro_enabled'), 'type' => 'checkbox', 'value' => $values['enabled'], 'wide' => true, 'help' => __('props.admin.pro_enabled_help')],
                 ['name' => 'monthly_price', 'label' => Str::ucfirst(__('fields.pro_monthly_price')), 'type' => 'number', 'value' => $values['monthly_price'], 'min' => 1, 'required' => true],
                 ['name' => 'yearly_price', 'label' => Str::ucfirst(__('fields.pro_yearly_price')), 'type' => 'number', 'value' => $values['yearly_price'], 'min' => 1, 'required' => true],
+                ['name' => 'elite_enabled', 'label' => __('props.admin.pro_elite_enabled'), 'type' => 'checkbox', 'value' => $values['elite_enabled'], 'wide' => true, 'help' => __('props.admin.pro_elite_enabled_help')],
+                ['name' => 'elite_bonus_tokens', 'label' => Str::ucfirst(__('fields.pro_elite_bonus_tokens')), 'type' => 'number', 'value' => $values['elite_bonus_tokens'], 'min' => 0, 'help' => __('props.admin.pro_elite_bonus_help')],
+                ['name' => 'elite_row_size', 'label' => Str::ucfirst(__('fields.pro_elite_row_size')), 'type' => 'number', 'value' => $values['elite_row_size'], 'min' => 0, 'help' => __('props.admin.pro_elite_row_help')],
             ],
         ];
     }
