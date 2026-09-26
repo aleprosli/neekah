@@ -88,7 +88,9 @@ it('settles on a callback whose checksum matches, and keeps the callback as it c
         ->and($events)->toHaveCount(2)
         ->and($events->pluck('outcome')->all())->toBe(['paid', 'already_paid'])
         ->and($events->first()->verified)->toBeTrue()
-        ->and($events->first()->payload['payment_code'])->toBe('HP-PAY-1');
+        ->and($events->first()->payload['payment_code'])->toBe('HP-PAY-1')
+        ->and($payment->gateway_payload)->toMatchArray(['source' => 'callback', 'verified' => true, 'outcome' => 'already_paid'])
+        ->and($payment->gateway_payload['data']['reference_code'])->toBe('HP-INV-1');
 });
 
 it('refuses a callback signed with the wrong key, and still keeps it', function () {
@@ -100,7 +102,11 @@ it('refuses a callback signed with the wrong key, and still keeps it', function 
     expect($payment->fresh()->status)->toBe(PaymentStatus::Pending)
         ->and($event->payment_id)->toBe($payment->id)
         ->and($event->verified)->toBeFalse()
-        ->and($event->http_status)->toBe(403);
+        ->and($event->http_status)->toBe(403)
+        ->and($payment->fresh()->gateway_payload)->toMatchArray(['source' => 'callback', 'verified' => false])
+        ->and($payment->fresh()->gateway_payload['data']['payment_code'])->toBe('HP-PAY-1')
+        // Kept to read, never trusted: no code is taken from it.
+        ->and($payment->fresh()->gateway_reference)->toBeNull();
 });
 
 it('refuses a callback whose reference was swapped for another payment', function () {

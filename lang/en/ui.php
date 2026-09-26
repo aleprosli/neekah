@@ -1351,6 +1351,7 @@ return [
         'verified' => 'Verified',
         'unverified' => 'Not verified',
         'raw' => 'Raw data',
+        'last_payload' => 'Last data from the gateway (JSON)',
         'requery_title' => 'Check with the gateway',
         'requery_help' => 'Ask the gateway where this payment stands now. If it was paid, it settles as a callback would.',
         'requery_unavailable' => 'No gateway payment code or API key. Attach the code from the gateway dashboard below.',

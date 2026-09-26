@@ -69,6 +69,15 @@ const detailEntries = Object.entries(props.payment.details ?? {});
                     </div>
                 </dl>
 
+                <details v-if="payment.gateway_payload" class="min-w-0 rounded-xl border border-line">
+                    <summary class="flex cursor-pointer flex-wrap items-center gap-2 px-3 py-2 text-xs font-medium text-ink-muted">
+                        {{ $t('payments.last_payload') }}
+                        <span :class="['rounded-full px-2 py-0.5 text-[11px] font-semibold', payment.gateway_payload.verified ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-800']">{{ payment.gateway_payload.verified ? $t('payments.verified') : $t('payments.unverified') }}</span>
+                        <span class="font-mono">{{ payment.gateway_payload.source }} · {{ payment.gateway_payload.received_at }}</span>
+                    </summary>
+                    <pre class="max-h-80 overflow-auto border-t border-line bg-surface-muted p-3 text-[11px] leading-relaxed">{{ pretty(payment.gateway_payload.data) }}</pre>
+                </details>
+
                 <dl v-if="detailEntries.length" class="grid min-w-0 gap-2 text-sm sm:grid-cols-2">
                     <div v-for="[key, value] in detailEntries" :key="key" class="min-w-0"><dt class="text-ink-muted">{{ key }}</dt><dd class="font-medium break-all">{{ value }}</dd></div>
                 </dl>
