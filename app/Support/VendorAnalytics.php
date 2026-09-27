@@ -41,7 +41,7 @@ class VendorAnalytics
      * Every day of the window, including the quiet ones: a chart that skips the
      * days nobody looked reads as steady interest when it was not.
      *
-     * @return array<int, array{label: string, value: int}>
+     * @return array<int, array{date: string, label: string, value: int}>
      */
     public function dailyViews(int $days = self::DAYS): array
     {
@@ -52,6 +52,7 @@ class VendorAnalytics
                 $day = today()->subDays($back);
 
                 return [
+                    'date' => $day->toDateString(),
                     'label' => $day->translatedFormat('j M'),
                     'value' => (int) ($rows->get($day->toDateString())?->profile_views ?? 0),
                 ];

@@ -2,12 +2,14 @@
 
 use App\Http\Middleware\BeginPageMetadata;
 use App\Http\Middleware\EnsureAccountIsActive;
+use App\Http\Middleware\EnsureApiProVendor;
 use App\Http\Middleware\EnsurePhoneNumber;
 use App\Http\Middleware\EnsureUserHasRole;
 use App\Http\Middleware\EnsureUserHasWedding;
 use App\Http\Middleware\EnsureUserIsCouple;
 use App\Http\Middleware\EnsureVendorHasFeature;
 use App\Http\Middleware\EnsureVendorIsApproved;
+use App\Http\Middleware\SetApiLocale;
 use App\Http\Middleware\SetLocale;
 use App\Support\ImageSettings;
 use App\Support\Locales;
@@ -21,6 +23,7 @@ use Illuminate\Support\Facades\App;
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: __DIR__.'/../routes/web.php',
+        api: __DIR__.'/../routes/api.php',
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
@@ -38,6 +41,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'couple' => EnsureUserIsCouple::class,
             'vendor.feature' => EnsureVendorHasFeature::class,
             'locale' => SetLocale::class,
+            'api.locale' => SetApiLocale::class,
+            'api.pro' => EnsureApiProVendor::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
