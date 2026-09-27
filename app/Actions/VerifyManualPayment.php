@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\DB;
 
 class VerifyManualPayment
 {
-    public function __construct(private AwardVendorPoints $awardPoints) {}
+    public function __construct(private AwardVendorPoints $awardPoints, private IssueReceipt $receipt) {}
 
     /**
      * The vendor has found the money in their account.
@@ -26,13 +26,14 @@ class VerifyManualPayment
      */
     public function handle(Payment $payment, User $verifier): Payment
     {
-        return DB::transaction(function () use ($payment, $verifier): Payment {
+        $payment = DB::transaction(function () use ($payment, $verifier): Payment {
             $payment->update([
                 'status' => PaymentStatus::Paid,
                 'paid_at' => $payment->paid_on ?? now(),
                 'verified_at' => now(),
                 'verified_by' => $verifier->id,
             ]);
+            $this->receipt->number($payment);
             PaymentEvent::record($payment, Payment::GATEWAY_MANUAL, PaymentEvent::MANUAL_VERIFIED, outcome: 'paid');
 
             $booking = $payment->booking->fresh();
@@ -61,6 +62,10 @@ class VerifyManualPayment
 
             return $payment;
         });
+
+        $this->receipt->send($payment);
+
+        return $payment;
     }
 
     /**

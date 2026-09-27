@@ -40,6 +40,7 @@ class SettlePayment
         private ActivateBoostPurchase $boost,
         private ActivateCameraAlbum $kenangan,
         private ConfirmOnlineDeposit $deposit,
+        private IssueReceipt $receipt,
     ) {}
 
     /**
@@ -84,8 +85,9 @@ class SettlePayment
     }
 
     /**
-     * Mark it paid and give the payer what it bought. False when it already
-     * was: the second caller changes nothing and sends nothing.
+     * Mark it paid, give the payer what it bought and send them the receipt.
+     * False when it already was: the second caller changes nothing and sends
+     * nothing.
      *
      * @param  array<string, mixed>  $attributes
      */
@@ -99,6 +101,7 @@ class SettlePayment
             }
 
             $locked->update([...$attributes, 'status' => PaymentStatus::Paid, 'paid_at' => now()]);
+            $this->receipt->number($locked);
 
             match ($locked->purpose) {
                 PaymentPurpose::VendorPro => $this->pro->fulfil($locked),
@@ -111,6 +114,10 @@ class SettlePayment
         });
 
         $payment->refresh();
+
+        if ($settled) {
+            $this->receipt->send($payment);
+        }
 
         return $settled;
     }

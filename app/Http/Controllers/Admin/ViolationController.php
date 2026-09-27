@@ -76,7 +76,7 @@ class ViolationController extends Controller
                 'url' => route('admin.violations.show', $violation),
                 'vendor' => e($violation->vendor->name),
                 'type' => $violation->type->label(),
-                'reporter' => $violation->reporter?->name ?? __('props.copy.deleted_user_lower'),
+                'reporter' => $violation->reporter?->name ?? __('props.copy.deleted_user'),
                 'description' => $violation->description,
                 'reported' => $violation->created_at->diffForHumans(),
                 'badge' => view('components.admin.status-pill', [

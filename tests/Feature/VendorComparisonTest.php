@@ -30,7 +30,7 @@ it('compares vendors side by side and marks the best value in each row', functio
         ->assertSee('Harga bermula')
         ->assertSee('Vendor Score')
         ->assertSee('Full Day')
-        ->assertSee('terbaik');
+        ->assertSee('Terbaik');
 
     // The order in the query string is the order on screen.
     $response->assertSeeInOrder(['Murah Studio', 'Premium Studio']);

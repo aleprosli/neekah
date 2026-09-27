@@ -117,20 +117,14 @@ class BookingController extends Controller
      * records, never from Herepay's query string: the callback, not this
      * visit, is what confirms a booking.
      */
-    public function paymentDone(Request $request, Booking $booking): View
+    /** Links made before the shared payment page still land somewhere useful. */
+    public function paymentDone(Booking $booking): RedirectResponse
     {
         Gate::authorize('view', $booking);
 
-        $booking->load(['vendor', 'payments']);
+        $payment = $booking->payments()->where('gateway', '!=', Payment::GATEWAY_MANUAL)->latest('id')->first();
 
-        return view('customer.bookings.payment-done', [
-            'booking' => $booking,
-            'state' => match (true) {
-                $booking->status === BookingStatus::Confirmed => 'confirmed',
-                $booking->isHeld() => 'waiting',
-                default => 'lapsed',
-            },
-        ]);
+        return $payment ? redirect()->route('payments.show', $payment) : redirect()->route('bookings.show', $booking);
     }
 
     public function show(Request $request, Booking $booking, PaymentSettings $paymentSettings, ImageSettings $images): View|RedirectResponse
@@ -224,6 +218,7 @@ class BookingController extends Controller
                 'status_label' => $payment->status->label(),
                 'status_tone' => $payment->status->tone(),
                 'receipt_url' => $payment->receiptUrl(),
+                'document_url' => $payment->isPaid() ? route('payments.document', $payment) : null,
                 'awaiting' => $payment->isAwaitingVerification(),
                 'destroy_url' => $payment->isAwaitingVerification()
                     ? route('bookings.payments.destroy', [$booking, $payment])

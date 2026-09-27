@@ -325,11 +325,11 @@ class Vendor extends Model
     {
         $links = [];
 
-        foreach (SocialLinks::PLATFORMS as $platform => $details) {
+        foreach (array_keys(SocialLinks::PLATFORMS) as $platform) {
             $url = $this->social_links[$platform] ?? null;
 
             if (is_string($url) && SocialLinks::isAllowed($platform, $url)) {
-                $links[] = ['platform' => $platform, 'label' => $details['label'], 'url' => $url];
+                $links[] = ['platform' => $platform, 'label' => SocialLinks::label($platform), 'url' => $url];
             }
         }
 

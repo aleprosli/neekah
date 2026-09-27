@@ -107,9 +107,12 @@
                 <ul class="divide-y divide-line rounded-2xl border border-line">
                     @foreach ($history as $row)
                         <li class="flex flex-wrap items-center justify-between gap-2 p-4 text-sm">
-                            <span class="font-mono text-xs">{{ $row['reference'] }}</span>
+                            <a href="{{ $row['url'] }}" class="font-mono text-xs hover:text-brand-700">{{ $row['reference'] }}</a>
                             <span>{{ $row['plan'] }} · RM{{ $row['amount'] }}</span>
                             <span class="text-ink-muted">{{ $row['status'] }}@if ($row['until']) · {{ __('pages.pro.until', ['date' => $row['until']]) }}@endif</span>
+                            @if ($row['document_url'])
+                                <a href="{{ $row['document_url'] }}" target="_blank" rel="noopener" class="text-xs font-medium text-brand-700 underline underline-offset-4">{{ __('pages.payment_page.view_receipt') }}</a>
+                            @endif
                         </li>
                     @endforeach
                 </ul>

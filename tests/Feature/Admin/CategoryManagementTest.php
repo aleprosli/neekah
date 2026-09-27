@@ -3,6 +3,7 @@
 use App\Actions\StoreOptimizedImage;
 use App\Models\Category;
 use App\Models\User;
+use App\Models\Vendor;
 use Database\Seeders\CategorySeeder;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -23,6 +24,54 @@ it('shows every category on one page, in display order, with counts', function (
                 && $names->first() === Category::ordered()->first()->name
                 && collect($props['stats'])->firstWhere('label', 'Jumlah kategori')['value'] === Category::count();
         });
+});
+
+it('shows each category with how many vendors use it and where it lives on the marketplace', function () {
+    $category = Category::where('slug', 'photography')->sole();
+    Vendor::factory()->for($category)->count(2)->create();
+    Vendor::factory()->for($category)->pending()->create();
+    $hidden = Category::factory()->create(['is_active' => false]);
+
+    $categories = collect($this->actingAs($this->admin)
+        ->get(route('admin.categories.index'))
+        ->assertOk()
+        ->viewData('props')['categories'])->keyBy('id');
+
+    expect($categories[$category->id])
+        ->vendors_count->toBe(3)
+        ->vendors_label->toBe('3 vendor')
+        ->approved_label->toBe('2 diluluskan')
+        ->marketplace_url->toBe(route('vendors.index', ['category' => 'photography']))
+        ->and($categories[$hidden->id])
+        ->vendors_label->toBe('Tiada vendor')
+        ->marketplace_url->toBeNull();
+});
+
+it('brings a rejected edit back open on the same category with what was typed', function () {
+    $category = Category::ordered()->skip(2)->first();
+
+    $this->actingAs($this->admin)
+        ->from(route('admin.categories.index'))
+        ->put(route('admin.categories.update', $category), [
+            'category_id' => $category->id,
+            'name' => ['ms' => '', 'en' => 'Half typed'],
+            'icon' => '📷',
+            'is_active' => 0,
+        ])
+        ->assertRedirect(route('admin.categories.index'))
+        ->assertSessionHasErrors('name.ms');
+
+    $old = $this->actingAs($this->admin)->get(route('admin.categories.index'))->viewData('props')['old'];
+
+    expect($old)
+        ->category_id->toEqual($category->id)
+        ->name->toBe(['ms' => null, 'en' => 'Half typed'])
+        ->icon->toBe('📷')
+        ->is_active->toBeFalse();
+});
+
+it('opens the page with no form when nothing was rejected', function () {
+    expect($this->actingAs($this->admin)->get(route('admin.categories.index'))->viewData('props')['old'])->toBeNull();
 });
 
 it('saves the order an admin dragged the categories into', function () {

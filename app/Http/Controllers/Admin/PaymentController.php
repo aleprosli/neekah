@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Actions\IssueReceipt;
 use App\Actions\RequeryPayment;
 use App\Actions\SettlePayment;
 use App\Enums\CameraTier;
@@ -12,6 +13,8 @@ use App\Enums\VendorPlan;
 use App\Http\Controllers\Controller;
 use App\Models\Payment;
 use App\Models\PaymentEvent;
+use App\Notifications\PaymentReceipt;
+use App\Support\Payments\PaymentDocument;
 use App\Support\Payments\PaymentGateways;
 use App\Support\TableFilter;
 use App\Support\VueProps;
@@ -19,6 +22,7 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -215,6 +219,15 @@ class PaymentController extends Controller
                     'can_mark_paid' => ! $payment->isPaid() && $payment->status !== PaymentStatus::Refunded,
                     'mark_paid_url' => route('admin.payments.paid', $payment),
                 ],
+                'receipt' => [
+                    'is_receipt' => PaymentDocument::for($payment)->isReceipt(),
+                    'number' => $payment->receipt_number,
+                    'sent_at' => $payment->receipt_sent_at?->translatedFormat('j M Y, g:i A'),
+                    'recipient' => PaymentDocument::payerOf($payment)?->email,
+                    'document_url' => route('payments.document', $payment),
+                    'email_url' => $payment->isPaid() ? route('admin.payments.email', $payment) : null,
+                    'send_url' => $payment->isPaid() && PaymentDocument::payerOf($payment) ? route('admin.payments.receipt', $payment) : null,
+                ],
             ]),
         ]);
     }
@@ -262,6 +275,25 @@ class PaymentController extends Controller
         Log::warning('Admin settled a payment by hand', ['admin_id' => $request->user()->id, 'payment' => $payment->reference, 'note' => $note]);
 
         return back()->with('status', __('pages.payments.marked_paid', ['reference' => $payment->reference]));
+    }
+
+    /** The receipt email exactly as the payer gets it. */
+    public function email(Payment $payment): Response
+    {
+        $payer = PaymentDocument::payerOf($payment);
+        abort_unless($payment->isPaid() && $payer, 404);
+
+        return response((new PaymentReceipt($payment))->toMail($payer)->render());
+    }
+
+    /** Send the receipt again, to the payer's address as it is now. */
+    public function sendReceipt(Payment $payment, IssueReceipt $receipt): RedirectResponse
+    {
+        abort_unless($payment->isPaid(), 404);
+
+        return back()->with('status', $receipt->send($payment, again: true)
+            ? __('flash.admin.receipt_sent', ['email' => PaymentDocument::payerOf($payment)?->email])
+            : __('flash.admin.receipt_not_sent'));
     }
 
     /** What the payment was for, in a few words. */

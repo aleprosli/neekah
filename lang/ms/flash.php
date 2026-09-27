@@ -21,6 +21,9 @@ return [
     ],
 
     'admin' => [
+        'invoice_saved' => 'Maklumat invois & resit disimpan.',
+        'receipt_sent' => 'Resit dihantar semula ke :email.',
+        'receipt_not_sent' => 'Resit tidak dapat dihantar: tiada pembayar dengan emel untuk bayaran ini.',
         'pro_ended' => 'Pro untuk :vendor ditamatkan. Vendor kini di pelan Basic.',
         'boost_tokens_changed' => 'Token boost :vendor dikemas kini. Baki: :balance.',
         'boost_saved' => 'Tetapan boost disimpan.',

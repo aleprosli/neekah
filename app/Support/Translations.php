@@ -35,9 +35,11 @@ class Translations
         // placeholder examples were turning up in the markup of every public
         // page, where two tests reasonably assert that a vendor's name is not.
         // date_picker: the booking calendar on a vendor page taking online bookings.
-        'site' => ['common', 'auth', 'blog', 'invitation', 'notifications', 'gallery', 'report', 'date_picker', 'copy'],
+        'site' => ['common', 'auth', 'blog', 'invitation', 'notifications', 'gallery', 'report', 'date_picker', 'copy', 'photo_picker'],
         // The Kamera Majlis page a guest opens from the QR.
         'camera' => ['common', 'copy', 'camera'],
+        // A printable invoice or receipt: no islands at all.
+        'document' => [],
     ];
 
     /**

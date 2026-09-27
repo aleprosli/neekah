@@ -172,10 +172,15 @@ it('reuses the open link when the couple pays again', function () {
 it('shows the couple what is known when Herepay sends them back', function () {
     bookOnline();
     $booking = Booking::sole();
+    $payment = Payment::sole();
 
-    $this->actingAs($this->couple)->get(route('bookings.payment.done', $booking))->assertOk()->assertSee(__('pages.online_booking.done_waiting_title'));
+    $this->actingAs($this->couple)->get(route('bookings.payment.done', $booking))->assertRedirect(route('payments.show', $payment));
+    $this->actingAs($this->couple)->get(route('payments.show', $payment))->assertOk()->assertSee(__('pages.payment_page.waiting_title'));
 
-    depositCallback(Payment::sole());
+    depositCallback($payment);
 
-    $this->actingAs($this->couple)->get(route('bookings.payment.done', $booking))->assertOk()->assertSee(__('pages.online_booking.done_confirmed_title'));
+    $this->actingAs($this->couple)->get(route('payments.show', $payment))
+        ->assertOk()
+        ->assertSee(__('pages.payment_page.paid_title'))
+        ->assertSee(__('pages.payment_page.paid_booking', ['vendor' => $this->vendor->name, 'date' => $booking->event_date->translatedFormat('j F Y')]));
 });

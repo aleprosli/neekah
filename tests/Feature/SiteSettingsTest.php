@@ -9,7 +9,7 @@ use App\Support\TurnstileSettings;
 
 it('gives every settings group its own page, listed in one menu', function () {
     $admin = User::factory()->admin()->create();
-    $ids = ['perhubungan', 'seo', 'gambar', 'keselamatan', 'telegram', 'pro', 'boost', 'tempahan', 'kamera', 'bayaran'];
+    $ids = ['perhubungan', 'seo', 'gambar', 'keselamatan', 'telegram', 'pro', 'boost', 'tempahan', 'kamera', 'bayaran', 'invois'];
 
     $response = $this->actingAs($admin)->get(route('admin.settings.edit'))->assertOk();
 
@@ -68,7 +68,9 @@ it('lets an admin publish the contact details shown in the footer', function () 
     $this->get(route('vendors.index'))
         ->assertSee('03-1234 5678')
         ->assertSee('hello@neekah.my')
-        ->assertSee('https://instagram.com/neekahmy');
+        ->assertSee('https://instagram.com/neekahmy')
+        ->assertSee('aria-label="Instagram"', false)
+        ->assertSee('data-social-icon="instagram"', false);
 });
 
 it('rejects a social link that is not a URL', function () {

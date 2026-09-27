@@ -49,7 +49,7 @@ const tones = {
         <UiStatCard v-for="stat in stats" :key="stat.label" v-bind="stat" />
     </div>
 
-    <p v-if="cardNotice" class="mt-4 rounded-2xl border border-line bg-surface-muted p-4 text-sm text-ink-muted">{{ $t('guests.kad_jemputan_belum_diterbitkan_jadi') }}<a :href="cardNotice.url" class="font-medium text-brand-700 hover:underline">{{ $t('guests.sediakan_kad_jemputan') }}</a>.
+    <p v-if="cardNotice" class="mt-4 rounded-2xl border border-line bg-surface-muted p-4 text-sm text-ink-muted">{{ $t('guests.kad_jemputan_belum_diterbitkan_jadi') }} <a :href="cardNotice.url" class="font-medium text-brand-700 hover:underline">{{ $t('guests.sediakan_kad_jemputan') }}</a>.
     </p>
 
     <ul v-if="importErrors.length" class="mt-4 flex flex-col gap-1 rounded-2xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900">
@@ -99,7 +99,7 @@ const tones = {
         <form :action="importUrl" method="POST" class="flex flex-col gap-3 rounded-2xl border border-line bg-surface-raised p-5">
             <input type="hidden" name="_token" :value="csrf">
             <h2 class="font-display text-lg font-semibold">{{ $t('guests.tampal_senarai_sedia_ada') }}</h2>
-            <p class="text-sm text-ink-muted">{{ $t('guests.satu_tetamu_satu_baris') }}<code class="text-xs">{{ $t('copy.guest_columns') }}</code>. {{ $t('copy.guest_columns_optional') }}</p>
+            <p class="text-sm text-ink-muted">{{ $t('guests.satu_tetamu_satu_baris') }} <code class="text-xs">{{ $t('copy.guest_columns') }}</code>. {{ $t('copy.guest_columns_optional') }}</p>
 
             <textarea
                 name="rows"

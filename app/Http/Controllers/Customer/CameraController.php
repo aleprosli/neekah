@@ -185,25 +185,16 @@ class CameraController extends Controller
      * Where the couple lands after paying. The gateway's callback, or its
      * signed return, opens the album; this only reports it.
      */
-    public function done(Request $request): View
+    /** Links made before the shared payment page still land somewhere useful. */
+    public function done(Request $request): RedirectResponse
     {
         $payment = Payment::query()
             ->for(PaymentPurpose::Kenangan)
-            ->with('album')
             ->where('reference', $request->string('ref')->toString())
             ->whereIn('wedding_id', $request->user()->weddings()->pluck('weddings.id'))
             ->firstOrFail();
 
-        return view('customer.camera.done', [
-            'payment' => $payment,
-            'tier' => CameraTier::from((string) $payment->detail('tier'))->label(),
-            'openUrl' => $payment->album ? route('camera.album', $payment->album) : route('camera.index'),
-            'state' => match ($payment->status) {
-                PaymentStatus::Paid => 'paid',
-                PaymentStatus::Failed, PaymentStatus::Expired => 'failed',
-                default => 'waiting',
-            },
-        ]);
+        return redirect()->route('payments.show', $payment);
     }
 
     public function update(UpdateCameraAlbumRequest $request, CameraAlbum $album): RedirectResponse
@@ -519,6 +510,7 @@ class CameraController extends Controller
                 'kind' => $payment->detail('kind'),
                 'amount' => 'RM'.number_format((float) $payment->amount, 2),
                 'paid_at' => $payment->paid_at?->translatedFormat('j M Y'),
+                'document_url' => route('payments.document', $payment),
             ])->values()->all();
     }
 

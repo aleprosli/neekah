@@ -212,6 +212,7 @@ const openBuy = () => {
                     <span class="text-ink-muted">{{ purchase.tier }}<template v-if="purchase.kind === 'upgrade'"> · {{ $t('camera.upgrade') }}</template></span>
                     <span class="ml-auto font-medium">{{ purchase.amount }}</span>
                     <span class="text-ink-muted">{{ purchase.paid_at }}</span>
+                    <a :href="purchase.document_url" target="_blank" rel="noopener" class="text-xs font-medium text-brand-700 underline underline-offset-4">{{ $t('payments.official_receipt') }}</a>
                 </li>
             </ul>
         </section>

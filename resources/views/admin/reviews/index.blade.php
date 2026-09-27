@@ -33,12 +33,12 @@
                 </label>
 
                 <label class="flex min-w-0 flex-col gap-1">
-                    <span class="text-xs font-semibold tracking-wide uppercase">{{ __('pages.admin_reviews.emel_penulis') }}<span class="font-normal normal-case opacity-70">(pilihan)</span></span>
+                    <span class="text-xs font-semibold tracking-wide uppercase">{{ __('pages.admin_reviews.emel_penulis') }} <span class="font-normal normal-case opacity-70">{{ __('ui.common.optional') }}</span></span>
                     <input type="email" name="author_email" value="{{ old('author_email') }}" maxlength="255" class="w-full rounded-xl border border-line bg-surface px-4 py-3 text-sm focus:border-brand-400 focus:outline-none">
                 </label>
 
                 <label class="flex min-w-0 flex-col gap-1">
-                    <span class="text-xs font-semibold tracking-wide uppercase">{{ __('pages.admin_reviews.tarikh_asal') }}<span class="font-normal normal-case opacity-70">(pilihan)</span></span>
+                    <span class="text-xs font-semibold tracking-wide uppercase">{{ __('pages.admin_reviews.tarikh_asal') }} <span class="font-normal normal-case opacity-70">{{ __('ui.common.optional') }}</span></span>
                     <input type="date" name="written_on" value="{{ old('written_on') }}" max="{{ now()->toDateString() }}" class="w-full rounded-xl border border-line bg-surface px-4 py-3 text-sm focus:border-brand-400 focus:outline-none">
                 </label>
             </div>
@@ -63,7 +63,7 @@
 
             <div data-vue="ui-photo-picker" data-props="@vueProps(['name' => 'photos[]', 'max' => $props['maxPhotos']])">
                 <label class="flex min-w-0 flex-col gap-1">
-                    <span class="text-xs font-semibold tracking-wide uppercase">{{ __('pages.admin_reviews.gambar') }}<span class="font-normal normal-case opacity-70">(pilihan)</span></span>
+                    <span class="text-xs font-semibold tracking-wide uppercase">{{ __('pages.admin_reviews.gambar') }} <span class="font-normal normal-case opacity-70">{{ __('ui.common.optional') }}</span></span>
                     <input type="file" name="photos[]" multiple accept="image/jpeg,image/png,image/webp" class="w-full text-sm">
                 </label>
             </div>

@@ -52,7 +52,7 @@ class ProfileController extends Controller
                 'states' => States::options(),
                 'districts' => States::districtOptions(),
                 'socialPlatforms' => collect(SocialLinks::PLATFORMS)
-                    ->map(fn (array $details, string $platform): array => ['key' => $platform, 'label' => $details['label'], 'placeholder' => $details['placeholder']])
+                    ->map(fn (array $details, string $platform): array => ['key' => $platform, 'label' => SocialLinks::label($platform), 'placeholder' => $details['placeholder']])
                     ->values()
                     ->all(),
                 'tones' => UpdateVendorProfileRequest::TONES,

@@ -114,7 +114,7 @@ const tones = {
                     </div>
 
                     <label class="flex flex-col gap-1.5 text-sm">
-                        <span class="font-medium">{{ $t('booking.nota_2') }}<span class="font-normal text-ink-muted">(pilihan)</span></span>
+                        <span class="font-medium">{{ $t('booking.nota_2') }} <span class="font-normal text-ink-muted">{{ $t('common.optional') }}</span></span>
                         <input
                             type="text"
                             name="note"
@@ -127,7 +127,7 @@ const tones = {
                     </label>
 
                     <label class="flex flex-col gap-1.5 text-sm">
-                        <span class="font-medium">{{ $t('booking.gambar_resit') }}<span class="font-normal text-ink-muted">(pilihan)</span></span>
+                        <span class="font-medium">{{ $t('booking.gambar_resit') }} <span class="font-normal text-ink-muted">{{ $t('common.optional') }}</span></span>
                         <input
                             type="file"
                             name="receipt"
@@ -217,6 +217,7 @@ const tones = {
                     <p v-if="payment.note" class="text-xs break-words text-ink-muted">{{ payment.note }}</p>
 
                     <a v-if="payment.receipt_url" :href="payment.receipt_url" target="_blank" rel="noopener" class="text-xs font-medium text-brand-700 underline underline-offset-4">{{ $t('booking.lihat_resit') }}</a>
+                    <a v-if="payment.document_url" :href="payment.document_url" target="_blank" rel="noopener" class="text-xs font-medium text-brand-700 underline underline-offset-4">{{ $t('payments.official_receipt') }}</a>
 
                     <UiConfirm
                         v-if="payment.destroy_url"

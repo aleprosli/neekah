@@ -15,7 +15,7 @@
                 <div class="flex min-w-0 flex-col gap-6">
                     <p class="font-script text-3xl text-brand-600 sm:text-4xl">{{ __('pages.landing.script_eyebrow') }}</p>
 
-                    <h1 class="font-display text-4xl leading-tight font-semibold tracking-tight text-balance sm:text-5xl lg:text-6xl">{{ __('pages.landing.cari_vendor_kahwin') }}<span class="text-brand-600">{{ __('pages.landing.headline_tail') }}</span>
+                    <h1 class="font-display text-4xl leading-tight font-semibold tracking-tight text-balance sm:text-5xl lg:text-6xl">{{ __('pages.landing.cari_vendor_kahwin') }} <span class="text-brand-600">{{ __('pages.landing.headline_tail') }}</span>
                     </h1>
 
                     <p class="max-w-xl text-lg text-ink-muted text-pretty">{{ __('pages.landing.neekah_bantu_anda_cari_vendor') }}</p>
@@ -222,7 +222,7 @@
                 <div class="mt-8 flex flex-col items-center gap-3 text-center">
                     <a href="{{ route('vendors.index') }}" class="inline-flex items-center justify-center rounded-full border border-gold-400 bg-surface-raised px-6 py-3 text-sm font-semibold transition hover:border-gold-500 hover:text-brand-700">{{ __('pages.landing.lihat_semua_vendor') }}</a>
                     @if ($helpUrl)
-                        <p class="text-sm text-ink-muted">{{ __('pages.landing.tak_jumpa_vendor_yang_anda') }}<a href="{{ $helpUrl }}" target="_blank" rel="noopener" class="font-semibold text-brand-600 hover:underline">{{ __('pages.landing.whatsapp_kami') }}</a>, kami bantu kongsikan kepada vendor lain.</p>
+                        <p class="text-sm text-ink-muted">{{ __('pages.landing.tak_jumpa_vendor_yang_anda') }} <a href="{{ $helpUrl }}" target="_blank" rel="noopener" class="font-semibold text-brand-600 hover:underline">{{ __('pages.landing.whatsapp_kami') }}</a>{{ __('pages.landing.kami_bantu_kongsikan') }}</p>
                     @endif
                 </div>
             </div>
