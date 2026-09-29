@@ -421,7 +421,7 @@ const previewFile = (event, target) => {
                     </ul>
                 </template>
 
-                <p class="text-sm text-ink-muted">{{ $t('card_editor.dipilih') }}<span class="font-semibold text-ink">{{ designMeta?.name ?? design.name }}</span> &middot; {{ $t('card_editor.change_anytime') }}</p>
+                <p class="text-sm text-ink-muted">{{ $t('card_editor.dipilih') }} <span class="font-semibold text-ink">{{ designMeta?.name ?? design.name }}</span> &middot; {{ $t('card_editor.change_anytime') }}</p>
             </section>
 
             <!-- Colours and faces -->

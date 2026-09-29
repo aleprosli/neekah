@@ -34,6 +34,8 @@ return [
         'password_confirm' => 'Sahkan kata laluan',
         'email' => 'Emel',
         'password' => 'Kata laluan',
+        'access_code' => 'Kod akses',
+        'access_code_help' => 'Laman ini hanya untuk pasukan dalaman buat masa ini.',
     ],
 
     'links' => [
@@ -55,6 +57,11 @@ return [
     'forgot' => [
         'title' => 'Lupa kata laluan',
         'subtitle' => 'Masukkan emel anda dan kami akan hantar pautan untuk set semula kata laluan.',
+    ],
+
+    'reset' => [
+        'title' => 'Set kata laluan baharu',
+        'subtitle' => 'Pilih kata laluan baharu untuk akaun anda.',
     ],
 
     'phone' => [

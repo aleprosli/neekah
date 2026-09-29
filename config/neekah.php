@@ -24,16 +24,14 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Booking through the platform
+    | Access code
     |--------------------------------------------------------------------------
-    | Off while Neekah is a network: couples contact vendors themselves and
-    | deal with them directly, so a public profile offers WhatsApp and an
-    | enquiry, not a booking form. The flow is still here — vendors record
-    | their own bookings — and switching this on brings the couple's side back
-    | when booking is automated.
+    | When set, signing in and signing up ask for this code, and Google sign-in
+    | is switched off because it would walk straight past it. For staging, so
+    | only the team can get in. Leave empty in production.
     */
 
-    'bookings_enabled' => (bool) env('NEEKAH_BOOKINGS_ENABLED', false),
+    'access_code' => env('NEEKAH_ACCESS_CODE'),
 
     /*
     |--------------------------------------------------------------------------

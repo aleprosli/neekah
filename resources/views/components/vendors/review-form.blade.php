@@ -13,7 +13,7 @@
     @if ($isOwnProfile)
         <p class="text-sm text-ink-muted">{{ __('pages.review_form.ini_profil_anda_sendiri_jadi') }}</p>
     @else
-        <h3 class="font-display text-lg font-semibold">Tulis review untuk {{ $vendor->name }}</h3>
+        <h3 class="font-display text-lg font-semibold">{{ __('pages.review_form.tulis_review_untuk', ['name' => $vendor->name]) }}</h3>
         <p class="mt-1 text-sm text-ink-muted">{{ __('pages.review_form.review_anda_terus_dipaparkan_ia') }}</p>
 
         <form method="POST" action="{{ route('vendors.reviews.store', $vendor) }}" enctype="multipart/form-data" class="mt-5 flex flex-col gap-5">
@@ -69,7 +69,7 @@
                         <input type="text" name="author_name" value="{{ old('author_name') }}" required minlength="2" maxlength="80" class="w-full rounded-xl border border-line bg-surface px-4 py-3 text-sm focus:border-brand-400 focus:outline-none">
                     </label>
                     <label class="flex min-w-0 flex-col gap-1">
-                        <span class="text-xs font-semibold tracking-wide uppercase">{{ __('pages.review_form.emel') }}<span class="font-normal normal-case opacity-70">(pilihan)</span></span>
+                        <span class="text-xs font-semibold tracking-wide uppercase">{{ __('pages.review_form.emel') }} <span class="font-normal normal-case opacity-70">{{ __('ui.common.optional') }}</span></span>
                         <input type="email" name="author_email" value="{{ old('author_email') }}" maxlength="255" class="w-full rounded-xl border border-line bg-surface px-4 py-3 text-sm focus:border-brand-400 focus:outline-none">
                         <span class="text-xs text-ink-muted">{{ __('pages.review_form.tidak_dipaparkan_hanya_untuk_kami') }}</span>
                     </label>
@@ -80,7 +80,7 @@
                  input inside as the fallback it replaces once mounted. --}}
             <div data-vue="ui-photo-picker" data-props="@vueProps(['name' => 'photos[]', 'max' => App\Models\Review::MAX_PHOTOS])">
                 <label class="flex min-w-0 flex-col gap-1">
-                    <span class="text-xs font-semibold tracking-wide uppercase">{{ __('pages.review_form.gambar') }}<span class="font-normal normal-case opacity-70">(pilihan, sehingga {{ App\Models\Review::MAX_PHOTOS }})</span></span>
+                    <span class="text-xs font-semibold tracking-wide uppercase">{{ __('pages.review_form.gambar') }} <span class="font-normal normal-case opacity-70">{{ __('ui.common.optional_up_to', ['count' => App\Models\Review::MAX_PHOTOS]) }}</span></span>
                     <input type="file" name="photos[]" multiple accept="image/jpeg,image/png,image/webp" class="w-full text-sm">
                 </label>
             </div>
@@ -90,7 +90,7 @@
             <button type="submit" class="rounded-full bg-brand-600 px-6 py-3.5 text-sm font-semibold text-white transition hover:bg-brand-700 sm:self-start">{{ __('pages.review_form.hantar_review') }}</button>
 
             @guest
-                <p class="text-xs text-ink-muted">{{ __('pages.review_form.anda_boleh_hantar_tanpa_akaun') }}<a href="{{ route('login') }}" class="font-medium text-ink underline underline-offset-4">{{ __('pages.review_form.log_masuk') }}</a> jika mahu review ini terikat pada akaun anda.
+                <p class="text-xs text-ink-muted">{{ __('pages.review_form.anda_boleh_hantar_tanpa_akaun') }} <a href="{{ route('login') }}" class="font-medium text-ink underline underline-offset-4">{{ __('pages.review_form.log_masuk') }}</a> {{ __('pages.review_form.jika_mahu_terikat_pada_akaun') }}
                 </p>
             @endguest
         </form>

@@ -13,6 +13,7 @@ const props = defineProps({
     facts: { type: Array, required: true },
     actions: { type: Array, required: true },
     vendorForm: { type: Object, default: null },
+    camera: { type: Object, default: null },
     csrf: { type: String, required: true },
     errors: { type: Object, default: () => ({}) },
 });
@@ -21,6 +22,17 @@ const card = 'flex min-w-0 flex-col gap-3 rounded-2xl border border-line bg-surf
 
 /** The switch-to-vendor form opens straight away when it came back with errors. */
 const showVendorForm = ref(Object.keys(props.errors).length > 0);
+
+const copied = ref(false);
+const copyCameraLink = async () => {
+    try {
+        await navigator.clipboard.writeText(props.camera.album.url);
+        copied.value = true;
+        window.setTimeout(() => (copied.value = false), 2000);
+    } catch {
+        copied.value = false;
+    }
+};
 
 const triggerClass = (tone) =>
     tone === 'danger'
@@ -43,6 +55,42 @@ const triggerClass = (tone) =>
             </p>
 
             <template v-else>
+                <!-- Kamera Majlis for this couple: pick a tier (free), or turn it off. -->
+                <div v-if="camera" :class="card">
+                    <h2 class="text-sm font-semibold">{{ $t('admin_camera.user_card_title') }}</h2>
+                    <p v-if="!camera.wedding" class="text-sm text-ink-muted">{{ $t('admin_camera.user_no_wedding') }}</p>
+
+                    <template v-else>
+                        <p class="text-sm text-ink-muted">{{ camera.wedding }}</p>
+                        <div class="grid grid-cols-3 gap-1 rounded-full bg-surface-muted p-1">
+                            <template v-for="option in camera.options" :key="option.value">
+                                <span v-if="option.value === camera.current" class="rounded-full bg-brand-600 px-3 py-1.5 text-center text-xs font-semibold text-white">{{ option.label }}</span>
+                                <UiConfirm
+                                    v-else
+                                    :action="camera.update_url"
+                                    method="PUT"
+                                    :tone="option.value === 'off' ? 'danger' : 'brand'"
+                                    :fields="{ tier: option.value }"
+                                    :title="option.value === 'off' ? $t('admin_camera.user_off_title', { wedding: camera.wedding }) : $t('admin_camera.user_grant_title', { tier: option.label, wedding: camera.wedding })"
+                                    :message="option.value === 'off' ? $t('admin_camera.user_off_message', { count: camera.album?.media ?? 0 }) : $t('admin_camera.user_grant_message')"
+                                    :confirm-label="option.value === 'off' ? $t('admin_camera.user_off') : $t('admin_camera.user_grant', { tier: option.label })"
+                                    trigger-class="w-full rounded-full px-3 py-1.5 text-center text-xs font-medium text-ink-muted transition hover:text-brand-700"
+                                    :csrf="csrf"
+                                >{{ option.label }}</UiConfirm>
+                            </template>
+                        </div>
+                        <span v-if="errors.tier" class="text-xs text-brand-700">{{ errors.tier }}</span>
+
+                        <div v-if="camera.album" class="flex min-w-0 flex-col gap-2">
+                            <p class="text-xs text-ink-muted">{{ $t('admin_camera.user_active', { date: camera.album.expires }) }}</p>
+                            <div class="flex min-w-0 items-center gap-2">
+                                <a :href="camera.album.url" target="_blank" rel="noopener" class="min-w-0 flex-1 truncate rounded-xl bg-surface-muted px-3 py-2 font-mono text-xs">{{ camera.album.url }}</a>
+                                <button type="button" class="shrink-0 rounded-full border border-line px-3 py-1.5 text-xs font-medium" @click="copyCameraLink">{{ copied ? $t('admin_camera.copied') : $t('admin_camera.copy') }}</button>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+
                 <div v-for="action in actions" :key="action.key" :class="card">
                     <h2 class="text-sm font-semibold">{{ action.heading }}</h2>
                     <p class="text-sm text-ink-muted">{{ action.body }}</p>

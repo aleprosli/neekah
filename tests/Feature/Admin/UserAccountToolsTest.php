@@ -36,6 +36,7 @@ it('lets an admin switch a couple with activity but no booking to a pending vend
             'business_name' => 'Studio Aina',
             'category_id' => Category::first()->id,
             'city' => 'Ipoh',
+            'district' => 'Kinta',
             'state' => 'Perak',
             'phone' => '012-345 6789',
         ])
@@ -49,7 +50,7 @@ it('refuses to switch a couple who has booked a vendor', function () {
     $booking = Booking::factory()->for(Vendor::factory()->for(Category::first()))->create();
 
     $this->actingAs($this->admin)
-        ->post(route('admin.users.vendor.store', $booking->user), ['business_name' => 'Studio', 'category_id' => Category::first()->id, 'city' => 'Ipoh', 'state' => 'Perak', 'phone' => '0123'])
+        ->post(route('admin.users.vendor.store', $booking->user), ['business_name' => 'Studio', 'category_id' => Category::first()->id, 'city' => 'Ipoh', 'district' => 'Kinta', 'state' => 'Perak', 'phone' => '0123'])
         ->assertForbidden();
 
     expect($booking->user->fresh()->role)->toBe(UserRole::Customer);

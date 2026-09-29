@@ -6,6 +6,7 @@ use App\Actions\SeedWeddingChecklist;
 use App\Enums\WeddingRole;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreWeddingRequest;
+use App\Models\Category;
 use App\Models\Wedding;
 use App\Support\States;
 use App\Support\VueProps;
@@ -46,6 +47,10 @@ class WeddingController extends Controller
     /**
      * What the form component needs, with anything already typed put back.
      *
+     * A new wedding also gets the split its budget will be seeded with, so the
+     * form can show what the number turns into before the couple commits to it.
+     * An existing one already has its own split on the Bajet page.
+     *
      * @return array<string, mixed>
      */
     private function formData(Wedding $wedding): array
@@ -58,6 +63,18 @@ class WeddingController extends Controller
                 'editing' => $editing,
                 'action' => $editing ? route('weddings.update', $wedding) : route('weddings.store'),
                 'cancelUrl' => route('dashboard'),
+                'budgetUrl' => $editing ? route('budget.index') : null,
+                'minDate' => today()->addDay()->toDateString(),
+                'budgetShares' => $editing ? [] : Category::active()->ordered()->get()
+                    ->map(fn (Category $category): array => [
+                        'name' => $category->name,
+                        'icon' => $category->icon,
+                        'share' => SeedWeddingChecklist::BUDGET_SHARES[$category->slug] ?? 0,
+                    ])
+                    ->filter(fn (array $row): bool => $row['share'] > 0)
+                    ->sortByDesc('share')
+                    ->values()
+                    ->all(),
                 'states' => States::options(),
                 'wedding' => [
                     'title' => old('title', $wedding->title),

@@ -9,7 +9,7 @@
     <details class="mb-6 min-w-0 rounded-2xl border border-line bg-surface-muted/40 p-4 sm:p-6" @if ($errors->addReview->any()) open @endif>
         <summary class="cursor-pointer text-sm font-semibold">{{ __('pages.reviews.tambah_review_dari_tempat_lain') }}</summary>
 
-        <p class="mt-2 max-w-2xl text-sm text-ink-muted">{{ __('pages.reviews.untuk_review_sebenar_yang_anda') }}<span class="font-medium text-ink">&ldquo;{{ __('enums.review_source.vendor_added') }}&rdquo;</span>{{ __('pages.reviews.ditambah_oleh_vendor_penjelasan') }}
+        <p class="mt-2 max-w-2xl text-sm text-ink-muted">{{ __('pages.reviews.untuk_review_sebenar_yang_anda') }} <span class="font-medium text-ink">&ldquo;{{ __('enums.review_source.vendor_added') }}&rdquo;</span>{{ __('pages.reviews.ditambah_oleh_vendor_penjelasan') }}
         </p>
 
         <form method="POST" action="{{ route('vendor.reviews.store') }}" enctype="multipart/form-data" class="mt-4 flex flex-col gap-4">
@@ -29,11 +29,11 @@
                     <input type="text" name="author_name" value="{{ old('author_name') }}" required minlength="2" maxlength="80" class="w-full rounded-xl border border-line bg-surface px-4 py-3 text-sm focus:border-brand-400 focus:outline-none">
                 </label>
                 <label class="flex min-w-0 flex-col gap-1">
-                    <span class="text-xs font-semibold tracking-wide uppercase">{{ __('pages.reviews.emel') }}<span class="font-normal normal-case opacity-70">(pilihan)</span></span>
+                    <span class="text-xs font-semibold tracking-wide uppercase">{{ __('pages.reviews.emel') }} <span class="font-normal normal-case opacity-70">{{ __('ui.common.optional') }}</span></span>
                     <input type="email" name="author_email" value="{{ old('author_email') }}" maxlength="255" class="w-full rounded-xl border border-line bg-surface px-4 py-3 text-sm focus:border-brand-400 focus:outline-none">
                 </label>
                 <label class="flex min-w-0 flex-col gap-1">
-                    <span class="text-xs font-semibold tracking-wide uppercase">{{ __('pages.reviews.tarikh_asal') }}<span class="font-normal normal-case opacity-70">(pilihan)</span></span>
+                    <span class="text-xs font-semibold tracking-wide uppercase">{{ __('pages.reviews.tarikh_asal') }} <span class="font-normal normal-case opacity-70">{{ __('ui.common.optional') }}</span></span>
                     <input type="date" name="written_on" value="{{ old('written_on') }}" max="{{ now()->toDateString() }}" class="w-full rounded-xl border border-line bg-surface px-4 py-3 text-sm focus:border-brand-400 focus:outline-none">
                 </label>
             </div>
@@ -58,7 +58,7 @@
 
             <div data-vue="ui-photo-picker" data-props="@vueProps(['name' => 'photos[]', 'max' => App\Models\Review::MAX_PHOTOS])">
                 <label class="flex min-w-0 flex-col gap-1">
-                    <span class="text-xs font-semibold tracking-wide uppercase">{{ __('pages.reviews.gambar') }}<span class="font-normal normal-case opacity-70">(pilihan)</span></span>
+                    <span class="text-xs font-semibold tracking-wide uppercase">{{ __('pages.reviews.gambar') }} <span class="font-normal normal-case opacity-70">{{ __('ui.common.optional') }}</span></span>
                     <input type="file" name="photos[]" multiple accept="image/jpeg,image/png,image/webp" class="w-full text-sm">
                 </label>
             </div>

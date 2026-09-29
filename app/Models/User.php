@@ -16,13 +16,14 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Lab404\Impersonate\Models\Impersonate;
+use Laravel\Sanctum\HasApiTokens;
 
 #[Fillable(['name', 'email', 'password', 'role', 'phone', 'locale', 'google_id', 'avatar_url', 'deactivated_at'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable implements HasLocalePreference
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Impersonate, Notifiable;
+    use HasApiTokens, HasFactory, Impersonate, Notifiable;
 
     /**
      * @return array<string, string>

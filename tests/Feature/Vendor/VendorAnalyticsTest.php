@@ -14,7 +14,7 @@ use Database\Seeders\CategorySeeder;
 beforeEach(function () {
     $this->seed(CategorySeeder::class);
     $this->owner = User::factory()->create(['role' => UserRole::Vendor]);
-    $this->vendor = Vendor::factory()->for(Category::first())->for($this->owner)->create();
+    $this->vendor = Vendor::factory()->pro()->for(Category::first())->for($this->owner)->create();
 });
 
 it('shows revenue and completed majlis by month', function () {

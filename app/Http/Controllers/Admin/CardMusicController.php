@@ -28,9 +28,9 @@ class CardMusicController extends Controller
             'props' => VueProps::for([
                 'storeUrl' => route('admin.card-music.store'),
                 'stats' => [
-                    ['label' => 'Jumlah trek', 'value' => $tracks->count()],
-                    ['label' => 'Aktif', 'value' => $tracks->where('is_active', true)->count()],
-                    ['label' => 'Digunakan pada kad', 'value' => $tracks->sum('sites_count')],
+                    ['label' => __('props.copy.total_tracks'), 'value' => $tracks->count()],
+                    ['label' => __('props.copy.active'), 'value' => $tracks->where('is_active', true)->count()],
+                    ['label' => __('props.copy.used_on_cards'), 'value' => $tracks->sum('sites_count')],
                 ],
                 'tracks' => $tracks->map(fn (CardMusicTrack $track): array => [
                     'id' => $track->id,

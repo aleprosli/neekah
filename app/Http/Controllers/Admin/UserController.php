@@ -74,7 +74,8 @@ class UserController extends Controller
                 [
                     'key' => 'role',
                     'exclusive' => true,
-                    'value' => $segment ? null : UserRole::tryFrom($request->string('role')->toString())?->value,
+                    'label' => __('props.common.filter_role'),
+                    'value' => $segment ? [] : TableFilter::requested($request, 'role', array_column(UserRole::cases(), 'value')),
                     'allLabel' => __('props.common.all'),
                     'allCount' => $counts->sum(),
                     'options' => array_map(fn (UserRole $case): array => [
@@ -86,6 +87,8 @@ class UserController extends Controller
                 [
                     'key' => 'segment',
                     'exclusive' => true,
+                    // One view at a time: each segment brings its own columns.
+                    'multiple' => false,
                     'label' => __('props.admin.perlu_diikuti'),
                     'value' => $segment?->value,
                     'allLabel' => __('props.common.none'),
@@ -127,7 +130,7 @@ class UserController extends Controller
     public function data(Request $request): JsonResponse
     {
         $segment = UserSegment::tryFrom($request->string('segment')->toString());
-        $role = $segment ? null : UserRole::tryFrom($request->string('role')->toString());
+        $roles = $segment ? [] : TableFilter::requestedEnums($request, 'role', UserRole::class);
         $sort = in_array($request->string('sort')->toString(), ['name', 'email', 'created_at'], true)
             ? $request->string('sort')->toString()
             : 'id';
@@ -143,7 +146,7 @@ class UserController extends Controller
             ->withCount(['bookings', 'weddings'])
             ->when($segment, fn ($query) => $segment->apply($query))
             ->when($segment, fn ($query) => $query->with($this->segmentRelations($segment)))
-            ->when($role, fn ($query) => $query->where('role', $role))
+            ->when($roles, fn ($query) => $query->whereIn('role', $roles))
             ->when($request->string('search')->trim()->toString(), function ($query, string $keyword): void {
                 $like = '%'.$keyword.'%';
                 $query->where(fn ($query) => $query->where('name', 'like', $like)->orWhere('email', 'like', $like));
@@ -268,19 +271,27 @@ class UserController extends Controller
                     ['label' => __('props.admin.telefon_2'), 'value' => $user->phone ?: '—'],
                     ['label' => __('props.admin.peranan_2'), 'value' => $user->role->label()],
                     ['label' => __('props.admin.status_5'), 'value' => $user->isDeactivated()
-                        ? 'Dinyahaktif sejak '.$user->deactivated_at->translatedFormat('j M Y')
-                        : 'Aktif'],
+                        ? __('props.copy.deactivated_since', ['date' => $user->deactivated_at->translatedFormat('j M Y')])
+                        : __('props.copy.active')],
                     ['label' => __('props.admin.daftar_3'), 'value' => $user->created_at->translatedFormat('j M Y').($user->google_id ? ' · Google' : '')],
                     ['label' => __('props.admin.majlis_2'), 'value' => __('props.units.shared_created', ['shared' => $user->weddings_count, 'created' => $user->created_weddings_count])],
+                    ...($user->vendor ? [[
+                        'label' => __('props.admin.plan'),
+                        'value' => $user->vendor->isPro()
+                            ? 'Pro · '.__('props.admin.plan_until', ['date' => $user->vendor->pro_until->translatedFormat('j M Y')])
+                            : 'Basic',
+                    ]] : []),
                     ['label' => __('props.admin.tempahan_sebagai_pengantin'), 'value' => $user->bookings_count],
                     ['label' => __('props.admin.enquiry_review'), 'value' => $user->enquiries_count.' · '.$user->reviews_count],
                 ],
                 'actions' => $this->accountActions($user, $admin),
+                'camera' => CameraController::userCard($user),
                 'vendorForm' => $admin->can('switchToVendor', $user) ? VueProps::for([
                     'action' => route('admin.users.vendor.store', $user),
                     'loginUrl' => route('login'),
                     'categories' => Category::active()->ordered()->get(['id', 'name', 'icon']),
                     'states' => States::options(),
+                    'districts' => States::districtOptions(),
                     'old' => ['phone' => $user->phone, ...old()],
                     'account' => ['name' => $user->name, 'email' => $user->email],
                 ]) : null,
@@ -372,7 +383,7 @@ class UserController extends Controller
             'tone' => 'danger',
             'confirm_title' => __('props.admin.padam_akaun_3').$user->name.'?',
             'confirm_message' => __('props.admin.akaun_majlis_enquiry_review_dan'),
-            'confirm_label' => 'Ya, padam kekal',
+            'confirm_label' => __('props.copy.delete_forever'),
         ];
 
         return $actions;

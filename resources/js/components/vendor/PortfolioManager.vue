@@ -119,7 +119,7 @@ const destroyUrl = (photo) => props.destroyUrlTemplate.replace('__ID__', photo.i
         <div class="flex flex-wrap items-center justify-between gap-3">
             <div>
                 <h2 class="font-semibold">{{ $t('portfolio.susunan_galeri') }}</h2>
-                <p class="text-sm text-ink-muted">{{ $t('portfolio.seret_untuk_susun') }}<strong>{{ HERO_COUNT }} gambar pertama</strong> mengisi grid di atas halaman awam anda; selebihnya muncul apabila pengantin menekan "Tunjuk semua gambar".
+                <p class="text-sm text-ink-muted">{{ $t('portfolio.seret_untuk_susun') }} <strong>{{ $t('portfolio.first_photos', { count: HERO_COUNT }) }}</strong> {{ $t('portfolio.first_photos_fill_grid') }}
                 </p>
             </div>
             <p class="text-xs text-ink-muted" aria-live="polite">

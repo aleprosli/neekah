@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Actions\ActivateCameraAlbum;
+use App\Enums\PaymentPurpose;
 use App\Enums\WeddingRole;
 use Database\Factories\WeddingFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -35,6 +37,39 @@ class Wedding extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Moving the event date moves when each Neekah Kenangan album that
+     * follows it is deleted, which is counted from the event. An album with a
+     * date of its own (another majlis) keeps its own.
+     */
+    protected static function booted(): void
+    {
+        static::updated(function (Wedding $wedding): void {
+            if (! $wedding->wasChanged('event_date')) {
+                return;
+            }
+
+            $wedding->cameraAlbums()
+                ->whereNull('event_date')
+                ->whereNull('purged_at')
+                ->whereNotNull('activated_at')
+                ->get()
+                ->each(fn (CameraAlbum $album) => $album->update(['expires_at' => ActivateCameraAlbum::expiryFor($wedding->event_date)]));
+        });
+    }
+
+    /** Neekah Kenangan albums, one per majlis the couple bought one for. */
+    public function cameraAlbums(): HasMany
+    {
+        return $this->hasMany(CameraAlbum::class);
+    }
+
+    /** What this wedding paid Neekah for Neekah Kenangan, newest first. */
+    public function kenanganPayments(): HasMany
+    {
+        return $this->hasMany(Payment::class)->where('purpose', PaymentPurpose::Kenangan)->latest('id');
     }
 
     public function members(): BelongsToMany

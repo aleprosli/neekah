@@ -3,7 +3,7 @@
         <div class="mx-auto flex max-w-7xl flex-col items-center justify-between gap-2 px-4 py-2 text-sm sm:flex-row sm:px-6 lg:px-10">
             <p class="flex items-center gap-2 text-center sm:text-left">
                 <svg class="size-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg>
-                <span>{{ __('pages.impersonation.mod_impersonate_anda_melihat_neekah') }}<strong>{{ auth()->user()->name }}</strong>. Pembayaran dimatikan.</span>
+                <span>{{ __('pages.impersonation.mod_impersonate_anda_melihat_neekah') }} <strong>{{ auth()->user()->name }}</strong>{{ __('pages.impersonation.pembayaran_dimatikan') }}</span>
             </p>
             <form method="POST" action="{{ route('impersonate.stop') }}" class="shrink-0">
                 @csrf

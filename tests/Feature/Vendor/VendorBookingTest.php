@@ -13,7 +13,7 @@ use Database\Seeders\CategorySeeder;
 
 beforeEach(function () {
     $this->seed(CategorySeeder::class);
-    $this->vendor = Vendor::factory()->for(Category::first())->create();
+    $this->vendor = Vendor::factory()->pro()->for(Category::first())->create();
     $this->package = Package::factory()->for($this->vendor)->create(['price' => 3000]);
     $this->customer = User::factory()->create(['email' => 'aina@example.com']);
 });
@@ -81,7 +81,7 @@ it('completes a confirmed booking after the event and refreshes vendor stats', f
 
 it('does not let another vendor complete or view the booking', function () {
     $booking = Booking::factory()->confirmed()->for($this->customer)->for($this->vendor)->create(['event_date' => now()->subDay()->toDateString()]);
-    $otherVendor = Vendor::factory()->for(Category::first())->create();
+    $otherVendor = Vendor::factory()->pro()->for(Category::first())->create();
 
     $this->actingAs($otherVendor->user)->post(route('vendor.bookings.complete', $booking))->assertForbidden();
     $this->actingAs($otherVendor->user)->get(route('vendor.bookings.show', $booking))->assertForbidden();

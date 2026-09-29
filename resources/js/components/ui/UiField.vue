@@ -28,7 +28,7 @@ const inputType = computed(() => (isPassword.value && revealed.value ? 'text' : 
 
 <template>
     <label class="flex flex-col gap-1.5">
-        <span class="text-sm font-medium">{{ label }}</span>
+        <span class="text-sm font-medium first-letter:uppercase">{{ label }}</span>
         <span class="relative flex">
             <input
                 :type="inputType"
@@ -49,7 +49,7 @@ const inputType = computed(() => (isPassword.value && revealed.value ? 'text' : 
                 v-if="isPassword"
                 type="button"
                 class="absolute inset-y-0 right-0 flex w-11 items-center justify-center rounded-r-xl text-ink-muted transition hover:text-ink focus-visible:text-brand-700 focus-visible:outline-none"
-                :aria-label="revealed ? 'Sembunyikan kata laluan' : 'Tunjukkan kata laluan'"
+                :aria-label="revealed ? $t('copy.hide_password') : $t('copy.show_password')"
                 :aria-pressed="revealed"
                 @click="revealed = !revealed"
             >

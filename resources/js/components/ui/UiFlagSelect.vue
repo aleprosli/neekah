@@ -92,7 +92,7 @@ const onKeydown = (event) => {
 <template>
     <div ref="root" :class="['relative', variant === 'bare' ? 'flex flex-col gap-0.5' : 'flex flex-col gap-1.5']">
         <span v-if="label && variant === 'bare'" class="text-[11px] font-semibold tracking-wide text-ink-muted uppercase">{{ label }}</span>
-        <span v-else-if="label" class="text-sm font-medium">{{ label }}</span>
+        <span v-else-if="label" class="text-sm font-medium first-letter:uppercase">{{ label }}</span>
 
         <input type="hidden" :name="name" :value="selected">
 

@@ -90,7 +90,7 @@
                                     ])>
                                         {{ $value }}
                                         @if ($row['best'] === $index)
-                                            <span class="ml-1 text-[11px] font-normal text-emerald-700">terbaik</span>
+                                            <span class="ml-1 text-[11px] font-normal text-emerald-700">{{ __('pages.compare.terbaik') }}</span>
                                         @endif
                                     </dd>
                                 @endforeach

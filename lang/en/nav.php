@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'pro_locked' => 'Locked, needs Neekah Pro',
 
     'find_vendors' => 'Find Vendors',
     'how_it_works' => 'How It Works',
@@ -28,4 +29,5 @@ return [
     'language' => 'Language',
 
     'switch_to' => 'Switch to :language',
+    'close_menu' => 'Close menu',
 ];

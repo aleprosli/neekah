@@ -191,9 +191,33 @@
             </div>
         @else
             <h1 class="sr-only">{{ $activeCategory?->name ?? __('pages.dash.semua_vendor') }}</h1>
+
+            {{-- Pilihan Elite: Pro vendors whose earned tier is Top or
+                 Recommended, on the first page of the Disyorkan order. Earned
+                 by performance, so it sits apart from the boosted "Dipromosi"
+                 cards, which are bought. --}}
+            @if ($elite->isNotEmpty())
+                <section class="relative mb-10 overflow-hidden rounded-3xl border border-gold-300/70 bg-linear-to-br from-ink via-brand-900 to-ink p-5 text-surface sm:p-7" aria-labelledby="pilihan-elite">
+                    <div class="pointer-events-none absolute -top-24 -right-16 size-72 rounded-full bg-gold-300/15 blur-3xl" aria-hidden="true"></div>
+                    <div class="relative mb-5 flex flex-wrap items-end justify-between gap-3">
+                        <div class="min-w-0">
+                            <p class="text-[11px] font-semibold tracking-[0.3em] text-gold-300 uppercase">✦ {{ __('marketplace.elite.eyebrow') }}</p>
+                            <h2 id="pilihan-elite" class="mt-1 font-display text-2xl font-semibold">{{ __('marketplace.elite.title') }}</h2>
+                            <p class="mt-1 max-w-xl text-sm text-surface/75">{{ __('marketplace.elite.body') }}</p>
+                        </div>
+                        <a href="{{ route('landing') }}#elite" class="shrink-0 text-sm font-medium text-gold-300 underline underline-offset-4">{{ __('marketplace.elite.what') }}</a>
+                    </div>
+                    <ul class="no-scrollbar relative -mx-5 flex gap-4 overflow-x-auto px-5 pb-1 sm:-mx-7 sm:px-7">
+                        @foreach ($elite as $vendor)
+                            <li class="w-44 shrink-0 sm:w-52"><x-vendor-card :vendor="$vendor" on-dark /></li>
+                        @endforeach
+                    </ul>
+                </section>
+            @endif
+
             <ul class="grid grid-cols-2 gap-x-3 gap-y-8 sm:gap-x-6 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
                 @foreach ($vendors as $vendor)
-                    <li><x-vendor-card :vendor="$vendor" comparable /></li>
+                    <li><x-vendor-card :vendor="$vendor" comparable :promoted="(bool) $vendor->boosted" /></li>
                 @endforeach
             </ul>
 

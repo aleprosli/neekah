@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Models\User;
+use App\Rules\AccessCode;
 use App\Rules\Turnstile;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -25,6 +26,7 @@ class RegisterRequest extends FormRequest
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique(User::class, 'email')],
             'phone' => ['nullable', 'string', 'max:30'],
             'password' => ['required', 'confirmed', Password::min(8)],
+            'access_code' => [new AccessCode],
             'cf-turnstile-response' => [app(Turnstile::class)],
         ];
     }

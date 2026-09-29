@@ -45,12 +45,19 @@ return [
         'price_asc' => 'Price: low to high',
         'price_desc' => 'Price: high to low',
         'reviews' => 'Most reviewed',
+        'popular' => 'Most viewed',
     ],
 
     'count' => '{0} No vendors|{1} :count vendor|[2,*] :count vendors',
     'demo' => 'Demo data',
 
     'card' => [
+        'promoted' => 'Promoted',
+        'trending' => 'Trending',
+        'pro' => 'Pro',
+        'pro_title' => 'Neekah Pro vendor',
+        'elite' => 'Elite',
+        'elite_title' => 'Pro Elite: a Neekah Pro vendor that reached the Top or Recommended tier through real performance',
         'recommended' => 'Recommended',
         'top' => 'Top vendor',
         'new' => 'New',
@@ -73,4 +80,10 @@ return [
         'limit' => 'Four vendors at most.',
     ],
 
+    'elite' => [
+        'eyebrow' => 'Elite picks',
+        'title' => 'Pro vendors with the best track record',
+        'body' => 'Neekah Pro members who reached the Top or Recommended tier through real ratings, completed bookings and responses. This status cannot be bought.',
+        'what' => 'What is Elite?',
+    ],
 ];

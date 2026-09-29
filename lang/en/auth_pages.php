@@ -34,6 +34,8 @@ return [
         'password_confirm' => 'Confirm your password',
         'email' => 'Email',
         'password' => 'Password',
+        'access_code' => 'Access code',
+        'access_code_help' => 'This site is open to the internal team only for now.',
     ],
 
     'links' => [
@@ -55,6 +57,11 @@ return [
     'forgot' => [
         'title' => 'Forgot your password',
         'subtitle' => 'Enter your email and we will send you a link to set a new password.',
+    ],
+
+    'reset' => [
+        'title' => 'Set a new password',
+        'subtitle' => 'Choose a new password for your account.',
     ],
 
     'phone' => [

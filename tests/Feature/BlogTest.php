@@ -53,6 +53,20 @@ it('describes an article to search engines', function () {
         ->and($graph->firstWhere('@type', 'BlogPosting')['headline'])->toBe('Panduan Bajet Kahwin');
 });
 
+it('escapes an article opening once when it stands in for a missing summary', function () {
+    $post = Post::factory()->published()->create([
+        'excerpt' => null,
+        'meta_description' => null,
+        'body' => '<p>Bajet &amp; tetamu&nbsp;&lt;script&gt;alert(1)&lt;/script&gt;</p>',
+    ]);
+
+    expect($post->summary())->toBe('Bajet & tetamu <script>alert(1)</script>');
+
+    $this->get($post->url())
+        ->assertOk()
+        ->assertSee('<meta name="description" content="Bajet &amp; tetamu &lt;script&gt;alert(1)&lt;/script&gt;">', false);
+});
+
 it('lists published articles in the sitemap and leaves drafts out', function () {
     $published = Post::factory()->published()->create();
     $draft = Post::factory()->create();

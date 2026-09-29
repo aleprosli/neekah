@@ -238,8 +238,8 @@ const tone = (progress) => {
         <div v-if="unsaved" class="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-surface-raised p-4 shadow-2xl lg:left-[17rem]">
             <div class="mx-auto flex max-w-3xl flex-wrap items-center justify-between gap-3">
                 <p class="text-sm">
-                    <span class="font-semibold">{{ unsaved }} perubahan</span>
-                    <span class="text-ink-muted"> belum disimpan</span>
+                    <span class="font-semibold">{{ $t('copy.changes_count', { count: unsaved }) }}</span>
+                    <span class="text-ink-muted"> {{ $t('copy.not_saved_yet') }}</span>
                 </p>
 
                 <div class="flex items-center gap-2">

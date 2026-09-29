@@ -47,9 +47,11 @@
                 </div>
 
                 @if ($social)
-                    <div class="flex flex-wrap gap-x-6 gap-y-2">
+                    <div class="flex flex-wrap gap-2">
                         @foreach ($social as $link)
-                            <a href="{{ $link['url'] }}" target="_blank" rel="noopener" class="transition hover:text-ink">{{ $link['label'] }}</a>
+                            <a href="{{ $link['url'] }}" target="_blank" rel="noopener" class="flex size-9 items-center justify-center rounded-full border border-line transition hover:border-brand-400 hover:text-ink" aria-label="{{ $link['label'] }}" title="{{ $link['label'] }}">
+                                <x-social-icon :platform="$link['platform']" />
+                            </a>
                         @endforeach
                     </div>
                 @endif

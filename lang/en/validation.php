@@ -165,6 +165,7 @@ return [
     'unique' => 'The :attribute has already been taken.',
     'uploaded' => 'The :attribute failed to upload.',
     'uppercase' => 'The :attribute field must be uppercase.',
+    'phone' => 'The :attribute field must be a valid phone number for the selected country.',
     'url' => 'The :attribute field must be a valid URL.',
     'ulid' => 'The :attribute field must be a valid ULID.',
     'uuid' => 'The :attribute field must be a valid UUID.',
@@ -181,6 +182,28 @@ return [
     */
 
     'custom' => [
+        'camera_album_closed' => 'This album is not taking photos right now.',
+        'camera_video_not_allowed' => 'Videos are for Neekah Moments Pro only.',
+        'camera_wish_limit' => 'You have already sent many wishes to this album. Thank you!',
+        'camera_voice_unreadable' => 'This recording could not be read. Please record it again.',
+        'camera_file_type' => 'This file is not a supported photo or video.',
+        'camera_file_too_large' => 'Files must be :mb MB or less.',
+        'camera_video_too_long' => 'Videos must be :minutes minutes or less.',
+        'camera_slow_down' => 'Too many uploads from this phone. Try again shortly.',
+        'camera_limit_reached' => 'This album is full (:count photos).',
+        'camera_passcode_wrong' => 'That passcode is not right.',
+        'boost_not_enough' => 'Not enough tokens. You have :count.',
+        'boost_category' => 'Pick one of your business categories.',
+        'boost_days' => 'Pick between 1 and :max days.',
+        'camera_no_wedding' => 'No wedding was found for this email.',
+        'camera_passcode_throttled' => 'Too many tries. Try again in :minutes minutes.',
+        'pax_needs_fixed_deposit' => 'Your price is per pax, so the deposit must be a fixed amount (RM).',
+        'online_booking_closed' => 'This vendor is not taking online bookings right now.',
+        'date_weekday_off' => 'The vendor does not take bookings on this day of the week.',
+        'date_too_soon' => 'This date is too soon to book online.',
+        'date_too_far' => 'This date is not open for booking yet.',
+        'date_past' => 'This date has passed.',
+        'herepay_keys_missing' => 'Herepay cannot be switched on yet. Fill these in .env first: :keys.',
         'file_too_large' => 'That file is too large. This server accepts :sizeMB per upload.',
 
         'remaining_balance' => 'Only RM:amount is left to record.',
@@ -206,6 +229,7 @@ return [
 
         'turnstile_missing' => 'Please complete the security check.',
         'turnstile_failed' => 'The security check did not pass. Please try again.',
+        'access_code' => 'That access code is not valid.',
 
         'credentials' => 'That email and password do not match our records.',
         'too_many_attempts' => 'Too many attempts. Try again in :minutes minutes.',

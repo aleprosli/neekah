@@ -2,7 +2,10 @@
 
 use App\Models\Category;
 use App\Models\Vendor;
+use App\Support\BoostSettings;
+use App\Support\CameraSettings;
 use App\Support\ContactSettings;
+use App\Support\ProSettings;
 use Database\Seeders\CategorySeeder;
 use Database\Seeders\SiteTemplateSeeder;
 
@@ -101,4 +104,28 @@ it('tells visitors the platform is free rather than quoting a commission', funct
         ->assertSee('Percuma')
         ->assertDontSee('Komisen platform')
         ->assertDontSee('8%');
+});
+
+it('explains Neekah Kenangan, Basic and Pro, boost and Pro Elite only once each is on sale, at the admin prices', function () {
+    $this->get(route('landing'))
+        ->assertOk()
+        ->assertDontSee('id="kenangan"', false)
+        ->assertDontSee('id="pro"', false)
+        ->assertDontSee('id="elite"', false);
+
+    app(CameraSettings::class)->save(['enabled' => true, 'pro_price' => 109]);
+    app(ProSettings::class)->save(['enabled' => true, 'monthly_price' => 59]);
+    app(BoostSettings::class)->save(['enabled' => true]);
+
+    $this->get(route('landing'))
+        ->assertOk()
+        ->assertSee('id="kenangan"', false)
+        ->assertSee('RM109')
+        ->assertSee('RM59')
+        ->assertSee('id="boost"', false)
+        ->assertSee('id="elite"', false)
+        ->assertSee(__('pages.landing.plans.deposit_note'))
+        // Still a network: nothing promises payment through Neekah.
+        ->assertDontSee('Tempah & bayar di Neekah')
+        ->assertDontSee('Deposit dibayar');
 });
