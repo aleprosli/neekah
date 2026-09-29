@@ -5,6 +5,7 @@ use App\Enums\AnnouncementStatus;
 use App\Jobs\SendAnnouncement;
 use App\Models\Announcement;
 use App\Models\User;
+use App\Models\Vendor;
 use App\Notifications\AnnouncementPublished;
 use App\Support\AnnouncementPresets;
 use Illuminate\Support\Facades\Notification;
@@ -66,6 +67,17 @@ it('sends to couples only, or vendors only, when that is the audience', function
 
     Notification::assertSentTo($this->vendor, AnnouncementPublished::class);
     Notification::assertNotSentTo([$this->aina, $this->hakim], AnnouncementPublished::class);
+});
+
+it('sends to vendors still waiting for approval, and to no approved vendor', function () {
+    Notification::fake();
+    Vendor::factory()->for($this->vendor)->create();
+    $waiting = Vendor::factory()->pending()->create()->user;
+
+    (new SendAnnouncement(Announcement::factory()->create(['audience' => 'pending_vendors'])))->handle();
+
+    Notification::assertSentTo($waiting, AnnouncementPublished::class);
+    Notification::assertNotSentTo([$this->vendor, $this->aina, $this->hakim], AnnouncementPublished::class);
 });
 
 it('leaves out an account that has been deactivated', function () {

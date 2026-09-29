@@ -6,6 +6,7 @@ return [
         'everyone' => 'Semua pengguna',
         'customers' => 'Pengantin sahaja',
         'vendors' => 'Vendor sahaja',
+        'pending_vendors' => 'Vendor belum disahkan',
         'custom' => 'Pilih sendiri',
     ],
 
@@ -181,6 +182,7 @@ return [
         'everyone' => 'Setiap pengantin dan vendor yang aktif.',
         'customers' => 'Akaun pengantin sahaja.',
         'vendors' => 'Akaun vendor sahaja.',
+        'pending_vendors' => 'Vendor yang profilnya masih menunggu kelulusan admin.',
         'custom' => 'Pilih pengguna satu per satu, atau taip alamat emel sendiri.',
     ],
 

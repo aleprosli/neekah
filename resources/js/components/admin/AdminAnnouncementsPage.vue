@@ -205,7 +205,7 @@ const sendTest = (event) => {
             <fieldset class="flex flex-col gap-2">
                 <legend class="text-sm font-medium">{{ $t('admin_announcements.penerima') }}</legend>
 
-                <div class="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+                <div class="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
                     <label
                         v-for="audience in audiences"
                         :key="audience.value"

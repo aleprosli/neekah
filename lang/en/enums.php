@@ -6,6 +6,7 @@ return [
         'everyone' => 'Everyone',
         'customers' => 'Couples only',
         'vendors' => 'Vendors only',
+        'pending_vendors' => 'Unverified vendors',
         'custom' => 'Chosen by hand',
     ],
 
@@ -181,6 +182,7 @@ return [
         'everyone' => 'Every active couple and vendor.',
         'customers' => 'Couples’ accounts only.',
         'vendors' => 'Vendor accounts only.',
+        'pending_vendors' => 'Vendors whose profile is still waiting for admin approval.',
         'custom' => 'Pick users one by one, or type an email address yourself.',
     ],
 
