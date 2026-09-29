@@ -106,7 +106,20 @@ it('writes the subject, every paragraph and the button into the email', function
         ->and($html)->toContain('Perenggan pertama.')
         ->toContain('Perenggan kedua.')
         ->toContain('Buka dashboard')
-        ->toContain('https://neekah.my/vendor');
+        ->toContain('https://neekah.my/vendor')
+        ->not->toContain('having trouble clicking');
+});
+
+it('draws the dashed lines of a message as a list, escaped', function () {
+    $announcement = Announcement::factory()->create([
+        'body' => "Sila pastikan:\n- Nama perniagaan\n- Logo <b>jelas</b>",
+    ]);
+
+    $html = (string) (new AnnouncementPublished($announcement))->toMail($this->aina)->render();
+
+    expect($html)->toMatch('/<li[^>]*>Nama perniagaan<\/li>/')
+        ->toMatch('/<li[^>]*>Logo &lt;b&gt;jelas&lt;\/b&gt;<\/li>/')
+        ->not->toContain('- Nama perniagaan');
 });
 
 it('lands in the notification bell with a link back to the announcement action', function () {

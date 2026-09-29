@@ -6,6 +6,8 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="color-scheme" content="light">
 <meta name="supported-color-schemes" content="light">
+{{-- The display face the site uses; clients that block web fonts fall back to Georgia. --}}
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;1,400&display=swap" rel="stylesheet">
 <style>
 @media only screen and (max-width: 600px) {
 .inner-body {
@@ -14,6 +16,16 @@ width: 100% !important;
 
 .footer {
 width: 100% !important;
+}
+
+.header-inner {
+width: 100% !important;
+}
+
+.header-corner,
+.header-corner img {
+width: 80px !important;
+height: auto !important;
 }
 }
 

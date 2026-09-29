@@ -4,7 +4,8 @@
 | The same palette as the site, written as hex because no email client
 | understands the oklch tokens in resources/css/app.css. Keep the two in step:
 | brand-600 #a82133, brand-700 #891426, ink #271515, ink-muted #6e5f5e,
-| line #e3ddd8, surface-muted #f5f3f1.
+| line #e3ddd8, surface-muted #f5f3f1, ivory #fdf8f2 (the public pages' paper),
+| gold-500 #dc9e12.
 */
 
 /* Base */
@@ -19,7 +20,7 @@ body *:not(html):not(style):not(br):not(tr):not(code) {
 
 body {
     -webkit-text-size-adjust: none;
-    background-color: #f5f3f1;
+    background-color: #fdf8f2;
     color: #6e5f5e;
     height: 100%;
     line-height: 1.4;
@@ -50,7 +51,6 @@ h1 {
     color: #271515;
     font-family: 'Playfair Display', Georgia, 'Times New Roman', serif;
     font-size: 22px;
-    font-size: 18px;
     font-weight: bold;
     margin-top: 0;
     text-align: start;
@@ -77,6 +77,20 @@ p {
     text-align: left;
 }
 
+ul,
+ol {
+    color: #6e5f5e;
+    font-size: 16px;
+    line-height: 1.5em;
+    margin-top: 0;
+    padding-left: 22px;
+}
+
+li {
+    margin-bottom: 6px;
+    padding-left: 2px;
+}
+
 p.sub {
     font-size: 12px;
 }
@@ -91,7 +105,7 @@ img {
     -premailer-cellpadding: 0;
     -premailer-cellspacing: 0;
     -premailer-width: 100%;
-    background-color: #f5f3f1;
+    background-color: #fdf8f2;
     margin: 0;
     padding: 0;
     width: 100%;
@@ -109,8 +123,35 @@ img {
 /* Header */
 
 .header {
-    padding: 25px 0;
+    padding: 0;
     text-align: center;
+}
+
+.header-inner {
+    -premailer-cellpadding: 0;
+    -premailer-cellspacing: 0;
+    -premailer-width: 570px;
+    margin: 0 auto;
+    width: 570px;
+}
+
+.header-corner {
+    line-height: 0;
+    width: 180px;
+}
+
+.header-corner img {
+    display: block;
+}
+
+.header-brand {
+    padding: 28px 0 20px;
+}
+
+.divider {
+    display: inline-block;
+    height: 16px;
+    width: 120px;
 }
 
 .header a {
@@ -124,8 +165,7 @@ img {
 
 .logo {
     height: 34px;
-    margin-top: 15px;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
     max-height: 34px;
     width: auto;
 }
@@ -136,9 +176,9 @@ img {
     -premailer-cellpadding: 0;
     -premailer-cellspacing: 0;
     -premailer-width: 100%;
-    background-color: #f5f3f1;
-    border-bottom: 1px solid #f5f3f1;
-    border-top: 1px solid #f5f3f1;
+    background-color: #fdf8f2;
+    border-bottom: 1px solid #fdf8f2;
+    border-top: 1px solid #fdf8f2;
     margin: 0;
     padding: 0;
     width: 100%;
@@ -149,10 +189,9 @@ img {
     -premailer-cellspacing: 0;
     -premailer-width: 570px;
     background-color: #ffffff;
-    border-color: #e3ddd8;
-    border-radius: 16px;
-    border-width: 1px;
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+    border: 1px solid #f1e6dc;
+    border-radius: 20px;
+    box-shadow: 0 8px 24px -12px rgba(137, 20, 38, 0.18);
     margin: 0 auto;
     padding: 0;
     width: 570px;
@@ -186,15 +225,37 @@ img {
     width: 570px;
 }
 
+.footer .content-cell {
+    padding: 28px 32px 40px;
+}
+
 .footer p {
     color: #6e5f5e;
-    font-size: 12px;
+    font-size: 13px;
+    margin: 0;
     text-align: center;
 }
 
+.footer .footer-tagline {
+    color: #a82133;
+    font-family: 'Playfair Display', Georgia, 'Times New Roman', serif;
+    font-size: 16px;
+    font-style: italic;
+    margin: 10px 0 12px;
+}
+
+.footer .footer-contact {
+    margin-bottom: 10px;
+}
+
+.footer .footer-legal {
+    color: #a8999a;
+    font-size: 12px;
+}
+
 .footer a {
-    color: #6e5f5e;
-    text-decoration: underline;
+    color: #891426;
+    text-decoration: none;
 }
 
 /* Tables */

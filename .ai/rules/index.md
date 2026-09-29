@@ -21,6 +21,7 @@ Before planning or editing, find the row whose globs match the file's path and r
 | resources/js/**, resources/js/navigation.js | .ai/rules/js.md |
 | lang/** | .ai/rules/lang.md |
 | resources/views/components/layouts/** | .ai/rules/layouts.md |
+| resources/views/vendor/mail/** | .ai/rules/mail.md |
 | database/migrations/** | .ai/rules/migrations.md |
 | app/Models/WeddingGuest.php, app/Models/Vendor.php, app/Models/Post.php, app/Models/Review.php, app/Models/Setting.php | .ai/rules/models.md |
 | app/Notifications/** | .ai/rules/notifications.md |
