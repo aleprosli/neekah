@@ -49,16 +49,18 @@ const input = 'w-full rounded-xl border border-line bg-surface px-4 py-2.5 text-
         <!-- What a boost buys, with the marketplace itself as the proof. -->
         <section class="flex min-w-0 flex-col gap-4 rounded-2xl border border-line bg-surface-raised p-5 sm:p-6">
             <h2 class="font-semibold">{{ $t('boost.benefits_title') }}</h2>
-            <ul class="grid min-w-0 gap-4 sm:grid-cols-3">
-                <li v-for="benefit in ['top', 'stay', 'control']" :key="benefit" class="flex min-w-0 flex-col gap-1">
-                    <p class="text-sm font-medium">{{ $t(`boost.benefit_${benefit}_title`) }}</p>
-                    <p class="text-sm text-ink-muted">{{ $t(`boost.benefit_${benefit}_body`) }}</p>
-                </li>
-            </ul>
-            <figure class="flex min-w-0 flex-col gap-2">
-                <img :src="urls.screenshot" :alt="$t('boost.screenshot_alt')" width="1600" height="600" loading="lazy" decoding="async" class="h-auto w-full rounded-xl border border-line">
-                <figcaption class="text-xs text-ink-muted">{{ $t('boost.screenshot_caption') }}</figcaption>
-            </figure>
+            <div class="grid min-w-0 gap-5 sm:grid-cols-[minmax(0,1fr)_13rem] sm:items-start">
+                <ul class="flex min-w-0 flex-col gap-4">
+                    <li v-for="benefit in ['top', 'stay', 'control']" :key="benefit" class="flex min-w-0 flex-col gap-1">
+                        <p class="text-sm font-medium">{{ $t(`boost.benefit_${benefit}_title`) }}</p>
+                        <p class="text-sm text-ink-muted">{{ $t(`boost.benefit_${benefit}_body`) }}</p>
+                    </li>
+                </ul>
+                <figure class="flex w-full max-w-52 min-w-0 flex-col gap-2 justify-self-center">
+                    <img :src="urls.screenshot" :alt="$t('boost.screenshot_alt')" width="524" height="810" loading="lazy" decoding="async" class="h-auto w-full rounded-xl border border-line">
+                    <figcaption class="text-xs text-ink-muted">{{ $t('boost.screenshot_caption') }}</figcaption>
+                </figure>
+            </div>
         </section>
 
         <!-- Lift a category. -->
