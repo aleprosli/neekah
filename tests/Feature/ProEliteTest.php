@@ -37,7 +37,7 @@ it('makes Elite of Pro vendors at the Top or Recommended tier, and of nobody els
         ->and(Vendor::query()->elite()->count())->toBe(0);
 });
 
-it('orders Disyorkan as boosted, then Elite, then score, and leaves other sorts alone', function () {
+it('orders Disyorkan as boosted, then Elite, then everyone else, and leaves other sorts alone', function () {
     app(ProSettings::class)->save(['elite_row_size' => 0]);
     Vendor::factory()->for($this->category)->create(['name' => 'Studio Skor Tinggi', 'score' => 99, 'views_30d' => 90]);
     eliteVendor($this->category, ['name' => 'Studio Elite', 'score' => 60, 'views_30d' => 10]);

@@ -77,6 +77,27 @@ it('puts a boosted vendor first in its own category, labelled, and only in the D
     $this->get(route('vendors.index', ['category' => $this->other->slug]))->assertDontSee(__('marketplace.card.promoted'));
 });
 
+it('shuffles the Disyorkan order by the hour, below the boosted vendor, without losing anyone', function () {
+    $others = Vendor::factory()->count(8)->for($this->category)->create();
+    VendorBoost::factory()->create(['vendor_id' => $this->vendor->id, 'category_id' => $this->category->id, 'ends_at' => now()->addDays(3)]);
+
+    $listed = fn (): array => $this->get(route('vendors.index', ['category' => $this->category->slug]))
+        ->assertOk()
+        ->viewData('vendors')->getCollection()->pluck('id')->all();
+
+    $orders = collect(range(1, 6))->map(function () use ($listed): array {
+        $this->travel(1)->hours();
+
+        return $listed();
+    });
+
+    $orders->each(fn (array $order) => expect($order[0])->toBe($this->vendor->id)
+        ->and(collect($order)->sort()->values()->all())->toBe([$this->vendor->id, ...$others->pluck('id')->sort()->values()->all()]));
+
+    expect($orders->unique()->count())->toBeGreaterThan(1)
+        ->and($listed())->toBe($orders->last());
+});
+
 it('gives Pro vendors their monthly tokens once every 30 days and reminds a boost ending tomorrow', function () {
     Notification::fake();
     $this->vendor->update(['pro_until' => now()->addMonths(2)]);

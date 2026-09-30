@@ -484,6 +484,23 @@ class Vendor extends Model
             ->orderByDesc('elite');
     }
 
+    /** A prime above any vendor id, so shuffled() gives every vendor its own place. */
+    private const SHUFFLE_PRIME = 1000003;
+
+    /**
+     * The "Disyorkan" order's last key: a shuffle, so the same vendors do not
+     * hold the top of the list for good. One seed always gives one order, so
+     * the pages of a listing never repeat or drop a vendor. Plain arithmetic
+     * rather than RAND(seed), which SQLite does not have.
+     */
+    #[Scope]
+    protected function shuffled(Builder $query, int $seed): Builder
+    {
+        $multiplier = 1 + crc32((string) $seed) % (self::SHUFFLE_PRIME - 1);
+
+        return $query->orderByRaw('(vendors.id * ?) % '.self::SHUFFLE_PRIME, [$multiplier]);
+    }
+
     #[Scope]
     protected function approved(Builder $query): Builder
     {

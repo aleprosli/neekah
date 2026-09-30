@@ -142,7 +142,9 @@ class VendorController extends Controller
      * paginator - see categories() for why nothing here may be an object.
      *
      * The hour is in the key too: boosts start and end on the hour, so one
-     * that runs out leaves the top without anything having to save.
+     * that runs out leaves the top without anything having to save. It is
+     * also the seed of the "Disyorkan" shuffle, so the order changes with
+     * the cache and every page of one hour belongs to the same order.
      *
      * @param  array<string, mixed>  $filters
      * @return LengthAwarePaginator<int, Vendor>
@@ -163,7 +165,7 @@ class VendorController extends Controller
                         'price_desc' => $query->orderByDesc('price_from'),
                         'reviews' => $query->orderByDesc('reviews_count'),
                         'popular' => $query->orderByDesc('views_30d'),
-                        default => $query->boostedFirst($activeCategory)->eliteFirst()->orderByDesc('score'),
+                        default => $query->boostedFirst($activeCategory)->eliteFirst()->shuffled((int) now()->format('YmdH')),
                     })
                     ->orderBy('id')
                     ->paginate(self::PER_PAGE);
