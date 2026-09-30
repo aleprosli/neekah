@@ -118,6 +118,19 @@ it('gives existing approved vendors their welcome tokens once from the command',
     expect($this->vendor->fresh()->boost_tokens)->toBe(7);
 });
 
+it('lists who would get the welcome tokens on a dry run without giving or emailing anything', function () {
+    Notification::fake();
+
+    $this->artisan('neekah:boost-welcome --dry-run')
+        ->expectsOutputToContain('Studio Boost')
+        ->expectsOutputToContain('1 vendor(s) would be given 7 welcome token(s)')
+        ->assertSuccessful();
+
+    expect($this->vendor->fresh()->boost_tokens)->toBe(0)
+        ->and($this->vendor->boostEntries()->count())->toBe(0);
+    Notification::assertNothingSent();
+});
+
 it('shows the vendor their balance, what is running and the history', function () {
     giveTokens($this->vendor, 4);
 

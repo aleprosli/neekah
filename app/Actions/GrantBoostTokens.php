@@ -50,10 +50,18 @@ class GrantBoostTokens
      */
     public function welcome(Vendor $vendor, int $tokens): ?VendorBoostEntry
     {
-        if ($tokens <= 0 || VendorBoostEntry::query()->where('vendor_id', $vendor->getKey())->where('reason', BoostTokenReason::Welcome)->exists()) {
+        if (! $this->isOwedWelcome($vendor, $tokens)) {
             return null;
         }
 
         return $this->handle($vendor, $tokens, BoostTokenReason::Welcome);
+    }
+
+    /**
+     * Whether the welcome tokens are still to come for this vendor.
+     */
+    public function isOwedWelcome(Vendor $vendor, int $tokens): bool
+    {
+        return $tokens > 0 && ! VendorBoostEntry::query()->where('vendor_id', $vendor->getKey())->where('reason', BoostTokenReason::Welcome)->exists();
     }
 }
