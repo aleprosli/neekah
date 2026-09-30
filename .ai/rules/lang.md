@@ -13,3 +13,6 @@ The only reliable sweep: write a throwaway Pest test that GETs every /en/ route 
 Card pages (/kad-jemputan previews, the wedding card itself) stay Malay by decision; state names are proper nouns. Both will show up in the sweep — ignore them.
 
 Check key parity between lang/ms and lang/en after every batch; a guessed key silently falls back to Malay.
+
+## Lang values are plain text, and a translated phrase keeps its space before a tag
+Never write HTML entities (&amp;, &mdash;, &rarr;, &#10;) in lang files: Blade {{ }} escapes them again and Vue $t() prints them literally, which is how "Panduan &amp; idea" shipped (27 Sep 2026). LocalisationTest fails on any entity (pagination.php excepted, Laravel prints it raw). Text built from HTML (Post::summary/plainText) must decode entities after strip_tags. When moving text into lang, keep a literal space between {{ __() }} / {{ $t() }} and an adjacent <a>, <strong> or badge — the translation pass dropped them and pages read "DariRM1,500", "vendor ini?Laporkan".

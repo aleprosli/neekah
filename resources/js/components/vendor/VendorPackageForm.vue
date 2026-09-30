@@ -100,7 +100,7 @@ const onImageChosen = (event) => {
             <div class="flex flex-wrap items-start justify-between gap-3">
                 <div>
                     <h2 class="font-semibold">{{ $t('package.kandungan_pakej') }}</h2>
-                    <p class="text-sm text-ink-muted">{{ $t('package.satu_item_satu_baris_seret') }}<span aria-hidden="true">⠿</span>{{ $t('package.untuk_susun_semula') }}</p>
+                    <p class="text-sm text-ink-muted">{{ $t('package.satu_item_satu_baris_seret') }} <span aria-hidden="true">⠿</span>{{ $t('package.untuk_susun_semula') }}</p>
                 </div>
                 <span class="rounded-full bg-surface-muted px-3 py-1 text-xs font-medium text-ink-muted">{{ visibleCount }} item</span>
             </div>

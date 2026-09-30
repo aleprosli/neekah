@@ -5,6 +5,7 @@ use App\Enums\AnnouncementStatus;
 use App\Jobs\SendAnnouncement;
 use App\Models\Announcement;
 use App\Models\User;
+use App\Models\Vendor;
 use App\Notifications\AnnouncementPublished;
 use App\Support\AnnouncementPresets;
 use Illuminate\Support\Facades\Notification;
@@ -68,6 +69,17 @@ it('sends to couples only, or vendors only, when that is the audience', function
     Notification::assertNotSentTo([$this->aina, $this->hakim], AnnouncementPublished::class);
 });
 
+it('sends to vendors still waiting for approval, and to no approved vendor', function () {
+    Notification::fake();
+    Vendor::factory()->for($this->vendor)->create();
+    $waiting = Vendor::factory()->pending()->create()->user;
+
+    (new SendAnnouncement(Announcement::factory()->create(['audience' => 'pending_vendors'])))->handle();
+
+    Notification::assertSentTo($waiting, AnnouncementPublished::class);
+    Notification::assertNotSentTo([$this->vendor, $this->aina, $this->hakim], AnnouncementPublished::class);
+});
+
 it('leaves out an account that has been deactivated', function () {
     Notification::fake();
     $this->hakim->update(['deactivated_at' => now()]);
@@ -94,7 +106,20 @@ it('writes the subject, every paragraph and the button into the email', function
         ->and($html)->toContain('Perenggan pertama.')
         ->toContain('Perenggan kedua.')
         ->toContain('Buka dashboard')
-        ->toContain('https://neekah.my/vendor');
+        ->toContain('https://neekah.my/vendor')
+        ->not->toContain('having trouble clicking');
+});
+
+it('draws the dashed lines of a message as a list, escaped', function () {
+    $announcement = Announcement::factory()->create([
+        'body' => "Sila pastikan:\n- Nama perniagaan\n- Logo <b>jelas</b>",
+    ]);
+
+    $html = (string) (new AnnouncementPublished($announcement))->toMail($this->aina)->render();
+
+    expect($html)->toMatch('/<li[^>]*>Nama perniagaan<\/li>/')
+        ->toMatch('/<li[^>]*>Logo &lt;b&gt;jelas&lt;\/b&gt;<\/li>/')
+        ->not->toContain('- Nama perniagaan');
 });
 
 it('lands in the notification bell with a link back to the announcement action', function () {

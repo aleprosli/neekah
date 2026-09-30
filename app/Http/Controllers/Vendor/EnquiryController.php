@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers\Vendor;
 
-use App\Actions\AwardVendorPoints;
+use App\Actions\ReplyToEnquiry;
 use App\Enums\EnquiryStatus;
-use App\Enums\PointReason;
+use App\Enums\VendorFeature;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ReplyEnquiryRequest;
 use App\Models\Enquiry;
-use App\Notifications\EnquiryReplied;
+use App\Models\Vendor;
 use App\Support\VueProps;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
@@ -19,7 +19,13 @@ class EnquiryController extends Controller
 {
     public function index(Request $request): View
     {
-        $enquiries = $request->user()->vendor->enquiries()
+        $vendor = $request->user()->vendor;
+
+        if (! $vendor->hasFeature(VendorFeature::Enquiries)) {
+            return $this->locked($vendor);
+        }
+
+        $enquiries = $vendor->enquiries()
             ->with(['user', 'package'])
             ->orderByRaw("case when status = 'open' then 0 else 1 end")
             ->latest()
@@ -37,6 +43,28 @@ class EnquiryController extends Controller
         ]));
 
         return view('vendor.enquiries.index', ['enquiries' => $enquiries]);
+    }
+
+    /**
+     * Basic: enquiries still arrive, so no couple is turned away, but only
+     * how many and when shows here. Who wrote and what they asked is Pro.
+     */
+    private function locked(Vendor $vendor): View
+    {
+        $open = $vendor->enquiries()->where('status', EnquiryStatus::Open);
+
+        return view('vendor.enquiries.locked', [
+            'props' => VueProps::for([
+                'waiting' => $open->clone()->count(),
+                'total' => $vendor->enquiries()->count(),
+                'recent' => $open->clone()->latest()->limit(5)->get()->map(fn (Enquiry $enquiry): array => [
+                    'id' => $enquiry->id,
+                    'received' => $enquiry->created_at->diffForHumans(),
+                    'event_date' => $enquiry->event_date?->translatedFormat('j M Y'),
+                ])->values(),
+                'proUrl' => route('vendor.pro.index'),
+            ]),
+        ]);
     }
 
     public function show(Enquiry $enquiry): View
@@ -69,22 +97,9 @@ class EnquiryController extends Controller
         ]);
     }
 
-    public function update(ReplyEnquiryRequest $request, Enquiry $enquiry, AwardVendorPoints $awardPoints): RedirectResponse
+    public function update(ReplyEnquiryRequest $request, Enquiry $enquiry, ReplyToEnquiry $reply): RedirectResponse
     {
-        $firstReply = $enquiry->replied_at === null;
-
-        $enquiry->update([
-            'reply' => $request->string('reply')->toString(),
-            'replied_at' => now(),
-            'status' => EnquiryStatus::Replied,
-        ]);
-
-        // Replying within a day is what the kertas kerja rewards, not the enquiry itself.
-        if ($firstReply && $enquiry->created_at->diffInHours(now()) < 24) {
-            $awardPoints->award($request->user()->vendor, PointReason::FastResponse, $enquiry);
-        }
-
-        $enquiry->user->notify(new EnquiryReplied($enquiry->fresh(['vendor'])));
+        $reply->handle($enquiry, $request->string('reply')->toString());
 
         return redirect()->route('vendor.enquiries.show', $enquiry)->with('status', __('flash.vendor.enquiry_replied'));
     }

@@ -46,11 +46,12 @@ class LoginController extends Controller
                 'forgotUrl' => route('password.request'),
                 // Google signs a newcomer up as a couple, so a vendor is not
                 // offered a button that would open the wrong kind of account.
-                'googleUrl' => $vendor ? null : route('auth.google'),
+                'googleUrl' => $vendor ? null : AuthForm::googleUrl(),
                 'notice' => session('status'),
                 'fields' => [
                     ['name' => 'email', 'label' => __('auth_pages.fields.email'), 'type' => 'email', 'autocomplete' => 'email', 'required' => true, 'value' => old('email')],
                     ['name' => 'password', 'label' => __('auth_pages.fields.password'), 'type' => 'password', 'autocomplete' => 'current-password', 'required' => true],
+                    ...AuthForm::accessCodeFields(),
                 ],
                 'links' => [
                     $vendor

@@ -48,3 +48,12 @@ it('mounts the flag dropdown over a plain select on the marketplace', function (
         ->assertSee('img/flag/selangor.svg')
         ->assertSee('<select name="state"', false);
 });
+
+it('lists at least one area for every negeri, with no daerah twice', function () {
+    foreach (States::names() as $state) {
+        $districts = States::districts($state);
+
+        expect($districts)->not->toBeEmpty("{$state} has no daerah")
+            ->and($districts)->toBe(array_values(array_unique($districts)));
+    }
+});

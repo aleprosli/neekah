@@ -16,7 +16,7 @@ defineEmits(['update:modelValue']);
 
 <template>
     <label class="flex flex-col gap-1.5">
-        <span class="text-sm font-medium">{{ label }}</span>
+        <span class="text-sm font-medium first-letter:uppercase">{{ label }}</span>
         <select
             :name="name"
             :value="modelValue"

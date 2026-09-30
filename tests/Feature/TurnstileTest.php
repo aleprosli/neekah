@@ -119,10 +119,10 @@ it('guards the login form as well', function () {
 });
 
 it('guards the booking form on a vendor page', function () {
-    config(['neekah.bookings_enabled' => true]);
+    enableOnlineBooking();
     $this->seed(CategorySeeder::class);
     $customer = User::factory()->create();
-    $vendor = Vendor::factory()->for(Category::first())->create();
+    $vendor = Vendor::factory()->for(Category::first())->takingOnlineBookings()->create();
     $package = Package::factory()->for($vendor)->create();
 
     enableTurnstile();

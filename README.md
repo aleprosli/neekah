@@ -12,6 +12,8 @@ Neekah is currently positioned as a **network**: couples deal and pay vendors di
 
 `.ai/rules/` holds the settled decisions, the non-obvious traps and the standing constraints for this codebase. `.ai/rules/index.md` maps file globs to rule files.
 
+For the big picture first — roles, request lifecycle, domain model, the invitation card engine and where to start for common changes — read `docs/ARCHITECTURE.md`.
+
 **Read the rules that cover the files you are about to touch, before you touch them.** They are short, and most of them exist because something broke. This is not optional reading — several of them describe behaviour that looks wrong until you know why it is that way.
 
 ---

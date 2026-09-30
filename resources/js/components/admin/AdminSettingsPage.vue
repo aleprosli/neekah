@@ -1,7 +1,8 @@
 <script setup>
 /**
- * Every admin-editable setting, one section per group, each posting on its own
- * so saving the phone number cannot disturb the SEO wording.
+ * Admin-editable settings, one section per group, each posting on its own so
+ * saving the phone number cannot disturb the SEO wording. The settings page
+ * hands it the one group being edited; the menu of groups is in Blade.
  *
  * The sections are described as data by the controller; this renders them.
  */
@@ -29,23 +30,11 @@ const values = ref(
 
 <template>
     <div class="flex max-w-3xl min-w-0 flex-col gap-6">
-        <!-- A scrollable row of jump links on a phone, a plain row on a laptop. -->
-        <nav class="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4 sm:mx-0 sm:flex-wrap sm:px-0" :aria-label="$t('admin_settings.bahagian_tetapan')">
-            <a
-                v-for="section in sections"
-                :key="`link-${section.id}`"
-                :href="`#${section.id}`"
-                class="flex shrink-0 items-center gap-2 rounded-full border border-line px-4 py-2 text-sm font-medium whitespace-nowrap transition hover:border-brand-400 hover:text-brand-700"
-            >
-                <span aria-hidden="true">{{ section.icon }}</span>{{ section.label }}
-            </a>
-        </nav>
-
         <section
             v-for="section in sections"
             :id="section.id"
             :key="section.id"
-            class="scroll-mt-28 rounded-2xl border border-line bg-surface-raised p-5 sm:p-6"
+            class="rounded-2xl border border-line bg-surface-raised p-5 sm:p-6"
         >
             <div class="flex flex-wrap items-start justify-between gap-2">
                 <h2 class="font-semibold">{{ section.title }}</h2>
@@ -67,7 +56,7 @@ const values = ref(
                             <input type="hidden" :name="field.name" value="0">
                             <input v-model="values[section.id][field.name]" type="checkbox" :name="field.name" value="1" class="mt-1 accent-brand-600">
                             <span>
-                                <span class="text-sm font-medium">{{ field.label }}</span>
+                                <span class="block text-sm font-medium first-letter:uppercase">{{ field.label }}</span>
                                 <span v-if="field.help" class="block text-xs text-ink-muted">{{ field.help }}</span>
                             </span>
                         </label>

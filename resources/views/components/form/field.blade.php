@@ -1,7 +1,7 @@
 @props(['label', 'name', 'type' => 'text', 'value' => null, 'required' => false, 'placeholder' => null, 'autocomplete' => null, 'help' => null])
 
 <label class="flex flex-col gap-1.5">
-    <span class="text-sm font-medium">{{ $label }}</span>
+    <span class="text-sm font-medium first-letter:uppercase">{{ $label }}</span>
     <input
         type="{{ $type }}"
         name="{{ $name }}"

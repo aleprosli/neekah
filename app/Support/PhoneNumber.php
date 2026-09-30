@@ -2,6 +2,8 @@
 
 namespace App\Support;
 
+use Propaganistas\LaravelPhone\PhoneNumber as ParsedPhoneNumber;
+
 class PhoneNumber
 {
     /**
@@ -18,5 +20,28 @@ class PhoneNumber
         }
 
         return strlen($digits) >= 9 ? substr($digits, 0, 20) : null;
+    }
+
+    /**
+     * A valid number in E.164 ("+60123456789"), or null when it is not one. A
+     * number typed without a country code is read as Malaysian, since that is
+     * who signs up.
+     */
+    public static function toE164(string $phone): ?string
+    {
+        $parsed = new ParsedPhoneNumber($phone, 'MY');
+
+        return $parsed->isValid() ? $parsed->formatE164() : null;
+    }
+
+    /**
+     * A number written the way people read it ("+60 11-6398 3556"), or as it
+     * came when it cannot be parsed.
+     */
+    public static function display(string $phone): string
+    {
+        $parsed = new ParsedPhoneNumber(str_starts_with($phone, '+') ? $phone : '+'.$phone);
+
+        return $parsed->isValid() ? $parsed->formatInternational() : $phone;
     }
 }

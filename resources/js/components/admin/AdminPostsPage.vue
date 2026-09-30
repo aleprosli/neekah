@@ -24,7 +24,7 @@ const tones = {
 </script>
 
 <template>
-    <div v-if="!posts.length" class="rounded-2xl border border-dashed border-line p-10 text-center text-sm text-ink-muted">{{ $t('admin_posts.belum_ada_artikel') }}<a :href="createUrl" class="font-medium text-brand-700 underline underline-offset-4">{{ $t('admin_posts.tulis_yang_pertama') }}</a>.
+    <div v-if="!posts.length" class="rounded-2xl border border-dashed border-line p-10 text-center text-sm text-ink-muted">{{ $t('admin_posts.belum_ada_artikel') }} <a :href="createUrl" class="font-medium text-brand-700 underline underline-offset-4">{{ $t('admin_posts.tulis_yang_pertama') }}</a>.
     </div>
 
     <template v-else>

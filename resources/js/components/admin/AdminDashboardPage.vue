@@ -33,7 +33,7 @@ defineProps({
 
     <a v-if="alert" :href="alert.url" class="mt-4 flex items-center gap-3 rounded-2xl border border-amber-200 bg-amber-50 px-5 py-4 text-sm text-amber-900 transition hover:border-amber-400">
         <span class="text-lg">⚠️</span>
-        <span><strong>{{ alert.count }}</strong> laporan vendor menunggu semakan anda.</span>
+        <span><strong>{{ alert.count }}</strong> {{ $t('copy.reports_waiting') }}</span>
     </a>
 
     <!-- min-w-0 on each grid child: without it a long business name widens the

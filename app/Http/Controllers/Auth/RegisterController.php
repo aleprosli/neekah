@@ -46,7 +46,7 @@ class RegisterController extends Controller
                 'action' => route('register'),
                 'submitLabel' => 'Daftar',
                 'captcha' => true,
-                'googleUrl' => route('auth.google'),
+                'googleUrl' => AuthForm::googleUrl(),
                 // Someone accepting an invitation is the partner already; the
                 // tip is for the one starting the account.
                 'tip' => $invitation ? null : [
@@ -67,6 +67,7 @@ class RegisterController extends Controller
                     ['name' => 'phone', 'label' => __('auth_pages.fields.phone'), 'type' => 'tel', 'autocomplete' => 'tel', 'placeholder' => '012-345 6789', 'value' => old('phone')],
                     ['name' => 'password', 'label' => __('auth_pages.fields.password'), 'type' => 'password', 'autocomplete' => 'new-password', 'help' => __('auth_pages.fields.password_help'), 'required' => true],
                     ['name' => 'password_confirmation', 'label' => __('auth_pages.fields.password_confirm'), 'type' => 'password', 'autocomplete' => 'new-password', 'required' => true],
+                    ...AuthForm::accessCodeFields(),
                 ],
                 'links' => [
                     ['prefix' => __('auth_pages.links.have_account'), 'label' => __('auth_pages.links.log_in'), 'url' => AuthAudience::Couple->loginUrl()],

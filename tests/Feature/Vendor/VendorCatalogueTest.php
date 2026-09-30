@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Storage;
 
 beforeEach(function () {
     $this->seed(CategorySeeder::class);
-    $this->vendor = Vendor::factory()->for(Category::first())->create(['price_from' => 9999]);
+    $this->vendor = Vendor::factory()->pro()->for(Category::first())->create(['price_from' => 9999]);
 });
 
 it('lets a vendor arrange the gallery and hide a photo from it', function () {

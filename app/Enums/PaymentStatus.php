@@ -9,6 +9,9 @@ enum PaymentStatus: string
     case Failed = 'failed';
     case Refunded = 'refunded';
 
+    /** The gateway link ran out without a payment. */
+    case Expired = 'expired';
+
     /** Recorded by the couple, waiting for the vendor to check their account. */
     case AwaitingVerification = 'awaiting_verification';
 
@@ -20,6 +23,7 @@ enum PaymentStatus: string
             self::Paid => __('enums.payment_status.paid'),
             self::Failed => __('enums.payment_status.failed'),
             self::Refunded => __('enums.payment_status.refunded'),
+            self::Expired => __('enums.payment_status.expired'),
         };
     }
 
@@ -30,7 +34,7 @@ enum PaymentStatus: string
             self::Paid => 'emerald',
             self::AwaitingVerification => 'amber',
             self::Pending => 'amber',
-            self::Failed, self::Refunded => 'muted',
+            self::Failed, self::Refunded, self::Expired => 'muted',
         };
     }
 }

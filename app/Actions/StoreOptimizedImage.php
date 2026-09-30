@@ -19,6 +19,9 @@ use RuntimeException;
  */
 class StoreOptimizedImage
 {
+    /** The quality for the file being encoded now: the admin's, unless a caller asked otherwise. */
+    private ?int $quality = null;
+
     public function __construct(private ImageSettings $settings) {}
 
     /**
@@ -31,30 +34,50 @@ class StoreOptimizedImage
     }
 
     /**
+     * $maxDimension and $quality override the admin's image settings for this
+     * call only, and $cacheControl the disk's year-long immutable header.
+     * Neekah Kenangan uses them (its tiers keep photos at their own size, and
+     * its files are deleted after the event, so the CDN must not keep them a
+     * year); every other caller leaves them null.
+     *
+     * Neekah Kenangan also asks for a smaller grid thumbnail
+     * ($thumbnailWidth), and for a "-display" copy no larger than
+     * $displayDimension that the full-screen viewer shows instead of the
+     * original. Both are encoded at $previewQuality, so a Pro album's
+     * near-lossless originals do not make its grid heavy.
+     *
      * @return string The stored path on the public disk.
      */
-    public function storeContents(string $contents, string $directory, bool $lossless = false): string
+    public function storeContents(string $contents, string $directory, bool $lossless = false, ?int $maxDimension = null, ?int $quality = null, ?string $cacheControl = null, ?int $thumbnailWidth = null, ?int $displayDimension = null, ?int $previewQuality = null): string
     {
         $this->allowMemoryForDecoding();
+        $this->quality = $quality;
 
         $image = $this->decode($contents);
         $extension = $lossless ? 'png' : ($this->settings->format() === 'jpeg' ? 'jpg' : 'webp');
         $path = trim($directory, '/').'/'.Str::random(40).'.'.$extension;
         $disk = Storage::disk('public');
 
-        $largest = $this->settings->maxDimension();
+        $largest = $maxDimension ?? $this->settings->maxDimension();
         $thumbnail = self::thumbnailPath($path);
 
         // The public disk is configured not to throw, so a write it cannot make
         // comes back as false. Ignoring that returned a path for a file that was
         // never written, and the caller saved it: a wedding card pointing at a
         // 404, with nothing anywhere saying the upload had failed.
-        $stored = $disk->put($path, $this->encode($this->resize($image, $largest, $largest), $extension))
-            && $disk->put($thumbnail, $this->encode($this->resize($image, $this->settings->thumbnailWidth(), PHP_INT_MAX), $extension));
+        $options = $cacheControl ? ['CacheControl' => $cacheControl] : [];
+        $stored = $disk->put($path, $this->encode($this->resize($image, $largest, $largest), $extension), $options);
+
+        $this->quality = $previewQuality ?? $quality;
+        $stored = $stored && $disk->put($thumbnail, $this->encode($this->resize($image, $thumbnailWidth ?? $this->settings->thumbnailWidth(), PHP_INT_MAX), $extension), $options);
+
+        if ($displayDimension !== null) {
+            $stored = $stored && $disk->put(self::displayPath($path), $this->encode($this->resize($image, $displayDimension, $displayDimension), $extension), $options);
+        }
 
         if (! $stored) {
-            // Whichever half landed is of no use on its own.
-            $disk->delete([$path, $thumbnail]);
+            // Whichever part landed is of no use on its own.
+            $disk->delete([$path, $thumbnail, self::displayPath($path)]);
 
             throw new RuntimeException('Could not write the uploaded image to '.$directory.'.');
         }
@@ -91,6 +114,7 @@ class StoreOptimizedImage
     public function refreshThumbnail(string $path): string
     {
         $this->allowMemoryForDecoding();
+        $this->quality = null;
 
         $disk = Storage::disk('public');
         $contents = $disk->get($path);
@@ -124,7 +148,7 @@ class StoreOptimizedImage
     }
 
     /**
-     * Remove an image and its thumbnail.
+     * Remove an image, its thumbnail and its display copy if it has one.
      */
     public function delete(?string $path): void
     {
@@ -132,7 +156,7 @@ class StoreOptimizedImage
             return;
         }
 
-        Storage::disk('public')->delete([$path, self::thumbnailPath($path)]);
+        Storage::disk('public')->delete([$path, self::thumbnailPath($path), self::displayPath($path)]);
     }
 
     /**
@@ -140,10 +164,23 @@ class StoreOptimizedImage
      */
     public static function thumbnailPath(string $path): string
     {
+        return self::variantPath($path, 'thumb');
+    }
+
+    /**
+     * "camera/7/abc.webp" becomes "camera/7/abc-display.webp".
+     */
+    public static function displayPath(string $path): string
+    {
+        return self::variantPath($path, 'display');
+    }
+
+    private static function variantPath(string $path, string $suffix): string
+    {
         $info = pathinfo($path);
         $directory = ($info['dirname'] ?? '.') === '.' ? '' : $info['dirname'].'/';
 
-        return $directory.$info['filename'].'-thumb'.(isset($info['extension']) ? '.'.$info['extension'] : '');
+        return $directory.$info['filename'].'-'.$suffix.(isset($info['extension']) ? '.'.$info['extension'] : '');
     }
 
     /**
@@ -244,7 +281,7 @@ class StoreOptimizedImage
     private function encodeWebp(GdImage $image): void
     {
         imagesavealpha($image, true);
-        imagewebp($image, null, $this->settings->quality());
+        imagewebp($image, null, $this->quality ?? $this->settings->quality());
     }
 
     /**
@@ -257,7 +294,7 @@ class StoreOptimizedImage
         imagefill($flat, 0, 0, imagecolorallocate($flat, 255, 255, 255));
         imagecopy($flat, $image, 0, 0, 0, 0, imagesx($image), imagesy($image));
         imageinterlace($flat, true);
-        imagejpeg($flat, null, $this->settings->quality());
+        imagejpeg($flat, null, $this->quality ?? $this->settings->quality());
     }
 
     private function encodePng(GdImage $image): void

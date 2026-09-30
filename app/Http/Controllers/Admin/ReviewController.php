@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreAdminReviewRequest;
 use App\Models\Review;
 use App\Models\Vendor;
+use App\Support\TableFilter;
 use App\Support\VueProps;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
@@ -39,14 +40,13 @@ class ReviewController extends Controller
 
     public function index(Request $request): View
     {
-        $filter = ReviewFilter::tryFrom($request->string('filter')->toString());
-
         return view('admin.reviews.index', [
             'columns' => self::columns(),
             'total' => Review::count(),
             'filters' => [[
                 'key' => 'filter',
-                'value' => $filter?->value,
+                'label' => __('props.common.filter_status'),
+                'value' => TableFilter::requested($request, 'filter', array_column(ReviewFilter::cases(), 'value')),
                 'allLabel' => __('props.common.all'),
                 'allCount' => Review::count(),
                 'hint' => __('props.admin.review_dari_tempahan_menggerakkan_rating'),
@@ -69,7 +69,7 @@ class ReviewController extends Controller
 
     public function data(Request $request): JsonResponse
     {
-        $filter = ReviewFilter::tryFrom($request->string('filter')->toString());
+        $filters = TableFilter::requestedEnums($request, 'filter', ReviewFilter::class);
         $sort = in_array($request->string('sort')->toString(), ['rating', 'created_at'], true)
             ? $request->string('sort')->toString()
             : 'created_at';
@@ -87,7 +87,12 @@ class ReviewController extends Controller
 
         $reviews = $matching->clone()
             ->with(['vendor:id,name', 'user:id,name', 'photos'])
-            ->when($filter, fn ($query) => $filter->apply($query))
+            // Several kinds widen the list: hidden OR reported.
+            ->when($filters, fn ($query) => $query->where(function ($query) use ($filters): void {
+                foreach ($filters as $filter) {
+                    $query->orWhere(fn ($query) => $filter->apply($query));
+                }
+            }))
             ->orderBy($sort, $direction)
             ->paginate(min($request->integer('per_page', 20), 100));
 

@@ -2,9 +2,14 @@
 
 use App\Http\Middleware\BeginPageMetadata;
 use App\Http\Middleware\EnsureAccountIsActive;
+use App\Http\Middleware\EnsureApiProVendor;
 use App\Http\Middleware\EnsurePhoneNumber;
 use App\Http\Middleware\EnsureUserHasRole;
 use App\Http\Middleware\EnsureUserHasWedding;
+use App\Http\Middleware\EnsureUserIsCouple;
+use App\Http\Middleware\EnsureVendorHasFeature;
+use App\Http\Middleware\EnsureVendorIsApproved;
+use App\Http\Middleware\SetApiLocale;
 use App\Http\Middleware\SetLocale;
 use App\Support\ImageSettings;
 use App\Support\Locales;
@@ -18,6 +23,7 @@ use Illuminate\Support\Facades\App;
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: __DIR__.'/../routes/web.php',
+        api: __DIR__.'/../routes/api.php',
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
@@ -26,10 +32,17 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->appendToGroup('web', EnsureAccountIsActive::class);
         $middleware->appendToGroup('web', EnsurePhoneNumber::class);
 
+        $middleware->validateCsrfTokens(except: ['webhooks/*']);
+
         $middleware->alias([
             'role' => EnsureUserHasRole::class,
             'wedding' => EnsureUserHasWedding::class,
+            'vendor.approved' => EnsureVendorIsApproved::class,
+            'couple' => EnsureUserIsCouple::class,
+            'vendor.feature' => EnsureVendorHasFeature::class,
             'locale' => SetLocale::class,
+            'api.locale' => SetApiLocale::class,
+            'api.pro' => EnsureApiProVendor::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

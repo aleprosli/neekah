@@ -13,6 +13,7 @@ use App\Models\Vendor;
 use App\Models\VendorPoint;
 use App\Support\AnalyticsPeriod;
 use App\Support\MonthlyTotals;
+use App\Support\TierProgress;
 use App\Support\VueProps;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
@@ -45,7 +46,7 @@ class PointController extends Controller
 
         $enquiryCount = $enquiries->clone()->count();
         $bookingsInPeriod = $vendor->bookings()->whereBetween('created_at', [$period->start, $period->end])->count();
-        $nextTier = $this->nextTier($vendor->tier);
+        $nextTier = TierProgress::next($vendor->tier);
 
         return view('vendor.points', [
             'props' => VueProps::for([
@@ -70,7 +71,7 @@ class PointController extends Controller
                 'periodStats' => [
                     ['label' => __('props.vendor.pendapatan'), 'value' => 'RM'.number_format((float) $revenue->clone()->sum('amount')), 'hint' => __('props.vendor.bayaran_diterima_dalam_tempoh')],
                     ['label' => __('props.vendor.enquiry_dibalas'), 'value' => $enquiryCount > 0 ? $enquiries->clone()->whereNotNull('replied_at')->count().' / '.$enquiryCount : __('props.vendor.tiada_enquiry'), 'hint' => __('props.vendor.enquiry_yang_anda_terima')],
-                    ['label' => __('props.vendor.enquiry_jadi_tempahan'), 'value' => $enquiryCount > 0 ? round($bookingsInPeriod / $enquiryCount * 100).'%' : 'Tiada data', 'hint' => $bookingsInPeriod.' tempahan dalam tempoh'],
+                    ['label' => __('props.vendor.enquiry_jadi_tempahan'), 'value' => $enquiryCount > 0 ? round($bookingsInPeriod / $enquiryCount * 100).'%' : __('props.copy.no_data'), 'hint' => __('props.copy.bookings_in_period', ['count' => $bookingsInPeriod])],
                 ],
                 'charts' => [
                     'revenue' => $this->chart($period->series(MonthlyTotals::of($revenue->clone(), 'paid_at', 'sum', 'amount')), fn (float $value): string => 'RM'.number_format($value)),
@@ -87,7 +88,7 @@ class PointController extends Controller
                 'progress' => [
                     'locked' => (bool) $vendor->tier_locked,
                     'next' => $nextTier?->label(),
-                    'requirements' => $this->requirements($vendor),
+                    'requirements' => TierProgress::requirements($vendor),
                     'clean_record_note' => $nextTier === VendorTier::Recommended
                         ? __('ui.points.recommended_needs_clean')
                         : null,
@@ -126,54 +127,6 @@ class PointController extends Controller
     {
         return collect($series)
             ->map(fn (array $row): array => [...$row, 'display' => $format((float) $row['value'])])
-            ->all();
-    }
-
-    private function nextTier(VendorTier $tier): ?VendorTier
-    {
-        return match ($tier) {
-            VendorTier::New, VendorTier::Verified => VendorTier::Trusted,
-            VendorTier::Trusted => VendorTier::Top,
-            VendorTier::Top => VendorTier::Recommended,
-            VendorTier::Recommended => null,
-        };
-    }
-
-    /**
-     * What the vendor still needs for the tier above them.
-     *
-     * @return array<int, array{label: string, current: string, target: string, met: bool}>
-     */
-    private function requirements(Vendor $vendor): array
-    {
-        $targets = match ($this->nextTier($vendor->tier)) {
-            VendorTier::Trusted => ['completed' => 5, 'rating' => 4.0, 'reviews' => 3, 'response' => 0, 'completion' => 0],
-            VendorTier::Top => ['completed' => 15, 'rating' => 4.5, 'reviews' => 8, 'response' => 90, 'completion' => 0],
-            VendorTier::Recommended => ['completed' => 30, 'rating' => 4.7, 'reviews' => 15, 'response' => 95, 'completion' => 90],
-            default => null,
-        };
-
-        if (! $targets) {
-            return [];
-        }
-
-        $rows = [
-            ['label' => __('props.vendor.booking_selesai'), 'value' => $vendor->completed_bookings_count, 'target' => $targets['completed'], 'suffix' => ''],
-            ['label' => __('props.vendor.rating_purata'), 'value' => (float) $vendor->rating_avg, 'target' => $targets['rating'], 'suffix' => ''],
-            ['label' => __('props.vendor.jumlah_review'), 'value' => $vendor->reviews_count, 'target' => $targets['reviews'], 'suffix' => ''],
-            ['label' => __('props.vendor.response_rate_2'), 'value' => $vendor->response_rate ?? 0, 'target' => $targets['response'], 'suffix' => '%'],
-            ['label' => __('props.vendor.completion_rate_2'), 'value' => $vendor->completion_rate, 'target' => $targets['completion'], 'suffix' => '%'],
-        ];
-
-        return collect($rows)
-            ->reject(fn (array $row): bool => $row['target'] <= 0)
-            ->map(fn (array $row): array => [
-                'label' => $row['label'],
-                'current' => $row['value'].$row['suffix'],
-                'target' => $row['target'].$row['suffix'],
-                'met' => $row['value'] >= $row['target'],
-            ])
-            ->values()
             ->all();
     }
 }
