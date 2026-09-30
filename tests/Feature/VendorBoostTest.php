@@ -160,5 +160,6 @@ it('shows the vendor their balance, what is running and the history', function (
     expect($props['balance'])->toBe(4)
         ->and(collect($props['categories'])->pluck('id')->all())->toContain($this->category->id)
         ->and($props['history'])->toHaveCount(1)
-        ->and($props['packs'])->toBe([]);
+        ->and($props['packs'])->toBe([])
+        ->and(public_path(parse_url($props['urls']['screenshot'], PHP_URL_PATH)))->toBeFile();
 });

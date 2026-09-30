@@ -66,6 +66,7 @@ class BoostController extends Controller
                     'boost' => route('vendor.boost.store'),
                     'checkout' => route('vendor.boost.checkout'),
                     'pro' => route('vendor.pro.index'),
+                    'screenshot' => asset('img/boost/marketplace-dipromosi.jpg'),
                 ],
             ]),
         ]);

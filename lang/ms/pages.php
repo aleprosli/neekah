@@ -870,7 +870,7 @@ return [
                 'body' => 'Lencana Pro pada kad dan profil anda, supaya pasangan tahu anda serius dengan perniagaan anda.',
             ],
         ],
-        'fair_note' => 'Tier (Verified hingga Recommended) dan skor tetap berdasarkan prestasi, tidak boleh dibeli. Susunan Disyorkan: vendor yang di-boost dahulu (dilabel Dipromosi), kemudian Pro Elite (ahli Pro di tier Top atau Disyorkan), kemudian yang lain ikut skor.',
+        'fair_note' => 'Tier (Verified hingga Recommended) dan skor tetap berdasarkan prestasi, tidak boleh dibeli. Susunan Disyorkan: vendor yang di-boost dahulu (dilabel Dipromosi), kemudian Pro Elite (ahli Pro di tier Top atau Disyorkan), kemudian yang lain secara rawak, bertukar setiap jam.',
         'analytics_heading_pro' => 'Analitik 28 hari',
         'analytics_heading_free' => '7 hari lepas',
         'analytics_teaser' => 'Naik taraf ke Pro untuk melihat graf harian 28 hari.',

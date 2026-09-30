@@ -46,6 +46,21 @@ const input = 'w-full rounded-xl border border-line bg-surface px-4 py-2.5 text-
             <UiStatCard :label="$t('boost.pro_monthly')" :value="isPro ? String(proTokens) : '—'" :hint="isPro ? $t('boost.pro_monthly_hint') : $t('boost.pro_monthly_free')" />
         </div>
 
+        <!-- What a boost buys, with the marketplace itself as the proof. -->
+        <section class="flex min-w-0 flex-col gap-4 rounded-2xl border border-line bg-surface-raised p-5 sm:p-6">
+            <h2 class="font-semibold">{{ $t('boost.benefits_title') }}</h2>
+            <ul class="grid min-w-0 gap-4 sm:grid-cols-3">
+                <li v-for="benefit in ['top', 'stay', 'control']" :key="benefit" class="flex min-w-0 flex-col gap-1">
+                    <p class="text-sm font-medium">{{ $t(`boost.benefit_${benefit}_title`) }}</p>
+                    <p class="text-sm text-ink-muted">{{ $t(`boost.benefit_${benefit}_body`) }}</p>
+                </li>
+            </ul>
+            <figure class="flex min-w-0 flex-col gap-2">
+                <img :src="urls.screenshot" :alt="$t('boost.screenshot_alt')" width="1600" height="600" loading="lazy" decoding="async" class="h-auto w-full rounded-xl border border-line">
+                <figcaption class="text-xs text-ink-muted">{{ $t('boost.screenshot_caption') }}</figcaption>
+            </figure>
+        </section>
+
         <!-- Lift a category. -->
         <form :action="urls.boost" method="POST" class="flex min-w-0 flex-col gap-4 rounded-2xl border border-line bg-surface-raised p-5 sm:p-6">
             <input type="hidden" name="_token" :value="csrf">

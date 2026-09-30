@@ -870,7 +870,7 @@ return [
                 'body' => 'A Pro badge on your card and profile, so couples know you take your business seriously.',
             ],
         ],
-        'fair_note' => 'Tiers (Verified to Recommended) and scores stay based on performance and cannot be bought. The Recommended order: boosted vendors first (labelled Promoted), then Pro Elite (Pro members at the Top or Recommended tier), then everyone else by score.',
+        'fair_note' => 'Tiers (Verified to Recommended) and scores stay based on performance and cannot be bought. The Recommended order: boosted vendors first (labelled Promoted), then Pro Elite (Pro members at the Top or Recommended tier), then everyone else in a shuffled order that changes every hour.',
         'analytics_heading_pro' => 'Last 28 days',
         'analytics_heading_free' => 'Last 7 days',
         'analytics_teaser' => 'Upgrade to Pro to see the daily chart for 28 days.',
