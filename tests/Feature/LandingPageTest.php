@@ -43,6 +43,15 @@ it('says booking and payment happen with the vendor directly, in the words a cou
         ->assertSee('bukan kepada kami');
 });
 
+it('walks through the six how-it-works steps in order', function () {
+    $this->get(route('landing'))
+        ->assertOk()
+        ->assertSeeInOrder([
+            __('pages.landing.step', ['number' => 1]), __('pages.landing.flow.plan'),
+            __('pages.landing.step', ['number' => 6]), __('pages.landing.flow.celebrate'),
+        ]);
+});
+
 it('draws its icons as line art rather than emoji', function () {
     $html = $this->get(route('landing'))->assertOk()->getContent();
 
@@ -131,6 +140,8 @@ it('explains Neekah Kenangan, Basic and Pro, boost and Pro Elite only once each 
     $this->get(route('landing'))
         ->assertOk()
         ->assertSee('id="kenangan"', false)
+        ->assertSee(__('pages.landing.kenangan.steps.scan.title'))
+        ->assertSee(__('pages.landing.kenangan.steps.keep.title'))
         ->assertSee('RM109')
         ->assertSee('RM59')
         ->assertSee('id="boost"', false)

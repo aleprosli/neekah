@@ -73,25 +73,34 @@
             </div>
         </section>
 
-        {{-- How it works: six steps on one gold thread --}}
-        <section id="cara" class="relative border-y border-gold-300/60 bg-surface-raised">
-            <div class="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
+        {{-- How it works: one phone playing each step on a made-up Neekah screen, each step's card sliding out of it in turn (FlowPhoneDemo.vue) --}}
+        @php
+            $flowSteps = collect($flow)->map(fn (array $step, int $index): array => $step + [
+                'number' => __('pages.landing.step', ['number' => $index + 1]),
+                'illustration' => Blade::render('<x-site.flow-illustration :name="$name" class="size-full" />', ['name' => $step['key']]),
+            ])->all();
+        @endphp
+        <section id="cara" class="relative overflow-hidden border-y border-gold-300/60 bg-ivory">
+            <div class="relative mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-20 lg:px-8">
                 <div class="flex flex-col items-center gap-3 text-center">
                     <h2 class="font-script text-3xl text-brand-600 sm:text-4xl">{{ __('pages.landing.cara_ia_berjalan') }}</h2>
                     <x-site.ornament name="divider-floral" class="h-6 w-44" color="var(--color-gold-500)" color2="var(--color-gold-300)" />
                 </div>
 
-                <ol class="relative mt-10 grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 lg:grid-cols-6">
-                    <span class="absolute top-2.5 right-[9%] left-[9%] hidden h-px bg-gold-300 lg:block" aria-hidden="true"></span>
-                    @foreach ($flow as $index => $step)
-                        <li class="relative flex min-w-0 flex-col gap-2 lg:items-center lg:text-center">
-                            <span class="flex size-5 items-center justify-center rounded-full border border-gold-500 bg-surface-raised" aria-hidden="true"><span class="size-2 rounded-full bg-gold-500"></span></span>
-                            <span class="font-script text-2xl leading-none text-brand-600">{{ str_pad((string) ($index + 1), 2, '0', STR_PAD_LEFT) }}</span>
-                            <span class="font-display text-lg font-semibold">{{ $step['label'] }}</span>
-                            <span class="text-sm text-ink-muted">{{ $step['description'] }}</span>
-                        </li>
-                    @endforeach
-                </ol>
+                <div class="mt-10 sm:mt-12" data-vue="flow-phone-demo" data-props="@vueProps(['steps' => $flowSteps, 'text' => __('pages.landing.flow_demo')])">
+                    <ol class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                        @foreach ($flowSteps as $step)
+                            <li class="flex min-w-0 items-center gap-3 rounded-2xl bg-white/60 p-3">
+                                <x-site.flow-illustration :name="$step['key']" class="size-12" />
+                                <span class="min-w-0 text-sm">
+                                    <span class="block text-[10px] font-semibold tracking-[0.2em] text-brand-600 uppercase">{{ $step['number'] }}</span>
+                                    <span class="block font-display text-base font-semibold">{{ $step['label'] }}</span>
+                                    <span class="text-ink-muted">{{ $step['description'] }}</span>
+                                </span>
+                            </li>
+                        @endforeach
+                    </ol>
+                </div>
             </div>
         </section>
 
@@ -132,17 +141,25 @@
                         <p class="text-sm font-semibold tracking-[0.2em] text-gold-600 uppercase">{{ __('pages.landing.kenangan.eyebrow') }}</p>
                         <h2 class="font-display text-3xl font-semibold tracking-tight text-balance sm:text-4xl">{{ __('pages.landing.kenangan.title') }}</h2>
                         <p class="text-lg text-ink-muted">{{ __('pages.landing.kenangan.body') }}</p>
-                        <ol class="mt-2 flex flex-col gap-3">
-                            @foreach (['scan', 'share', 'wish', 'keep'] as $step)
-                                <li class="flex min-w-0 items-start gap-3">
-                                    <span class="flex size-8 shrink-0 items-center justify-center rounded-full border border-gold-500 bg-ivory font-display text-sm font-semibold text-brand-700">{{ $loop->iteration }}</span>
-                                    <span class="min-w-0 pt-1 text-sm"><span class="font-semibold">{{ __('pages.landing.kenangan.steps.'.$step.'.title') }}</span> <span class="text-ink-muted">{{ __('pages.landing.kenangan.steps.'.$step.'.body', ['days' => $kenangan['retention']]) }}</span></span>
-                                </li>
-                            @endforeach
-                        </ol>
+                        <div class="mt-2" data-vue="kenangan-phone-demo" data-props="@vueProps(['steps' => $kenangan['steps']])">
+                            <ol class="flex flex-col">
+                                @foreach ($kenangan['steps'] as $step)
+                                    <li class="relative flex min-w-0 items-start gap-4 pb-6 last:pb-0">
+                                        @unless ($loop->last)
+                                            <span class="absolute top-16 bottom-0 left-8 border-l-2 border-dashed border-gold-300" aria-hidden="true"></span>
+                                        @endunless
+                                        <span class="relative">
+                                            <x-site.kenangan-step :name="$step['key']" class="size-16" />
+                                            <span class="absolute -top-1 -right-1 flex size-6 items-center justify-center rounded-full bg-brand-600 font-display text-xs font-semibold text-white ring-2 ring-surface-raised">{{ $loop->iteration }}</span>
+                                        </span>
+                                        <span class="min-w-0 pt-2 text-sm"><span class="block font-semibold">{{ $step['title'] }}</span> <span class="text-ink-muted">{{ $step['body'] }}</span></span>
+                                    </li>
+                                @endforeach
+                            </ol>
+                        </div>
                     </div>
 
-                    <div class="grid min-w-0 gap-5 sm:grid-cols-2">
+                    <div class="grid min-w-0 content-center gap-5 sm:grid-cols-2">
                         @foreach ($kenangan['tiers'] as $tier)
                             <article @class([
                                 'relative flex min-w-0 flex-col gap-4 overflow-hidden rounded-3xl border p-6',
