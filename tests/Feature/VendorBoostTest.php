@@ -5,6 +5,8 @@ use App\Actions\GrantBoostTokens;
 use App\Enums\BoostTokenReason;
 use App\Enums\VendorStatus;
 use App\Models\Category;
+use App\Models\Package;
+use App\Models\PortfolioItem;
 use App\Models\User;
 use App\Models\Vendor;
 use App\Models\VendorBoost;
@@ -96,6 +98,33 @@ it('shuffles the Disyorkan order by the hour, below the boosted vendor, without 
 
     expect($orders->unique()->count())->toBeGreaterThan(1)
         ->and($listed())->toBe($orders->last());
+});
+
+it('shuffles vendors with a cover, a pictured package and a portfolio ahead of those missing any of it', function () {
+    $showcased = Vendor::factory()->count(3)->for($this->category)->create(['cover_image' => 'vendors/cover.webp'])
+        ->each(function (Vendor $vendor): void {
+            Package::factory()->for($vendor)->create(['image' => 'packages/pakej.webp']);
+            PortfolioItem::factory()->for($vendor)->count(3)->create();
+        });
+    $noCover = Vendor::factory()->for($this->category)->create();
+    Package::factory()->for($noCover)->create(['image' => 'packages/pakej.webp']);
+    PortfolioItem::factory()->for($noCover)->count(3)->create();
+    $noPackageImage = Vendor::factory()->for($this->category)->create(['cover_image' => 'vendors/cover.webp']);
+    Package::factory()->for($noPackageImage)->create(['image' => null]);
+    PortfolioItem::factory()->for($noPackageImage)->count(3)->create();
+    $thinPortfolio = Vendor::factory()->for($this->category)->create(['cover_image' => 'vendors/cover.webp']);
+    Package::factory()->for($thinPortfolio)->create(['image' => 'packages/pakej.webp']);
+    PortfolioItem::factory()->for($thinPortfolio)->count(2)->create();
+    VendorBoost::factory()->create(['vendor_id' => $this->vendor->id, 'category_id' => $this->category->id, 'ends_at' => now()->addDays(3)]);
+
+    collect(range(1, 4))->each(function () use ($showcased): void {
+        $this->travel(1)->hours();
+        $order = $this->get(route('vendors.index', ['category' => $this->category->slug]))->viewData('vendors')->getCollection()->pluck('id');
+
+        expect($order->first())->toBe($this->vendor->id)
+            ->and($order->slice(1, 3)->sort()->values()->all())->toBe($showcased->pluck('id')->sort()->values()->all())
+            ->and($order)->toHaveCount(7);
+    });
 });
 
 it('gives Pro vendors their monthly tokens once every 30 days and reminds a boost ending tomorrow', function () {

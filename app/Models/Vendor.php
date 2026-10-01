@@ -484,6 +484,31 @@ class Vendor extends Model
             ->orderByDesc('elite');
     }
 
+    /**
+     * Vendors whose page has something to look at: a cover image, an active
+     * package with its own image and at least three portfolio images. In the
+     * "Disyorkan" order they come before the shuffle reaches anyone else, so
+     * a card with no picture never sits above one that has its pictures.
+     */
+    #[Scope]
+    protected function showcasedFirst(Builder $query): Builder
+    {
+        $packages = Package::query()
+            ->selectRaw('1')
+            ->whereColumn('packages.vendor_id', 'vendors.id')
+            ->where('packages.is_active', true)
+            ->whereNotNull('packages.image')->where('packages.image', '!=', '');
+
+        $portfolio = PortfolioItem::query()
+            ->selectRaw('count(*)')
+            ->whereColumn('portfolio_items.vendor_id', 'vendors.id');
+
+        return $query->selectRaw(
+            "(vendors.cover_image is not null and vendors.cover_image != '' and exists(".$packages->toSql().') and ('.$portfolio->toSql().') >= 3) as showcased',
+            [...$packages->getBindings(), ...$portfolio->getBindings()],
+        )->orderByDesc('showcased');
+    }
+
     /** A prime above any vendor id, so shuffled() gives every vendor its own place. */
     private const SHUFFLE_PRIME = 1000003;
 

@@ -165,7 +165,7 @@ class VendorController extends Controller
                         'price_desc' => $query->orderByDesc('price_from'),
                         'reviews' => $query->orderByDesc('reviews_count'),
                         'popular' => $query->orderByDesc('views_30d'),
-                        default => $query->boostedFirst($activeCategory)->eliteFirst()->shuffled((int) now()->format('YmdH')),
+                        default => $query->boostedFirst($activeCategory)->eliteFirst()->showcasedFirst()->shuffled((int) now()->format('YmdH')),
                     })
                     ->orderBy('id')
                     ->paginate(self::PER_PAGE);
