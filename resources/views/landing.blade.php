@@ -6,8 +6,8 @@
     <main class="bg-ivory">
         {{-- Hero --}}
         <section class="relative overflow-hidden">
-            <img src="{{ asset('img/decor/botanical-corner.webp') }}" alt="" class="absolute -bottom-24 -left-28 w-96 opacity-25 sm:w-[34rem] lg:w-[40rem]" decoding="async">
-            <img src="{{ asset('img/decor/botanical-corner.webp') }}" alt="" class="absolute -top-32 -right-36 w-96 scale-x-[-1] opacity-10 sm:w-[32rem]" decoding="async">
+            <img src="{{ asset('img/decor/botanical-corner.svg') }}" alt="" class="absolute -bottom-24 -left-28 w-96 opacity-25 sm:w-[34rem] lg:w-[40rem]" decoding="async">
+            <img src="{{ asset('img/decor/botanical-corner.svg') }}" alt="" class="absolute -top-32 -right-36 w-96 scale-x-[-1] opacity-10 sm:w-[32rem]" decoding="async">
 
             <div class="relative mx-auto grid max-w-7xl items-center gap-14 px-4 pt-28 pb-16 sm:px-6 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] lg:px-8 lg:pt-36 lg:pb-24">
                 <div class="flex min-w-0 flex-col gap-6">
@@ -106,7 +106,7 @@
 
         {{-- Features --}}
         <section id="ciri" class="relative overflow-hidden">
-            <img src="{{ asset('img/decor/botanical-corner.webp') }}" alt="" class="absolute top-8 -right-28 w-80 scale-x-[-1] opacity-10 sm:w-[28rem]" loading="lazy" decoding="async">
+            <img src="{{ asset('img/decor/botanical-corner.svg') }}" alt="" class="absolute top-8 -right-28 w-80 scale-x-[-1] opacity-10 sm:w-[28rem]" loading="lazy" decoding="async">
 
             <div class="relative mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
                 <div class="max-w-2xl">
@@ -133,8 +133,8 @@
         {{-- Neekah Kenangan: shown once an admin opens it (LandingController). --}}
         @if ($kenangan)
             <section id="kenangan" class="relative overflow-hidden border-y border-gold-300/60 bg-surface-raised">
-                <x-site.ornament name="corner-peony" class="absolute -top-14 -right-14 size-64 opacity-40 sm:size-80" color="var(--color-brand-200)" color2="var(--color-gold-300)" />
-                <x-site.ornament name="corner-wildflower" class="absolute -bottom-14 -left-14 size-56 rotate-180 opacity-35 sm:size-72" color="var(--color-gold-300)" color2="var(--color-brand-100)" />
+                <img src="{{ asset('img/decor/botanical-corner.svg') }}" alt="" class="pointer-events-none absolute -top-24 -right-28 w-72 rotate-180 opacity-20 sm:w-96" loading="lazy" decoding="async">
+                <img src="{{ asset('img/decor/botanical-corner.svg') }}" alt="" class="pointer-events-none absolute -bottom-24 -left-28 w-72 opacity-20 sm:w-96" loading="lazy" decoding="async">
 
                 <div class="relative mx-auto grid max-w-7xl gap-12 px-4 py-20 sm:px-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:px-8">
                     <div class="flex min-w-0 flex-col gap-5">
@@ -186,7 +186,7 @@
 
         {{-- Marketplace preview --}}
         <section id="marketplace" class="relative overflow-hidden bg-ivory-deep">
-            <img src="{{ asset('img/decor/botanical-corner.webp') }}" alt="" class="absolute -top-28 left-1/2 w-80 -translate-x-1/2 rotate-45 opacity-[0.06]" loading="lazy" decoding="async">
+            <img src="{{ asset('img/decor/botanical-corner.svg') }}" alt="" class="absolute -top-28 left-1/2 w-80 -translate-x-1/2 rotate-45 opacity-[0.06]" loading="lazy" decoding="async">
 
             <div class="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
                 <div class="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
@@ -247,8 +247,8 @@
         <section class="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
             <div class="relative overflow-hidden rounded-3xl border border-gold-300 bg-surface-raised p-8 sm:p-12 lg:p-16">
                 <span class="pointer-events-none absolute inset-3 rounded-[1.25rem] border border-gold-300/70" aria-hidden="true"></span>
-                <img src="{{ asset('img/decor/botanical-corner.webp') }}" alt="" class="absolute -top-20 -left-24 w-72 opacity-15 sm:w-96" loading="lazy" decoding="async">
-                <img src="{{ asset('img/decor/botanical-corner.webp') }}" alt="" class="absolute -right-24 -bottom-20 w-72 rotate-180 opacity-15 sm:w-96" loading="lazy" decoding="async">
+                <img src="{{ asset('img/decor/botanical-corner.svg') }}" alt="" class="absolute -top-20 -left-24 w-72 opacity-15 sm:w-96" loading="lazy" decoding="async">
+                <img src="{{ asset('img/decor/botanical-corner.svg') }}" alt="" class="absolute -right-24 -bottom-20 w-72 rotate-180 opacity-15 sm:w-96" loading="lazy" decoding="async">
 
                 <div class="relative grid gap-10 lg:grid-cols-2">
                     <div class="flex flex-col gap-4">
@@ -305,9 +305,9 @@
                     <p class="text-brand-100">{{ __('pages.landing.tiada_komisen_tiada_yuran_lengkapkan') }}</p>
 
                     <ul class="mt-2 flex items-center justify-between pb-2">
-                        @foreach (['New' => 'new', 'Verified' => 'verified', 'Trusted' => 'trusted', 'Top' => 'top', 'Elite' => 'elite'] as $tier => $file)
+                        @foreach (\App\Enums\VendorTier::cases() as $tier)
                             <li>
-                                <img src="{{ asset('img/vendor-ranks/web/'.$file.'.webp') }}" alt="{{ $tier }} vendor rank" class="size-12 object-contain sm:size-16" width="64" height="64" loading="lazy" decoding="async">
+                                <x-vendor-rank-badge :tier="$tier" :label="$tier->label().' vendor rank'" class="size-12 sm:size-16" />
                             </li>
                             @unless ($loop->last)
                                 <li class="text-xs text-gold-400 sm:text-sm" aria-hidden="true">→</li>
@@ -341,8 +341,8 @@
              stays earned. Shown once Pro (and boost) are on sale. --}}
         @if ($plans || $boost)
             <section id="pro" class="relative overflow-hidden bg-ivory-deep">
-                <x-site.ornament name="corner-rose" class="absolute -top-10 -left-10 size-48 opacity-40 sm:size-64" color="var(--color-brand-300)" color2="var(--color-brand-100)" />
-                <x-site.ornament name="corner-tropical" class="absolute -right-12 -bottom-12 size-56 rotate-180 opacity-30 sm:size-72" color="var(--color-gold-300)" color2="var(--color-brand-100)" />
+                <img src="{{ asset('img/decor/botanical-corner.svg') }}" alt="" class="pointer-events-none absolute -top-24 -left-28 w-72 scale-y-[-1] opacity-20 sm:w-96" loading="lazy" decoding="async">
+                <img src="{{ asset('img/decor/botanical-corner.svg') }}" alt="" class="pointer-events-none absolute -right-28 -bottom-24 w-72 scale-x-[-1] opacity-20 sm:w-96" loading="lazy" decoding="async">
 
                 <div class="relative mx-auto flex max-w-7xl flex-col gap-12 px-4 py-20 sm:px-6 lg:px-8">
                     <div class="max-w-2xl">
@@ -426,8 +426,8 @@
         {{-- CTA --}}
         <section id="cta" class="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
             <div class="relative overflow-hidden rounded-3xl border border-gold-300 bg-surface-raised px-6 py-16 text-center sm:px-12">
-                <img src="{{ asset('img/decor/botanical-corner.webp') }}" alt="" class="absolute -bottom-28 -left-24 w-80 opacity-15 sm:w-96" loading="lazy" decoding="async">
-                <img src="{{ asset('img/decor/botanical-corner.webp') }}" alt="" class="absolute -top-28 -right-24 w-80 scale-x-[-1] opacity-10 sm:w-96" loading="lazy" decoding="async">
+                <img src="{{ asset('img/decor/botanical-corner.svg') }}" alt="" class="absolute -bottom-28 -left-24 w-80 opacity-15 sm:w-96" loading="lazy" decoding="async">
+                <img src="{{ asset('img/decor/botanical-corner.svg') }}" alt="" class="absolute -top-28 -right-24 w-80 scale-x-[-1] opacity-10 sm:w-96" loading="lazy" decoding="async">
 
                 <div class="relative">
                     <x-site.ornament name="divider-floral" class="mx-auto h-6 w-44" color="var(--color-gold-500)" color2="var(--color-gold-300)" />

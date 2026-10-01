@@ -1,13 +1,6 @@
 @props(['vendor'])
 
 @php
-    $rankIcons = [
-        \App\Enums\VendorTier::New->value => 'new.png',
-        \App\Enums\VendorTier::Verified->value => 'verified.png',
-        \App\Enums\VendorTier::Trusted->value => 'trusted.png',
-        \App\Enums\VendorTier::Top->value => 'top.png',
-        \App\Enums\VendorTier::Recommended->value => 'elite.png',
-    ];
     $rankGlows = [
         \App\Enums\VendorTier::New->value => 'bg-orange-400/45',
         \App\Enums\VendorTier::Verified->value => 'bg-emerald-400/45',
@@ -27,7 +20,7 @@
         \App\Enums\VendorTier::Top->value => ['completed' => 15, 'rating' => 4.5, 'reviews' => 8, 'response' => 90, 'completion' => 0],
         \App\Enums\VendorTier::Recommended->value => ['completed' => 30, 'rating' => 4.7, 'reviews' => 15, 'response' => 95, 'completion' => 90],
     ];
-    $tiers = collect(\App\Enums\VendorTier::cases())->map(function (\App\Enums\VendorTier $tier) use ($vendor, $rankIcons, $rankGlows, $rankBorders, $rankTargets): array {
+    $tiers = collect(\App\Enums\VendorTier::cases())->map(function (\App\Enums\VendorTier $tier) use ($vendor, $rankGlows, $rankBorders, $rankTargets): array {
         $reached = $tier->rank() <= $vendor->tier->rank();
         $missing = [];
 
@@ -73,7 +66,7 @@
         return [
             'label' => $tier->label(),
             'rank' => $tier->rank() + 1,
-            'icon' => asset('img/vendor-ranks/'.$rankIcons[$tier->value]),
+            'tier' => $tier,
             'glow' => $rankGlows[$tier->value],
             'border' => $rankBorders[$tier->value],
             'reached' => $reached,
@@ -96,13 +89,11 @@
         <div class="flex min-w-0 items-center gap-4">
             <div class="group relative grid size-20 shrink-0 place-items-center sm:size-24">
                 <span class="absolute inset-2 scale-75 rounded-full blur-2xl transition duration-300 group-hover:scale-110 group-hover:opacity-100 {{ $currentTier['glow'] }}" aria-hidden="true"></span>
-                <img
-                    src="{{ $currentTier['icon'] }}"
-                    alt="{{ __('pages.dash.logo_rank', ['rank' => $currentTier['rank'], 'tier' => $currentTier['label']]) }}"
-                    class="relative size-full object-contain transition duration-300 ease-out group-hover:scale-105 motion-reduce:transform-none"
-                    width="96"
-                    height="96"
-                >
+                <x-vendor-rank-badge
+                    :tier="$currentTier['tier']"
+                    :label="__('pages.dash.logo_rank', ['rank' => $currentTier['rank'], 'tier' => $currentTier['label']])"
+                    class="relative size-full transition duration-300 ease-out group-hover:scale-105 motion-reduce:transform-none"
+                />
             </div>
             <div class="min-w-0">
                 <p class="text-xs font-semibold tracking-[0.16em] text-brand-700 uppercase">{{ __('pages.dash.ranking_vendor') }}</p>
@@ -141,14 +132,11 @@
                     >
                         <div class="relative grid size-32 place-items-center">
                             <span class="absolute inset-5 scale-50 rounded-full opacity-0 blur-xl transition duration-300 group-hover:scale-105 group-hover:opacity-100 group-focus-visible:scale-105 group-focus-visible:opacity-100 {{ $tier['glow'] }}" aria-hidden="true"></span>
-                            <img
-                                src="{{ $tier['icon'] }}"
-                                alt="{{ __('pages.dash.logo_rank', ['rank' => $tier['rank'], 'tier' => $tier['label']]) }}"
-                                class="relative z-10 size-24 object-contain transition duration-300 ease-out group-hover:scale-105 group-focus-visible:scale-105 motion-reduce:transform-none sm:size-28 {{ $tier['reached'] ? '' : 'opacity-80 grayscale brightness-75 contrast-75' }}"
-                                width="112"
-                                height="112"
-                                loading="lazy"
-                            >
+                            <x-vendor-rank-badge
+                                :tier="$tier['tier']"
+                                :label="__('pages.dash.logo_rank', ['rank' => $tier['rank'], 'tier' => $tier['label']])"
+                                :class="Arr::toCssClasses(['relative z-10 size-24 transition duration-300 ease-out group-hover:scale-105 group-focus-visible:scale-105 motion-reduce:transform-none sm:size-28', 'opacity-80 grayscale brightness-75 contrast-75' => ! $tier['reached']])"
+                            />
                         </div>
 
                         <div class="mt-2 w-full rounded-xl border bg-surface-raised/95 px-3 py-2 text-center shadow-sm transition duration-300 group-hover:-translate-y-0.5 group-hover:shadow-md group-focus-visible:-translate-y-0.5 group-focus-visible:shadow-md {{ $tier['border'] }}">

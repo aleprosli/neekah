@@ -56,11 +56,11 @@ it('layers the supplied rank artwork in front of the vendor logo on the public p
         ->assertOk()
         ->assertSee('data-ranked-vendor-avatar="trusted"', false)
         ->assertSee('data-rank-artwork-layer="front"', false)
-        ->assertSee('data-vendor-avatar-fit="large"', false)
-        ->assertSeeInOrder(['Logo Bride Assistant', 'img/vendor-rank-frames/trusted.png'], false);
+        ->assertSeeInOrder(['data-rank-badge="trusted"', 'Logo Bride Assistant'], false)
+        ->assertDontSee('img/vendor-rank-frames/', false);
 });
 
-it('positions the elite vendor logo below its crown', function () {
+it('sets the elite vendor logo in the crowned elite badge', function () {
     $this->vendor->update([
         'logo' => 'vendors/bride-assistant.png',
         'tier' => VendorTier::Recommended,
@@ -68,19 +68,18 @@ it('positions the elite vendor logo below its crown', function () {
 
     $this->get(route('vendors.show', $this->vendor))
         ->assertOk()
-        ->assertSee('data-vendor-avatar-fit="elite-expanded"', false)
-        ->assertSee('data-vendor-avatar-position="crown-label-touch"', false)
-        ->assertSee('img/vendor-rank-frames/elite.png', false);
+        ->assertSeeInOrder(['data-rank-badge="recommended"', 'Logo Bride Assistant'], false)
+        ->assertDontSee('img/vendor-rank-frames/', false);
 });
 
-it('uses the supplied front artwork for verified vendors', function () {
+it('frames a verified vendor in the verified badge', function () {
     $this->vendor->update(['tier' => VendorTier::Verified]);
 
     $this->get(route('vendors.show', $this->vendor))
         ->assertOk()
         ->assertSee('data-ranked-vendor-avatar="verified"', false)
         ->assertSee('data-rank-artwork-layer="front"', false)
-        ->assertSee('img/vendor-rank-frames/verified.png', false);
+        ->assertSee('data-rank-badge="verified"', false);
 });
 
 it('replaces the old logo file rather than leaving it behind', function () {

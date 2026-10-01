@@ -1,35 +1,15 @@
 @props(['vendor'])
 
-@php
-    $frontRankFrames = [
-        \App\Enums\VendorTier::New->value => 'new.png',
-        \App\Enums\VendorTier::Verified->value => 'verified.png',
-        \App\Enums\VendorTier::Trusted->value => 'trusted.png',
-        \App\Enums\VendorTier::Top->value => 'top.png',
-        \App\Enums\VendorTier::Recommended->value => 'elite.png',
-    ];
-    $frontRankFrame = $frontRankFrames[$vendor->tier->value];
-    $hasCrownClearance = $vendor->tier === \App\Enums\VendorTier::Recommended;
-    $vendorAvatarFit = $hasCrownClearance ? 'top-4 size-16' : 'top-2 size-16';
-@endphp
-
+{{-- The vendor's logo set in their rank badge (x-vendor-rank-badge): the logo,
+     or the initial when there is none, fills the hexagon's face. --}}
 <span
     data-ranked-vendor-avatar="{{ $vendor->tier->value }}"
     data-rank-artwork-layer="front"
-    data-vendor-avatar-fit="{{ $hasCrownClearance ? 'elite-expanded' : 'large' }}"
-    @if ($hasCrownClearance) data-vendor-avatar-position="crown-label-touch" @endif
-    {{ $attributes->class('relative size-24 shrink-0') }}
+    {{ $attributes->class('relative size-28 shrink-0') }}
 >
-    <x-vendor-avatar
-        :vendor="$vendor"
-        class="absolute left-1/2 z-10 -translate-x-1/2 border-2 border-white text-lg shadow-sm {{ $vendorAvatarFit }}"
-    />
-    <img
-        src="{{ asset('img/vendor-rank-frames/'.$frontRankFrame) }}"
-        alt=""
-        aria-hidden="true"
-        class="pointer-events-none absolute inset-0 z-20 size-full object-contain"
-        width="96"
-        height="96"
-    >
+    <x-vendor-rank-badge :tier="$vendor->tier" :label="$vendor->name.' · '.$vendor->tier->label()" class="size-full">
+        <foreignObject x="29" y="17.5" width="62" height="73">
+            <x-vendor-avatar :vendor="$vendor" class="size-full rounded-none! text-3xl" />
+        </foreignObject>
+    </x-vendor-rank-badge>
 </span>

@@ -57,22 +57,14 @@ it('shows the vendor rank and points before onboarding', function () {
         ->assertSee('Achieved')
         ->assertSee('30 lagi booking selesai')
         ->assertSee('342')
-        ->assertSee('img/vendor-ranks/new.png', false)
-        ->assertSee('img/vendor-ranks/verified.png', false)
-        ->assertSee('img/vendor-ranks/trusted.png', false)
-        ->assertSee('img/vendor-ranks/top.png', false)
-        ->assertSee('img/vendor-ranks/elite.png', false)
+        ->assertSee('data-rank-badge="new"', false)
+        ->assertSee('data-rank-badge="verified"', false)
+        ->assertSee('data-rank-badge="trusted"', false)
+        ->assertSee('data-rank-badge="top"', false)
+        ->assertSee('data-rank-badge="recommended"', false)
+        // Drawn as SVG, never the heavy PNG artwork.
+        ->assertDontSee('img/vendor-ranks/', false)
         ->assertSee('Elite');
-
-    foreach (['new', 'verified', 'trusted', 'top', 'elite'] as $rank) {
-        $path = public_path('img/vendor-ranks/'.$rank.'.png');
-        $contents = file_get_contents($path);
-        $hasTransparency = in_array(ord($contents[25]), [4, 6], true) || str_contains($contents, 'tRNS');
-
-        expect(file_exists($path))->toBeTrue()
-            ->and(getimagesize($path)['mime'])->toBe('image/png')
-            ->and($hasTransparency)->toBeTrue();
-    }
 });
 
 it('registers a vendor as pending and logs the owner in', function () {

@@ -58,7 +58,7 @@ it('draws its icons as line art rather than emoji', function () {
     // An emoji is drawn by whichever operating system opens the page, at its own
     // weight, so a row of them never reads as one set.
     expect($html)->not->toContain('🔎')->not->toContain('📋')->not->toContain('🏆')->not->toContain('💍')
-        ->and($html)->toContain('img/decor/botanical-corner.webp')
+        ->and($html)->toContain('img/decor/botanical-corner.svg')
         ->and($html)->toContain('img/decor/songket-cempaka-corner.webp')
         ->and($html)->not->toContain('img/layers/corner-peony.svg')
         ->and($html)->not->toContain('img/layers/corner-filigree.svg')
@@ -68,9 +68,11 @@ it('draws its icons as line art rather than emoji', function () {
 it('shows the real vendor rank badges from new through elite', function () {
     $response = $this->get(route('landing'))->assertOk();
 
-    foreach (['new', 'verified', 'trusted', 'top', 'elite'] as $rank) {
-        $response->assertSee('img/vendor-ranks/web/'.$rank.'.webp', false);
+    foreach (['new', 'verified', 'trusted', 'top', 'recommended'] as $rank) {
+        $response->assertSee('data-rank-badge="'.$rank.'"', false);
     }
+
+    $response->assertDontSee('img/vendor-ranks/', false);
 });
 
 it('promises nothing the platform does not do while it takes no payment', function () {

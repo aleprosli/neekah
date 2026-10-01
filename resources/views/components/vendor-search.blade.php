@@ -16,8 +16,8 @@
 {{-- The same ivory paper and light watercolor botanicals as the rest of the
      public site. --}}
 <section class="relative overflow-hidden bg-ivory pt-24 pb-8 md:pt-28 md:pb-12">
-    <img src="{{ asset('img/decor/botanical-corner.webp') }}" alt="" class="absolute -top-20 -left-28 w-80 opacity-20 sm:w-[28rem]" decoding="async">
-    <img src="{{ asset('img/decor/botanical-corner.webp') }}" alt="" class="absolute -top-24 -right-32 w-80 scale-x-[-1] opacity-10 sm:w-[28rem]" decoding="async">
+    <img src="{{ asset('img/decor/botanical-corner.svg') }}" alt="" class="absolute -top-20 -left-28 w-80 opacity-20 sm:w-[28rem]" decoding="async">
+    <img src="{{ asset('img/decor/botanical-corner.svg') }}" alt="" class="absolute -top-24 -right-32 w-80 scale-x-[-1] opacity-10 sm:w-[28rem]" decoding="async">
 
     <div class="relative mx-auto flex max-w-[1760px] flex-col items-center gap-5 px-4 text-center sm:px-6 md:gap-7 lg:px-10">
         <div class="max-w-2xl">

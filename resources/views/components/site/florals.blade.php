@@ -18,18 +18,18 @@
      `relative` element and keep the content in a `relative` sibling. --}}
 <div class="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
     @if (in_array($corners, ['both', 'left'], true))
-        <img src="{{ asset('img/decor/botanical-corner.webp') }}" alt="" class="absolute -top-16 -left-24 w-72 opacity-25 sm:w-[26rem]" decoding="async">
+        <img src="{{ asset('img/decor/botanical-corner.svg') }}" alt="" class="absolute -top-16 -left-24 w-72 opacity-25 sm:w-[26rem]" decoding="async">
     @endif
     @if (in_array($corners, ['both', 'right'], true))
-        <img src="{{ asset('img/decor/botanical-corner.webp') }}" alt="" class="absolute -top-20 -right-28 w-72 scale-x-[-1] opacity-15 sm:w-[26rem]" decoding="async">
+        <img src="{{ asset('img/decor/botanical-corner.svg') }}" alt="" class="absolute -top-20 -right-28 w-72 scale-x-[-1] opacity-15 sm:w-[26rem]" decoding="async">
     @endif
     @if ($particles)
-        <img src="{{ asset('img/decor/botanical-corner.webp') }}" alt="" class="absolute top-[24rem] left-1/2 w-72 -translate-x-1/2 rotate-45 opacity-[0.06] sm:w-[30rem]" loading="lazy" decoding="async">
+        <img src="{{ asset('img/decor/botanical-corner.svg') }}" alt="" class="absolute top-[24rem] left-1/2 w-72 -translate-x-1/2 rotate-45 opacity-[0.06] sm:w-[30rem]" loading="lazy" decoding="async">
     @endif
     @if ($sprig)
-        <img src="{{ asset('img/decor/botanical-corner.webp') }}" alt="" class="absolute top-[36rem] -left-24 w-72 opacity-10 sm:w-96" loading="lazy" decoding="async">
+        <img src="{{ asset('img/decor/botanical-corner.svg') }}" alt="" class="absolute top-[36rem] -left-24 w-72 opacity-10 sm:w-96" loading="lazy" decoding="async">
     @endif
     @if ($cluster)
-        <img src="{{ asset('img/decor/botanical-corner.webp') }}" alt="" class="absolute top-[16rem] -right-28 w-80 scale-x-[-1] opacity-10 sm:w-[28rem]" loading="lazy" decoding="async">
+        <img src="{{ asset('img/decor/botanical-corner.svg') }}" alt="" class="absolute top-[16rem] -right-28 w-80 scale-x-[-1] opacity-10 sm:w-[28rem]" loading="lazy" decoding="async">
     @endif
 </div>
