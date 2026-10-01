@@ -221,14 +221,26 @@ watch(() => batch.value.settled, (settled) => {
             <p v-else class="text-center text-sm text-ink-muted">{{ $t('camera.sharing_as', { name: guestName }) }} · <button type="button" class="underline" @click="nameSaved = false">{{ $t('camera.change') }}</button></p>
 
             <section v-if="album.accepts_uploads" class="grid gap-3" :class="limits.allows_video ? 'grid-cols-3' : 'grid-cols-2'">
-                <button type="button" class="flex flex-col items-center gap-2 rounded-2xl bg-brand-600 px-3 py-5 text-sm font-semibold text-white shadow-lg shadow-brand-900/20 transition active:scale-95" @click="photoInput.click()">
-                    <span class="text-3xl" aria-hidden="true">📷</span>{{ $t('camera.take_photo') }}
+                <button type="button" class="group relative flex flex-col items-center gap-3 overflow-hidden rounded-2xl bg-linear-to-br from-brand-500 to-brand-700 px-3 py-5 text-sm font-semibold text-white shadow-lg shadow-brand-900/25 transition hover:-translate-y-0.5 hover:shadow-xl active:scale-95" @click="photoInput.click()">
+                    <span class="pointer-events-none absolute -top-8 -right-8 size-24 rounded-full bg-white/10" aria-hidden="true"></span>
+                    <span class="relative flex size-14 items-center justify-center rounded-full bg-white/15 ring-1 ring-white/30">
+                        <span class="absolute inset-0 rounded-full ring-2 ring-white/40 motion-safe:animate-ping [animation-duration:2.4s]" aria-hidden="true"></span>
+                        <svg class="size-7 transition-transform duration-300 group-hover:scale-110 group-active:scale-90" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3.5"/></svg>
+                    </span>
+                    <span class="relative">{{ $t('camera.take_photo') }}</span>
                 </button>
-                <button type="button" class="flex flex-col items-center gap-2 rounded-2xl border border-line bg-surface-raised px-3 py-5 text-sm font-semibold transition active:scale-95" @click="pickInput.click()">
-                    <span class="text-3xl" aria-hidden="true">🖼️</span>{{ $t('camera.pick_files') }}
+                <button type="button" class="group flex flex-col items-center gap-3 rounded-2xl border border-line bg-surface-raised px-3 py-5 text-sm font-semibold transition hover:-translate-y-0.5 hover:border-gold-400 hover:shadow-md active:scale-95" @click="pickInput.click()">
+                    <span class="flex size-14 items-center justify-center rounded-full bg-linear-to-br from-gold-300/50 to-gold-400/30 text-gold-600">
+                        <svg class="size-7 transition-transform duration-300 group-hover:-rotate-6 group-hover:scale-110" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.1-3.1a2 2 0 0 0-2.8 0L6 21"/></svg>
+                    </span>
+                    {{ $t('camera.pick_files') }}
                 </button>
-                <button v-if="limits.allows_video" type="button" class="flex flex-col items-center gap-2 rounded-2xl border border-line bg-surface-raised px-3 py-5 text-sm font-semibold transition active:scale-95" @click="videoInput.click()">
-                    <span class="text-3xl" aria-hidden="true">🎥</span>{{ $t('camera.record_video') }}
+                <button v-if="limits.allows_video" type="button" class="group flex flex-col items-center gap-3 rounded-2xl border border-line bg-surface-raised px-3 py-5 text-sm font-semibold transition hover:-translate-y-0.5 hover:border-brand-300 hover:shadow-md active:scale-95" @click="videoInput.click()">
+                    <span class="relative flex size-14 items-center justify-center rounded-full bg-linear-to-br from-brand-100 to-brand-50 text-brand-600">
+                        <svg class="size-7 transition-transform duration-300 group-hover:scale-110" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m16 13 5.2 3.5a.5.5 0 0 0 .8-.4V7.9a.5.5 0 0 0-.8-.4L16 11"/><rect x="2" y="6" width="14" height="12" rx="2"/></svg>
+                        <span class="absolute top-2.5 right-2.5 size-2.5 rounded-full bg-red-500 ring-2 ring-surface-raised motion-safe:animate-pulse" aria-hidden="true"></span>
+                    </span>
+                    {{ $t('camera.record_video') }}
                 </button>
 
                 <input ref="photoInput" type="file" accept="image/*" capture="environment" class="hidden" @change="pick">
@@ -248,7 +260,7 @@ watch(() => batch.value.settled, (settled) => {
                 <ul class="flex flex-col gap-2">
                     <li v-for="item in items" :key="item.id" class="flex min-w-0 items-center gap-3 rounded-xl border border-line bg-surface-raised p-2">
                         <img v-if="item.preview" :src="item.preview" alt="" class="size-12 shrink-0 rounded-lg object-cover">
-                        <span v-else class="flex size-12 shrink-0 items-center justify-center rounded-lg bg-surface-muted text-xl" aria-hidden="true">🎥</span>
+                        <span v-else class="flex size-12 shrink-0 items-center justify-center rounded-lg bg-surface-muted text-ink-muted"><svg class="size-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m16 13 5.2 3.5a.5.5 0 0 0 .8-.4V7.9a.5.5 0 0 0-.8-.4L16 11"/><rect x="2" y="6" width="14" height="12" rx="2"/></svg></span>
                         <div class="min-w-0 flex-1">
                             <p class="truncate text-xs text-ink-muted">{{ item.error || stateLabel(item) }}</p>
                             <div class="mt-1 h-1.5 overflow-hidden rounded-full bg-surface-muted">
@@ -263,13 +275,13 @@ watch(() => batch.value.settled, (settled) => {
             <!-- A wish for the couple: written, or spoken on Pro. -->
             <section v-if="album.accepts_uploads" class="flex flex-col gap-4 rounded-3xl border border-line bg-surface-raised p-5">
                 <div>
-                    <h2 class="font-display text-lg font-semibold">💌 {{ $t('camera.wish_title') }}</h2>
+                    <h2 class="flex items-center gap-2.5 font-display text-lg font-semibold"><span class="flex size-9 shrink-0 items-center justify-center rounded-full bg-brand-50 text-brand-600"><svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg></span>{{ $t('camera.wish_title') }}</h2>
                     <p class="text-sm text-ink-muted">{{ $t('camera.wish_help') }}</p>
                 </div>
 
                 <div v-if="album.allows_voice && voice.supported" class="grid grid-cols-2 gap-1 rounded-full bg-surface-muted p-1 text-sm font-semibold">
-                    <button type="button" :class="['rounded-full py-2 transition', wishMode === 'text' ? 'bg-surface-raised shadow-sm' : 'text-ink-muted']" @click="wishMode = 'text'">✍️ {{ $t('camera.wish_write') }}</button>
-                    <button type="button" :class="['rounded-full py-2 transition', wishMode === 'voice' ? 'bg-surface-raised shadow-sm' : 'text-ink-muted']" @click="wishMode = 'voice'">🎙️ {{ $t('camera.wish_record') }}</button>
+                    <button type="button" :class="['flex items-center justify-center gap-1.5 rounded-full py-2 transition', wishMode === 'text' ? 'bg-surface-raised shadow-sm' : 'text-ink-muted']" @click="wishMode = 'text'"><svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21.17 6.81a2.83 2.83 0 0 0-4-4L3.84 16.17a2 2 0 0 0-.5.83l-1.32 4.35a.5.5 0 0 0 .62.62l4.35-1.32a2 2 0 0 0 .83-.5z"/></svg>{{ $t('camera.wish_write') }}</button>
+                    <button type="button" :class="['flex items-center justify-center gap-1.5 rounded-full py-2 transition', wishMode === 'voice' ? 'bg-surface-raised shadow-sm' : 'text-ink-muted']" @click="wishMode = 'voice'"><svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M19 10v1a7 7 0 0 1-14 0v-1"/><path d="M12 18v4"/></svg>{{ $t('camera.wish_record') }}</button>
                 </div>
 
                 <form v-if="wishMode === 'text'" class="flex flex-col gap-3" @submit.prevent="sendWish">
@@ -280,7 +292,7 @@ watch(() => batch.value.settled, (settled) => {
                 <div v-else class="flex flex-col items-center gap-3">
                     <p v-if="voice.state.value === 'denied'" class="rounded-xl bg-amber-50 px-4 py-3 text-center text-sm text-amber-900">{{ $t('camera.voice_denied') }}</p>
                     <template v-if="voice.state.value !== 'recorded'">
-                        <button type="button" :class="['flex size-20 items-center justify-center rounded-full text-3xl text-white shadow-lg transition active:scale-95', voice.state.value === 'recording' ? 'animate-pulse bg-red-600' : 'bg-brand-600']" :aria-label="voice.state.value === 'recording' ? $t('camera.voice_stop') : $t('camera.voice_start')" @click="voice.state.value === 'recording' ? voice.stop() : voice.start()">{{ voice.state.value === 'recording' ? '■' : '🎙️' }}</button>
+                        <button type="button" :class="['flex size-20 items-center justify-center rounded-full text-3xl text-white shadow-lg transition active:scale-95', voice.state.value === 'recording' ? 'animate-pulse bg-red-600' : 'bg-brand-600']" :aria-label="voice.state.value === 'recording' ? $t('camera.voice_stop') : $t('camera.voice_start')" @click="voice.state.value === 'recording' ? voice.stop() : voice.start()"><svg v-if="voice.state.value === 'recording'" class="size-7" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2"/></svg><svg v-else class="size-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M19 10v1a7 7 0 0 1-14 0v-1"/><path d="M12 18v4"/></svg></button>
                         <p class="text-sm font-medium tabular-nums">{{ voice.state.value === 'recording' ? `${clock(voice.seconds.value)} / ${clock(album.voice_max_seconds)}` : $t('camera.voice_tap', { seconds: album.voice_max_seconds }) }}</p>
                     </template>
                     <template v-else>
@@ -341,7 +353,7 @@ watch(() => batch.value.settled, (settled) => {
                 <ul class="flex max-h-48 gap-2 overflow-x-auto pb-1">
                     <li v-for="item in items" :key="item.id" class="relative size-14 shrink-0 overflow-hidden rounded-xl bg-surface-muted">
                         <img v-if="item.preview" :src="item.preview" alt="" class="size-full object-cover">
-                        <span v-else class="flex size-full items-center justify-center text-xl" aria-hidden="true">🎥</span>
+                        <span v-else class="flex size-full items-center justify-center text-ink-muted"><svg class="size-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m16 13 5.2 3.5a.5.5 0 0 0 .8-.4V7.9a.5.5 0 0 0-.8-.4L16 11"/><rect x="2" y="6" width="14" height="12" rx="2"/></svg></span>
                         <span v-if="item.state === 'done'" class="absolute inset-0 flex items-center justify-center bg-emerald-600/60 text-white">✓</span>
                         <button v-else-if="item.state === 'failed'" type="button" class="absolute inset-0 flex items-center justify-center bg-brand-700/70 text-xs font-semibold text-white" @click="retry(item)">↻</button>
                         <span v-else class="absolute inset-x-0 bottom-0 h-1 bg-brand-600 transition-all" :style="{ width: `${Math.round(item.progress * 100)}%` }"></span>
