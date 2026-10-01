@@ -504,10 +504,6 @@ return [
     ],
 
     'vendor_dashboard' => [
-        'views' => 'Profile views',
-        'whatsapp' => 'WhatsApp taps',
-        'phone' => 'Phone taps',
-        'tokens' => 'Boost tokens',
         'pro_expiring_title' => 'Pro ends on :date',
         'pro_expiring_body' => 'Renew so online booking, enquiries and the calendar stay unlocked.',
         'pro_expiring_cta' => 'Renew Pro',

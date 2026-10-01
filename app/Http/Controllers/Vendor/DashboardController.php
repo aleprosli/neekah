@@ -15,7 +15,6 @@ use App\Support\ContactSettings;
 use App\Support\ImageSettings;
 use App\Support\PhoneNumber;
 use App\Support\ProSettings;
-use App\Support\VendorAnalytics;
 use App\Support\VendorAvailability;
 use App\Support\VueProps;
 use Illuminate\Contracts\View\View;
@@ -34,7 +33,6 @@ class DashboardController extends Controller
         }
 
         $isPro = $vendor->isPro();
-        $reach = (new VendorAnalytics($vendor))->totals(VendorAnalytics::TEASER_DAYS);
         $openEnquiries = $vendor->enquiries()->where('status', EnquiryStatus::Open)->count();
         $boostEnds = $vendor->boosts()->where('ends_at', '>', now())->max('ends_at');
 
@@ -52,13 +50,6 @@ class DashboardController extends Controller
                     'recordBookingUrl' => $isPro ? route('vendor.bookings.create') : null,
                 ],
                 'actions' => $this->actions($vendor, $openEnquiries),
-                'reach' => [
-                    ['label' => __('props.vendor_dashboard.views'), 'value' => number_format($reach['profile_views']), 'icon' => '👀'],
-                    ['label' => __('props.vendor_dashboard.whatsapp'), 'value' => number_format($reach['whatsapp_clicks']), 'icon' => '💬'],
-                    ['label' => __('props.vendor_dashboard.phone'), 'value' => number_format($reach['phone_clicks']), 'icon' => '📞'],
-                    ['label' => __('props.vendor_dashboard.tokens'), 'value' => number_format((int) $vendor->boost_tokens), 'icon' => '🚀', 'href' => route('vendor.boost.index')],
-                ],
-                'reachUrl' => route('vendor.pro.index'),
                 'business' => $isPro ? $this->business($vendor, $openEnquiries) : null,
                 'upcoming' => $isPro ? $this->upcoming($vendor) : [],
                 'standing' => [

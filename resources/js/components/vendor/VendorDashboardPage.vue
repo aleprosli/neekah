@@ -4,9 +4,9 @@
  *
  * A greeting with the plan, then "Perlu tindakan" (only what applies: a
  * receipt to check, enquiries to answer, a stale calendar, a missing piece of
- * the profile, unused boost tokens), then the week's reach. Pro vendors see
- * their business numbers and the next weddings; Basic vendors see what Pro
- * would open. Standing (tier, score, rating, popularity) sits on the side.
+ * the profile, unused boost tokens). Pro vendors see their business numbers
+ * and the next weddings; Basic vendors see what Pro would open. Standing
+ * (tier, score, rating, popularity) sits on the side.
  */
 import { computed } from 'vue';
 import UiBadge from '../ui/UiBadge.vue';
@@ -15,8 +15,6 @@ import UiStatCard from '../ui/UiStatCard.vue';
 const props = defineProps({
     vendor: { type: Object, required: true },
     actions: { type: Array, default: () => [] },
-    reach: { type: Array, required: true },
-    reachUrl: { type: String, required: true },
     business: { type: Array, default: null },
     upcoming: { type: Array, default: () => [] },
     standing: { type: Object, required: true },
@@ -93,27 +91,6 @@ const tones = {
                             </a>
                         </li>
                     </ul>
-                </section>
-
-                <!-- Reach this week -->
-                <section class="flex min-w-0 flex-col gap-3">
-                    <div class="flex items-baseline justify-between gap-3">
-                        <h2 class="font-display text-xl font-semibold">{{ $t('vendor_home.reach') }}</h2>
-                        <a :href="reachUrl" class="text-sm font-medium text-brand-700 hover:underline">{{ isPro ? $t('vendor_home.see_trend') : $t('vendor_home.see_trend_pro') }}</a>
-                    </div>
-                    <div class="grid min-w-0 grid-cols-2 gap-3 lg:grid-cols-4">
-                        <component
-                            :is="item.href ? 'a' : 'div'"
-                            v-for="item in reach"
-                            :key="item.label"
-                            :href="item.href"
-                            :class="['flex min-w-0 flex-col gap-1 rounded-2xl border border-line bg-surface-raised p-4', item.href ? 'transition hover:border-brand-300' : '']"
-                        >
-                            <span class="text-lg" aria-hidden="true">{{ item.icon }}</span>
-                            <span class="font-display text-2xl font-semibold">{{ item.value }}</span>
-                            <span class="truncate text-xs text-ink-muted">{{ item.label }}</span>
-                        </component>
-                    </div>
                 </section>
 
                 <!-- Pro: the business -->

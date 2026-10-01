@@ -504,10 +504,6 @@ return [
     ],
 
     'vendor_dashboard' => [
-        'views' => 'Paparan profil',
-        'whatsapp' => 'Tekan WhatsApp',
-        'phone' => 'Tekan telefon',
-        'tokens' => 'Token boost',
         'pro_expiring_title' => 'Pro tamat pada :date',
         'pro_expiring_body' => 'Bayar semula supaya tempahan online, enquiry dan kalendar tidak terkunci.',
         'pro_expiring_cta' => 'Sambung Pro',

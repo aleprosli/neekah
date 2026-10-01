@@ -52,6 +52,12 @@ it('shows Basic the enquiries waiting behind Pro, unused boost tokens, and what 
         ->and($props['locked'])->toHaveCount(4);
 });
 
+it('leaves the week\'s views and taps off the dashboard, so a quiet week after a boost does not read as a failed one', function () {
+    $props = $this->actingAs(completeVendor()->user)->get(route('vendor.dashboard'))->viewData('props');
+
+    expect($props)->not->toHaveKeys(['reach', 'reachUrl']);
+});
+
 it('puts a Pro vendor receipt to check and enquiries to answer first, with the business numbers', function () {
     $vendor = completeVendor(['pro_until' => now()->addMonths(3)]);
     Enquiry::factory()->for($vendor)->create();
