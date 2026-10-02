@@ -48,17 +48,17 @@ class LandingController extends Controller
     }
 
     /**
-     * @return array<int, array{label: string, description: string}>
+     * @return array<int, array{key: string, label: string, description: string}>
      */
     private function flow(): array
     {
         return [
-            ['label' => __('pages.landing.flow.plan'), 'description' => __('pages.landing.flow.plan_detail')],
-            ['label' => __('pages.landing.flow.search'), 'description' => __('pages.landing.flow.search_detail')],
-            ['label' => __('pages.landing.flow.contact'), 'description' => __('pages.landing.flow.contact_detail')],
-            ['label' => __('pages.landing.flow.deal'), 'description' => __('pages.landing.flow.deal_detail')],
-            ['label' => __('pages.landing.flow.invite'), 'description' => __('pages.landing.flow.invite_detail')],
-            ['label' => __('pages.landing.flow.celebrate'), 'description' => __('pages.landing.flow.celebrate_detail')],
+            ['key' => 'plan', 'label' => __('pages.landing.flow.plan'), 'description' => __('pages.landing.flow.plan_detail')],
+            ['key' => 'search', 'label' => __('pages.landing.flow.search'), 'description' => __('pages.landing.flow.search_detail')],
+            ['key' => 'contact', 'label' => __('pages.landing.flow.contact'), 'description' => __('pages.landing.flow.contact_detail')],
+            ['key' => 'deal', 'label' => __('pages.landing.flow.deal'), 'description' => __('pages.landing.flow.deal_detail')],
+            ['key' => 'invite', 'label' => __('pages.landing.flow.invite'), 'description' => __('pages.landing.flow.invite_detail')],
+            ['key' => 'celebrate', 'label' => __('pages.landing.flow.celebrate'), 'description' => __('pages.landing.flow.celebrate_detail')],
         ];
     }
 
@@ -102,7 +102,7 @@ class LandingController extends Controller
     /**
      * Neekah Kenangan's two packages, for couples.
      *
-     * @return array{tiers: list<array{label: string, price: float, pro: bool, features: list<string>}>, retention: int}|null
+     * @return array{steps: list<array{key: string, title: string, body: string}>, tiers: list<array{label: string, price: float, pro: bool, features: list<string>}>}|null
      */
     private function kenangan(): ?array
     {
@@ -113,7 +113,11 @@ class LandingController extends Controller
         }
 
         return [
-            'retention' => $settings->retentionDays(),
+            'steps' => array_map(fn (string $step): array => [
+                'key' => $step,
+                'title' => __('pages.landing.kenangan.steps.'.$step.'.title'),
+                'body' => __('pages.landing.kenangan.steps.'.$step.'.body', ['days' => $settings->retentionDays()]),
+            ], ['scan', 'share', 'wish', 'keep']),
             'tiers' => array_map(function (CameraTier $tier) use ($settings): array {
                 $limits = $settings->limitsFor($tier);
 

@@ -260,4 +260,43 @@ return [
         'body' => 'Your boost ends on :date. Add days to stay at the top.',
         'action' => 'Extend the boost',
     ],
+
+    'quotation_sent' => [
+        'subject' => 'Quotation :number from :vendor',
+        'intro' => ':vendor sent you a quotation.',
+        'total' => 'Total: :total',
+        'valid_until' => 'Valid until :date.',
+        'action' => 'View quotation',
+    ],
+
+    'quotation_accepted' => [
+        'title' => ':name accepted quotation :number',
+        'intro' => ':name accepted quotation :number for :total.',
+        'body' => 'Contact the client about the deposit, then issue the invoice or record the booking.',
+        'action' => 'Open quotation',
+    ],
+
+    'quotation_declined' => [
+        'title' => ':name declined quotation :number',
+        'intro' => ':name declined quotation :number.',
+        'body' => 'You can copy it as a new quotation with a different offer.',
+        'action' => 'Open quotation',
+    ],
+
+    'contract_sent' => [
+        'subject' => 'Contract :number from :vendor',
+        'intro' => ':vendor sent you a contract to read and sign.',
+        'body' => 'You do not need to sign in. Open the link, read it, and sign with a finger or the mouse.',
+        'action' => 'Read & sign',
+    ],
+
+    'contract_signed' => [
+        'title' => ':name signed contract :number',
+        'intro' => ':name has signed contract :number.',
+        'body' => 'The signed copy is on the contract page, ready to print.',
+        'action' => 'Open contract',
+        'client_subject' => 'Your copy of contract :number with :vendor',
+        'client_intro' => 'Thank you for signing contract :number with :vendor. Keep this link for your copy.',
+        'client_action' => 'View contract',
+    ],
 ];

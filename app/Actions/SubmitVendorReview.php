@@ -11,14 +11,16 @@ use Illuminate\Support\Facades\DB;
 /**
  * A review written straight on a vendor's profile, by anyone.
  *
- * These carry no booking, so they are deliberately kept out of rating_avg,
- * the vendor's points and the ranking tier — see Vendor::rankingReviews().
+ * These carry no booking, so they are deliberately kept out of rating_avg
+ * and the vendor's points — see Vendor::rankingReviews(). Since 2 Oct 2026
+ * the ranking tier does count them (Vendor::tierReviews, never the ones a
+ * vendor adds themselves), so the vendor is recalculated after each one.
  * They are published the moment they are written; an admin is what takes one
  * down again.
  */
 class SubmitVendorReview
 {
-    public function __construct(private StoreOptimizedImage $images) {}
+    public function __construct(private StoreOptimizedImage $images, private RecalculateVendorStats $stats) {}
 
     /**
      * @param  array{rating: int, comment: string, author_name?: string|null, author_email?: string|null}  $attributes
@@ -33,7 +35,7 @@ class SubmitVendorReview
         ?User $author = null,
         ?User $addedBy = null,
     ): Review {
-        return DB::transaction(function () use ($vendor, $attributes, $photos, $author, $addedBy): Review {
+        $review = DB::transaction(function () use ($vendor, $attributes, $photos, $author, $addedBy): Review {
             $review = Review::create([
                 ...$attributes,
                 'vendor_id' => $vendor->id,
@@ -49,6 +51,13 @@ class SubmitVendorReview
 
             return $review;
         });
+
+        // A review the vendor typed in themselves never counts; anyone else's may move the tier, and only the tier.
+        if ($addedBy === null || $addedBy->id !== $vendor->user_id) {
+            $this->stats->refreshTier($vendor);
+        }
+
+        return $review;
     }
 
     /**

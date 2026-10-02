@@ -2,6 +2,7 @@
 
 use App\Actions\AwardVendorPoints;
 use App\Actions\RecalculateVendorStats;
+use App\Actions\SubmitVendorReview;
 use App\Enums\PointReason;
 use App\Enums\VendorTier;
 use App\Models\Booking;
@@ -106,17 +107,39 @@ it('awards and revokes the profile and catalogue milestones as the vendor change
     expect($bare->fresh()->points_total)->toBe(PointReason::CatalogueComplete->points());
 });
 
-it('promotes a vendor up the ladder as their record grows', function () {
-    expect($this->recalculate->handle($this->vendor)->tier)->toBe(VendorTier::Verified);
+it('promotes a vendor up the ladder as reviews on their profile grow', function () {
+    // Owner, 2 Oct 2026: couples book over WhatsApp, so the ladder climbs on a
+    // complete profile and reviews, not on bookings nobody records.
+    completeSetup($this->vendor);
+    expect($this->recalculate->handle($this->vendor->fresh())->tier)->toBe(VendorTier::Verified);
 
-    givePerformance($this->vendor, completed: 5, reviews: 3, rating: 4);
+    giveProfileReviews($this->vendor, count: 3, rating: 4);
     expect($this->recalculate->handle($this->vendor->fresh())->tier)->toBe(VendorTier::Trusted);
 
-    givePerformance($this->vendor, completed: 15, reviews: 8, rating: 5, responseRate: 92);
+    giveProfileReviews($this->vendor, count: 8, rating: 5);
     expect($this->recalculate->handle($this->vendor->fresh())->tier)->toBe(VendorTier::Top);
 
-    givePerformance($this->vendor, completed: 30, reviews: 15, rating: 5, responseRate: 98);
+    giveProfileReviews($this->vendor, count: 15, rating: 5);
     expect($this->recalculate->handle($this->vendor->fresh())->tier)->toBe(VendorTier::Recommended);
+});
+
+it('holds a vendor at Verified until their profile is complete, and never counts reviews they added themselves', function () {
+    giveProfileReviews($this->vendor, count: 15, rating: 5);
+    expect($this->recalculate->handle($this->vendor->fresh())->tier)->toBe(VendorTier::Verified);
+
+    completeSetup($this->vendor);
+    $this->vendor->reviews()->update(['added_by' => $this->vendor->user_id]);
+    expect($this->recalculate->handle($this->vendor->fresh())->tier)->toBe(VendorTier::Verified);
+});
+
+it('moves only the tier when someone reviews the profile', function () {
+    completeSetup($this->vendor);
+    giveProfileReviews($this->vendor, count: 2, rating: 5);
+    $this->recalculate->handle($this->vendor->fresh());
+
+    app(SubmitVendorReview::class)->handle($this->vendor->fresh(), ['rating' => 5, 'comment' => 'Terbaik', 'author_name' => 'Aina']);
+
+    expect($this->vendor->fresh()->tier)->toBe(VendorTier::Trusted);
 });
 
 it('keeps a locked tier out of the automatic engine', function () {
@@ -136,7 +159,8 @@ it('tracks the completion rate from settled bookings', function () {
 });
 
 it('shows the vendor their points, score and what the next tier needs', function () {
-    givePerformance($this->vendor, completed: 5, reviews: 3, rating: 4);
+    completeSetup($this->vendor);
+    giveProfileReviews($this->vendor, count: 3, rating: 4);
 
     $props = $this->actingAs($this->vendor->user)
         ->get(route('vendor.points.index'))
@@ -146,7 +170,7 @@ it('shows the vendor their points, score and what the next tier needs', function
     expect(collect($props['stats'])->pluck('label'))->toContain('Performance point', 'Vendor Score')
         ->and(collect($props['earnable'])->pluck('label'))->toContain('Booking melalui platform')
         ->and($props['progress']['next'])->toBe('Top')
-        ->and(collect($props['progress']['requirements'])->pluck('label'))->toContain('Booking selesai');
+        ->and(collect($props['progress']['requirements'])->pluck('label'))->toContain(__('pages.ranking.req_reviews'), __('pages.ranking.req_profile'));
 });
 
 /**
@@ -183,4 +207,23 @@ function giveAnsweredEnquiries(Vendor $vendor, int $percent, int $total = 20): v
 
     Enquiry::factory()->count($answered)->for($vendor)->create(['created_at' => now()->subDays(3), 'replied_at' => now()->subDays(2)]);
     Enquiry::factory()->count($total - $answered)->for($vendor)->create(['created_at' => now()->subDays(3), 'replied_at' => null]);
+}
+
+/** A profile and catalogue that pass Vendor::hasCompleteSetup(). */
+function completeSetup(Vendor $vendor): void
+{
+    $vendor->update(['tagline' => 'Candid', 'description' => 'Jurugambar majlis.', 'phone' => '+60123456789', 'price_from' => 1500]);
+    Package::factory()->for($vendor)->create(['is_active' => true]);
+    PortfolioItem::factory()->count(3)->for($vendor)->create();
+}
+
+/** Replace the vendor's reviews with open ones on their profile at a fixed rating. */
+function giveProfileReviews(Vendor $vendor, int $count, int $rating): void
+{
+    $vendor->reviews()->delete();
+
+    Review::factory()->open()->count($count)->create([
+        'vendor_id' => $vendor->id,
+        'rating' => $rating,
+    ]);
 }

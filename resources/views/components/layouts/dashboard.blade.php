@@ -1,4 +1,4 @@
-@props(['title', 'nav', 'context' => [], 'heading' => null, 'subheading' => null])
+@props(['title', 'nav', 'context' => [], 'heading' => null, 'subheading' => null, 'back' => null])
 
 @php
     app(App\Support\Seo::class)->noindex();
@@ -61,6 +61,19 @@
                     <svg class="size-2.5" viewBox="0 0 10 10" fill="currentColor"><path d="M5 0 6.2 3.8 10 5 6.2 6.2 5 10 3.8 6.2 0 5 3.8 3.8Z"/></svg>
                     <span class="h-px flex-1 bg-linear-to-l from-transparent to-gold-300"></span>
                 </div>
+
+                @if (! empty($context['countdown']))
+                    {{-- resources/js/components/customer/WeddingCountdown.vue; the day count is what shows before it mounts. --}}
+                    <div class="relative mx-4 mt-3" data-vue="wedding-countdown" data-props="@vueProps([...$context['countdown'], 'variant' => 'sidebar'])">
+                        <p class="rounded-2xl border border-gold-300/60 bg-surface-raised/80 px-3 py-2.5 text-center text-sm font-semibold text-brand-700">{{ $context['detail'] }}</p>
+                    </div>
+                @endif
+
+                @isset($sidebar)
+                    <div class="relative shrink-0">
+                        {{ $sidebar }}
+                    </div>
+                @endisset
 
                 <nav class="no-scrollbar relative flex-1 overflow-y-auto px-4 pt-4 pb-6">
                     @foreach ($nav as $group)
@@ -171,6 +184,13 @@
                 @if ($heading)
                     <div class="mb-8 flex flex-col gap-4 break-words sm:flex-row sm:items-end sm:justify-between">
                         <div class="min-w-0">
+                            {{-- A page one level down says where up is: ['url' => ..., 'label' => ...]. --}}
+                            @if ($back)
+                                <a href="{{ $back['url'] }}" class="mb-3 inline-flex items-center gap-1.5 rounded-full py-1 pr-2 text-sm font-medium text-ink-muted transition hover:text-ink">
+                                    <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6" /></svg>
+                                    {{ $back['label'] }}
+                                </a>
+                            @endif
                             <h1 class="font-display text-3xl font-semibold tracking-tight">{{ $heading }}</h1>
                             @if ($subheading)
                                 <p class="mt-1.5 text-sm text-ink-muted">{{ $subheading }}</p>

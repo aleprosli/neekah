@@ -15,14 +15,16 @@ const props = defineProps({
     csrf: { type: String, required: true },
     packages: { type: Array, required: true },
     commissionRate: { type: Number, required: true },
+    /** An accepted quotation this booking is recorded from: its total replaces the package price. */
+    quotation: { type: Object, default: null },
     errors: { type: Object, default: () => ({}) },
     old: { type: Object, default: () => ({}) },
 });
 
 const form = ref({
-    customer_email: props.old.customer_email ?? '',
-    package_id: props.old.package_id ?? props.packages[0]?.id ?? '',
-    event_date: props.old.event_date ?? '',
+    customer_email: props.old.customer_email ?? props.quotation?.customer_email ?? '',
+    package_id: props.old.package_id ?? props.quotation?.package_id ?? props.packages[0]?.id ?? '',
+    event_date: props.old.event_date ?? props.quotation?.event_date ?? '',
     notes: props.old.notes ?? '',
 });
 
@@ -34,7 +36,7 @@ const chosen = computed(() => props.packages.find((p) => String(p.id) === String
 const split = computed(() => {
     if (!chosen.value) return null;
 
-    const total = Number(chosen.value.price);
+    const total = props.quotation ? Number(props.quotation.total) : Number(chosen.value.price);
     const commission = total * props.commissionRate;
 
     return {
@@ -51,6 +53,8 @@ const split = computed(() => {
 
     <form v-else :action="action" method="POST" class="flex max-w-2xl flex-col gap-4 rounded-2xl border border-line bg-surface-raised p-6">
         <input type="hidden" name="_token" :value="csrf">
+        <input v-if="quotation" type="hidden" name="quotation_id" :value="quotation.id">
+        <p v-if="quotation" class="rounded-xl bg-emerald-50 p-3 text-sm text-emerald-900">{{ $t('vendor_booking_form.from_quotation', { number: quotation.number }) }}</p>
 
         <UiField
             v-model="form.customer_email"
@@ -71,7 +75,7 @@ const split = computed(() => {
         <UiTextarea v-model="form.notes" :label="$t('vendor_booking_form.nota_pilihan')" name="notes" :rows="3" :placeholder="$t('vendor_booking_form.lokasi_jumlah_tetamu_permintaan_khas')" :error="errors.notes" />
 
         <dl v-if="split" class="flex flex-col gap-2 rounded-xl bg-surface-muted p-4 text-sm">
-            <div class="flex justify-between"><dt class="text-ink-muted">{{ $t('vendor_booking_form.jumlah_pakej') }}</dt><dd class="font-medium">{{ split.total }}</dd></div>
+            <div class="flex justify-between"><dt class="text-ink-muted">{{ quotation ? $t('vendor_booking_form.jumlah_sebut_harga') : $t('vendor_booking_form.jumlah_pakej') }}</dt><dd class="font-medium">{{ split.total }}</dd></div>
             <!-- While Neekah is free the rate is 0, and a "Komisen 0%" line would only raise a question. -->
             <template v-if="commissionRate > 0">
                 <div class="flex justify-between"><dt class="text-ink-muted">Komisen platform ({{ Math.round(commissionRate * 100) }}%)</dt><dd>− {{ split.commission }}</dd></div>

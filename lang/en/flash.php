@@ -79,6 +79,8 @@ return [
     ],
 
     'couple' => [
+        'timeline_template_applied' => 'Template applied. Adjust the times and assign your vendors.',
+        'timeline_not_empty' => 'The timeline already has activities. Templates are for an empty timeline.',
         'camera_saved' => 'Album settings saved.',
         'camera_link_rotated' => 'A new link is ready. The old link and QR no longer work.',
         'camera_export_queued' => 'The ZIP is being prepared. We will email you when it is ready.',
@@ -96,6 +98,8 @@ return [
         'timeline_added' => 'The activity has been added to the timeline.',
         'timeline_updated' => 'The activity has been updated.',
         'timeline_deleted' => 'The activity has been deleted.',
+        'song_added' => 'Song added to the playlist.',
+        'song_deleted' => 'Song removed from the playlist.',
         'guest_added' => 'The guest has been added to the list.',
         'guest_updated' => 'The guest details have been updated.',
         'guest_deleted' => 'The guest has been removed from the list.',
@@ -131,6 +135,19 @@ return [
     ],
 
     'vendor' => [
+        'contract_saved' => 'Contract :number saved.',
+        'contract_deleted' => 'Draft :number deleted.',
+        'contract_sent' => 'Contract :number sent. Share its link with the client.',
+        'contract_emailed' => 'Contract :number sent and emailed to the client.',
+        'contract_duplicated' => ':number copied from :from. Check it and save.',
+        'contract_voided' => 'Contract :number withdrawn.',
+        'quotation_saved' => 'Quotation :number saved.',
+        'quotation_deleted' => 'Draft :number deleted.',
+        'quotation_sent' => 'Quotation :number sent. Share its link with the client.',
+        'quotation_emailed' => 'Quotation :number sent and emailed to the client.',
+        'quotation_duplicated' => ':number copied from :from. Check it and save.',
+        'invoice_issued' => 'Invoice :number issued. The client sees it at the same link.',
+        'invoice_status_saved' => 'Invoice status updated.',
         'online_needs_payment' => 'Connect Herepay or add your bank details first, so couples have a way to pay the deposit.',
         'online_on' => 'Online booking is on.',
         'online_off' => 'Online booking is off.',
@@ -196,4 +213,12 @@ return [
         'delete_review_label' => 'Delete this review you added',
     ],
 
+    'quotation' => [
+        'accepted' => 'Thank you. The vendor has been told and will contact you.',
+        'declined' => 'Your answer has been sent to the vendor.',
+    ],
+
+    'contract' => [
+        'signed' => 'Thank you. The contract is signed and the vendor has been told.',
+    ],
 ];

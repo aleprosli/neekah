@@ -1,15 +1,13 @@
 <x-layouts.app :title="__('pages.landing.semua_urusan_majlis_satu_platform')">
     <x-site.header />
 
-    {{-- The page wears the florals of the invitation cards themselves
-         (public/img/layers, drawn through <x-site.ornament>), so what a couple
-         sees here is the stationery they will be holding later. --}}
+    {{-- A light watercolor botanical keeps the page bridal without competing
+         with the real invitation designs shown in the hero. --}}
     <main class="bg-ivory">
         {{-- Hero --}}
         <section class="relative overflow-hidden">
-            <x-site.ornament name="corner-peony" class="absolute -top-16 -left-16 size-[22rem] opacity-60 sm:size-[30rem] lg:size-[36rem]" color="var(--color-brand-200)" color2="var(--color-brand-100)" />
-            <x-site.ornament name="corner-peony" class="absolute -right-20 -bottom-24 size-[22rem] rotate-180 opacity-50 sm:size-[30rem] lg:size-[36rem]" color="var(--color-gold-300)" color2="var(--color-brand-100)" />
-            <x-site.ornament name="particles" class="absolute inset-0 opacity-40" color="var(--color-gold-400)" />
+            <img src="{{ asset('img/decor/botanical-corner.svg') }}" alt="" class="absolute -bottom-24 -left-28 w-96 opacity-25 sm:w-[34rem] lg:w-[40rem]" decoding="async">
+            <img src="{{ asset('img/decor/botanical-corner.svg') }}" alt="" class="absolute -top-32 -right-36 w-96 scale-x-[-1] opacity-10 sm:w-[32rem]" decoding="async">
 
             <div class="relative mx-auto grid max-w-7xl items-center gap-14 px-4 pt-28 pb-16 sm:px-6 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] lg:px-8 lg:pt-36 lg:pb-24">
                 <div class="flex min-w-0 flex-col gap-6">
@@ -75,31 +73,40 @@
             </div>
         </section>
 
-        {{-- How it works: six steps on one gold thread --}}
-        <section id="cara" class="relative border-y border-gold-300/60 bg-surface-raised">
-            <div class="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
+        {{-- How it works: one phone playing each step on a made-up Neekah screen, each step's card sliding out of it in turn (FlowPhoneDemo.vue) --}}
+        @php
+            $flowSteps = collect($flow)->map(fn (array $step, int $index): array => $step + [
+                'number' => __('pages.landing.step', ['number' => $index + 1]),
+                'illustration' => Blade::render('<x-site.flow-illustration :name="$name" class="size-full" />', ['name' => $step['key']]),
+            ])->all();
+        @endphp
+        <section id="cara" class="relative overflow-hidden border-y border-gold-300/60 bg-ivory">
+            <div class="relative mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-20 lg:px-8">
                 <div class="flex flex-col items-center gap-3 text-center">
                     <h2 class="font-script text-3xl text-brand-600 sm:text-4xl">{{ __('pages.landing.cara_ia_berjalan') }}</h2>
                     <x-site.ornament name="divider-floral" class="h-6 w-44" color="var(--color-gold-500)" color2="var(--color-gold-300)" />
                 </div>
 
-                <ol class="relative mt-10 grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 lg:grid-cols-6">
-                    <span class="absolute top-2.5 right-[9%] left-[9%] hidden h-px bg-gold-300 lg:block" aria-hidden="true"></span>
-                    @foreach ($flow as $index => $step)
-                        <li class="relative flex min-w-0 flex-col gap-2 lg:items-center lg:text-center">
-                            <span class="flex size-5 items-center justify-center rounded-full border border-gold-500 bg-surface-raised" aria-hidden="true"><span class="size-2 rounded-full bg-gold-500"></span></span>
-                            <span class="font-script text-2xl leading-none text-brand-600">{{ str_pad((string) ($index + 1), 2, '0', STR_PAD_LEFT) }}</span>
-                            <span class="font-display text-lg font-semibold">{{ $step['label'] }}</span>
-                            <span class="text-sm text-ink-muted">{{ $step['description'] }}</span>
-                        </li>
-                    @endforeach
-                </ol>
+                <div class="mt-10 sm:mt-12" data-vue="flow-phone-demo" data-props="@vueProps(['steps' => $flowSteps, 'text' => __('pages.landing.flow_demo')])">
+                    <ol class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                        @foreach ($flowSteps as $step)
+                            <li class="flex min-w-0 items-center gap-3 rounded-2xl bg-white/60 p-3">
+                                <x-site.flow-illustration :name="$step['key']" class="size-12" />
+                                <span class="min-w-0 text-sm">
+                                    <span class="block text-[10px] font-semibold tracking-[0.2em] text-brand-600 uppercase">{{ $step['number'] }}</span>
+                                    <span class="block font-display text-base font-semibold">{{ $step['label'] }}</span>
+                                    <span class="text-ink-muted">{{ $step['description'] }}</span>
+                                </span>
+                            </li>
+                        @endforeach
+                    </ol>
+                </div>
             </div>
         </section>
 
         {{-- Features --}}
         <section id="ciri" class="relative overflow-hidden">
-            <x-site.ornament name="leaf-sprig" class="absolute top-10 -right-6 h-72 w-48 opacity-30 sm:h-96 sm:w-64" color="var(--color-brand-200)" />
+            <img src="{{ asset('img/decor/botanical-corner.svg') }}" alt="" class="absolute top-8 -right-28 w-80 scale-x-[-1] opacity-10 sm:w-[28rem]" loading="lazy" decoding="async">
 
             <div class="relative mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
                 <div class="max-w-2xl">
@@ -126,25 +133,33 @@
         {{-- Neekah Kenangan: shown once an admin opens it (LandingController). --}}
         @if ($kenangan)
             <section id="kenangan" class="relative overflow-hidden border-y border-gold-300/60 bg-surface-raised">
-                <x-site.ornament name="corner-peony" class="absolute -top-14 -right-14 size-64 opacity-40 sm:size-80" color="var(--color-brand-200)" color2="var(--color-gold-300)" />
-                <x-site.ornament name="corner-wildflower" class="absolute -bottom-14 -left-14 size-56 rotate-180 opacity-35 sm:size-72" color="var(--color-gold-300)" color2="var(--color-brand-100)" />
+                <img src="{{ asset('img/decor/botanical-corner.svg') }}" alt="" class="pointer-events-none absolute -top-24 -right-28 w-72 rotate-180 opacity-20 sm:w-96" loading="lazy" decoding="async">
+                <img src="{{ asset('img/decor/botanical-corner.svg') }}" alt="" class="pointer-events-none absolute -bottom-24 -left-28 w-72 opacity-20 sm:w-96" loading="lazy" decoding="async">
 
                 <div class="relative mx-auto grid max-w-7xl gap-12 px-4 py-20 sm:px-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:px-8">
                     <div class="flex min-w-0 flex-col gap-5">
                         <p class="text-sm font-semibold tracking-[0.2em] text-gold-600 uppercase">{{ __('pages.landing.kenangan.eyebrow') }}</p>
                         <h2 class="font-display text-3xl font-semibold tracking-tight text-balance sm:text-4xl">{{ __('pages.landing.kenangan.title') }}</h2>
                         <p class="text-lg text-ink-muted">{{ __('pages.landing.kenangan.body') }}</p>
-                        <ol class="mt-2 flex flex-col gap-3">
-                            @foreach (['scan', 'share', 'wish', 'keep'] as $step)
-                                <li class="flex min-w-0 items-start gap-3">
-                                    <span class="flex size-8 shrink-0 items-center justify-center rounded-full border border-gold-500 bg-ivory font-display text-sm font-semibold text-brand-700">{{ $loop->iteration }}</span>
-                                    <span class="min-w-0 pt-1 text-sm"><span class="font-semibold">{{ __('pages.landing.kenangan.steps.'.$step.'.title') }}</span> <span class="text-ink-muted">{{ __('pages.landing.kenangan.steps.'.$step.'.body', ['days' => $kenangan['retention']]) }}</span></span>
-                                </li>
-                            @endforeach
-                        </ol>
+                        <div class="mt-2" data-vue="kenangan-phone-demo" data-props="@vueProps(['steps' => $kenangan['steps']])">
+                            <ol class="flex flex-col">
+                                @foreach ($kenangan['steps'] as $step)
+                                    <li class="relative flex min-w-0 items-start gap-4 pb-6 last:pb-0">
+                                        @unless ($loop->last)
+                                            <span class="absolute top-16 bottom-0 left-8 border-l-2 border-dashed border-gold-300" aria-hidden="true"></span>
+                                        @endunless
+                                        <span class="relative">
+                                            <x-site.kenangan-step :name="$step['key']" class="size-16" />
+                                            <span class="absolute -top-1 -right-1 flex size-6 items-center justify-center rounded-full bg-brand-600 font-display text-xs font-semibold text-white ring-2 ring-surface-raised">{{ $loop->iteration }}</span>
+                                        </span>
+                                        <span class="min-w-0 pt-2 text-sm"><span class="block font-semibold">{{ $step['title'] }}</span> <span class="text-ink-muted">{{ $step['body'] }}</span></span>
+                                    </li>
+                                @endforeach
+                            </ol>
+                        </div>
                     </div>
 
-                    <div class="grid min-w-0 gap-5 sm:grid-cols-2">
+                    <div class="grid min-w-0 content-center gap-5 sm:grid-cols-2">
                         @foreach ($kenangan['tiers'] as $tier)
                             <article @class([
                                 'relative flex min-w-0 flex-col gap-4 overflow-hidden rounded-3xl border p-6',
@@ -171,7 +186,7 @@
 
         {{-- Marketplace preview --}}
         <section id="marketplace" class="relative overflow-hidden bg-ivory-deep">
-            <x-site.ornament name="garland" class="absolute -top-2 left-1/2 h-14 w-[36rem] max-w-full -translate-x-1/2 opacity-50" color="var(--color-gold-400)" color2="var(--color-brand-300)" />
+            <img src="{{ asset('img/decor/botanical-corner.svg') }}" alt="" class="absolute -top-28 left-1/2 w-80 -translate-x-1/2 rotate-45 opacity-[0.06]" loading="lazy" decoding="async">
 
             <div class="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
                 <div class="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
@@ -232,8 +247,8 @@
         <section class="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
             <div class="relative overflow-hidden rounded-3xl border border-gold-300 bg-surface-raised p-8 sm:p-12 lg:p-16">
                 <span class="pointer-events-none absolute inset-3 rounded-[1.25rem] border border-gold-300/70" aria-hidden="true"></span>
-                <x-site.ornament name="corner-rose" class="absolute -top-8 -left-8 size-40 opacity-50 sm:size-56" color="var(--color-brand-300)" color2="var(--color-brand-100)" />
-                <x-site.ornament name="corner-rose" class="absolute -right-8 -bottom-8 size-40 rotate-180 opacity-50 sm:size-56" color="var(--color-brand-300)" color2="var(--color-gold-300)" />
+                <img src="{{ asset('img/decor/botanical-corner.svg') }}" alt="" class="absolute -top-20 -left-24 w-72 opacity-15 sm:w-96" loading="lazy" decoding="async">
+                <img src="{{ asset('img/decor/botanical-corner.svg') }}" alt="" class="absolute -right-24 -bottom-20 w-72 rotate-180 opacity-15 sm:w-96" loading="lazy" decoding="async">
 
                 <div class="relative grid gap-10 lg:grid-cols-2">
                     <div class="flex flex-col gap-4">
@@ -255,14 +270,21 @@
                         </div>
                     </div>
 
-                    <ol class="relative flex flex-col gap-0 text-sm">
-                        <span class="absolute top-4 bottom-4 left-[0.9rem] w-px bg-gold-300" aria-hidden="true"></span>
+                    <ol class="grid content-center gap-3 text-sm sm:grid-cols-2">
                         @foreach (__('pages.landing.stages') as $index => $stage)
-                            <li class="relative flex items-center gap-4 py-3">
-                                <span class="relative z-10 flex size-7 shrink-0 items-center justify-center rounded-full border border-gold-500 bg-surface-raised font-display text-xs font-semibold text-brand-700">{{ $index + 1 }}</span>
-                                <span class="font-medium">{{ $stage }}</span>
+                            <li @class([
+                                'group relative flex min-h-24 items-center gap-4 overflow-hidden rounded-2xl border p-4 transition hover:-translate-y-0.5 hover:shadow-md',
+                                'border-line bg-surface-raised hover:border-gold-400' => ! $loop->last,
+                                'border-brand-800 bg-brand-900 text-white sm:col-span-2' => $loop->last,
+                            ])>
+                                <span @class([
+                                    'flex size-10 shrink-0 items-center justify-center rounded-full border font-display text-sm font-semibold',
+                                    'border-gold-400 bg-brand-50 text-brand-700' => ! $loop->last,
+                                    'border-gold-400/70 bg-brand-800 text-gold-300' => $loop->last,
+                                ])>{{ str_pad((string) ($index + 1), 2, '0', STR_PAD_LEFT) }}</span>
+                                <span class="font-display text-base font-semibold">{{ $stage }}</span>
                                 @if ($loop->last)
-                                    <x-site.ornament name="heart" class="ml-auto size-5" color="var(--color-brand-500)" />
+                                    <x-site.ornament name="heart" class="ml-auto size-6" color="var(--color-gold-300)" />
                                 @endif
                             </li>
                         @endforeach
@@ -273,8 +295,8 @@
 
         {{-- For vendors --}}
         <section id="vendor" class="relative overflow-hidden bg-brand-900 text-white">
-            <x-site.ornament name="corner-filigree" class="absolute -top-6 -left-6 size-48 opacity-40 sm:size-64" color="var(--color-gold-400)" color2="var(--color-gold-600)" />
-            <x-site.ornament name="corner-filigree" class="absolute -right-6 -bottom-6 size-48 rotate-180 opacity-40 sm:size-64" color="var(--color-gold-400)" color2="var(--color-gold-600)" />
+            <img src="{{ asset('img/decor/songket-cempaka-corner.webp') }}" alt="" class="absolute -top-8 -left-20 w-80 opacity-20 sm:w-[28rem]" loading="lazy" decoding="async">
+            <img src="{{ asset('img/decor/songket-cempaka-corner.webp') }}" alt="" class="absolute -right-20 -bottom-8 w-80 rotate-180 opacity-15 sm:w-[28rem]" loading="lazy" decoding="async">
 
             <div class="relative mx-auto grid max-w-7xl gap-12 px-4 py-20 sm:px-6 lg:grid-cols-2 lg:px-8">
                 <div class="flex flex-col gap-5">
@@ -282,11 +304,13 @@
                     <h2 class="font-display text-3xl font-semibold tracking-tight sm:text-4xl">{{ __('pages.landing.senarai_percuma_pengantin_hubungi_anda') }}</h2>
                     <p class="text-brand-100">{{ __('pages.landing.tiada_komisen_tiada_yuran_lengkapkan') }}</p>
 
-                    <ul class="mt-2 flex flex-wrap items-center gap-2 text-sm">
-                        @foreach (['New', 'Verified', 'Trusted', 'Top', 'Recommended'] as $tier)
-                            <li class="rounded-full border border-gold-400/50 bg-brand-800 px-3 py-1 font-medium">{{ $tier }}</li>
+                    <ul class="mt-2 flex items-center justify-between pb-2">
+                        @foreach (\App\Enums\VendorTier::cases() as $tier)
+                            <li>
+                                <x-vendor-rank-badge :tier="$tier" :label="$tier->label().' vendor rank'" class="size-12 sm:size-16" />
+                            </li>
                             @unless ($loop->last)
-                                <li class="text-gold-400" aria-hidden="true">→</li>
+                                <li class="text-xs text-gold-400 sm:text-sm" aria-hidden="true">→</li>
                             @endunless
                         @endforeach
                     </ul>
@@ -317,8 +341,8 @@
              stays earned. Shown once Pro (and boost) are on sale. --}}
         @if ($plans || $boost)
             <section id="pro" class="relative overflow-hidden bg-ivory-deep">
-                <x-site.ornament name="corner-rose" class="absolute -top-10 -left-10 size-48 opacity-40 sm:size-64" color="var(--color-brand-300)" color2="var(--color-brand-100)" />
-                <x-site.ornament name="corner-tropical" class="absolute -right-12 -bottom-12 size-56 rotate-180 opacity-30 sm:size-72" color="var(--color-gold-300)" color2="var(--color-brand-100)" />
+                <img src="{{ asset('img/decor/botanical-corner.svg') }}" alt="" class="pointer-events-none absolute -top-24 -left-28 w-72 scale-y-[-1] opacity-20 sm:w-96" loading="lazy" decoding="async">
+                <img src="{{ asset('img/decor/botanical-corner.svg') }}" alt="" class="pointer-events-none absolute -right-28 -bottom-24 w-72 scale-x-[-1] opacity-20 sm:w-96" loading="lazy" decoding="async">
 
                 <div class="relative mx-auto flex max-w-7xl flex-col gap-12 px-4 py-20 sm:px-6 lg:px-8">
                     <div class="max-w-2xl">
@@ -402,8 +426,8 @@
         {{-- CTA --}}
         <section id="cta" class="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
             <div class="relative overflow-hidden rounded-3xl border border-gold-300 bg-surface-raised px-6 py-16 text-center sm:px-12">
-                <x-site.ornament name="cluster-peony" class="absolute -bottom-16 -left-16 size-64 opacity-40 sm:size-80" color="var(--color-brand-200)" color2="var(--color-brand-100)" />
-                <x-site.ornament name="cluster-peony" class="absolute -top-16 -right-16 size-64 opacity-40 sm:size-80" color="var(--color-gold-300)" color2="var(--color-brand-100)" />
+                <img src="{{ asset('img/decor/botanical-corner.svg') }}" alt="" class="absolute -bottom-28 -left-24 w-80 opacity-15 sm:w-96" loading="lazy" decoding="async">
+                <img src="{{ asset('img/decor/botanical-corner.svg') }}" alt="" class="absolute -top-28 -right-24 w-80 scale-x-[-1] opacity-10 sm:w-96" loading="lazy" decoding="async">
 
                 <div class="relative">
                     <x-site.ornament name="divider-floral" class="mx-auto h-6 w-44" color="var(--color-gold-500)" color2="var(--color-gold-300)" />

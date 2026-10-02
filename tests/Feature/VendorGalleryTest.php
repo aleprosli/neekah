@@ -37,3 +37,15 @@ it('lets a screen reader hear the photo once, not twice', function () {
     expect(substr_count($tile, '<img'))->toBe(1)
         ->and($tile)->toContain(':alt="photo.caption || vendorName"');
 });
+
+it('centers the thumbnail list on the current lightbox image', function () {
+    $component = file_get_contents(resource_path('js/components/public/PortfolioGallery.vue'));
+
+    expect($component)
+        ->toContain('ref="thumbnailTrack"')
+        ->toContain('px-[calc(50%-1.75rem)]')
+        ->toContain('snap-center')
+        ->toContain('centerCurrentThumbnail')
+        ->toContain('track.scrollTo({ left: centeredLeft, behavior })')
+        ->toContain('watch(index, () => centerCurrentThumbnail())');
+});

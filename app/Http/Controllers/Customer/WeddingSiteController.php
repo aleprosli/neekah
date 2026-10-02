@@ -31,7 +31,7 @@ class WeddingSiteController extends Controller
      * The invitation editor. A wedding without a site yet gets a draft filled in
      * from the wedding project, so the couple starts with something to preview.
      *
-     * The designs themselves are not sent with the page: fifty of them carry about
+     * The designs themselves are not sent with the page: together they carry about
      * two thousand layers between them, and a couple who never opens the design tab
      * should not download the lot. The chosen design travels with the page so the
      * preview draws at once; the rest arrive from designs() when asked for.

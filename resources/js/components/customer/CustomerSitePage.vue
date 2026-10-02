@@ -6,7 +6,7 @@
  * the right is the same component a guest opens, drawn from what is in the form this
  * second. A couple should never have to save to find out what their card looks like.
  *
- * The fifty designs are not shipped with the page — between them they carry about
+ * The designs are not shipped with the page — between them they carry about
  * two thousand layers. The chosen one arrives with the page, and the rest are fetched
  * from site.designs when the design shelf is opened.
  *
@@ -128,6 +128,18 @@ const chooseDesign = async (slug) => {
 
 const designMeta = computed(() => props.designIndex.designs.find((item) => item.slug === form.value.template));
 
+const hasBundledMusic = computed(() => form.value.template === 'sutera-zaitun');
+const selectedMusic = computed(() => {
+    if (!form.value.music_enabled) return null;
+
+    const track = props.tracks.find((item) => item.id === Number(form.value.music_track_id));
+
+    if (track) return { url: track.url, title: track.label };
+    if (hasBundledMusic.value) return { url: '/sutera-zaitun-music.mp3', title: 'Wedding Harp — Francisco Alvear' };
+
+    return null;
+});
+
 const designsIn = (category) => props.designIndex.designs.filter((item) => item.category === category);
 
 /*
@@ -205,6 +217,7 @@ const previewProps = computed(() =>
         photos: props.gallery?.photos ?? [],
         wishes: props.wishes.filter((wish) => wish.public).map((wish) => ({ name: wish.name, message: wish.message })),
         giftQrUrl: qrPreview.value,
+        music: selectedMusic.value,
     }),
 );
 
@@ -692,7 +705,7 @@ const previewFile = (event, target) => {
                     <p class="text-sm text-ink-muted">{{ $t('card_editor.muzik_bermula_apabila_tetamu_membuka') }}</p>
                 </div>
 
-                <p v-if="!tracks.length" class="text-sm text-ink-muted">{{ $t('card_editor.belum_ada_trek') }}</p>
+                <p v-if="!tracks.length && !hasBundledMusic" class="text-sm text-ink-muted">{{ $t('card_editor.belum_ada_trek') }}</p>
 
                 <template v-else>
                     <label class="flex items-center gap-2 text-sm">
@@ -702,12 +715,12 @@ const previewFile = (event, target) => {
                     <label class="flex flex-col gap-1.5">
                         <span class="text-sm font-medium">{{ $t('card_editor.pilih_trek') }}</span>
                         <select v-model="form.music_track_id" name="music_track_id" class="nk-select rounded-xl border border-line bg-surface py-2.5 pr-10 pl-4 text-sm focus:border-brand-400 focus:outline-none">
-                            <option value="">{{ $t('card_editor.tiada_muzik') }}</option>
+                            <option value="">{{ hasBundledMusic ? 'Wedding Harp — Francisco Alvear' : $t('card_editor.tiada_muzik') }}</option>
                             <option v-for="track in tracks" :key="track.id" :value="track.id">{{ track.label }}{{ track.length ? ` · ${track.length}` : '' }}</option>
                         </select>
                     </label>
 
-                    <audio v-if="form.music_track_id" :src="tracks.find((track) => track.id === Number(form.music_track_id))?.url" controls preload="none" class="w-full max-w-sm" />
+                    <audio v-if="selectedMusic" :src="selectedMusic.url" controls preload="none" class="w-full max-w-sm" />
                 </template>
             </section>
 

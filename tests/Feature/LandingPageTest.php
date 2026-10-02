@@ -43,14 +43,36 @@ it('says booking and payment happen with the vendor directly, in the words a cou
         ->assertSee('bukan kepada kami');
 });
 
+it('walks through the six how-it-works steps in order', function () {
+    $this->get(route('landing'))
+        ->assertOk()
+        ->assertSeeInOrder([
+            __('pages.landing.step', ['number' => 1]), __('pages.landing.flow.plan'),
+            __('pages.landing.step', ['number' => 6]), __('pages.landing.flow.celebrate'),
+        ]);
+});
+
 it('draws its icons as line art rather than emoji', function () {
     $html = $this->get(route('landing'))->assertOk()->getContent();
 
     // An emoji is drawn by whichever operating system opens the page, at its own
     // weight, so a row of them never reads as one set.
     expect($html)->not->toContain('🔎')->not->toContain('📋')->not->toContain('🏆')->not->toContain('💍')
-        ->and($html)->toContain('img/layers/corner-peony.svg')
+        ->and($html)->toContain('img/decor/botanical-corner.svg')
+        ->and($html)->toContain('img/decor/songket-cempaka-corner.webp')
+        ->and($html)->not->toContain('img/layers/corner-peony.svg')
+        ->and($html)->not->toContain('img/layers/corner-filigree.svg')
         ->and($html)->not->toContain('data-icon-missing');
+});
+
+it('shows the real vendor rank badges from new through elite', function () {
+    $response = $this->get(route('landing'))->assertOk();
+
+    foreach (['new', 'verified', 'trusted', 'top', 'recommended'] as $rank) {
+        $response->assertSee('data-rank-badge="'.$rank.'"', false);
+    }
+
+    $response->assertDontSee('img/vendor-ranks/', false);
 });
 
 it('promises nothing the platform does not do while it takes no payment', function () {
@@ -120,6 +142,8 @@ it('explains Neekah Kenangan, Basic and Pro, boost and Pro Elite only once each 
     $this->get(route('landing'))
         ->assertOk()
         ->assertSee('id="kenangan"', false)
+        ->assertSee(__('pages.landing.kenangan.steps.scan.title'))
+        ->assertSee(__('pages.landing.kenangan.steps.keep.title'))
         ->assertSee('RM109')
         ->assertSee('RM59')
         ->assertSee('id="boost"', false)

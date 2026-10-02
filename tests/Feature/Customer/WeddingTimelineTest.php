@@ -86,3 +86,40 @@ it('lets the partner edit and delete slots but keeps strangers out', function ()
     $this->actingAs($hakim)->delete(route('weddings.timeline.destroy', [$this->wedding, $item]))->assertRedirect();
     expect(WeddingTimelineItem::count())->toBe(0);
 });
+
+it('starts an empty timeline from a ready-made running order, once', function () {
+    $this->actingAs($this->aina)
+        ->post(route('weddings.timeline.template', $this->wedding), ['template' => 'penuh'])
+        ->assertRedirect()
+        ->assertSessionHas('status', __('flash.couple.timeline_template_applied'));
+
+    expect($this->wedding->timelineItems()->count())->toBe(10)
+        ->and($this->wedding->timelineItems()->first()->title)->toBe(__('pages.timeline_templates.items.groom_arrives'));
+
+    // Applied again it would double every slot.
+    $this->actingAs($this->aina)
+        ->post(route('weddings.timeline.template', $this->wedding), ['template' => 'akad'])
+        ->assertSessionHasErrors(['template' => __('flash.couple.timeline_not_empty')]);
+
+    expect($this->wedding->timelineItems()->count())->toBe(10);
+});
+
+it('refuses an unknown template, and another couple\'s wedding', function () {
+    $this->actingAs($this->aina)
+        ->post(route('weddings.timeline.template', $this->wedding), ['template' => 'mewah'])
+        ->assertSessionHasErrors('template');
+
+    $stranger = User::factory()->create();
+    $this->actingAs($stranger)
+        ->post(route('weddings.timeline.template', $this->wedding), ['template' => 'akad'])
+        ->assertForbidden();
+
+    expect($this->wedding->timelineItems()->count())->toBe(0);
+});
+
+it('shows what a timeline is for, with the templates, while it is empty', function () {
+    $this->actingAs($this->aina)->get(route('timeline.index'))
+        ->assertOk()
+        ->assertSee(__('pages.timeline_templates.akad.title'))
+        ->assertSee(route('weddings.timeline.template', $this->wedding), false);
+});

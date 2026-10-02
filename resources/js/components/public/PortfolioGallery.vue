@@ -6,7 +6,7 @@
  * every photo the vendor published is reachable: through "Tunjuk semua", by
  * tapping any tile, and by swiping inside the lightbox.
  */
-import { computed, onBeforeUnmount, ref, watch } from 'vue';
+import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue';
 
 const props = defineProps({
     photos: { type: Array, required: true },
@@ -20,6 +20,7 @@ const SWIPE_THRESHOLD = 40;
 const open = ref(false);
 const index = ref(0);
 const touchStartX = ref(null);
+const thumbnailTrack = ref(null);
 
 const hero = computed(() => props.photos.slice(0, HERO_COUNT));
 const current = computed(() => props.photos[index.value] ?? null);
@@ -33,6 +34,24 @@ const show = (at) => {
 const close = () => (open.value = false);
 const next = () => (index.value = (index.value + 1) % props.photos.length);
 const previous = () => (index.value = (index.value - 1 + props.photos.length) % props.photos.length);
+
+const centerCurrentThumbnail = async (behavior = 'smooth') => {
+    await nextTick();
+
+    const track = thumbnailTrack.value;
+    const activeThumbnail = track?.querySelector(`[data-gallery-thumbnail="${index.value}"]`);
+
+    if (!track || !activeThumbnail) return;
+
+    const trackRect = track.getBoundingClientRect();
+    const thumbnailRect = activeThumbnail.getBoundingClientRect();
+    const centeredLeft = track.scrollLeft
+        + thumbnailRect.left
+        - trackRect.left
+        - ((track.clientWidth - thumbnailRect.width) / 2);
+
+    track.scrollTo({ left: centeredLeft, behavior });
+};
 
 const onKey = (event) => {
     if (event.key === 'Escape') close();
@@ -57,7 +76,11 @@ const onTouchEnd = (event) => {
 watch(open, (isOpen) => {
     document.body.style.overflow = isOpen ? 'hidden' : '';
     isOpen ? window.addEventListener('keydown', onKey) : window.removeEventListener('keydown', onKey);
+
+    if (isOpen) centerCurrentThumbnail('auto');
 });
+
+watch(index, () => centerCurrentThumbnail());
 
 onBeforeUnmount(() => {
     document.body.style.overflow = '';
@@ -151,16 +174,22 @@ onBeforeUnmount(() => {
                     <p v-if="current.caption" class="mb-3 text-center text-sm text-white/80">{{ current.caption }}</p>
                     <p class="mb-3 text-center text-xs text-white/50 sm:hidden">{{ $t('gallery.swipe_hint') }}</p>
 
-                    <div class="no-scrollbar flex gap-2 overflow-x-auto">
+                    <div
+                        ref="thumbnailTrack"
+                        data-gallery-thumbnail-track
+                        class="no-scrollbar flex snap-x gap-2 overflow-x-auto px-[calc(50%-1.75rem)] py-1"
+                    >
                         <button
                             v-for="(photo, at) in photos"
                             :key="photo.id"
+                            :data-gallery-thumbnail="at"
                             type="button"
                             :class="[
-                                'size-14 shrink-0 overflow-hidden rounded-lg transition',
+                                'size-14 shrink-0 snap-center overflow-hidden rounded-lg transition',
                                 at === index ? 'ring-2 ring-white' : 'opacity-50 hover:opacity-100',
                             ]"
                             :aria-label="`Gambar ${at + 1}`"
+                            :aria-current="at === index ? 'true' : undefined"
                             @click="index = at"
                         >
                             <img :src="photo.thumbnail" alt="" loading="lazy" class="size-full object-cover">

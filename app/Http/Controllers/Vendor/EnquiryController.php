@@ -78,6 +78,7 @@ class EnquiryController extends Controller
             'props' => VueProps::for([
                 'action' => route('vendor.enquiries.update', $enquiry),
                 'recordBookingUrl' => route('vendor.bookings.create'),
+                'quotationUrl' => route('vendor.quotations.create', ['enquiry' => $enquiry->id]),
                 'enquiry' => [
                     'message' => $enquiry->message,
                     'reply' => $enquiry->reply,

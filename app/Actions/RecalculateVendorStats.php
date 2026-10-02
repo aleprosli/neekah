@@ -50,8 +50,32 @@ class RecalculateVendorStats
     }
 
     /**
-     * The ranking ladder from the kertas kerja. Recommended additionally requires a
-     * clean violation record, so one serious breach drops a vendor out of it.
+     * Only the tier, for an open review coming or going: it counts towards
+     * the ladder but earns no points and moves no rating or score, so the
+     * rest of handle() has nothing to do.
+     */
+    public function refreshTier(Vendor $vendor): Vendor
+    {
+        if ($vendor->tier_locked) {
+            return $vendor;
+        }
+
+        $tier = $this->tierFor($vendor);
+
+        if ($tier !== $vendor->tier) {
+            $vendor->timestamps = false;
+            $vendor->tier = $tier;
+            $vendor->save();
+            $vendor->timestamps = true;
+        }
+
+        return $vendor;
+    }
+
+    /**
+     * The ranking ladder, written down in VendorTier::requirements(): a
+     * complete profile, reviews and their rating, and for the top rung a clean
+     * violation record, so one serious breach drops a vendor out of it.
      */
     public function tierFor(Vendor $vendor): VendorTier
     {
@@ -59,29 +83,20 @@ class RecalculateVendorStats
             return VendorTier::New;
         }
 
-        $rating = (float) $vendor->rating_avg;
-        $completed = $vendor->completed_bookings_count;
+        $reviews = $vendor->tierReviewStats();
+        $complete = $vendor->hasCompleteSetup();
         $recentViolations = $vendor->violations()->upheld()->where('resolved_at', '>=', now()->subMonths(6))->count();
 
-        $earned = match (true) {
-            $completed >= 30
-                && $rating >= 4.7
-                && $vendor->reviews_count >= 15
-                && ($vendor->response_rate ?? 0) >= 95
-                && $vendor->completion_rate >= 90
-                && $recentViolations === 0 => VendorTier::Recommended,
+        // The highest tier whose every requirement is met (VendorTier::requirements).
+        $earned = collect([VendorTier::Recommended, VendorTier::Top, VendorTier::Trusted])
+            ->first(function (VendorTier $tier) use ($reviews, $complete, $recentViolations): bool {
+                $needs = $tier->requirements();
 
-            $completed >= 15
-                && $rating >= 4.5
-                && $vendor->reviews_count >= 8
-                && ($vendor->response_rate ?? 0) >= 90 => VendorTier::Top,
-
-            $completed >= 5
-                && $rating >= 4.0
-                && $vendor->reviews_count >= 3 => VendorTier::Trusted,
-
-            default => VendorTier::Verified,
-        };
+                return (! $needs['complete_profile'] || $complete)
+                    && $reviews['count'] >= $needs['reviews']
+                    && $reviews['rating'] >= $needs['rating']
+                    && (! $needs['clean_record'] || $recentViolations === 0);
+            }) ?? VendorTier::Verified;
 
         return $this->capForViolations($earned, $recentViolations);
     }

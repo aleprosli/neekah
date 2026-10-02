@@ -3,6 +3,7 @@
 use App\Models\CameraAlbum;
 use App\Models\Category;
 use App\Models\Package;
+use App\Models\User;
 use App\Models\Vendor;
 use Database\Seeders\CategorySeeder;
 use Illuminate\Testing\TestResponse;
@@ -52,4 +53,17 @@ it('gives the Kamera Majlis guest page its own strings and nothing of the couple
 
     expect($dictionary['camera']['take_photo'] ?? null)->toBe(__('ui.camera.take_photo'))
         ->and($dictionary)->not->toHaveKey('guests');
+});
+
+it('gives the couple-to-vendor switch the sign-up form strings, and no other site page', function () {
+    $this->seed(CategorySeeder::class);
+    $couple = User::factory()->create();
+
+    // The page mounts VendorRegisterForm; without these the form printed raw keys
+    // such as "vendor_signup.business_name" (2 Oct 2026).
+    $dictionary = clientDictionary($this->actingAs($couple)->get(route('vendor.convert'))->assertOk());
+
+    expect($dictionary['vendor_signup']['business_name'] ?? null)->toBe(__('ui.vendor_signup.business_name'));
+
+    expect(clientDictionary($this->get(route('vendors.index'))))->not->toHaveKey('vendor_signup');
 });

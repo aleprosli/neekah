@@ -13,6 +13,8 @@ return [
     ],
 
     'vendor_feature' => [
+        'contracts' => 'Digital Contracts',
+        'quotations' => 'Quotations & Invoices',
         'boost' => 'Boost',
         'online_booking' => 'Online Booking',
         'packages' => 'Packages',
@@ -25,6 +27,8 @@ return [
     ],
 
     'vendor_feature_desc' => [
+        'contracts' => 'Prepare contracts and let clients sign them online.',
+        'quotations' => 'Send quotations as a link, let clients accept online, and issue invoices.',
         'boost' => 'Spend tokens to lift your profile to the top of your category.',
         'online_booking' => 'Couples book a date and pay the deposit right on the vendor page.',
         'packages' => 'Manage the packages and prices shown on the public page.',
@@ -193,7 +197,7 @@ return [
         'verified' => 'Verified',
         'trusted' => 'Trusted',
         'top' => 'Top',
-        'recommended' => 'Recommended',
+        'recommended' => 'Elite',
     ],
 
     'violation_action' => [
@@ -218,6 +222,16 @@ return [
         'other' => 'Other',
     ],
 
+    'song_moment' => [
+        'akad' => 'Akad Nikah',
+        'entrance' => 'Couple\'s Entrance',
+        'makan_beradab' => 'Makan Beradab',
+        'potong_kek' => 'Cake Cutting',
+        'first_walk' => 'First Walk',
+        'latar' => 'Background Music',
+        'ending' => 'Closing',
+    ],
+
     'wedding_role' => [
         'owner' => 'Wedding owner',
         'partner' => 'Partner',
@@ -240,8 +254,8 @@ return [
     'review_filter_desc' => [
         'reported' => 'The vendor disputes this review and has asked an admin to look. It stays visible until you act.',
         'hidden' => 'Already taken off the vendor’s profile. The record stays, including why and who took it off.',
-        'open' => 'Written straight onto the profile, with no booking behind it. It does not touch the vendor’s rating, points or ranking.',
-        'verified' => 'It comes from a booking completed on Neekah. Only these move the rating and the ranking.',
+        'open' => 'Written straight onto the profile, with no booking behind it. It counts towards the vendor’s ranking (unless the vendor added it), but not their rating or points.',
+        'verified' => 'It comes from a booking completed on Neekah. Only these move the rating and points; the ranking counts both kinds.',
     ],
 
     'announcement_audience_desc' => [
@@ -302,5 +316,30 @@ return [
     'camera_tier' => [
         'basic' => 'Basic',
         'pro' => 'Pro',
+    ],
+
+    'quotation_status' => [
+        'draft' => 'Draft',
+        'sent' => 'Sent',
+        'accepted' => 'Accepted',
+        'declined' => 'Declined',
+    ],
+
+    'quotation_item_kind' => [
+        'package' => 'Package',
+        'addon' => 'Add-on',
+    ],
+
+    'invoice_status' => [
+        'unpaid' => 'Unpaid',
+        'deposit_paid' => 'Deposit paid',
+        'paid' => 'Paid in full',
+    ],
+
+    'contract_status' => [
+        'draft' => 'Draft',
+        'sent' => 'Awaiting signature',
+        'signed' => 'Signed',
+        'void' => 'Withdrawn',
     ],
 ];

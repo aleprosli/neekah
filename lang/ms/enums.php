@@ -13,6 +13,8 @@ return [
     ],
 
     'vendor_feature' => [
+        'contracts' => 'Kontrak Digital',
+        'quotations' => 'Sebut Harga & Invois',
         'boost' => 'Boost',
         'online_booking' => 'Tempahan Online',
         'packages' => 'Pakej',
@@ -25,6 +27,8 @@ return [
     ],
 
     'vendor_feature_desc' => [
+        'contracts' => 'Sediakan kontrak dan biar klien tandatangan secara online.',
+        'quotations' => 'Hantar sebut harga melalui pautan, klien terima online, dan keluarkan invois.',
         'boost' => 'Guna token untuk naikkan profil ke atas kategori anda.',
         'online_booking' => 'Pengantin tempah tarikh dan bayar deposit terus di halaman vendor.',
         'packages' => 'Urus pakej dan harga yang dipaparkan di halaman awam.',
@@ -193,7 +197,7 @@ return [
         'verified' => 'Verified',
         'trusted' => 'Trusted',
         'top' => 'Top',
-        'recommended' => 'Recommended',
+        'recommended' => 'Elite',
     ],
 
     'violation_action' => [
@@ -218,6 +222,16 @@ return [
         'other' => 'Lain-lain',
     ],
 
+    'song_moment' => [
+        'akad' => 'Akad Nikah',
+        'entrance' => 'Entrance Pengantin',
+        'makan_beradab' => 'Makan Beradab',
+        'potong_kek' => 'Potong Kek',
+        'first_walk' => 'First Walk',
+        'latar' => 'Lagu Latar Majlis',
+        'ending' => 'Penutup Majlis',
+    ],
+
     'wedding_role' => [
         'owner' => 'Pemilik majlis',
         'partner' => 'Pasangan',
@@ -240,8 +254,8 @@ return [
     'review_filter_desc' => [
         'reported' => 'Vendor membantah review ini dan meminta admin melihatnya. Ia masih dipaparkan sehingga anda bertindak.',
         'hidden' => 'Sudah ditarik dari profil vendor. Rekodnya kekal, termasuk sebab dan siapa yang menariknya.',
-        'open' => 'Ditulis terus pada profil, tanpa tempahan. Tidak menyentuh rating, mata atau ranking vendor.',
-        'verified' => 'Datang daripada tempahan yang selesai di Neekah. Hanya yang ini menggerakkan rating dan ranking.',
+        'open' => 'Ditulis terus pada profil, tanpa tempahan. Dikira untuk ranking vendor (kecuali yang vendor tambah sendiri), tetapi tidak menyentuh rating atau mata.',
+        'verified' => 'Datang daripada tempahan yang selesai di Neekah. Hanya yang ini menggerakkan rating dan mata; ranking mengira kedua-duanya.',
     ],
 
     'announcement_audience_desc' => [
@@ -302,5 +316,30 @@ return [
     'camera_tier' => [
         'basic' => 'Basic',
         'pro' => 'Pro',
+    ],
+
+    'quotation_status' => [
+        'draft' => 'Draf',
+        'sent' => 'Dihantar',
+        'accepted' => 'Diterima',
+        'declined' => 'Ditolak',
+    ],
+
+    'quotation_item_kind' => [
+        'package' => 'Pakej',
+        'addon' => 'Add-on',
+    ],
+
+    'invoice_status' => [
+        'unpaid' => 'Belum dibayar',
+        'deposit_paid' => 'Deposit dibayar',
+        'paid' => 'Dibayar penuh',
+    ],
+
+    'contract_status' => [
+        'draft' => 'Draf',
+        'sent' => 'Menunggu tandatangan',
+        'signed' => 'Ditandatangan',
+        'void' => 'Dibatalkan',
     ],
 ];

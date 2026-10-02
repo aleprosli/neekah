@@ -167,3 +167,20 @@ it('reminds a vendor a week before Pro runs out, and not a day earlier', functio
     Notification::assertSentTo($this->owner, ProExpiring::class, fn (ProExpiring $notification): bool => $notification->days === 7);
     Notification::assertNotSentTo($later->user, ProExpiring::class);
 });
+
+it('tells what Pro gives as before and after, and what the yearly plan saves', function () {
+    $response = $this->actingAs($this->owner)->get(route('vendor.pro.index'))->assertOk();
+
+    preg_match('/data-vue="vendor-pro-showcase" data-props="([^"]*)"/', $response->getContent(), $matches);
+    $props = json_decode(html_entity_decode($matches[1], ENT_QUOTES), true, flags: JSON_THROW_ON_ERROR);
+
+    expect(array_column($props['benefits'], 'key'))->toBe(['enquiries', 'quotations', 'contracts', 'booking', 'boost', 'analytics', 'ranking', 'badge'])
+        ->and(array_column($props['benefits'], 'pain'))->each->not->toStartWith('pages.')
+        ->and($props['cta']['url'])->toBe('#harga');
+
+    // RM490 against 12 × RM49 = RM588.
+    $response->assertSee(__('pages.pro.save_percent', ['percent' => 17]));
+
+    $this->vendor->forceFill(['pro_until' => now()->addMonth()])->save();
+    $this->actingAs($this->owner->fresh())->get(route('vendor.pro.index'))->assertDontSee('#harga', false);
+});

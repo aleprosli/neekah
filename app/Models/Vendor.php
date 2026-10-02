@@ -209,6 +209,18 @@ class Vendor extends Model
         return $this->hasMany(Booking::class);
     }
 
+    /** Neekah Pro: what this vendor has quoted. */
+    public function quotations(): HasMany
+    {
+        return $this->hasMany(Quotation::class);
+    }
+
+    /** Neekah Pro: this vendor's contracts with clients. */
+    public function contracts(): HasMany
+    {
+        return $this->hasMany(Contract::class);
+    }
+
     public function reviews(): HasMany
     {
         return $this->hasMany(Review::class);
@@ -223,6 +235,36 @@ class Vendor extends Model
     public function rankingReviews(): HasMany
     {
         return $this->reviews()->verified()->published();
+    }
+
+    /**
+     * The reviews the tier climbs on: everything published on the profile
+     * except what the vendor entered themselves. Wider than rankingReviews(),
+     * which still alone feeds rating_avg, reviews_count, points and score.
+     */
+    public function tierReviews(): HasMany
+    {
+        return $this->reviews()->published()->where(fn ($query) => $query
+            ->whereNull('added_by')
+            ->orWhere('added_by', '!=', $this->user_id));
+    }
+
+    /**
+     * How many tier reviews there are and their average, in one query.
+     *
+     * @return array{count: int, rating: float}
+     */
+    public function tierReviewStats(): array
+    {
+        $row = $this->tierReviews()->toBase()->selectRaw('count(*) as total, avg(rating) as average')->first();
+
+        return ['count' => (int) ($row->total ?? 0), 'rating' => round((float) ($row->average ?? 0), 2)];
+    }
+
+    /** Profile and catalogue both complete: the first rung of the earned tiers. */
+    public function hasCompleteSetup(): bool
+    {
+        return $this->hasCompleteProfile() && $this->hasCompleteCatalogue();
     }
 
     public function violations(): HasMany

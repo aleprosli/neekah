@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Vendor;
 use App\Actions\CreateBooking;
 use App\Enums\BookingStatus;
 use App\Enums\PaymentStatus;
+use App\Enums\QuotationStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreVendorBookingRequest;
 use App\Models\Booking;
@@ -102,20 +103,37 @@ class BookingController extends Controller
         ]);
     }
 
+    /**
+     * A blank booking, or one from an accepted quotation: its client, date and
+     * first package are filled in, and its total and deposit carry over.
+     */
     public function create(Request $request): View
     {
+        $vendor = $request->user()->vendor;
+        $quotation = $request->filled('quotation')
+            ? $vendor->quotations()->where('status', QuotationStatus::Accepted)->whereNull('booking_id')->with('items')->firstWhere('token', $request->string('quotation')->toString())
+            : null;
+
         return view('vendor.bookings.create', [
             'props' => VueProps::for([
                 'action' => route('vendor.bookings.store'),
-                'cancelUrl' => route('vendor.bookings.index'),
+                'cancelUrl' => $quotation ? route('vendor.quotations.show', $quotation) : route('vendor.bookings.index'),
                 'createPackageUrl' => route('vendor.packages.create'),
-                'packages' => $request->user()->vendor->packages()->active()->get()
+                'packages' => $vendor->packages()->active()->get()
                     ->map(fn (Package $package): array => [
                         'id' => $package->id,
                         'name' => $package->name,
                         'price' => (float) $package->price,
                     ])->values(),
                 'commissionRate' => Booking::COMMISSION_RATE / 100,
+                'quotation' => $quotation ? [
+                    'id' => $quotation->id,
+                    'number' => $quotation->number,
+                    'total' => (float) $quotation->total,
+                    'customer_email' => $quotation->client_email,
+                    'package_id' => $quotation->items->firstWhere('package_id', '!=', null)?->package_id,
+                    'event_date' => $quotation->event_date?->toDateString(),
+                ] : null,
                 'old' => old(),
             ]),
         ]);
@@ -132,6 +150,7 @@ class BookingController extends Controller
             'event_date' => $request->date('event_date'),
             'wedding_id' => $customer->weddings()->latest('event_date')->value('weddings.id'),
             'notes' => $request->string('notes')->toString() ?: null,
+            'quotation' => $request->quotation(),
         ]);
 
         return redirect()

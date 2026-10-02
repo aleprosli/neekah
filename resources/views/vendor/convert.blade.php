@@ -1,4 +1,6 @@
-<x-layouts.app :title="__('pages.dash.tukar_ke_akaun_vendor')">
+{{-- A site page mounting the vendor sign-up form, so it asks for that form's
+     strings itself (Translations::forClient); the site shell leaves them out. --}}
+<x-layouts.app :title="__('pages.dash.tukar_ke_akaun_vendor')" :client-groups="['vendor_signup']">
     <x-site.header />
 
     <main class="mx-auto max-w-3xl px-4 pt-24 pb-24 sm:px-6 lg:pt-28">

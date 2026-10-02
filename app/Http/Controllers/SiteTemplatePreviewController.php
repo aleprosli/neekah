@@ -45,7 +45,7 @@ class SiteTemplatePreviewController extends Controller
             // Each tile is the real design, drawn by the card renderer at thumbnail
             // size, so the gallery can never show something a card would not.
             //
-            // Building fifty of these is the most expensive thing this page does
+            // Building all of these is the most expensive thing this page does
             // and the result is the same for every visitor, so it is cached. The
             // per-visitor half - the CSRF token and any validation errors - is
             // added by VueProps::for after the cache, never inside it.

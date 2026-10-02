@@ -38,6 +38,7 @@
         'rocket' => '<path d="M5 15c-1 1-1.5 3.5-1.5 5.5 2 0 4.5-.5 5.5-1.5"/><path d="M9 15 5.5 11.5 8 9h5l5-5c1.5 0 2 .5 2 2l-5 5v5l-2.5 2.5L9 15Z"/><circle cx="15" cy="9" r="1"/>',
         'lock' => '<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>',
         'tag' => '<path d="M11 3H4v7l10 10 7-7L11 3Z"/><path d="M7.5 7.5h.01"/>',
+        'document' => '<path d="M6 3h8l4 4v14H6V3Z"/><path d="M14 3v4h4M9 12h6M9 16h6"/>',
     ];
 @endphp
 
