@@ -6,6 +6,7 @@ use App\Support\BoostSettings;
 use App\Support\CameraSettings;
 use App\Support\ContactSettings;
 use App\Support\ProSettings;
+use App\Support\ProStory;
 use Database\Seeders\CategorySeeder;
 use Database\Seeders\SiteTemplateSeeder;
 
@@ -139,7 +140,7 @@ it('explains Neekah Kenangan, Basic and Pro, boost and Pro Elite only once each 
     app(ProSettings::class)->save(['enabled' => true, 'monthly_price' => 59]);
     app(BoostSettings::class)->save(['enabled' => true]);
 
-    $this->get(route('landing'))
+    $response = $this->get(route('landing'))
         ->assertOk()
         ->assertSee('id="kenangan"', false)
         ->assertSee(__('pages.landing.kenangan.steps.scan.title'))
@@ -147,9 +148,17 @@ it('explains Neekah Kenangan, Basic and Pro, boost and Pro Elite only once each 
         ->assertSee('RM109')
         ->assertSee('RM59')
         ->assertSee('id="boost"', false)
-        ->assertSee('id="elite"', false)
         ->assertSee(__('pages.landing.plans.deposit_note'))
         // Still a network: nothing promises payment through Neekah.
         ->assertDontSee('Tempah & bayar di Neekah')
         ->assertDontSee('Deposit dibayar');
+
+    // The same Pro story as /vendor/pro, Pro Elite inside it, told to a visitor.
+    preg_match('/data-vue="vendor-pro-showcase" data-props="([^"]*)"/', $response->getContent(), $matches);
+    $story = json_decode(html_entity_decode($matches[1], ENT_QUOTES), true, flags: JSON_THROW_ON_ERROR);
+
+    expect(array_column($story['benefits'], 'key'))->toBe(ProStory::BENEFITS)
+        ->and($story['headline'])->toBe(__('pages.pro.story.headline'))
+        ->and($story['elite']['status'])->toBe(__('pages.pro.elite.kept'))
+        ->and($story['cta']['url'])->toBe('#pelan');
 });

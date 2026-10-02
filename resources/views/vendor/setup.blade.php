@@ -337,7 +337,7 @@
 
             @foreach ([
                 ['title' => __('pages.vendor_setup.why_title'), 'intro' => __('pages.vendor_setup.why_intro'), 'items' => array_map(fn (string $reason): string => __("pages.vendor_setup.why_{$reason}"), ['seo', 'marketing', 'referral']), 'outro' => __('pages.vendor_setup.why_community'), 'mark' => '✦'],
-                ['title' => __('pages.vendor_setup.unlock_title'), 'intro' => __('pages.vendor_setup.unlock_intro'), 'items' => array_map(fn (string $feature): string => __("pages.vendor_setup.unlock_{$feature}"), ['page', 'reach', 'enquiries', 'reviews', 'ranking', 'pro']), 'outro' => __('pages.vendor_setup.unlock_note'), 'mark' => '🔒'],
+                ['title' => __('pages.vendor_setup.unlock_title'), 'intro' => __('pages.vendor_setup.unlock_intro'), 'items' => array_map(fn (string $feature): string => __("pages.vendor_setup.unlock_{$feature}"), ['page', 'enquiries', 'reviews', 'ranking', 'pro']), 'outro' => __('pages.vendor_setup.unlock_note'), 'mark' => '🔒'],
             ] as $fold)
                 <details class="group rounded-2xl border border-line bg-surface-raised">
                     <summary class="flex cursor-pointer list-none items-center justify-between gap-3 px-5 py-4 text-sm font-semibold [&::-webkit-details-marker]:hidden">

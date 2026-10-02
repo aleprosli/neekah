@@ -57,7 +57,6 @@ class DashboardController extends Controller
                     'score' => number_format((float) $vendor->score, 1),
                     'rating' => $vendor->reviews_count ? number_format((float) $vendor->rating_avg, 1) : null,
                     'reviews' => $vendor->reviews_count,
-                    'views30' => number_format((int) $vendor->views_30d),
                     'trending' => $vendor->trending_at !== null,
                     'boostedUntil' => $boostEnds ? Carbon::parse($boostEnds)->translatedFormat('j M, g:i A') : null,
                     'pointsUrl' => $isPro ? route('vendor.points.index') : null,

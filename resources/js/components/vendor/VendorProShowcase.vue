@@ -8,6 +8,10 @@
  * feature that replaces it, its icon drawing itself in as it scrolls into
  * view.
  *
+ * Pro Elite closes the after section: the same promise, for the vendors who
+ * climb to Top or Elite, so the page tells one story instead of tacking it on
+ * below the prices.
+ *
  * Every animation is motion-safe (keyframes in resources/css/app.css), and
  * the features are shown at once when IntersectionObserver is missing.
  */
@@ -20,28 +24,31 @@ defineProps({
     footnote: { type: String, required: true },
     afterHeading: { type: String, required: true },
     afterLead: { type: String, required: true },
+    /** { url, title, body, label }: the last tile of the grid; url and label are null for a Pro vendor. */
     cta: { type: Object, default: null },
     /** [{ key, title, body, pain }] in the order the notes are scattered. */
     benefits: { type: Array, required: true },
+    /** { kicker, title, body, earned, isElite, status, perks: [{ key, title, body }] }, null when Elite is off. */
+    elite: { type: Object, default: null },
 });
 
 /**
  * Where each note sits, as % of the stage, and its tilt. Desktop is a wide
  * stage (1000 × 460) with a row above and a row below; a phone gets a tall
- * one (400 × 760) that zigzags down.
+ * one (400 × 680) that zigzags down.
  */
 const stages = {
     wide: {
         width: 1000,
         height: 460,
-        spots: [[11, 27, -4], [37, 16, 2], [63, 22, -2], [88, 29, 3], [23, 79, 3], [49, 73, -3], [72, 84, 2], [89, 76, -3]],
-        links: [[0, 4, true], [1, 4, false], [1, 5, false], [2, 5, true], [2, 6, false], [3, 6, false], [3, 7, true]],
+        spots: [[11, 27, -4], [37, 16, 2], [63, 22, -2], [88, 29, 3], [24, 79, 3], [51, 73, -3], [77, 82, 2]],
+        links: [[0, 4, true], [1, 4, false], [1, 5, false], [2, 5, true], [2, 6, false], [3, 6, true]],
     },
     tall: {
         width: 400,
-        height: 760,
-        spots: [[30, 6, -4], [70, 17, 3], [30, 30, -2], [70, 42, 3], [30, 55, 2], [70, 67, -3], [30, 80, 2], [68, 93, -3]],
-        links: [[0, 1, false], [1, 2, true], [2, 3, false], [3, 4, false], [4, 5, true], [5, 6, false], [6, 7, false]],
+        height: 680,
+        spots: [[30, 7, -4], [70, 21, 3], [30, 35, -2], [70, 49, 3], [30, 63, 2], [70, 77, -3], [32, 92, 2]],
+        links: [[0, 1, false], [1, 2, true], [2, 3, false], [3, 4, false], [4, 5, true], [5, 6, false]],
     },
 };
 
@@ -71,9 +78,16 @@ const icons = {
     contracts: ['M4 20h4L20 8l-4-4L4 16v4Z', 'm14 6 4 4', 'M13 20h7'],
     booking: ['M4 6h16v14H4z', 'M4 10h16', 'M9 3v4', 'M15 3v4', 'm9 15 2 2 4-4'],
     boost: ['M5 15c-1 1-1.5 3.5-1.5 5.5 2 0 4.5-.5 5.5-1.5', 'M9 15 5.5 11.5 8 9h5l5-5c1.5 0 2 .5 2 2l-5 5v5l-2.5 2.5L9 15Z'],
-    analytics: ['M3 17l6-6 4 4 7-7', 'M14 8h6v6', 'M3 21h18'],
     ranking: ['M8 4h8v5a4 4 0 0 1-8 0V4Z', 'M8 5H5v2a3 3 0 0 0 3 3', 'M16 5h3v2a3 3 0 0 1-3 3', 'M12 13v4', 'M9 20h6'],
     badge: ['m3 8 4.5 4L12 5l4.5 7L21 8l-2 11H5L3 8Z'],
+};
+
+/** Pro Elite's perks, drawn the same way in gold. */
+const perkIcons = {
+    badge: ['M12 3 4 6v6c0 4.5 3.4 8 8 9 4.6-1 8-4.5 8-9V6l-8-3Z', 'm9 12 2 2 4-4'],
+    row: ['M4 5h16v5H4z', 'M4 14h7v5H4z', 'M13 14h7v5h-7z'],
+    order: ['M7 20V5', 'm3 9 4-4 4 4', 'M14 7h7', 'M14 12h5', 'M14 17h3'],
+    tokens: ['M12 3v2', 'M12 19v2', 'M5 12H3', 'M21 12h-2', 'm6.3 6.3-1.4-1.4', 'm19.1 19.1-1.4-1.4', 'm6.3 17.7-1.4 1.4', 'm19.1 4.9-1.4 1.4', 'M12 8l1.2 2.8L16 12l-2.8 1.2L12 16l-1.2-2.8L8 12l2.8-1.2Z'],
 };
 
 const shown = ref(false);
@@ -172,11 +186,84 @@ const tone = ['from-brand-50 to-gold-300/40', 'from-gold-300/30 to-brand-50', 'f
                     <h3 class="font-semibold">{{ benefit.title }}</h3>
                     <p class="text-sm leading-relaxed text-ink-muted">{{ benefit.body }}</p>
                 </li>
+                <li
+                    v-if="cta"
+                    data-pro-cta
+                    :class="['flex flex-col justify-between gap-4 rounded-3xl bg-linear-to-br from-brand-600 to-brand-800 p-5 text-white shadow-[0_18px_40px_-24px_rgb(0_0_0/0.45)] transition duration-700 ease-out', shown ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0']"
+                    :style="{ transitionDelay: shown ? `${benefits.length * 90}ms` : '0ms' }"
+                >
+                    <div>
+                        <p class="font-script text-2xl leading-none text-gold-300">Neekah Pro</p>
+                        <h3 class="mt-3 font-display text-2xl leading-tight font-semibold">{{ cta.title }}</h3>
+                        <p class="mt-2 text-sm text-white/80">{{ cta.body }}</p>
+                    </div>
+                    <a v-if="cta.url" :href="cta.url" class="w-fit rounded-full bg-gold-300 px-5 py-2.5 text-sm font-semibold text-ink transition hover:bg-gold-400">{{ cta.label }} →</a>
+                </li>
             </ul>
 
-            <div v-if="cta" class="flex justify-center">
-                <a :href="cta.url" class="rounded-full bg-brand-600 px-8 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-700">{{ cta.label }}</a>
+            <!-- Pro Elite: the top of the same promise -->
+            <div
+                v-if="elite"
+                id="elite"
+                data-pro-elite
+                :class="['relative mt-2 scroll-mt-24 overflow-hidden rounded-[2rem] bg-linear-to-br from-ink via-brand-900 to-ink p-6 text-surface ring-1 ring-gold-300/60 transition duration-700 ease-out sm:p-8 lg:p-10', shown ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0']"
+                :style="{ transitionDelay: shown ? `${(benefits.length + 1) * 90}ms` : '0ms' }"
+            >
+                <span class="pointer-events-none absolute -top-24 -right-16 size-72 rounded-full bg-gold-300/15 blur-3xl" aria-hidden="true"></span>
+                <span class="pointer-events-none absolute -bottom-24 -left-10 size-60 rounded-full bg-brand-500/20 blur-3xl" aria-hidden="true"></span>
+
+                <div class="relative grid gap-8 lg:grid-cols-12 lg:items-center">
+                    <div class="flex flex-col gap-4 lg:col-span-5">
+                        <div class="flex items-center gap-3">
+                            <span class="relative flex size-14 shrink-0 items-center justify-center rounded-2xl bg-linear-to-br from-gold-300 to-gold-500 text-ink shadow-lg shadow-gold-500/30 motion-safe:animate-[nk-bob_3s_ease-in-out_infinite]" aria-hidden="true">
+                                <svg class="size-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="m3 8 4.5 4L12 5l4.5 7L21 8l-2 11H5L3 8Z" />
+                                </svg>
+                                <span class="absolute -top-1.5 -right-1.5 text-sm text-gold-300 motion-safe:animate-pulse">✦</span>
+                            </span>
+                            <div class="min-w-0">
+                                <p class="font-script text-2xl leading-none text-gold-300">{{ elite.kicker }}</p>
+                                <p class="mt-1 text-[11px] font-semibold tracking-[0.3em] text-surface/60 uppercase">Pro Elite</p>
+                            </div>
+                        </div>
+
+                        <h3 class="font-display text-3xl leading-tight font-semibold sm:text-4xl">{{ elite.title }}</h3>
+                        <p class="text-sm leading-relaxed text-surface/75 sm:text-base">{{ elite.body }}</p>
+
+                        <div class="flex flex-wrap items-center gap-2">
+                            <span class="rounded-full bg-gold-300 px-3 py-1 text-xs font-bold text-ink">{{ elite.earned }}</span>
+                        </div>
+
+                        <p v-if="elite.status" data-elite-status class="rounded-2xl bg-white/5 px-4 py-3 text-xs leading-relaxed text-surface/80 ring-1 ring-white/10">{{ elite.status }}</p>
+                    </div>
+
+                    <ul class="grid gap-3 sm:grid-cols-2 lg:col-span-7">
+                        <li
+                            v-for="(perk, index) in elite.perks"
+                            :key="perk.key"
+                            class="group flex gap-3 rounded-2xl bg-white/5 p-4 ring-1 ring-white/10 transition hover:bg-white/10 hover:ring-gold-300/40"
+                        >
+                            <span class="flex size-10 shrink-0 items-center justify-center rounded-xl bg-gold-300/15 text-gold-300 motion-safe:group-hover:animate-[nk-bob_0.9s_ease-in-out]">
+                                <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                    <path
+                                        v-for="d in perkIcons[perk.key] ?? perkIcons.badge"
+                                        :key="d"
+                                        :d="d"
+                                        pathLength="100"
+                                        stroke-dasharray="100"
+                                        :style="{ strokeDashoffset: shown ? 0 : 100, transition: 'stroke-dashoffset 1.4s ease', transitionDelay: `${(benefits.length + index) * 90 + 250}ms` }"
+                                    />
+                                </svg>
+                            </span>
+                            <span class="min-w-0">
+                                <span class="block text-sm font-semibold text-gold-300">{{ perk.title }}</span>
+                                <span class="mt-1 block text-xs leading-relaxed text-surface/75">{{ perk.body }}</span>
+                            </span>
+                        </li>
+                    </ul>
+                </div>
             </div>
+
         </section>
     </div>
 </template>

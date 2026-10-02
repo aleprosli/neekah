@@ -57,19 +57,19 @@ it('counts a tap on the phone number', function () {
     expect(reach($this->vendor, 'phone_clicks'))->toBe(1);
 });
 
-it('shows a free vendor last weeks totals and keeps the chart for Pro', function () {
+it('shows no vendor their reach on the web, Pro or not', function () {
+    // Owner, 3 Oct 2026: while traffic is low, a row of view counts turns vendors away.
     VendorDailyStat::create(['vendor_id' => $this->vendor->id, 'date' => today()->subDays(2), 'profile_views' => 12]);
-    VendorDailyStat::create(['vendor_id' => $this->vendor->id, 'date' => today()->subDays(20), 'profile_views' => 30]);
 
     $this->actingAs($this->owner)->get(route('vendor.pro.index'))
         ->assertOk()
-        ->assertSee(__('pages.pro.analytics_teaser'))
-        ->assertDontSee(__('pages.pro.daily_views'))
-        ->assertViewHas('totals', fn (array $totals): bool => $totals['profile_views'] === 12);
+        ->assertViewMissing('totals')
+        ->assertViewMissing('daily');
 
     $this->vendor->update(['pro_until' => now()->addMonth()]);
 
     $this->actingAs($this->owner->fresh())->get(route('vendor.pro.index'))
-        ->assertSee(__('pages.pro.daily_views'))
-        ->assertViewHas('totals', fn (array $totals): bool => $totals['profile_views'] === 42);
+        ->assertOk()
+        ->assertViewMissing('totals')
+        ->assertViewMissing('daily');
 });
