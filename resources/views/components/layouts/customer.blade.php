@@ -20,8 +20,9 @@
         ]],
         ['label' => __('pages.sidebar_couple.tetamu'), 'items' => [
             $item(__('pages.sidebar_couple.senarai_tetamu'), 'users', 'guests.index', 'guests.*'),
-            $item(__('pages.sidebar_couple.kad_jemputan'), 'mail', 'site.edit', 'site.*'),
-            $item(__('pages.sidebar_couple.kamera'), 'camera', 'camera.index', 'camera.*'),
+            // The two Neekah products a couple shows off: marked so they are found.
+            [...$item(__('pages.sidebar_couple.kad_jemputan'), 'mail', 'site.edit', 'site.*'), 'tag' => __('pages.sidebar_couple.premium')],
+            [...$item(__('pages.sidebar_couple.kamera'), 'camera', 'camera.index', 'camera.*'), 'tag' => __('pages.sidebar_couple.premium')],
         ]],
         ['label' => __('pages.sidebar_couple.vendor'), 'items' => [
             ['label' => __('pages.sidebar_couple.cari_vendor'), 'icon' => 'search', 'href' => route('vendors.index'), 'active' => false, 'badge' => null],

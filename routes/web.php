@@ -317,6 +317,7 @@ $site = function (): void {
 
             Route::get('/timeline', [CustomerArea\WeddingTimelineController::class, 'index'])->middleware('wedding')->name('timeline.index');
             Route::post('/weddings/{wedding}/timeline', [CustomerArea\WeddingTimelineController::class, 'store'])->name('weddings.timeline.store');
+            Route::post('/weddings/{wedding}/timeline/templat', [CustomerArea\WeddingTimelineController::class, 'template'])->name('weddings.timeline.template');
             Route::put('/weddings/{wedding}/timeline/{item}', [CustomerArea\WeddingTimelineController::class, 'update'])->name('weddings.timeline.update');
             Route::delete('/weddings/{wedding}/timeline/{item}', [CustomerArea\WeddingTimelineController::class, 'destroy'])->name('weddings.timeline.destroy');
 

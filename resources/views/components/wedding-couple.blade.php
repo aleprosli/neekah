@@ -9,21 +9,22 @@
 @endphp
 
 <section {{ $attributes->class([
-    'overflow-hidden rounded-3xl border',
-    'border-emerald-200 bg-emerald-50/40' => $state === 'connected',
-    'border-gold-400/60 bg-gold-300/10' => $state === 'pending',
-    'border-dashed border-line bg-surface-raised' => $state === 'alone',
+    'relative overflow-hidden rounded-[1.75rem] shadow-sm shadow-brand-900/5 ring-1',
+    'bg-linear-to-br from-emerald-50 via-surface-raised to-gold-300/20 ring-emerald-200' => $state === 'connected',
+    'bg-linear-to-br from-gold-300/30 via-surface-raised to-brand-50 ring-gold-300/70' => $state !== 'connected',
 ]) }}>
-    <div class="flex flex-col gap-6 p-6 sm:p-7 lg:flex-row lg:items-center lg:gap-8">
+    <div class="pointer-events-none absolute -top-20 -right-16 size-56 rounded-full bg-gold-300/25 blur-3xl" aria-hidden="true"></div>
+    <div class="pointer-events-none absolute -bottom-24 -left-16 size-56 rounded-full bg-brand-200/30 blur-3xl" aria-hidden="true"></div>
+    <div class="relative flex flex-col gap-6 p-6 text-center sm:p-8 lg:flex-row lg:items-center lg:gap-8 lg:text-left">
         {{-- Rings --}}
         <div class="flex shrink-0 items-center justify-center gap-0 lg:w-44" aria-hidden="true">
             @if ($state === 'connected')
-                <span class="flex size-16 items-center justify-center rounded-full border-4 border-brand-500 bg-surface font-display text-lg font-semibold text-brand-700">{{ mb_substr($owner->name, 0, 1) }}</span>
-                <span class="-ml-5 flex size-16 items-center justify-center rounded-full border-4 border-gold-500 bg-surface font-display text-lg font-semibold text-brand-900">{{ mb_substr($partner->name, 0, 1) }}</span>
+                <span class="flex size-18 items-center justify-center rounded-full border-4 border-brand-500 bg-surface font-display text-xl font-semibold text-brand-700 shadow-sm">{{ mb_substr($owner->name, 0, 1) }}</span>
+                <span class="-ml-5 flex size-18 items-center justify-center rounded-full border-4 border-gold-500 bg-surface font-display text-xl font-semibold text-brand-900 shadow-sm">{{ mb_substr($partner->name, 0, 1) }}</span>
             @else
-                <span class="flex size-16 items-center justify-center rounded-full border-4 border-brand-500 bg-surface font-display text-lg font-semibold text-brand-700">{{ mb_substr($owner->name, 0, 1) }}</span>
+                <span class="flex size-18 items-center justify-center rounded-full border-4 border-brand-500 bg-surface font-display text-xl font-semibold text-brand-700 shadow-sm">{{ mb_substr($owner->name, 0, 1) }}</span>
                 <span @class([
-                    '-ml-5 flex size-16 items-center justify-center rounded-full border-4 border-dashed bg-surface',
+                    '-ml-5 flex size-18 items-center justify-center rounded-full border-4 border-dashed bg-surface',
                     'border-gold-500 text-gold-600' => $state === 'pending',
                     'border-line text-ink-muted' => $state === 'alone',
                 ])>
@@ -39,19 +40,19 @@
         {{-- Copy --}}
         <div class="min-w-0 flex-1">
             @if ($state === 'connected')
-                <p class="flex items-center gap-2 text-xs font-semibold tracking-wide text-emerald-700 uppercase">
+                <p class="flex items-center justify-center gap-2 text-xs font-semibold tracking-wide lg:justify-start text-emerald-700 uppercase">
                     <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>{{ __('pages.couple.terhubung') }}</p>
-                <h2 class="mt-1 font-display text-xl font-semibold">{{ $owner->name }} &amp; {{ $partner->name }}</h2>
+                <h2 class="mt-1 font-display text-2xl font-semibold">{{ $owner->name }} &amp; {{ $partner->name }}</h2>
                 <p class="mt-1 text-sm text-ink-muted">{{ __('pages.couple.anda_berdua_menguruskan_majlis_ini') }}</p>
             @elseif ($state === 'pending')
-                <p class="flex items-center gap-2 text-xs font-semibold tracking-wide text-gold-600 uppercase">
+                <p class="flex items-center justify-center gap-2 text-xs font-semibold tracking-wide lg:justify-start text-gold-600 uppercase">
                     <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 7v5l3 2"/><circle cx="12" cy="12" r="9"/></svg>{{ __('pages.couple.menunggu_jawapan') }}</p>
-                <h2 class="mt-1 font-display text-xl font-semibold">{{ __('pages.couple.jemputan_dihantar') }}</h2>
+                <h2 class="mt-1 font-display text-2xl font-semibold">{{ __('pages.couple.jemputan_dihantar') }}</h2>
                 <p class="mt-1 text-sm break-words text-ink-muted">{{ $pendingInvite->email }} belum menerima jemputan. Pautan ini sah sehingga {{ $pendingInvite->expires_at->translatedFormat('j F Y') }}.</p>
             @else
-                <p class="flex items-center gap-2 text-xs font-semibold tracking-wide text-ink-muted uppercase">
+                <p class="flex items-center justify-center gap-2 text-xs font-semibold tracking-wide lg:justify-start text-ink-muted uppercase">
                     <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 15 6-6M6.5 10.5 5 12a4 4 0 0 0 5.7 5.7l1.3-1.5M17.5 13.5 19 12a4 4 0 0 0-5.7-5.7L12 7.8"/></svg>{{ __('pages.couple.belum_terhubung') }}</p>
-                <h2 class="mt-1 font-display text-xl font-semibold">{{ __('pages.couple.uruskan_majlis_berdua') }}</h2>
+                <h2 class="mt-1 font-display text-2xl font-semibold">{{ __('pages.couple.uruskan_majlis_berdua') }}</h2>
                 <p class="mt-1 text-sm text-ink-muted">{{ __('pages.couple.jemput_bakal_pasangan_anda_supaya') }}</p>
             @endif
         </div>
@@ -89,7 +90,7 @@
                 <form method="POST" action="{{ route('weddings.invitations.store', $wedding) }}" class="flex flex-col gap-2">
                     @csrf
                     <label class="sr-only" for="partner-email">{{ __('pages.couple.emel_pasangan') }}</label>
-                    <input id="partner-email" type="email" name="email" value="{{ old('email') }}" placeholder="{{ __('pages.couple.emel_pasangan_anda') }}" required class="rounded-xl border border-line bg-surface px-4 py-2.5 text-sm focus:border-brand-400 focus:outline-none">
+                    <input id="partner-email" type="email" name="email" value="{{ old('email') }}" placeholder="{{ __('pages.couple.emel_pasangan_anda') }}" required class="rounded-full border border-line bg-surface px-5 py-2.5 text-sm focus:border-brand-400 focus:outline-none">
                     <button type="submit" class="rounded-full bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700">{{ __('pages.couple.jemput_pasangan') }}</button>
                 </form>
             @else

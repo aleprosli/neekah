@@ -3,23 +3,39 @@
 namespace App\Http\Controllers\Customer;
 
 use App\Enums\BookingStatus;
-use App\Enums\PaymentStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
-use App\Models\Category;
+use App\Models\Wedding;
+use App\Support\CoupleNextSteps;
 use App\Support\VueProps;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 
 class DashboardController extends Controller
 {
     /**
-     * Wedding command center: budget, booked categories, upcoming payments.
+     * The couple's home, kept to what moves them forward: the countdown, the
+     * next step or two, four shortcuts and the vendors they have booked. The
+     * stat cards and the category checklist it used to carry made the page a
+     * wall of numbers, and couples stopped coming back to it.
      */
     public function __invoke(Request $request): View
     {
         $user = $request->user();
-        $wedding = $user->weddings()->with(['members', 'invitations' => fn ($query) => $query->pending()])->latest('event_date')->first();
+        $wedding = $user->weddings()->with(['members', 'site', 'invitations' => fn ($query) => $query->pending()])->latest('event_date')->first();
+
+        if ($wedding === null) {
+            return view('customer.dashboard', [
+                'wedding' => null,
+                'props' => VueProps::for([
+                    'hasWedding' => false,
+                    'createUrl' => route('weddings.create'),
+                    // Someone who signed up as a couple but runs a business.
+                    'convertUrl' => $user->canBecomeVendor() ? route('vendor.convert') : null,
+                ]),
+            ]);
+        }
 
         $bookings = Booking::query()
             ->forCustomer($user)
@@ -28,32 +44,17 @@ class DashboardController extends Controller
             ->orderBy('event_date')
             ->get();
 
-        $categories = Category::active()->ordered()->get();
-        $bookedCategoryIds = $bookings->pluck('vendor.category_id')->unique();
-
-        $committed = (float) $bookings->sum('total_amount');
-        $budget = (float) ($wedding?->budget ?? 0);
-        $paid = (float) $bookings->sum(fn (Booking $booking): float => $booking->paidAmount());
-        $awaitingVerification = $bookings->flatMap->payments->where('status', PaymentStatus::AwaitingVerification)->count();
+        $steps = new CoupleNextSteps($wedding);
 
         return view('customer.dashboard', [
             'wedding' => $wedding,
             'props' => VueProps::for([
-                'hasWedding' => $wedding !== null,
+                'hasWedding' => true,
                 'createUrl' => route('weddings.create'),
-                'findVendorsUrl' => route('vendors.index'),
-                'stats' => $wedding === null ? [] : [
-                    ['label' => __('props.couple.bajet'), 'value' => 'RM'.number_format($budget), 'hint' => __('props.couple.baki_rm').number_format($budget - $committed)],
-                    ['label' => __('props.couple.ditempah'), 'value' => 'RM'.number_format($committed), 'hint' => __('props.couple.dibayar_rm').number_format($paid)],
-                    ['label' => __('props.couple.vendor'), 'value' => $bookedCategoryIds->count().' / '.$categories->count(), 'hint' => ($categories->count() ? round($bookedCategoryIds->count() / $categories->count() * 100) : 0).'% kategori ditempah'],
-                    ['label' => __('props.couple.menunggu_pengesahan'), 'value' => $awaitingVerification, 'hint' => __('props.couple.bayaran_direkod_belum_disahkan_vendor'), 'href' => route('bookings.index')],
-                ],
-                'budget' => $wedding === null ? null : [
-                    'caption' => 'RM'.number_format($committed).' / RM'.number_format($budget),
-                    'percent' => $budget > 0 ? min(100, round($committed / $budget * 100)) : 0,
-                    'over' => $committed > $budget,
-                    'overBy' => 'RM'.number_format(max(0, $committed - $budget)),
-                ],
+                'steps' => $steps->open(),
+                'stepsDone' => $steps->completed(),
+                'stepsTotal' => count($steps->all()),
+                'shortcuts' => $this->shortcuts($wedding, $bookings),
                 'bookings' => $bookings->map(fn (Booking $booking): array => [
                     'reference' => $booking->reference,
                     'url' => route('bookings.show', $booking),
@@ -68,16 +69,63 @@ class DashboardController extends Controller
                         'illustration' => $booking->vendor->category->illustrationUrl(),
                     ],
                 ])->values(),
-                'categories' => $categories->map(fn (Category $category): array => [
-                    'name' => $category->name,
-                    'icon' => $category->icon,
-                    'illustration' => $category->illustrationUrl(),
-                    'booked' => $bookedCategoryIds->contains($category->id),
-                    'url' => $bookedCategoryIds->contains($category->id)
-                        ? route('bookings.index')
-                        : route('vendors.index', ['category' => $category->slug]),
-                ])->values(),
+                'findVendorsUrl' => route('vendors.index'),
+                'convertUrl' => $user->canBecomeVendor() ? route('vendor.convert') : null,
             ]),
         ]);
+    }
+
+    /**
+     * The four places a couple goes most, each saying where it stands.
+     *
+     * @param  Collection<int, Booking>  $bookings
+     * @return list<array{key: string, title: string, value: string, hint: string, url: string, icon: string}>
+     */
+    private function shortcuts(Wedding $wedding, Collection $bookings): array
+    {
+        $site = $wedding->site;
+        $guests = $wedding->guests()->toBase()->selectRaw('count(*) as total, coalesce(sum(pax_invited), 0) as pax')->first();
+        $tasks = $wedding->tasks()->toBase()->selectRaw('count(*) as total, count(completed_at) as done')->first();
+        $budget = (float) $wedding->budget;
+        $committed = (float) $bookings->sum('total_amount');
+
+        return [
+            [
+                'key' => 'card',
+                'title' => __('pages.shortcuts.card'),
+                'value' => match (true) {
+                    $site === null => __('pages.shortcuts.card_none'),
+                    $site->is_published => __('pages.shortcuts.card_published'),
+                    default => __('pages.shortcuts.card_draft'),
+                },
+                'hint' => $site?->is_published ? trans_choice('pages.shortcuts.card_views', (int) $site->views, ['count' => number_format((int) $site->views)]) : __('pages.shortcuts.card_hint'),
+                'url' => route('site.edit'),
+                'icon' => 'mail',
+            ],
+            [
+                'key' => 'guests',
+                'title' => __('pages.shortcuts.guests'),
+                'value' => number_format((int) $guests->total),
+                'hint' => (int) $guests->total > 0 ? __('pages.shortcuts.guests_pax', ['count' => number_format((int) $guests->pax)]) : __('pages.shortcuts.guests_hint'),
+                'url' => route('guests.index'),
+                'icon' => 'users',
+            ],
+            [
+                'key' => 'checklist',
+                'title' => __('pages.shortcuts.checklist'),
+                'value' => ((int) $tasks->done).' / '.((int) $tasks->total),
+                'hint' => __('pages.shortcuts.checklist_hint', ['percent' => $wedding->planningProgress()]),
+                'url' => route('checklist.index'),
+                'icon' => 'check',
+            ],
+            [
+                'key' => 'budget',
+                'title' => __('pages.shortcuts.budget'),
+                'value' => $budget > 0 ? 'RM'.number_format($budget - $committed) : __('pages.shortcuts.budget_none'),
+                'hint' => $budget > 0 ? __('pages.shortcuts.budget_hint', ['budget' => 'RM'.number_format($budget)]) : __('pages.shortcuts.budget_set'),
+                'url' => route('budget.index'),
+                'icon' => 'wallet',
+            ],
+        ];
     }
 }

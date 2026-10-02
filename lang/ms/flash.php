@@ -79,6 +79,8 @@ return [
     ],
 
     'couple' => [
+        'timeline_template_applied' => 'Templat digunakan. Ubah masa dan tugaskan vendor anda.',
+        'timeline_not_empty' => 'Timeline sudah ada aktiviti. Templat hanya untuk timeline yang kosong.',
         'camera_saved' => 'Tetapan album disimpan.',
         'camera_link_rotated' => 'Pautan baharu sedia. Pautan dan QR lama tidak lagi berfungsi.',
         'camera_export_queued' => 'ZIP sedang disediakan. Kami akan emel anda bila siap.',

@@ -8,12 +8,14 @@ use App\Http\Requests\StoreTimelineItemRequest;
 use App\Models\Vendor;
 use App\Models\Wedding;
 use App\Models\WeddingTimelineItem;
+use App\Support\TimelineTemplates;
 use App\Support\VueProps;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Validation\Rule;
 
 class WeddingTimelineController extends Controller
 {
@@ -26,6 +28,14 @@ class WeddingTimelineController extends Controller
             'wedding' => $wedding,
             'props' => VueProps::for([
                 'storeUrl' => route('weddings.timeline.store', $wedding),
+                'templateUrl' => route('weddings.timeline.template', $wedding),
+                'templates' => collect(TimelineTemplates::keys())->map(fn (string $key): array => [
+                    'key' => $key,
+                    'title' => __('pages.timeline_templates.'.$key.'.title'),
+                    'body' => __('pages.timeline_templates.'.$key.'.body'),
+                    'count' => count(TimelineTemplates::items($key)),
+                ])->values(),
+                'eventDate' => $wedding->event_date->translatedFormat('l, j F Y'),
                 'items' => $wedding->timelineItems()->with('vendor.category')->get()
                     ->map(fn (WeddingTimelineItem $item): array => [
                         'id' => $item->id,
@@ -57,6 +67,25 @@ class WeddingTimelineController extends Controller
         $wedding->timelineItems()->create($request->validated());
 
         return back()->with('status', __('flash.couple.timeline_added'));
+    }
+
+    /**
+     * Start an empty timeline from a ready-made running order. Only while it
+     * is empty: applied twice it would only double every slot.
+     */
+    public function template(Request $request, Wedding $wedding): RedirectResponse
+    {
+        Gate::authorize('update', $wedding);
+
+        $validated = $request->validate(['template' => ['required', Rule::in(TimelineTemplates::keys())]]);
+
+        if ($wedding->timelineItems()->exists()) {
+            return back()->withErrors(['template' => __('flash.couple.timeline_not_empty')]);
+        }
+
+        $wedding->timelineItems()->createMany(TimelineTemplates::items($validated['template']));
+
+        return back()->with('status', __('flash.couple.timeline_template_applied'));
     }
 
     public function update(StoreTimelineItemRequest $request, Wedding $wedding, WeddingTimelineItem $item): RedirectResponse
