@@ -1089,3 +1089,47 @@ html {
     }
 }
 
+
+/*
+ * The Neekah Pro page (VendorProShowcase.vue): the scattered notes drift,
+ * the tangle of dashed lines marches, and each feature's icon draws itself
+ * in as it scrolls into view. Every use sits behind motion-safe:, so none of
+ * it moves for someone who asked their system for less motion.
+ */
+@keyframes nk-drift {
+    0%,
+    100% {
+        transform: translate(-50%, -50%) rotate(var(--tilt, 0deg));
+    }
+    50% {
+        transform: translate(-50%, calc(-50% - 7px)) rotate(calc(var(--tilt, 0deg) * -0.4));
+    }
+}
+
+@keyframes nk-march {
+    to {
+        stroke-dashoffset: -28;
+    }
+}
+
+@keyframes nk-bob {
+    0%,
+    100% {
+        transform: translateY(0) rotate(0deg);
+    }
+    40% {
+        transform: translateY(-4px) rotate(-6deg);
+    }
+    70% {
+        transform: translateY(1px) rotate(4deg);
+    }
+}
+
+@keyframes nk-draw {
+    from {
+        stroke-dashoffset: 100;
+    }
+    to {
+        stroke-dashoffset: 0;
+    }
+}

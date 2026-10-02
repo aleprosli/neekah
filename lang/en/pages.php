@@ -822,6 +822,28 @@ return [
     ],
 
     'pro' => [
+        'story' => [
+            'eyebrow' => 'Neekah Pro',
+            'headline' => 'A wedding business should not be this messy',
+            'lead' => 'Enquiries in WhatsApp, quotations in PDFs, dates in a diary, contracts in a folder. It is all there, just everywhere.',
+            'footnote' => 'Time that should go into your clients\' weddings goes into keeping track.',
+            'after_heading' => 'With Neekah Pro, it is all in one place.',
+            'after_lead' => 'Each one replaces a job you do by hand today.',
+            'cta' => 'See Pro pricing',
+        ],
+        'pains' => [
+            'enquiries' => 'Lost enquiries',
+            'quotations' => 'PDF quotations',
+            'contracts' => 'Printed contracts',
+            'booking' => 'Paper diary',
+            'boost' => 'Buried profile',
+            'analytics' => 'Who saw my profile?',
+            'ranking' => 'What do I fix?',
+            'badge' => 'Looks like the rest',
+        ],
+        'price_lead' => 'One FPX payment, no automatic debit. Pay again when it runs out.',
+        'save_percent' => 'Save :percent%',
+        'per_month' => 'Works out to :price a month',
         'elite' => [
             'title' => 'Become Pro Elite',
             'you_are' => 'You are Pro Elite',

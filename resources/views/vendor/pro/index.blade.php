@@ -1,5 +1,5 @@
 <x-layouts.vendor :title="__('pages.pro.title')" :heading="__('pages.pro.heading')" :subheading="__('pages.pro.subheading')">
-    <div class="flex flex-col gap-8">
+    <div class="flex flex-col gap-12">
         {{-- Where the vendor stands now. --}}
         <section @class([
             'flex flex-wrap items-center justify-between gap-4 rounded-2xl border p-6',
@@ -20,16 +20,96 @@
             </div>
         </section>
 
-        {{-- What Pro gives, next to what stays free. --}}
-        <section class="grid gap-4 sm:grid-cols-2">
-            @foreach (['booking', 'enquiries', 'quotations', 'contracts', 'ranking', 'boost', 'analytics', 'badge'] as $benefit)
-                <div class="flex flex-col gap-2 rounded-2xl border border-line bg-surface-raised p-5">
-                    <h2 class="font-semibold">{{ __('pages.pro.benefits.'.$benefit.'.title') }}</h2>
-                    <p class="text-sm text-ink-muted">{{ __('pages.pro.benefits.'.$benefit.'.body') }}</p>
-                </div>
-            @endforeach
+        {{-- What Pro gives, told as before and after: the scattered notes of a
+             vendor's day, then the Pro feature that replaces each one. --}}
+        @php
+            $benefitKeys = ['enquiries', 'quotations', 'contracts', 'booking', 'boost', 'analytics', 'ranking', 'badge'];
+            $benefits = array_map(fn (string $key): array => [
+                'key' => $key,
+                'title' => __('pages.pro.benefits.'.$key.'.title'),
+                'body' => __('pages.pro.benefits.'.$key.'.body'),
+                'pain' => __('pages.pro.pains.'.$key),
+            ], $benefitKeys);
+        @endphp
+        {{-- resources/js/components/vendor/VendorProShowcase.vue --}}
+        <div data-vue="vendor-pro-showcase" data-props="@vueProps([
+            'eyebrow' => __('pages.pro.story.eyebrow'),
+            'headline' => __('pages.pro.story.headline'),
+            'lead' => __('pages.pro.story.lead'),
+            'footnote' => __('pages.pro.story.footnote'),
+            'afterHeading' => __('pages.pro.story.after_heading'),
+            'afterLead' => __('pages.pro.story.after_lead'),
+            'cta' => $vendor->isPro() ? null : ['url' => '#harga', 'label' => __('pages.pro.story.cta')],
+            'benefits' => $benefits,
+        ])">
+            <ul class="grid gap-4 sm:grid-cols-2">
+                @foreach ($benefits as $benefit)
+                    <li class="rounded-2xl border border-line bg-surface-raised p-5">
+                        <p class="font-semibold">{{ $benefit['title'] }}</p>
+                        <p class="mt-1 text-sm text-ink-muted">{{ $benefit['body'] }}</p>
+                    </li>
+                @endforeach
+            </ul>
+        </div>
+
+        {{-- Paying. The yearly plan says what it saves against twelve months. --}}
+        @php
+            $monthly = collect($plans)->firstWhere('plan', App\Enums\VendorPlan::Monthly)['price'] ?? null;
+        @endphp
+        <section id="harga" class="flex scroll-mt-24 flex-col gap-5">
+            <div class="text-center">
+                <h2 class="font-display text-3xl font-semibold tracking-tight">{{ $vendor->isPro() ? __('pages.pro.renew_heading') : __('pages.pro.upgrade_heading') }}</h2>
+                <p class="mt-2 text-sm text-ink-muted">{{ __('pages.pro.price_lead') }}</p>
+            </div>
+
+            @error('plan')
+                <p class="rounded-xl border border-brand-200 bg-brand-50 px-4 py-3 text-sm text-brand-800">{{ $message }}</p>
+            @enderror
+
+            <div class="mx-auto grid w-full max-w-3xl gap-4 sm:grid-cols-2">
+                @foreach ($plans as $option)
+                    @php
+                        $months = $option['plan']->months();
+                        $saving = $monthly && $months > 1 ? (int) round((1 - $option['price'] / ($monthly * $months)) * 100) : 0;
+                        $featured = $months > 1;
+                    @endphp
+                    <form method="POST" action="{{ route('vendor.pro.checkout') }}" @class([
+                        'relative flex flex-col gap-4 rounded-3xl p-6 sm:p-7',
+                        'bg-linear-to-br from-ink via-brand-900 to-ink text-surface ring-1 ring-gold-300/60' => $featured,
+                        'bg-surface-raised ring-1 ring-line' => ! $featured,
+                    ])>
+                        @csrf
+                        <input type="hidden" name="plan" value="{{ $option['plan']->value }}">
+                        <div class="flex items-center justify-between gap-3">
+                            <p @class(['text-sm font-semibold uppercase tracking-wide', 'text-gold-300' => $featured, 'text-ink-muted' => ! $featured])>{{ $option['plan']->label() }}</p>
+                            @if ($saving > 0)
+                                <span class="rounded-full bg-gold-300 px-3 py-1 text-xs font-bold text-ink">{{ __('pages.pro.save_percent', ['percent' => $saving]) }}</span>
+                            @endif
+                        </div>
+                        <p>
+                            <span class="font-display text-4xl font-semibold">RM{{ number_format($option['price']) }}</span>
+                            <span @class(['text-sm', 'text-surface/70' => $featured, 'text-ink-muted' => ! $featured])>/ {{ trans_choice('pages.pro.months', $months, ['count' => $months]) }}</span>
+                        </p>
+                        @if ($months > 1)
+                            <p class="text-sm text-surface/70">{{ __('pages.pro.per_month', ['price' => 'RM'.number_format($option['price'] / $months, 2)]) }}</p>
+                        @endif
+                        @if ($canCheckout)
+                            <button type="submit" @class([
+                                'mt-auto rounded-full py-3 text-sm font-semibold transition',
+                                'bg-gold-300 text-ink hover:bg-gold-400' => $featured,
+                                'bg-brand-600 text-white hover:bg-brand-700' => ! $featured,
+                            ])>{{ __('pages.pro.pay_fpx') }}</button>
+                        @endif
+                    </form>
+                @endforeach
+            </div>
+
+            @unless ($canCheckout)
+                <p class="text-center text-sm text-ink-muted">{{ __('pages.pro.checkout_soon') }}</p>
+            @endunless
+
+            <p class="mx-auto max-w-3xl text-center text-xs text-ink-muted">{{ __('pages.pro.fair_note') }}</p>
         </section>
-        <p class="-mt-4 text-sm text-ink-muted">{{ __('pages.pro.fair_note') }}</p>
 
         {{-- Analytics: the whole window for Pro, last week's totals otherwise. --}}
         {{-- Pro Elite: what Pro adds for vendors who perform. Earned, never bought. --}}
@@ -72,33 +152,6 @@
             @else
                 <p class="rounded-2xl border border-dashed border-line p-5 text-sm text-ink-muted">{{ __('pages.pro.analytics_teaser') }}</p>
             @endif
-        </section>
-
-        {{-- Paying. --}}
-        <section class="flex flex-col gap-4">
-            <h2 class="font-display text-xl font-semibold">{{ $vendor->isPro() ? __('pages.pro.renew_heading') : __('pages.pro.upgrade_heading') }}</h2>
-
-            @error('plan')
-                <p class="rounded-xl border border-brand-200 bg-brand-50 px-4 py-3 text-sm text-brand-800">{{ $message }}</p>
-            @enderror
-
-            <div class="grid gap-4 sm:grid-cols-2">
-                @foreach ($plans as $option)
-                    <form method="POST" action="{{ route('vendor.pro.checkout') }}" class="flex flex-col gap-3 rounded-2xl border border-line bg-surface-raised p-6">
-                        @csrf
-                        <input type="hidden" name="plan" value="{{ $option['plan']->value }}">
-                        <p class="text-sm font-semibold text-ink-muted uppercase">{{ $option['plan']->label() }}</p>
-                        <p><span class="font-display text-3xl font-semibold">RM{{ number_format($option['price']) }}</span> <span class="text-sm text-ink-muted">/ {{ trans_choice('pages.pro.months', $option['plan']->months(), ['count' => $option['plan']->months()]) }}</span></p>
-                        @if ($canCheckout)
-                            <button type="submit" class="mt-2 rounded-full bg-brand-600 py-3 text-sm font-semibold text-white transition hover:bg-brand-700">{{ __('pages.pro.pay_fpx') }}</button>
-                        @endif
-                    </form>
-                @endforeach
-            </div>
-
-            @unless ($canCheckout)
-                <p class="text-sm text-ink-muted">{{ __('pages.pro.checkout_soon') }}</p>
-            @endunless
         </section>
 
         @if ($history->isNotEmpty())

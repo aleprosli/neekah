@@ -822,6 +822,28 @@ return [
     ],
 
     'pro' => [
+        'story' => [
+            'eyebrow' => 'Neekah Pro',
+            'headline' => 'Bisnes kahwin tak patut serabut macam ni',
+            'lead' => 'Enquiry dalam WhatsApp, sebut harga dalam PDF, tarikh dalam buku, kontrak dalam fail. Semuanya ada, tapi bersepah.',
+            'footnote' => 'Masa yang sepatutnya untuk majlis pelanggan, habis untuk mengurus.',
+            'after_heading' => 'Dengan Neekah Pro, semuanya satu tempat.',
+            'after_lead' => 'Setiap satu ganti satu kerja manual yang anda buat hari ini.',
+            'cta' => 'Lihat harga Pro',
+        ],
+        'pains' => [
+            'enquiries' => 'Enquiry tertimbus',
+            'quotations' => 'Sebut harga PDF',
+            'contracts' => 'Kontrak bercetak',
+            'booking' => 'Buku tarikh',
+            'boost' => 'Profil tenggelam',
+            'analytics' => 'Siapa tengok profil?',
+            'ranking' => 'Nak baiki apa?',
+            'badge' => 'Nampak biasa je',
+        ],
+        'price_lead' => 'Satu bayaran FPX, tiada potongan automatik. Bayar semula bila tempoh tamat.',
+        'save_percent' => 'Jimat :percent%',
+        'per_month' => 'Bersamaan :price sebulan',
         'elite' => [
             'title' => 'Jadi Pro Elite',
             'you_are' => 'Anda Pro Elite',
