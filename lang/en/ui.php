@@ -252,6 +252,15 @@ return [
     ],
 
     'countdown' => [
+        'bila_hari_bahagia' => 'When is your big day?',
+        'tetapkan_tarikh_ringkas' => 'Set your wedding date to start the countdown.',
+        'tetapkan_tarikh' => 'Set the date',
+        'hari_bahagia' => 'The big day',
+        'pengantin_baru' => 'Newlyweds',
+        'selamat_pengantin_baru' => 'Congratulations, newlyweds',
+        'hari_bergelar' => ':count days married',
+        'persiapan' => 'Checklist :percent% done',
+        'perjalanan_persiapan' => 'Planning checklist',
         'menuju_hari_bahagia' => 'Counting down to the big day',
         'hari_ini' => 'Today is your big day!',
         'hari' => 'Days',

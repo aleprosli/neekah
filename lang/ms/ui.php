@@ -252,6 +252,15 @@ return [
     ],
 
     'countdown' => [
+        'bila_hari_bahagia' => 'Bila hari bahagia anda?',
+        'tetapkan_tarikh_ringkas' => 'Tetapkan tarikh majlis untuk mula kira detik.',
+        'tetapkan_tarikh' => 'Tetapkan tarikh',
+        'hari_bahagia' => 'Hari bahagia',
+        'pengantin_baru' => 'Pengantin baru',
+        'selamat_pengantin_baru' => 'Selamat pengantin baru',
+        'hari_bergelar' => ':count hari bergelar suami isteri',
+        'persiapan' => 'Checklist :percent% siap',
+        'perjalanan_persiapan' => 'Checklist persiapan',
         'menuju_hari_bahagia' => 'Menuju hari bahagia',
         'hari_ini' => 'Hari ini hari bahagia anda!',
         'hari' => 'Hari',

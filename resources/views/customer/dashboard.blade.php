@@ -1,11 +1,5 @@
 <x-layouts.customer :title="__('pages.dash.majlis_saya')" :heading="$wedding?->title ?? __('pages.dash.majlis_saya')" :subheading="$wedding ? $wedding->event_date->translatedFormat('l, j F Y').' · '.$wedding->city.', '.$wedding->state : __('pages.dash.cipta_wedding_project_sub')">
     <x-slot:actions>
-        @if ($wedding && ! $wedding->event_date->isPast())
-            {{-- resources/js/components/customer/WeddingCountdown.vue; the day count is what shows before it mounts. --}}
-            <div class="w-full" data-vue="wedding-countdown" data-props="@vueProps(['target' => $wedding->startsAt()->toIso8601String()])">
-                <p class="rounded-2xl border border-gold-300/70 bg-surface-raised px-5 py-3 text-center font-display text-xl font-semibold text-brand-700">{{ __('pages.sidebar_couple.hari_lagi', ['count' => (int) today()->diffInDays($wedding->event_date)]) }}</p>
-            </div>
-        @endif
 
         {{-- On a phone the buttons get a fixed shape instead of wrapping
              wherever they land: the digital card on a row of its own, first,
@@ -35,7 +29,19 @@
          of the page it went unseen. It stays server-rendered, because it is
          the one piece of this page that shows another person's name, and it
          reads from relations the component would otherwise be handed wholesale. --}}
+    {{-- The countdown has the full width to itself: squeezed in beside the
+         title it pushed the heading out of shape. Counting down, the day, or
+         days married; the day count is what shows before it mounts. --}}
     @if ($wedding)
+        {{-- resources/js/components/customer/WeddingCountdown.vue --}}
+        <div class="mb-6" data-vue="wedding-countdown" data-props="@vueProps([
+            'target' => $wedding->startsAt()->toIso8601String(),
+            'progress' => $wedding->planningProgress(),
+            'detail' => $wedding->event_date->translatedFormat('l, j F Y').' · '.$wedding->city.', '.$wedding->state,
+        ])">
+            <p class="rounded-[1.75rem] bg-brand-800 px-6 py-8 text-center font-display text-2xl font-semibold text-white">{{ $wedding->event_date->isFuture() ? __('pages.sidebar_couple.hari_lagi', ['count' => (int) today()->diffInDays($wedding->event_date)]) : $wedding->event_date->translatedFormat('j F Y') }}</p>
+        </div>
+
         <x-wedding-couple :wedding="$wedding" class="mb-6" />
         <x-invitation-setup :wedding="$wedding" class="mb-6" />
     @endif

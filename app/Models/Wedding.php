@@ -149,6 +149,17 @@ class Wedding extends Model
         return $this->event_date->copy()->setTimeFromTimeString($time);
     }
 
+    /**
+     * How much of the checklist is done, as a whole percentage: the planning
+     * bar under the countdown. One query, counted in the database.
+     */
+    public function planningProgress(): int
+    {
+        $counts = $this->tasks()->toBase()->selectRaw('count(*) as total, count(completed_at) as done')->first();
+
+        return $counts && $counts->total > 0 ? (int) round($counts->done / $counts->total * 100) : 0;
+    }
+
     public function guests(): HasMany
     {
         return $this->hasMany(WeddingGuest::class)->orderBy('name');

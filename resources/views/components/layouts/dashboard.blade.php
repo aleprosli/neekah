@@ -64,7 +64,7 @@
 
                 @if (! empty($context['countdown']))
                     {{-- resources/js/components/customer/WeddingCountdown.vue; the day count is what shows before it mounts. --}}
-                    <div class="relative mx-4 mt-3" data-vue="wedding-countdown" data-props="@vueProps(['target' => $context['countdown'], 'variant' => 'sidebar'])">
+                    <div class="relative mx-4 mt-3" data-vue="wedding-countdown" data-props="@vueProps([...$context['countdown'], 'variant' => 'sidebar'])">
                         <p class="rounded-2xl border border-gold-300/60 bg-surface-raised/80 px-3 py-2.5 text-center text-sm font-semibold text-brand-700">{{ $context['detail'] }}</p>
                     </div>
                 @endif
