@@ -1535,7 +1535,6 @@ return [
         'tier' => 'Tier',
         'score' => 'Score',
         'rating' => 'Rating',
-        'views30' => 'Views, 30 days',
         'trending' => 'Trending in your category',
         'boosted_until' => 'Boosted until :date',
         'see_ranking' => 'Points & ranking',

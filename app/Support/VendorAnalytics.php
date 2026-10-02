@@ -10,16 +10,15 @@ use Illuminate\Support\Collection;
  * What a vendor's page is doing for them: views, and taps on WhatsApp and the
  * phone number, per day.
  *
- * Every vendor is counted; what they are shown depends on Pro. A free vendor
- * sees last week's totals, a Pro one the whole window and the trend.
+ * Every vendor is counted, but the web shows no vendor these numbers: while
+ * traffic is low a row of zeros turns them away (owner, 3 Oct 2026). Only the
+ * mobile app's dashboard API still reads them, because the released app
+ * requires the fields.
  */
 class VendorAnalytics
 {
     /** Four weeks: long enough to see a trend, short enough to act on. */
     public const DAYS = 28;
-
-    /** The teaser a free vendor sees. */
-    public const TEASER_DAYS = 7;
 
     public function __construct(private Vendor $vendor) {}
 

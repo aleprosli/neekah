@@ -1535,7 +1535,6 @@ return [
         'tier' => 'Tahap',
         'score' => 'Skor',
         'rating' => 'Rating',
-        'views30' => 'Paparan 30 hari',
         'trending' => 'Trending dalam kategori anda',
         'boosted_until' => 'Di-boost hingga :date',
         'see_ranking' => 'Point & ranking',

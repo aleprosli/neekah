@@ -8,9 +8,10 @@ use App\Enums\PaymentStatus;
 use App\Enums\VendorPlan;
 use App\Http\Controllers\Controller;
 use App\Models\Payment;
+use App\Models\Vendor;
 use App\Support\Herepay\HerepayGateway;
 use App\Support\ProSettings;
-use App\Support\VendorAnalytics;
+use App\Support\ProStory;
 use Carbon\Carbon;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
@@ -27,7 +28,6 @@ class ProController extends Controller
     public function index(Request $request, ProSettings $settings, HerepayGateway $gateway): View
     {
         $vendor = $request->user()->vendor;
-        $analytics = new VendorAnalytics($vendor);
 
         return view('vendor.pro.index', [
             'vendor' => $vendor,
@@ -35,6 +35,7 @@ class ProController extends Controller
                 'plan' => $plan,
                 'price' => $settings->price($plan),
             ]),
+            'story' => ProStory::props($vendor, $this->storyTile($vendor, $settings)),
             'canCheckout' => $settings->isEnabled() && $gateway->isConfigured() && $vendor->isApproved(),
             // Unpaid checkouts are abandoned carts; the history is what happened.
             'history' => $vendor->proPayments()->whereNot('status', PaymentStatus::Pending)->limit(12)->get()
@@ -47,9 +48,22 @@ class ProController extends Controller
                     'url' => route('payments.show', $payment),
                     'document_url' => $payment->isPaid() ? route('payments.document', $payment) : null,
                 ]),
-            'totals' => $analytics->totals($vendor->isPro() ? VendorAnalytics::DAYS : VendorAnalytics::TEASER_DAYS),
-            'daily' => $vendor->isPro() ? $analytics->dailyViews() : [],
         ]);
+    }
+
+    /**
+     * The last tile of the story's grid: the way down to the prices, or what a
+     * Pro vendor already has.
+     *
+     * @return array{url: string|null, title: string, body: string, label: string|null}
+     */
+    private function storyTile(Vendor $vendor, ProSettings $settings): array
+    {
+        if ($vendor->isPro()) {
+            return ['url' => null, 'title' => __('pages.pro.story.cta_pro_title'), 'body' => __('pages.pro.active_until', ['date' => $vendor->pro_until->translatedFormat('j F Y')]), 'label' => null];
+        }
+
+        return ['url' => '#harga', 'title' => __('pages.pro.story.cta_title'), 'body' => __('pages.pro.story.cta_body', ['price' => 'RM'.number_format($settings->price(VendorPlan::Monthly))]), 'label' => __('pages.pro.story.cta')];
     }
 
     /**

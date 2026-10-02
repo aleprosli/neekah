@@ -3,6 +3,7 @@
 use App\Enums\PaymentPurpose;
 use App\Enums\PaymentStatus;
 use App\Enums\VendorPlan;
+use App\Enums\VendorTier;
 use App\Models\Category;
 use App\Models\Payment;
 use App\Models\PaymentEvent;
@@ -13,6 +14,17 @@ use App\Notifications\ProExpiring;
 use App\Support\ProSettings;
 use Database\Seeders\CategorySeeder;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Testing\TestResponse;
+
+/**
+ * @return array<string, mixed>
+ */
+function proShowcaseProps(TestResponse $response): array
+{
+    preg_match('/data-vue="vendor-pro-showcase" data-props="([^"]*)"/', $response->getContent(), $matches);
+
+    return json_decode(html_entity_decode($matches[1], ENT_QUOTES), true, flags: JSON_THROW_ON_ERROR);
+}
 
 beforeEach(function () {
     $this->seed(CategorySeeder::class);
@@ -171,10 +183,9 @@ it('reminds a vendor a week before Pro runs out, and not a day earlier', functio
 it('tells what Pro gives as before and after, and what the yearly plan saves', function () {
     $response = $this->actingAs($this->owner)->get(route('vendor.pro.index'))->assertOk();
 
-    preg_match('/data-vue="vendor-pro-showcase" data-props="([^"]*)"/', $response->getContent(), $matches);
-    $props = json_decode(html_entity_decode($matches[1], ENT_QUOTES), true, flags: JSON_THROW_ON_ERROR);
+    $props = proShowcaseProps($response);
 
-    expect(array_column($props['benefits'], 'key'))->toBe(['enquiries', 'quotations', 'contracts', 'booking', 'boost', 'analytics', 'ranking', 'badge'])
+    expect(array_column($props['benefits'], 'key'))->toBe(['enquiries', 'quotations', 'contracts', 'booking', 'boost', 'ranking', 'badge'])
         ->and(array_column($props['benefits'], 'pain'))->each->not->toStartWith('pages.')
         ->and($props['cta']['url'])->toBe('#harga');
 
@@ -183,4 +194,27 @@ it('tells what Pro gives as before and after, and what the yearly plan saves', f
 
     $this->vendor->forceFill(['pro_until' => now()->addMonth()])->save();
     $this->actingAs($this->owner->fresh())->get(route('vendor.pro.index'))->assertDontSee('#harga', false);
+});
+
+it('tells Pro Elite inside the Pro story, with what the next step to it needs', function () {
+    app(ProSettings::class)->save(['elite_enabled' => true]);
+    $this->vendor->forceFill(['tier' => VendorTier::Trusted])->save();
+
+    $elite = proShowcaseProps($this->actingAs($this->owner)->get(route('vendor.pro.index'))->assertOk())['elite'];
+
+    expect($elite['isElite'])->toBeFalse()
+        ->and($elite['status'])->toBe(__('pages.pro.elite.how', ['tier' => VendorTier::Trusted->label(), 'reviews' => 8, 'rating' => '4.5']))
+        ->and(array_column($elite['perks'], 'key'))->toBe(['badge', 'row', 'order', 'tokens']);
+
+    $this->vendor->forceFill(['tier' => VendorTier::Top, 'pro_until' => now()->addMonth()])->save();
+
+    $elite = proShowcaseProps($this->actingAs($this->owner->fresh())->get(route('vendor.pro.index')))['elite'];
+
+    expect($elite['isElite'])->toBeTrue()
+        ->and($elite['title'])->toBe(__('pages.pro.elite.you_are'))
+        ->and($elite['status'])->toBeNull();
+
+    app(ProSettings::class)->save(['elite_enabled' => false]);
+
+    expect(proShowcaseProps($this->actingAs($this->owner->fresh())->get(route('vendor.pro.index')))['elite'])->toBeNull();
 });
