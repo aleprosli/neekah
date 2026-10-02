@@ -24,17 +24,17 @@ const copy = async () => {
     }
 };
 
-// Beside the sheet (≥1400px) the history stays open; above it, on a phone,
-// it folds away so the sheet is not pushed far down.
+// Beside the sheet (lg) the history stays open; above it, on a phone, it
+// folds away so the sheet is not pushed far down.
 const wide = ref(false);
-onMounted(() => (wide.value = window.matchMedia('(min-width: 1400px)').matches));
+onMounted(() => (wide.value = window.matchMedia('(min-width: 1024px)').matches));
 
 const button = 'rounded-full border border-line px-4 py-2 text-center text-sm font-medium transition hover:border-brand-400';
 const primary = 'rounded-full bg-brand-600 px-4 py-2 text-center text-sm font-semibold text-white transition hover:bg-brand-700';
 </script>
 
 <template>
-    <aside class="grid min-w-0 items-start gap-4 md:grid-cols-2 min-[1400px]:grid-cols-1">
+    <aside class="flex min-w-0 flex-col gap-4">
         <section class="flex flex-col gap-3 rounded-2xl border border-line bg-surface-raised p-5">
             <p class="text-xs font-semibold tracking-wide text-ink-muted uppercase">{{ $t('vendor_contract.share') }}</p>
 
@@ -105,11 +105,11 @@ const primary = 'rounded-full bg-brand-600 px-4 py-2 text-center text-sm font-se
             </form>
         </details>
 
-        <div class="flex flex-wrap gap-2">
-            <a v-if="contract.links.edit" :href="contract.links.edit" :class="button">{{ $t('vendor_quotation.edit') }}</a>
-            <form :action="contract.links.duplicate" method="POST">
+        <div class="grid grid-cols-2 gap-2">
+            <a v-if="contract.links.edit" :href="contract.links.edit" :class="[button, contract.links.destroy ? '' : 'col-span-2']">{{ $t('vendor_quotation.edit') }}</a>
+            <form :action="contract.links.duplicate" method="POST" class="order-last col-span-2">
                 <input type="hidden" name="_token" :value="csrf">
-                <button type="submit" :class="button">{{ $t('vendor_quotation.duplicate') }}</button>
+                <button type="submit" :class="[button, 'w-full']">{{ $t('vendor_quotation.duplicate') }}</button>
             </form>
             <UiConfirm
                 v-if="contract.links.destroy"

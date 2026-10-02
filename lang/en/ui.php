@@ -1502,6 +1502,9 @@ return [
     ],
 
     'vendor_quotation_form' => [
+        'add_items' => 'Add items',
+        'added' => 'added',
+        'pricing' => 'Discount & deposit',
         'save_draft' => 'Save draft',
         'save_and_send' => 'Save & send',
         'sheet_hint' => 'Fill it in right on this sheet. This is the quotation the client receives and prints.',
@@ -1530,7 +1533,7 @@ return [
         'item_description' => 'Description (optional)',
         'quantity' => 'Quantity',
         'unit_price' => 'Unit price (RM)',
-        'no_items' => 'Add at least one package or add-on.',
+        'no_items' => 'No items yet. Add a package or an add-on from the Add items panel.',
         'add_package_label' => 'Your packages',
         'add_package' => 'Add package',
         'add_addon' => 'Add add-on',
@@ -1599,6 +1602,9 @@ return [
     ],
 
     'vendor_contract_form' => [
+        'quotation_panel' => 'Quotation',
+        'no_quotation_attached' => 'No quotation attached.',
+        'template' => 'Template',
         'step_quotation' => 'Quotation',
         'step_write' => 'Write the contract',
         'step_send' => 'Send',

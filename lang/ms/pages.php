@@ -1212,6 +1212,8 @@ return [
     ],
 
     'quotations' => [
+        'back' => 'Kembali',
+        'back_to_list' => 'Sebut Harga & Invois',
         'title' => 'Sebut Harga & Invois',
         'subheading' => 'Hantar sebut harga melalui pautan, klien terima secara online, kemudian keluarkan invois.',
         'new' => 'Sebut harga baharu',
@@ -1280,6 +1282,7 @@ return [
     ],
 
     'contracts' => [
+        'back_to_list' => 'Kontrak Digital',
         'pick_subheading' => 'Pilih sebut harga untuk kontrak ini. Klien, tarikh dan jumlahnya akan diisi sendiri.',
         'step_quotation' => 'Sebut harga',
         'step_write' => 'Tulis kontrak',

@@ -1502,6 +1502,9 @@ return [
     ],
 
     'vendor_quotation_form' => [
+        'add_items' => 'Tambah item',
+        'added' => 'ditambah',
+        'pricing' => 'Diskaun & deposit',
         'save_draft' => 'Simpan draf',
         'save_and_send' => 'Simpan & hantar',
         'sheet_hint' => 'Isi terus di atas helaian ini. Inilah rupa sebut harga yang klien terima dan cetak.',
@@ -1530,7 +1533,7 @@ return [
         'item_description' => 'Keterangan (pilihan)',
         'quantity' => 'Kuantiti',
         'unit_price' => 'Harga seunit (RM)',
-        'no_items' => 'Tambah sekurang-kurangnya satu pakej atau add-on.',
+        'no_items' => 'Belum ada item. Tambah pakej atau add-on dari panel Tambah item.',
         'add_package_label' => 'Pakej anda',
         'add_package' => 'Tambah pakej',
         'add_addon' => 'Tambah add-on',
@@ -1599,6 +1602,9 @@ return [
     ],
 
     'vendor_contract_form' => [
+        'quotation_panel' => 'Sebut harga',
+        'no_quotation_attached' => 'Tiada sebut harga dilampirkan.',
+        'template' => 'Templat',
         'step_quotation' => 'Sebut harga',
         'step_write' => 'Tulis kontrak',
         'step_send' => 'Hantar',

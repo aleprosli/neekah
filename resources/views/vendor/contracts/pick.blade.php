@@ -1,6 +1,6 @@
 {{-- Step one of a new contract: which quotation it is for. Its client, date
      and sums come with it; starting without one is the second choice. --}}
-<x-layouts.vendor :title="__('pages.contracts.create_heading')" :heading="__('pages.contracts.create_heading')" :subheading="__('pages.contracts.pick_subheading')">
+<x-layouts.vendor :title="__('pages.contracts.create_heading')" :heading="__('pages.contracts.create_heading')" :subheading="__('pages.contracts.pick_subheading')" :back="['url' => route('vendor.contracts.index'), 'label' => __('pages.contracts.back_to_list')]">
     <div class="mx-auto flex max-w-3xl flex-col gap-4">
         <ol class="flex items-center gap-3 text-xs font-medium text-ink-muted">
             <li class="flex items-center gap-2 text-brand-700"><span class="flex size-6 items-center justify-center rounded-full bg-brand-600 text-white">1</span>{{ __('pages.contracts.step_quotation') }}</li>

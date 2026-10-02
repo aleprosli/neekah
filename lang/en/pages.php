@@ -1212,6 +1212,8 @@ return [
     ],
 
     'quotations' => [
+        'back' => 'Back',
+        'back_to_list' => 'Quotations & Invoices',
         'title' => 'Quotations & Invoices',
         'subheading' => 'Send a quotation as a link, let the client accept online, then issue the invoice.',
         'new' => 'New quotation',
@@ -1280,6 +1282,7 @@ return [
     ],
 
     'contracts' => [
+        'back_to_list' => 'Digital Contracts',
         'pick_subheading' => 'Pick the quotation this contract is for. Its client, date and sums are filled in for you.',
         'step_quotation' => 'Quotation',
         'step_write' => 'Write the contract',

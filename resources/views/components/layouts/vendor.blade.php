@@ -1,4 +1,4 @@
-@props(['title', 'heading' => null, 'subheading' => null])
+@props(['title', 'heading' => null, 'subheading' => null, 'back' => null])
 
 @php
     $vendor = auth()->user()->vendor;
@@ -57,7 +57,7 @@
         : ['title' => __('pages.sidebar_vendor.dashboard_vendor'), 'detail' => null];
 @endphp
 
-<x-layouts.dashboard :title="$title" :nav="$nav" :context="$context" :heading="$heading" :subheading="$subheading">
+<x-layouts.dashboard :title="$title" :nav="$nav" :context="$context" :heading="$heading" :subheading="$subheading" :back="$back">
     @isset($actions)
         <x-slot:actions>{{ $actions }}</x-slot:actions>
     @endisset

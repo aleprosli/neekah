@@ -1,17 +1,18 @@
-<x-layouts.vendor :title="__('pages.contracts.show_title', ['number' => $contract->number])" :heading="$contract->number" :subheading="$contract->client_name.($contract->event_date ? ' · '.$contract->event_date->translatedFormat('j F Y') : '')">
+<x-layouts.vendor :title="__('pages.contracts.show_title', ['number' => $contract->number])" :heading="$contract->number" :subheading="$contract->client_name.($contract->event_date ? ' · '.$contract->event_date->translatedFormat('j F Y') : '')" :back="['url' => route('vendor.contracts.index'), 'label' => __('pages.contracts.back_to_list')]">
     <x-slot:actions>
         <x-booking-status :status="$contract->status" class="self-center" />
     </x-slot:actions>
 
-    {{-- The contract exactly as the client reads, signs and prints it. What
-         the vendor can do sits above it, and beside it once the screen is
-         wide enough to keep the sheet at full A4 width. --}}
-    <div class="grid gap-6 break-words min-[1400px]:grid-cols-[minmax(0,1fr)_300px]">
-        <div class="min-w-0 rounded-2xl bg-ivory p-1 sm:p-4">
-            <x-contract-sheet :contract="$contract" />
+    {{-- The sheet exactly as the client sees and prints it, at the full
+         width of its column (8 of 12), with the vendor's panel beside it (4 of 12)
+         from lg, as the calendar page does. Below
+         that the panel comes first, so sending is the first thing on a phone. --}}
+    <div class="grid gap-6 break-words lg:grid-cols-12 lg:items-start">
+        <div class="min-w-0 lg:col-span-8">
+            <x-contract-sheet :contract="$contract" fluid />
         </div>
 
         {{-- resources/js/components/vendor/VendorContractDetail.vue --}}
-        <div class="order-first min-w-0 min-[1400px]:order-none" data-vue="vendor-contract-detail" data-props="@vueProps($props)"></div>
+        <div class="order-first min-w-0 lg:sticky lg:top-24 lg:order-none lg:col-span-4" data-vue="vendor-contract-detail" data-props="@vueProps($props)"></div>
     </div>
 </x-layouts.vendor>

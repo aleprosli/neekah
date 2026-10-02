@@ -1,4 +1,4 @@
-<x-layouts.vendor :title="$heading" :heading="$heading" :subheading="__('pages.quotations.form_subheading')">
+<x-layouts.vendor :title="$heading" :heading="$heading" :subheading="__('pages.quotations.form_subheading')" :back="['url' => $props['cancelUrl'], 'label' => __('pages.quotations.back')]">
     {{-- resources/js/components/vendor/VendorQuotationForm.vue --}}
     <div data-vue="vendor-quotation-form" data-props="@vueProps($props)"></div>
 </x-layouts.vendor>

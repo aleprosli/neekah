@@ -1,4 +1,4 @@
-@props(['contract'])
+@props(['contract', 'fluid' => false])
 
 {{-- A contract as a sheet of A4: the client's page, the vendor's view of it
      and the PDF. Pair it with <x-print-fit /> so it prints on one page. --}}
@@ -15,7 +15,10 @@
     $badge = [$contract->status->label(), $contract->status->tone()];
 @endphp
 
-<article data-doc {{ $attributes->class('@container relative mx-auto max-w-[210mm] overflow-hidden rounded-2xl bg-white shadow-[0_1px_3px_rgb(0_0_0/0.08),0_12px_40px_-12px_rgb(0_0_0/0.15)] print:max-w-none print:rounded-none print:shadow-none') }}>
+<article data-doc {{ $attributes->class([
+    '@container relative mx-auto overflow-hidden rounded-2xl bg-white shadow-[0_1px_3px_rgb(0_0_0/0.08),0_12px_40px_-12px_rgb(0_0_0/0.15)] print:max-w-none print:rounded-none print:shadow-none',
+    $fluid ? 'w-full' : 'max-w-[210mm]',
+]) }}>
     <div class="h-2 bg-gradient-to-r from-brand-700 via-brand-500 to-gold-400 print:[print-color-adjust:exact]"></div>
 
     <div data-doc-body class="p-5 @lg:p-8 @2xl:p-12 print:p-0 print:pt-6">
