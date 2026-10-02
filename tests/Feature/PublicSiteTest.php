@@ -4,7 +4,9 @@ use App\Models\SiteTemplate;
 use App\Models\WeddingGuest;
 use App\Models\WeddingRsvp;
 use App\Models\WeddingSite;
+use App\Support\Card\Catalog;
 use Database\Seeders\SiteTemplateSeeder;
+use Illuminate\Routing\Middleware\ThrottleRequests;
 
 beforeEach(function () {
     $this->seed(SiteTemplateSeeder::class);
@@ -48,10 +50,12 @@ it('returns 404 for an unpublished or unknown address', function () {
     $this->get('http://tiada-langsung.'.config('neekah.site_domain'))->assertNotFound();
 });
 
-it('renders all fifty designs', function () {
+it('renders every design in the catalogue', function () {
+    $this->withoutMiddleware(ThrottleRequests::class);
+
     $templates = SiteTemplate::active()->get();
 
-    expect($templates)->toHaveCount(50);
+    expect($templates)->toHaveCount(count(Catalog::all()));
 
     foreach ($templates as $template) {
         $site = WeddingSite::factory()->published()->create(['template' => $template->slug]);
@@ -203,9 +207,13 @@ it('offers a calendar file guests can add to their phone', function () {
 it('shows the gallery, filters it by category, and samples every design', function () {
     $this->get(route('sites.templates'))
         ->assertOk()
-        ->assertSee('50 template untuk dipilih')
+        ->assertSee(__('pages.gallery_page.template_untuk_dipilih', ['count' => count(Catalog::all())]))
         ->assertSee('Royal Songket Gold')
-        ->assertSee('Midnight Luxury');
+        ->assertSee('Midnight Luxury')
+        ->assertSee('Ekad Ivory Heirloom')
+        ->assertSee('Mihrab Mawar')
+        ->assertSee('Lili Kasih')
+        ->assertSee('Taman Bulan');
 
     $this->get(route('sites.templates', ['category' => 'Islamic']))
         ->assertOk()
@@ -223,10 +231,9 @@ it('shows the gallery, filters it by category, and samples every design', functi
 });
 
 it('leaves the gallery tiles to mount as the visitor scrolls, and the single sample at once', function () {
-    // Fifty live card apps mounted on load is what data-vue-lazy exists to avoid.
     $gallery = $this->get(route('sites.templates'))->assertOk();
 
-    expect(substr_count($gallery->getContent(), 'data-vue="card-view" data-vue-lazy'))->toBe(50);
+    expect(substr_count($gallery->getContent(), 'data-vue="card-view" data-vue-lazy'))->toBe(count(Catalog::all()));
 
     $this->get(route('sites.templates.show', 'rose-garden'))
         ->assertOk()

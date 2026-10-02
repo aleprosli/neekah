@@ -62,6 +62,19 @@
                     <span class="h-px flex-1 bg-linear-to-l from-transparent to-gold-300"></span>
                 </div>
 
+                @if (! empty($context['countdown']))
+                    {{-- resources/js/components/customer/WeddingCountdown.vue; the day count is what shows before it mounts. --}}
+                    <div class="relative mx-4 mt-3" data-vue="wedding-countdown" data-props="@vueProps(['target' => $context['countdown'], 'variant' => 'sidebar'])">
+                        <p class="rounded-2xl border border-gold-300/60 bg-surface-raised/80 px-3 py-2.5 text-center text-sm font-semibold text-brand-700">{{ $context['detail'] }}</p>
+                    </div>
+                @endif
+
+                @isset($sidebar)
+                    <div class="relative shrink-0">
+                        {{ $sidebar }}
+                    </div>
+                @endisset
+
                 <nav class="no-scrollbar relative flex-1 overflow-y-auto px-4 pt-4 pb-6">
                     @foreach ($nav as $group)
                         @if (! empty($group['key']))

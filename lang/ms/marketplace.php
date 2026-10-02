@@ -60,7 +60,7 @@ return [
         'pro_title' => 'Vendor Neekah Pro',
         'elite' => 'Elite',
         'elite_title' => 'Pro Elite: vendor Neekah Pro yang mencapai tier Top atau Disyorkan melalui prestasi sebenar',
-        'recommended' => 'Disyorkan',
+        'recommended' => 'Elite',
         'top' => 'Vendor terbaik',
         'new' => 'Baru',
         'from' => 'Dari',

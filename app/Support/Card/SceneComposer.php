@@ -10,6 +10,7 @@ namespace App\Support\Card;
  */
 class SceneComposer
 {
+    use Artwork;
     use Covers;
     use CoversB;
     use Inner;

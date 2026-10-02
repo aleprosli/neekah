@@ -33,6 +33,7 @@ Before planning or editing, find the row whose globs match the file's path and r
 | app/Http/Requests/** | .ai/rules/requests.md |
 | routes/** | .ai/rules/routes.md |
 | app/Rules/** | .ai/rules/rules.md |
+| database/seeders/ChecklistSeeder.php | .ai/rules/seeders.md |
 | resources/views/sites/** | .ai/rules/sites.md |
 | app/Support/Seo.php, app/Support/**, app/Support/ImageSettings.php, app/Support/ContentVersion.php, app/Support/VendorAvailability.php, app/Support/Translations.php | .ai/rules/support.md |
 | tests/** | .ai/rules/tests.md |
@@ -40,3 +41,4 @@ Before planning or editing, find the row whose globs match the file's path and r
 | app/Http/Controllers/Vendor/ReviewController.php, app/Http/Controllers/Vendor/** | .ai/rules/vendor.md |
 | resources/views/vendors/** | .ai/rules/vendors.md |
 | resources/views/components/analytics.blade.php | .ai/rules/views-components.md |
+| app/**, resources/views/**, lang/** | .ai/rules/views.md |

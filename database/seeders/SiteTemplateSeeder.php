@@ -9,7 +9,7 @@ use Illuminate\Database\Seeder;
 class SiteTemplateSeeder extends Seeder
 {
     /**
-     * The fifty layered invitation designs, composed from App\Support\Card\Catalog.
+     * The layered invitation designs, composed from App\Support\Card\Catalog.
      *
      * A design is a palette of ten colour roles, four type faces and three canvases
      * of layers; the artwork is code, so re-running this is how a tweak to a design

@@ -23,7 +23,7 @@ Post body is printed unescaped ({!! !!}), so every write must pass through App\S
 ## Anyone may review; only bookings move the ranking
 Reviews are open: a guest or a signed-in user posts one straight on a vendor profile (POST vendors/{vendor}/reviews, throttled 5/hour, Turnstile), with 1-5 stars, a comment and up to Review::MAX_PHOTOS images. It is published immediately — nobody waits for approval to be heard. The old "only after a verified booking" rule is gone.
 
-What keeps it honest is the split, not pre-moderation. Review::verified() is booking_id IS NOT NULL; Vendor::rankingReviews() is verified+published and is the ONLY thing rating_avg, reviews_count, the points and the tier may read. Open reviews are shown with their own average and badged apart. Never fold the two averages into one — a stranger with an email address would then be moving a vendor's ranking, which the kertas kerja makes 30% of the Recommended score.
+What keeps it honest is the split, not pre-moderation. Review::verified() is booking_id IS NOT NULL; Vendor::rankingReviews() is verified+published and is the ONLY thing rating_avg, reviews_count, the points and the tier may read. Open reviews are shown with their own average and badged apart. Never fold the two averages into one — a stranger with an email address would then be moving a vendor's ranking, which the kertas kerja makes 30% of the Elite score.
 
 A vendor CANNOT hide or delete a review; ReviewPolicy gives them reply() and report() only. Admins moderate via ModerateReview: hide (reversible, keeps the row, the reason and who did it) and delete (permanent, takes the photos off disk). Both re-award or revoke PositiveReview points and recalculate stats, but only for booking-backed reviews.
 

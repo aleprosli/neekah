@@ -62,7 +62,7 @@ const imageStyle = computed(() => {
             class="nkc-layer"
             :style="{ ...box, background: `url('${photo}') 0 0/${cq(layer.tile, scene.width)} repeat` }"
         />
-        <div v-else-if="photo" class="nkc-layer nkc-layer-image" :style="{ ...box, ...frameStyle(scene, layer) }">
+        <div v-else-if="photo" class="nkc-layer nkc-layer-image" :class="{ 'nkc-layer-artwork': layer.motion, 'nkc-layer-gif': layer.widgetAnimation }" :style="{ ...box, ...frameStyle(scene, layer) }">
             <img :src="photo" alt="" :loading="eager ? 'eager' : 'lazy'" decoding="async" :style="imageStyle">
         </div>
         <div v-else-if="preview && layer.bind" class="nkc-layer nkc-layer-empty" :style="{ ...box, ...frameStyle(scene, layer) }">

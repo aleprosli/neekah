@@ -1,6 +1,7 @@
 <?php
 
 use App\Actions\SeedWeddingChecklist;
+use App\Casts\Translatable;
 use App\Enums\WeddingRole;
 use App\Models\Category;
 use App\Models\ChecklistItem;
@@ -224,4 +225,14 @@ it('files a task the couple already had under its phase instead of adding it twi
         ->and($mine->checklist_item_id)->toBe($item->id)
         ->and($mine->checklist_section_id)->toBe($item->checklist_section_id)
         ->and($mine->isDone())->toBeTrue();
+});
+
+it('keeps the extra lists inside the eight phases, each item under a Malay title of its own', function () {
+    $titles = collect(ChecklistSeeder::sections())->flatMap(fn (array $section) => collect($section['items'])->pluck('title.ms'));
+    $engagement = ChecklistItem::whereTranslated('title', 'Tetapkan tarikh pertunangan')->sole();
+
+    expect(ChecklistSection::count())->toBe(8)
+        ->and($titles->duplicates())->toBeEmpty()
+        ->and(Translatable::all($engagement, 'group')['ms'])->toBe('Pertunangan')
+        ->and(Translatable::all($engagement->section, 'title')['ms'])->toBe('Perancangan Awal');
 });

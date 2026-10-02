@@ -12,6 +12,11 @@
 
 return [
     'open' => 'Open the card',
+    'motion_previous' => 'Previous scene',
+    'motion_next' => 'Next scene',
+    'motion_pause' => 'Pause animation',
+    'motion_play' => 'Play animation',
+    'motion_scene' => 'Scene :current / :total',
     'countdown' => 'Counting down',
     'countdown_days' => 'Days',
     'countdown_hours' => 'Hours',

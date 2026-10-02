@@ -193,7 +193,7 @@ return [
         'verified' => 'Verified',
         'trusted' => 'Trusted',
         'top' => 'Top',
-        'recommended' => 'Recommended',
+        'recommended' => 'Elite',
     ],
 
     'violation_action' => [
@@ -216,6 +216,16 @@ return [
         'misleading_listing' => 'Listing atau portfolio mengelirukan',
         'poor_service' => 'Kualiti perkhidmatan tidak memuaskan',
         'other' => 'Lain-lain',
+    ],
+
+    'song_moment' => [
+        'akad' => 'Akad Nikah',
+        'entrance' => 'Entrance Pengantin',
+        'makan_beradab' => 'Makan Beradab',
+        'potong_kek' => 'Potong Kek',
+        'first_walk' => 'First Walk',
+        'latar' => 'Lagu Latar Majlis',
+        'ending' => 'Penutup Majlis',
     ],
 
     'wedding_role' => [

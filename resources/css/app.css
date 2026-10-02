@@ -294,6 +294,340 @@ html {
     max-width: none;
 }
 
+.nkc-is-preview:not(.nkc-is-thumb).nkc-has-widget-artwork .nkc-column {
+    max-width: 480px;
+}
+
+.nkc-is-motion {
+    display: grid;
+    place-items: center;
+    min-height: calc(100svh - var(--nkc-motion-header, 0px));
+    overflow: hidden;
+    background: var(--c-bg2);
+}
+
+.nkc-is-preview.nkc-is-motion {
+    --nkc-motion-header: 46px;
+}
+
+.nkc-motion-shell {
+    width: min(100%, 480px, calc((100svh - var(--nkc-motion-header, 0px) - 90px) * 0.5625));
+    margin-inline: auto;
+}
+
+.nkc-motion-frame {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 9 / 16;
+    overflow: hidden;
+    background: var(--c-card);
+    box-shadow: 0 16px 52px color-mix(in srgb, var(--c-ink) 18%, transparent);
+}
+
+.nkc-motion-slide {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+}
+
+.nkc-motion-slide .nkc-scene {
+    width: 100%;
+}
+
+.nkc-motion-slide-widget {
+    overflow-y: auto;
+    scrollbar-width: thin;
+}
+
+.nkc-motion-slide-widget .nkc-section {
+    display: grid;
+    place-items: center;
+    min-height: 100%;
+}
+
+.nkc-motion-shell.has-widget-foreground .nkc-motion-slide-widget .nkc-section-inner {
+    width: min(80%, 21rem);
+}
+
+.nkc-motion-shell.has-widget-foreground .nkc-motion-slide-widget .nkc-heading {
+    max-width: 14rem;
+    margin-inline: auto;
+}
+
+.nkc-motion-shell.has-widget-foreground .nkc-motion-slide-widget[data-widget="rsvp"] .nkc-heading {
+    max-width: 10rem;
+}
+
+.nkc-motion-foreground,
+.nkc-motion-butterflies {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    object-fit: fill;
+    pointer-events: none;
+}
+
+.nkc-motion-foreground {
+    z-index: 2;
+    animation: nkc-floral-drift 12s ease-in-out infinite alternate;
+}
+
+.nkc-motion-butterflies {
+    z-index: 3;
+}
+
+.nkc-motion-slide.is-active .nkc-scene,
+.nkc-motion-slide.is-active .nkc-section {
+    animation: nkc-motion-reveal 0.9s ease both;
+}
+
+.nkc-motion-slide.is-active .nkc-layer-text {
+    animation: nkc-motion-text 0.75s ease both;
+    animation-delay: 0.2s;
+}
+
+.nkc-motion-slide.is-active .nkc-layer-artwork:not(:first-child) {
+    animation: nkc-motion-piece 0.85s ease both;
+}
+
+.nkc-motion-slide.is-active .nkc-layer-artwork:nth-child(3n + 2) { animation-delay: 0.16s; }
+.nkc-motion-slide.is-active .nkc-layer-artwork:nth-child(3n) { animation-delay: 0.31s; }
+.nkc-motion-slide.is-active .nkc-layer-artwork:nth-child(3n + 1) { animation-delay: 0.46s; }
+
+@keyframes nkc-motion-reveal {
+    from { opacity: 0; transform: scale(1.035); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes nkc-motion-text {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes nkc-motion-piece {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.nkc-motion-envelope {
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+    display: grid;
+    place-items: center;
+    width: 100%;
+    border: 0;
+    background: transparent;
+    color: var(--c-ink);
+    cursor: pointer;
+}
+
+.nkc-motion-envelope::before,
+.nkc-motion-envelope::after {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 50%;
+    content: '';
+    background: linear-gradient(125deg, var(--c-card), var(--c-bg2));
+    transition: transform 0.85s cubic-bezier(0.65, 0, 0.25, 1);
+}
+
+.nkc-motion-envelope::before {
+    left: 0;
+    box-shadow: inset -8px 0 20px color-mix(in srgb, var(--c-ink) 8%, transparent);
+}
+
+.nkc-motion-envelope::after {
+    right: 0;
+    box-shadow: inset 8px 0 20px color-mix(in srgb, var(--c-ink) 8%, transparent);
+}
+
+.nkc-motion-envelope.has-texture::before,
+.nkc-motion-envelope.has-texture::after {
+    background-image: var(--nkc-gate-texture);
+    background-size: 200% 100%;
+    filter: blur(0.6px);
+}
+
+.nkc-motion-envelope.has-texture::before {
+    background-position: left center;
+}
+
+.nkc-motion-envelope.has-texture::after {
+    background-position: right center;
+}
+
+.nkc-motion-envelope.is-opening::before {
+    transform: translateX(-105%);
+}
+
+.nkc-motion-envelope.is-opening::after {
+    transform: translateX(105%);
+}
+
+.nkc-motion-seal,
+.nkc-motion-open-label {
+    position: relative;
+    z-index: 1;
+    transition: opacity 0.25s ease, transform 0.55s ease;
+}
+
+.nkc-motion-seal {
+    display: grid;
+    place-items: center;
+    width: 5.5rem;
+    aspect-ratio: 1;
+    border: 3px double var(--c-acc2);
+    border-radius: 50%;
+    background: var(--c-pri);
+    box-shadow: 0 8px 20px color-mix(in srgb, var(--c-ink) 18%, transparent);
+    color: var(--c-card);
+    font-family: var(--f-d);
+    font-size: 1.3rem;
+    letter-spacing: 0.1em;
+}
+
+.nkc-motion-seal.has-artwork {
+    width: 7rem;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+}
+
+.nkc-motion-seal-art {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 8px 12px color-mix(in srgb, var(--c-bg2) 45%, transparent));
+}
+
+.nkc-motion-seal.has-artwork .nkc-motion-seal-initials {
+    position: relative;
+    color: var(--c-bg2);
+    font-size: 1.6rem;
+}
+
+.nkc-motion-open-label {
+    position: absolute;
+    top: calc(50% + 4.5rem);
+    font-family: var(--f-n);
+    font-size: 0.8rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+}
+
+.nkc-motion-envelope.is-opening .nkc-motion-seal,
+.nkc-motion-envelope.is-opening .nkc-motion-open-label {
+    opacity: 0;
+    transform: scale(0.5);
+}
+
+.nkc-motion-controls {
+    padding: 0.8rem 0.5rem 0.2rem;
+    color: var(--c-ink);
+    font-family: var(--f-n);
+}
+
+.nkc-motion-progress,
+.nkc-motion-actions {
+    display: flex;
+    align-items: center;
+}
+
+.nkc-motion-progress {
+    gap: 3px;
+}
+
+.nkc-motion-progress-track {
+    flex: 1;
+    height: 3px;
+    overflow: hidden;
+    border-radius: 4px;
+    background: color-mix(in srgb, var(--c-acc) 25%, transparent);
+}
+
+.nkc-motion-progress-track > span {
+    display: block;
+    height: 100%;
+    background: var(--c-acc);
+}
+
+.nkc-motion-actions {
+    justify-content: space-between;
+    gap: 0.35rem;
+    min-height: 3rem;
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+}
+
+.nkc-motion-actions button {
+    display: grid;
+    place-items: center;
+    flex: 0 0 2.4rem;
+    width: 2.4rem;
+    height: 2.4rem;
+    border: 1px solid color-mix(in srgb, var(--c-acc) 35%, transparent);
+    border-radius: 50%;
+    background: var(--c-card);
+    color: var(--c-pri);
+    font-size: 1.4rem;
+    cursor: pointer;
+}
+
+.nkc-motion-actions .nkc-icon {
+    width: 1.15rem;
+    height: 1.15rem;
+}
+
+.nkc-motion-actions button:disabled {
+    opacity: 0.35;
+    cursor: default;
+}
+
+@media (max-width: 640px) {
+    .nkc-is-preview.nkc-is-motion {
+        --nkc-motion-header: 74px;
+    }
+
+    .nkc-motion-shell.has-widget-foreground .nkc-motion-slide-widget[data-widget="rsvp"] .nkc-form {
+        gap: 0.65rem;
+    }
+
+    .nkc-motion-shell.has-widget-foreground .nkc-motion-slide-widget[data-widget="rsvp"] .nkc-input {
+        padding-block: 0.65rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .nkc-motion-foreground {
+        animation: none;
+    }
+
+    .nkc-layer-gif,
+    .nkc-motion-butterflies {
+        display: none;
+    }
+
+    .nkc-motion-slide.is-active .nkc-scene,
+    .nkc-motion-slide.is-active .nkc-section,
+    .nkc-motion-slide.is-active .nkc-layer-text,
+    .nkc-motion-slide.is-active .nkc-layer-artwork {
+        animation: none;
+    }
+
+    .nkc-motion-envelope::before,
+    .nkc-motion-envelope::after,
+    .nkc-motion-seal,
+    .nkc-motion-open-label {
+        transition: none;
+    }
+}
+
 /* ---- The designed canvases ---- */
 .nkc-scene {
     position: relative;
@@ -327,6 +661,21 @@ html {
     display: block;
     width: 100%;
     height: 100%;
+}
+
+.nkc:not(.nkc-is-thumb) .nkc-layer-artwork img {
+    animation: nkc-floral-drift 12s ease-in-out infinite alternate;
+}
+
+@keyframes nkc-floral-drift {
+    from { transform: translate3d(0, 0, 0) scale(1); }
+    to { transform: translate3d(0, -0.45%, 0) scale(1.012); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .nkc:not(.nkc-is-thumb) .nkc-layer-artwork img {
+        animation: none;
+    }
 }
 
 /* A slot with no photo yet, shown only while the couple is editing. */
@@ -377,6 +726,12 @@ html {
     padding: 3.5rem 1.75rem;
     text-align: center;
     color: var(--c-ink);
+}
+
+.nkc-has-widget-artwork .nkc-section {
+    background-image: var(--nkc-widget-artwork);
+    background-position: center;
+    background-size: cover;
 }
 
 .nkc-section-inner {
@@ -481,20 +836,30 @@ html {
 .nkc-countdown {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 0.5rem;
+    gap: 0.75rem;
 }
 
 .nkc-cd-cell {
+    position: relative;
     display: grid;
     justify-items: center;
-    gap: 0.35rem;
-    border: 1px solid color-mix(in srgb, var(--c-acc) 45%, transparent);
-    padding: 1rem 0.25rem;
+    gap: 0.5rem;
+    border: 1px solid color-mix(in srgb, var(--c-acc) 55%, transparent);
+    background: linear-gradient(180deg, color-mix(in srgb, var(--c-acc) 7%, transparent), transparent 70%);
+    padding: 1.35rem 0.35rem 1.1rem;
+}
+
+.nkc-cd-cell::before {
+    content: '';
+    position: absolute;
+    inset: 4px;
+    border: 1px solid color-mix(in srgb, var(--c-acc) 28%, transparent);
+    pointer-events: none;
 }
 
 .nkc-cd-cell strong {
-    font-family: var(--f-r);
-    font-size: 1.7rem;
+    font-family: var(--f-d);
+    font-size: 2rem;
     font-weight: 500;
     line-height: 1;
     color: var(--c-pri);
@@ -502,11 +867,24 @@ html {
 }
 
 .nkc-cd-cell span {
+    position: relative;
+    padding-top: 0.5rem;
     font-family: var(--f-n);
     font-size: 0.55rem;
     letter-spacing: 0.2em;
     text-transform: uppercase;
     color: var(--c-mut);
+}
+
+.nkc-cd-cell span::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 1.1rem;
+    height: 1px;
+    background: color-mix(in srgb, var(--c-acc) 60%, transparent);
+    transform: translateX(-50%);
 }
 
 /* ---- Tentatif ---- */
@@ -1088,4 +1466,3 @@ html {
         animation-duration: 2s;
     }
 }
-

@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\VendorTier;
 use App\Models\Category;
 use App\Models\Vendor;
 use Database\Seeders\CategorySeeder;
@@ -43,6 +44,42 @@ it('shows the initial until a logo is uploaded, then the logo', function () {
     Storage::disk('public')->assertExists($logo);
 
     $this->get(route('vendors.show', $this->vendor))->assertOk()->assertSee('Logo Bride Assistant');
+});
+
+it('layers the supplied rank artwork in front of the vendor logo on the public profile', function () {
+    $this->vendor->update([
+        'logo' => 'vendors/bride-assistant.png',
+        'tier' => VendorTier::Trusted,
+    ]);
+
+    $this->get(route('vendors.show', $this->vendor))
+        ->assertOk()
+        ->assertSee('data-ranked-vendor-avatar="trusted"', false)
+        ->assertSee('data-rank-artwork-layer="front"', false)
+        ->assertSeeInOrder(['data-rank-badge="trusted"', 'Logo Bride Assistant'], false)
+        ->assertDontSee('img/vendor-rank-frames/', false);
+});
+
+it('sets the elite vendor logo in the crowned elite badge', function () {
+    $this->vendor->update([
+        'logo' => 'vendors/bride-assistant.png',
+        'tier' => VendorTier::Recommended,
+    ]);
+
+    $this->get(route('vendors.show', $this->vendor))
+        ->assertOk()
+        ->assertSeeInOrder(['data-rank-badge="recommended"', 'Logo Bride Assistant'], false)
+        ->assertDontSee('img/vendor-rank-frames/', false);
+});
+
+it('frames a verified vendor in the verified badge', function () {
+    $this->vendor->update(['tier' => VendorTier::Verified]);
+
+    $this->get(route('vendors.show', $this->vendor))
+        ->assertOk()
+        ->assertSee('data-ranked-vendor-avatar="verified"', false)
+        ->assertSee('data-rank-artwork-layer="front"', false)
+        ->assertSee('data-rank-badge="verified"', false);
 });
 
 it('replaces the old logo file rather than leaving it behind', function () {

@@ -12,6 +12,11 @@
 
 return [
     'open' => 'Buka kad',
+    'motion_previous' => 'Babak sebelumnya',
+    'motion_next' => 'Babak seterusnya',
+    'motion_pause' => 'Jeda animasi',
+    'motion_play' => 'Mainkan animasi',
+    'motion_scene' => 'Babak :current / :total',
     'countdown' => 'Detik menanti',
     'countdown_days' => 'Hari',
     'countdown_hours' => 'Jam',

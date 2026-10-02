@@ -39,6 +39,34 @@ it('walks a new vendor through what is missing and what each photo is for', func
         });
 });
 
+it('shows the vendor rank and points before onboarding', function () {
+    $vendor = Vendor::factory()->for(Category::first())->create([
+        'tier' => VendorTier::Top,
+        'points_total' => 342,
+    ]);
+
+    $this->actingAs($vendor->user)
+        ->get(route('vendor.dashboard'))
+        ->assertOk()
+        ->assertSeeInOrder(['data-vendor-ranking-sidebar', __('pages.sidebar_vendor.ringkasan')], false)
+        ->assertSeeInOrder(['data-vendor-ranking', 'data-vue="vendor-dashboard-page"'], false)
+        ->assertSee('data-vendor-rank-track', false)
+        ->assertSee('data-current-vendor-rank', false)
+        ->assertSee('data-rank-message="Top"', false)
+        ->assertSee('Rank 4 · Top')
+        ->assertSee('Achieved')
+        ->assertSee('30 lagi booking selesai')
+        ->assertSee('342')
+        ->assertSee('data-rank-badge="new"', false)
+        ->assertSee('data-rank-badge="verified"', false)
+        ->assertSee('data-rank-badge="trusted"', false)
+        ->assertSee('data-rank-badge="top"', false)
+        ->assertSee('data-rank-badge="recommended"', false)
+        // Drawn as SVG, never the heavy PNG artwork.
+        ->assertDontSee('img/vendor-ranks/', false)
+        ->assertSee('Elite');
+});
+
 it('registers a vendor as pending and logs the owner in', function () {
     $category = Category::first();
 
