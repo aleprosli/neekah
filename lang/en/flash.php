@@ -131,6 +131,12 @@ return [
     ],
 
     'vendor' => [
+        'contract_saved' => 'Contract :number saved.',
+        'contract_deleted' => 'Draft :number deleted.',
+        'contract_sent' => 'Contract :number sent. Share its link with the client.',
+        'contract_emailed' => 'Contract :number sent and emailed to the client.',
+        'contract_duplicated' => ':number copied from :from. Check it and save.',
+        'contract_voided' => 'Contract :number withdrawn.',
         'quotation_saved' => 'Quotation :number saved.',
         'quotation_deleted' => 'Draft :number deleted.',
         'quotation_sent' => 'Quotation :number sent. Share its link with the client.',
@@ -206,5 +212,9 @@ return [
     'quotation' => [
         'accepted' => 'Thank you. The vendor has been told and will contact you.',
         'declined' => 'Your answer has been sent to the vendor.',
+    ],
+
+    'contract' => [
+        'signed' => 'Thank you. The contract is signed and the vendor has been told.',
     ],
 ];

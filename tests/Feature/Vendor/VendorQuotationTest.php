@@ -229,7 +229,7 @@ it('records a booking at the accepted quotation\'s total and deposit', function 
     $quotation = Quotation::factory()->for($this->vendor)->accepted()->create(['client_email' => 'aina@example.com']);
 
     $this->actingAs($this->vendor->user)
-        ->get(route('vendor.bookings.create', ['quotation' => $quotation->id]))
+        ->get(route('vendor.bookings.create', ['quotation' => $quotation->token]))
         ->assertOk()
         ->assertViewHas('props', fn (array $props) => $props['quotation']['number'] === $quotation->number);
 
@@ -279,4 +279,17 @@ it('starts a quotation from an enquiry with the couple and their package filled 
         ->and($props['quotation']['client_email'])->toBe('siti@example.com')
         ->and($props['quotation']['enquiry_id'])->toBe($enquiry->id)
         ->and($props['quotation']['items'][0]['package_id'])->toBe($this->package->id);
+});
+
+it('addresses a quotation by its token in the vendor area too, never by its id', function () {
+    $quotation = Quotation::factory()->for($this->vendor)->create();
+
+    expect(route('vendor.quotations.show', $quotation))->toEndWith('/'.$quotation->token);
+
+    $this->actingAs($this->vendor->user)->get('/vendor/sebut-harga/'.$quotation->id)->assertNotFound();
+    $this->actingAs($this->vendor->user)
+        ->get(route('vendor.quotations.show', $quotation))
+        ->assertOk()
+        ->assertSee('data-doc', false)
+        ->assertSee($quotation->number);
 });

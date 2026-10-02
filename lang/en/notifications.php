@@ -282,4 +282,21 @@ return [
         'body' => 'You can copy it as a new quotation with a different offer.',
         'action' => 'Open quotation',
     ],
+
+    'contract_sent' => [
+        'subject' => 'Contract :number from :vendor',
+        'intro' => ':vendor sent you a contract to read and sign.',
+        'body' => 'You do not need to sign in. Open the link, read it, and sign with a finger or the mouse.',
+        'action' => 'Read & sign',
+    ],
+
+    'contract_signed' => [
+        'title' => ':name signed contract :number',
+        'intro' => ':name has signed contract :number.',
+        'body' => 'The signed copy is on the contract page, ready to print.',
+        'action' => 'Open contract',
+        'client_subject' => 'Your copy of contract :number with :vendor',
+        'client_intro' => 'Thank you for signing contract :number with :vendor. Keep this link for your copy.',
+        'client_action' => 'View contract',
+    ],
 ];

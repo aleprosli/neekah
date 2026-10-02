@@ -182,6 +182,10 @@ return [
     */
 
     'custom' => [
+        'contract_locked' => 'This contract has been sent and can no longer be changed. Withdraw it and copy it as a new one.',
+        'contract_closed' => 'This contract is no longer waiting for a signature.',
+        'contract_not_voidable' => 'Only a contract awaiting signature can be withdrawn.',
+        'signature_invalid' => 'Please draw your signature in the box.',
         'quotation_locked' => 'The client has already answered this quotation, so it can no longer be changed. Copy it as a new one.',
         'quotation_closed' => 'This quotation is no longer waiting for an answer.',
         'quotation_not_accepted' => 'An invoice can only be issued after the client accepts the quotation.',

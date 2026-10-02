@@ -13,6 +13,7 @@ return [
     ],
 
     'vendor_feature' => [
+        'contracts' => 'Kontrak Digital',
         'quotations' => 'Sebut Harga & Invois',
         'boost' => 'Boost',
         'online_booking' => 'Tempahan Online',
@@ -26,6 +27,7 @@ return [
     ],
 
     'vendor_feature_desc' => [
+        'contracts' => 'Sediakan kontrak dan biar klien tandatangan secara online.',
         'quotations' => 'Hantar sebut harga melalui pautan, klien terima online, dan keluarkan invois.',
         'boost' => 'Guna token untuk naikkan profil ke atas kategori anda.',
         'online_booking' => 'Pengantin tempah tarikh dan bayar deposit terus di halaman vendor.',
@@ -322,5 +324,12 @@ return [
         'unpaid' => 'Belum dibayar',
         'deposit_paid' => 'Deposit dibayar',
         'paid' => 'Dibayar penuh',
+    ],
+
+    'contract_status' => [
+        'draft' => 'Draf',
+        'sent' => 'Menunggu tandatangan',
+        'signed' => 'Ditandatangan',
+        'void' => 'Dibatalkan',
     ],
 ];

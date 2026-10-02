@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\ContractStatus;
 use App\Enums\DepositType;
 use App\Enums\InvoiceStatus;
 use App\Enums\QuotationStatus;
@@ -79,6 +80,15 @@ class Quotation extends Model
         return $token;
     }
 
+    /**
+     * The token, in the vendor's own pages as on the public one: a running id
+     * in the address would tell anyone how many there are and invite guessing.
+     */
+    public function getRouteKeyName(): string
+    {
+        return 'token';
+    }
+
     public function vendor(): BelongsTo
     {
         return $this->belongsTo(Vendor::class);
@@ -92,6 +102,17 @@ class Quotation extends Model
     public function booking(): BelongsTo
     {
         return $this->belongsTo(Booking::class);
+    }
+
+    public function contracts(): HasMany
+    {
+        return $this->hasMany(Contract::class);
+    }
+
+    /** The contract waiting for the client's signature, if one is attached. */
+    public function contractAwaitingSignature(): ?Contract
+    {
+        return $this->contracts()->where('status', ContractStatus::Sent)->latest('id')->first();
     }
 
     public function items(): HasMany

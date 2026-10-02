@@ -13,6 +13,7 @@ return [
     ],
 
     'vendor_feature' => [
+        'contracts' => 'Digital Contracts',
         'quotations' => 'Quotations & Invoices',
         'boost' => 'Boost',
         'online_booking' => 'Online Booking',
@@ -26,6 +27,7 @@ return [
     ],
 
     'vendor_feature_desc' => [
+        'contracts' => 'Prepare contracts and let clients sign them online.',
         'quotations' => 'Send quotations as a link, let clients accept online, and issue invoices.',
         'boost' => 'Spend tokens to lift your profile to the top of your category.',
         'online_booking' => 'Couples book a date and pay the deposit right on the vendor page.',
@@ -322,5 +324,12 @@ return [
         'unpaid' => 'Unpaid',
         'deposit_paid' => 'Deposit paid',
         'paid' => 'Paid in full',
+    ],
+
+    'contract_status' => [
+        'draft' => 'Draft',
+        'sent' => 'Awaiting signature',
+        'signed' => 'Signed',
+        'void' => 'Withdrawn',
     ],
 ];

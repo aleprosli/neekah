@@ -9,8 +9,10 @@ use App\Actions\SendQuotation;
 use App\Enums\DepositType;
 use App\Enums\InvoiceStatus;
 use App\Enums\QuotationStatus;
+use App\Enums\VendorFeature;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SaveQuotationRequest;
+use App\Models\Contract;
 use App\Models\Enquiry;
 use App\Models\Package;
 use App\Models\Quotation;
@@ -140,7 +142,7 @@ class QuotationController extends Controller
     {
         Gate::authorize('view', $quotation);
 
-        $quotation->load(['items', 'booking', 'enquiry']);
+        $quotation->load(['items', 'booking.payments', 'enquiry', 'contracts', 'vendor.user']);
 
         return view('vendor.quotations.show', [
             'quotation' => $quotation,
@@ -247,13 +249,22 @@ class QuotationController extends Controller
         return VueProps::for([
             'action' => $action,
             'method' => $quotation ? 'PUT' : 'POST',
+            'number' => $quotation?->number,
+            'vendor' => [
+                'name' => $vendor->name,
+                'logo' => $vendor->logoUrl(),
+                'lines' => array_values(array_filter([
+                    $vendor->phone,
+                    $vendor->user?->email,
+                    collect([$vendor->city, $vendor->state])->filter()->implode(', '),
+                ])),
+            ],
             'cancelUrl' => $quotation ? route('vendor.quotations.show', $quotation) : route('vendor.quotations.index'),
             'packages' => $packages->map(fn (Package $package): array => [
                 'id' => $package->id,
                 'name' => $package->name,
                 'price' => (float) $package->price,
             ])->values(),
-            'depositTypes' => collect(DepositType::cases())->map(fn (DepositType $type): array => ['value' => $type->value, 'label' => $type->label()])->values(),
             'quotation' => [
                 'enquiry_id' => $quotation?->enquiry_id ?? $enquiry?->id,
                 'client_name' => $quotation?->client_name ?? $enquiry?->user->name ?? '',
@@ -291,28 +302,7 @@ class QuotationController extends Controller
 
         return [
             'number' => $quotation->number,
-            'status' => ['value' => $quotation->status->value, 'label' => $quotation->isExpired() ? __('pages.quotations.expired') : $quotation->status->label(), 'tone' => $quotation->isExpired() ? 'muted' : $quotation->status->tone()],
-            'client' => [
-                'name' => $quotation->client_name,
-                'contact' => collect([$quotation->client_email, $quotation->client_phone])->filter()->implode(' · '),
-            ],
-            'event_date' => $quotation->event_date?->translatedFormat('l, j F Y'),
-            'event_location' => $quotation->event_location,
-            'valid_until' => $quotation->valid_until->translatedFormat('j F Y'),
-            'items' => $quotation->items->map(fn (QuotationItem $item): array => [
-                'name' => $item->name,
-                'kind' => $item->kind->label(),
-                'quantity' => $item->quantity,
-                'unit_price' => Quotation::money($item->unit_price),
-                'line_total' => Quotation::money($item->line_total),
-            ])->values(),
-            'subtotal' => Quotation::money($quotation->subtotal),
-            'discount' => (float) $quotation->discount_amount > 0 ? Quotation::money($quotation->discount_amount) : null,
-            'total' => Quotation::money($quotation->total),
-            'deposit' => $quotation->hasDeposit() ? Quotation::money($quotation->deposit_amount) : null,
-            'balance' => Quotation::money($quotation->balanceAmount()),
-            'terms' => $quotation->terms,
-            'notes' => $quotation->notes,
+            'client' => ['name' => $quotation->client_name],
             'history' => collect([
                 [__('pages.quotations.history_created'), $quotation->created_at],
                 [__('pages.quotations.history_sent'), $quotation->sent_at],
@@ -339,10 +329,16 @@ class QuotationController extends Controller
                 'duplicate' => route('vendor.quotations.duplicate', $quotation),
                 'destroy' => request()->user()->can('delete', $quotation) ? route('vendor.quotations.destroy', $quotation) : null,
                 'invoice' => $canInvoice && ! $quotation->isInvoiced() ? route('vendor.quotations.invoice', $quotation) : null,
-                'record_booking' => $canInvoice && ! $quotation->booking_id ? route('vendor.bookings.create', ['quotation' => $quotation->id]) : null,
+                'record_booking' => $canInvoice && ! $quotation->booking_id ? route('vendor.bookings.create', ['quotation' => $quotation->token]) : null,
                 'booking' => $quotation->booking ? route('vendor.bookings.show', $quotation->booking) : null,
                 'enquiry' => $quotation->enquiry ? route('vendor.enquiries.show', $quotation->enquiry) : null,
+                'contract' => request()->user()->vendor->hasFeature(VendorFeature::Contracts) ? route('vendor.contracts.create', ['quotation' => $quotation->token]) : null,
             ],
+            'contracts' => $quotation->contracts->sortByDesc('id')->map(fn (Contract $contract): array => [
+                'number' => $contract->number,
+                'status' => $contract->status->label(),
+                'url' => route('vendor.contracts.show', $contract),
+            ])->values(),
             'is_draft' => $quotation->status === QuotationStatus::Draft,
             'has_email' => filled($quotation->client_email),
         ];

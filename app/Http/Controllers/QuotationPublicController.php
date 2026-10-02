@@ -41,6 +41,8 @@ class QuotationPublicController extends Controller
             'vendor' => $quotation->vendor,
             'isOwner' => $isOwner,
             'asInvoice' => $quotation->isInvoiced(),
+            // With a contract waiting, signing it is how the client accepts.
+            'contract' => $quotation->awaitsClient() ? $quotation->contractAwaitingSignature() : null,
         ]);
     }
 

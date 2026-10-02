@@ -189,4 +189,9 @@ return [
     'harga_seunit' => 'harga seunit',
     'nama_penuh' => 'nama penuh',
     'persetujuan' => 'persetujuan',
+
+    'bahagian_kontrak' => 'bahagian kontrak',
+    'tajuk_bahagian' => 'tajuk bahagian',
+    'isi_bahagian' => 'isi bahagian',
+    'tandatangan' => 'tandatangan',
 ];

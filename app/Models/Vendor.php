@@ -215,6 +215,12 @@ class Vendor extends Model
         return $this->hasMany(Quotation::class);
     }
 
+    /** Neekah Pro: this vendor's contracts with clients. */
+    public function contracts(): HasMany
+    {
+        return $this->hasMany(Contract::class);
+    }
+
     public function reviews(): HasMany
     {
         return $this->hasMany(Review::class);

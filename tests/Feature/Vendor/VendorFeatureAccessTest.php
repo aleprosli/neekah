@@ -25,7 +25,7 @@ it('gives Basic the profile features and boosting, and Pro everything', function
     }
 
     expect(collect(VendorFeature::cases())->filter->requiresPro()->values()->all())
-        ->toBe([VendorFeature::Calendar, VendorFeature::Bookings, VendorFeature::Enquiries, VendorFeature::Points, VendorFeature::OnlineBooking, VendorFeature::Quotations]);
+        ->toBe([VendorFeature::Calendar, VendorFeature::Bookings, VendorFeature::Enquiries, VendorFeature::Points, VendorFeature::OnlineBooking, VendorFeature::Quotations, VendorFeature::Contracts]);
 });
 
 it('sends a Basic vendor to the Pro page for a Pro feature, and refuses writes to it', function () {

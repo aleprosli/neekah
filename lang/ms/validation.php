@@ -182,6 +182,10 @@ return [
     */
 
     'custom' => [
+        'contract_locked' => 'Kontrak ini sudah dihantar dan tidak boleh diubah lagi. Batalkan dan salin sebagai baharu.',
+        'contract_closed' => 'Kontrak ini tidak lagi menunggu tandatangan.',
+        'contract_not_voidable' => 'Hanya kontrak yang menunggu tandatangan boleh dibatalkan.',
+        'signature_invalid' => 'Sila lukis tandatangan anda di dalam kotak.',
         'quotation_locked' => 'Sebut harga ini sudah dijawab klien dan tidak boleh diubah lagi. Salin sebagai baharu.',
         'quotation_closed' => 'Sebut harga ini tidak lagi menunggu jawapan.',
         'quotation_not_accepted' => 'Invois hanya boleh dikeluarkan selepas klien menerima sebut harga.',

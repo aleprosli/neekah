@@ -6,8 +6,8 @@ namespace App\Enums;
  * The parts of the vendor area, each open to every vendor or only on Neekah
  * Pro. Fixed by the owner (26 Sep 2026): Basic gets what builds the public
  * profile (packages, portfolio, reviews) and boosting; Pro adds the calendar
- * with online booking, bookings, enquiries, quotations & invoices and
- * points & ranking.
+ * with online booking, bookings, enquiries, quotations & invoices,
+ * digital contracts and points & ranking.
  *
  * The overview, the business profile, the Pro page and the account are not
  * here: every vendor always has them, and the Pro page is where a locked
@@ -25,11 +25,12 @@ enum VendorFeature: string
     case OnlineBooking = 'online_booking';
     case Boost = 'boost';
     case Quotations = 'quotations';
+    case Contracts = 'contracts';
 
     /** Whether only a Neekah Pro vendor can use it. */
     public function requiresPro(): bool
     {
-        return in_array($this, [self::Calendar, self::Bookings, self::Enquiries, self::Quotations, self::Points, self::OnlineBooking], true);
+        return in_array($this, [self::Calendar, self::Bookings, self::Enquiries, self::Quotations, self::Contracts, self::Points, self::OnlineBooking], true);
     }
 
     /**
@@ -40,7 +41,7 @@ enum VendorFeature: string
      */
     public static function menu(): array
     {
-        return [self::Packages, self::Portfolio, self::Reviews, self::Boost, self::Calendar, self::Bookings, self::Enquiries, self::Quotations, self::Points];
+        return [self::Packages, self::Portfolio, self::Reviews, self::Boost, self::Calendar, self::Bookings, self::Enquiries, self::Quotations, self::Contracts, self::Points];
     }
 
     public function label(): string
@@ -67,6 +68,7 @@ enum VendorFeature: string
             self::OnlineBooking => 'calendar',
             self::Boost => 'rocket',
             self::Quotations => 'document',
+            self::Contracts => 'pencil',
         };
     }
 
@@ -84,6 +86,7 @@ enum VendorFeature: string
             self::OnlineBooking => 'vendor.availability.index',
             self::Boost => 'vendor.boost.index',
             self::Quotations => 'vendor.quotations.index',
+            self::Contracts => 'vendor.contracts.index',
         };
     }
 
@@ -101,6 +104,7 @@ enum VendorFeature: string
             self::OnlineBooking => 'vendor.availability.*',
             self::Boost => 'vendor.boost.*',
             self::Quotations => 'vendor.quotations.*',
+            self::Contracts => 'vendor.contracts.*',
         };
     }
 }

@@ -1,178 +1,178 @@
 {
-  "_CardClosing-Dr6D-Uej.js": {
-    "file": "assets/CardClosing-Dr6D-Uej.js",
+  "_CardClosing-BRseJq5A.js": {
+    "file": "assets/CardClosing-BRseJq5A.js",
     "name": "CardClosing",
     "imports": [
-      "_PopperContent-CA085Lqf.js",
+      "_PopperContent-BS2wMM-C.js",
       "_runtime-core.esm-bundler-Car86Ubo.js",
-      "_CardSection-xBwJBGP_.js"
+      "_CardSection-B32cC6nb.js"
     ]
   },
-  "_CardContacts-D_KBBGle.js": {
-    "file": "assets/CardContacts-D_KBBGle.js",
+  "_CardContacts-ckF5l5K_.js": {
+    "file": "assets/CardContacts-ckF5l5K_.js",
     "name": "CardContacts",
     "imports": [
-      "_PopperContent-CA085Lqf.js",
+      "_PopperContent-BS2wMM-C.js",
       "_runtime-core.esm-bundler-Car86Ubo.js",
-      "_CardSection-xBwJBGP_.js"
+      "_CardSection-B32cC6nb.js"
     ]
   },
-  "_CardCountdown-0tSLRd0m.js": {
-    "file": "assets/CardCountdown-0tSLRd0m.js",
+  "_CardCountdown-DQKO1toY.js": {
+    "file": "assets/CardCountdown-DQKO1toY.js",
     "name": "CardCountdown",
     "imports": [
-      "_PopperContent-CA085Lqf.js",
+      "_PopperContent-BS2wMM-C.js",
       "_runtime-core.esm-bundler-Car86Ubo.js",
-      "_CardSection-xBwJBGP_.js"
+      "_CardSection-B32cC6nb.js"
     ]
   },
-  "_CardGallery-Cr5z671r.js": {
-    "file": "assets/CardGallery-Cr5z671r.js",
+  "_CardGallery-DYS9GG27.js": {
+    "file": "assets/CardGallery-DYS9GG27.js",
     "name": "CardGallery",
     "imports": [
-      "_PopperContent-CA085Lqf.js",
+      "_PopperContent-BS2wMM-C.js",
       "_runtime-core.esm-bundler-Car86Ubo.js",
       "resources/js/app.js",
-      "_CardSection-xBwJBGP_.js"
+      "_CardSection-B32cC6nb.js"
     ]
   },
-  "_CardGift-BD-Wm02C.js": {
-    "file": "assets/CardGift-BD-Wm02C.js",
+  "_CardGift-CKOFYHVs.js": {
+    "file": "assets/CardGift-CKOFYHVs.js",
     "name": "CardGift",
     "imports": [
-      "_PopperContent-CA085Lqf.js",
+      "_PopperContent-BS2wMM-C.js",
       "_runtime-core.esm-bundler-Car86Ubo.js",
-      "_CardSection-xBwJBGP_.js"
+      "_CardSection-B32cC6nb.js"
     ]
   },
-  "_CardItinerary-Dt663Cds.js": {
-    "file": "assets/CardItinerary-Dt663Cds.js",
+  "_CardItinerary-DwLkxVlV.js": {
+    "file": "assets/CardItinerary-DwLkxVlV.js",
     "name": "CardItinerary",
     "imports": [
-      "_PopperContent-CA085Lqf.js",
+      "_PopperContent-BS2wMM-C.js",
       "_runtime-core.esm-bundler-Car86Ubo.js",
-      "_CardSection-xBwJBGP_.js"
+      "_CardSection-B32cC6nb.js"
     ]
   },
-  "_CardLayer-CqtpWmfs.js": {
-    "file": "assets/CardLayer-CqtpWmfs.js",
+  "_CardLayer-CKFuB1An.js": {
+    "file": "assets/CardLayer-CKFuB1An.js",
     "name": "CardLayer",
     "imports": [
-      "_PopperContent-CA085Lqf.js",
+      "_PopperContent-BS2wMM-C.js",
       "_runtime-core.esm-bundler-Car86Ubo.js"
     ]
   },
-  "_CardLocation-CM4DDJvT.js": {
-    "file": "assets/CardLocation-CM4DDJvT.js",
+  "_CardLocation-Co2i9hvh.js": {
+    "file": "assets/CardLocation-Co2i9hvh.js",
     "name": "CardLocation",
     "imports": [
-      "_PopperContent-CA085Lqf.js",
+      "_PopperContent-BS2wMM-C.js",
       "_runtime-core.esm-bundler-Car86Ubo.js",
-      "_CardSection-xBwJBGP_.js"
+      "_CardSection-B32cC6nb.js"
     ]
   },
-  "_CardRsvp-CTmiWPkQ.js": {
-    "file": "assets/CardRsvp-CTmiWPkQ.js",
+  "_CardRsvp-ByEgjTnA.js": {
+    "file": "assets/CardRsvp-ByEgjTnA.js",
     "name": "CardRsvp",
     "imports": [
-      "_PopperContent-CA085Lqf.js",
+      "_PopperContent-BS2wMM-C.js",
       "_runtime-core.esm-bundler-Car86Ubo.js",
       "resources/js/app.js",
-      "_CardSection-xBwJBGP_.js"
+      "_CardSection-B32cC6nb.js"
     ]
   },
-  "_CardScene-CSClrOmv.js": {
-    "file": "assets/CardScene-CSClrOmv.js",
+  "_CardScene-CeYxeBdu.js": {
+    "file": "assets/CardScene-CeYxeBdu.js",
     "name": "CardScene",
     "imports": [
-      "_PopperContent-CA085Lqf.js",
+      "_PopperContent-BS2wMM-C.js",
       "_runtime-core.esm-bundler-Car86Ubo.js",
-      "_CardLayer-CqtpWmfs.js"
+      "_CardLayer-CKFuB1An.js"
     ]
   },
-  "_CardSection-xBwJBGP_.js": {
-    "file": "assets/CardSection-xBwJBGP_.js",
+  "_CardSection-B32cC6nb.js": {
+    "file": "assets/CardSection-B32cC6nb.js",
     "name": "CardSection",
     "imports": [
-      "_PopperContent-CA085Lqf.js",
+      "_PopperContent-BS2wMM-C.js",
       "_runtime-core.esm-bundler-Car86Ubo.js"
     ]
   },
-  "_CardWishes-CdUYAJ4p.js": {
-    "file": "assets/CardWishes-CdUYAJ4p.js",
+  "_CardWishes-DWxK01hn.js": {
+    "file": "assets/CardWishes-DWxK01hn.js",
     "name": "CardWishes",
     "imports": [
-      "_PopperContent-CA085Lqf.js",
+      "_PopperContent-BS2wMM-C.js",
       "_runtime-core.esm-bundler-Car86Ubo.js",
-      "_CardSection-xBwJBGP_.js"
+      "_CardSection-B32cC6nb.js"
     ]
   },
-  "_PopperContent-CA085Lqf.js": {
-    "file": "assets/PopperContent-CA085Lqf.js",
+  "_PopperContent-BS2wMM-C.js": {
+    "file": "assets/PopperContent-BS2wMM-C.js",
     "name": "PopperContent",
     "imports": [
       "_runtime-core.esm-bundler-Car86Ubo.js",
       "resources/js/app.js"
     ]
   },
-  "_UiColumnToggle-AWRvWiD9.js": {
-    "file": "assets/UiColumnToggle-AWRvWiD9.js",
+  "_UiColumnToggle-dEgt63Fy.js": {
+    "file": "assets/UiColumnToggle-dEgt63Fy.js",
     "name": "UiColumnToggle",
     "imports": [
-      "_PopperContent-CA085Lqf.js",
+      "_PopperContent-BS2wMM-C.js",
       "_runtime-core.esm-bundler-Car86Ubo.js",
       "resources/js/app.js"
     ]
   },
-  "_UiConfirm-A70m-Ao8.js": {
-    "file": "assets/UiConfirm-A70m-Ao8.js",
+  "_UiConfirm-B4h9EiOC.js": {
+    "file": "assets/UiConfirm-B4h9EiOC.js",
     "name": "UiConfirm",
     "imports": [
-      "_PopperContent-CA085Lqf.js",
+      "_PopperContent-BS2wMM-C.js",
       "_runtime-core.esm-bundler-Car86Ubo.js",
       "resources/js/app.js"
     ]
   },
-  "_UiDistrictSelect-wlm5fSd7.js": {
-    "file": "assets/UiDistrictSelect-wlm5fSd7.js",
+  "_UiDistrictSelect-QEls4M0W.js": {
+    "file": "assets/UiDistrictSelect-QEls4M0W.js",
     "name": "UiDistrictSelect",
     "imports": [
-      "_PopperContent-CA085Lqf.js",
+      "_PopperContent-BS2wMM-C.js",
       "_runtime-core.esm-bundler-Car86Ubo.js",
-      "_UiSelect-BBQ-FGL2.js"
+      "_UiSelect-BRh_x7NR.js"
     ]
   },
-  "_UiFacetedFilter-gfE6DWyn.js": {
-    "file": "assets/UiFacetedFilter-gfE6DWyn.js",
+  "_UiFacetedFilter-NDAFJKkU.js": {
+    "file": "assets/UiFacetedFilter-NDAFJKkU.js",
     "name": "UiFacetedFilter",
     "imports": [
-      "_PopperContent-CA085Lqf.js",
+      "_PopperContent-BS2wMM-C.js",
       "_runtime-core.esm-bundler-Car86Ubo.js",
       "resources/js/app.js"
     ]
   },
-  "_UiField-CwNP5-F2.js": {
-    "file": "assets/UiField-CwNP5-F2.js",
+  "_UiField-DPwyOUNf.js": {
+    "file": "assets/UiField-DPwyOUNf.js",
     "name": "UiField",
     "imports": [
-      "_PopperContent-CA085Lqf.js",
+      "_PopperContent-BS2wMM-C.js",
       "_runtime-core.esm-bundler-Car86Ubo.js"
     ]
   },
-  "_UiFlagSelect-OCKx4lOT.js": {
-    "file": "assets/UiFlagSelect-OCKx4lOT.js",
+  "_UiFlagSelect-Bcl9m014.js": {
+    "file": "assets/UiFlagSelect-Bcl9m014.js",
     "name": "UiFlagSelect",
     "imports": [
-      "_PopperContent-CA085Lqf.js",
+      "_PopperContent-BS2wMM-C.js",
       "_runtime-core.esm-bundler-Car86Ubo.js",
       "_useAnchoredMenu-DVus4CDk.js"
     ]
   },
-  "_UiPhoneField-BeUpEgS8.js": {
-    "file": "assets/UiPhoneField-BeUpEgS8.js",
+  "_UiPhoneField-CdCayjrc.js": {
+    "file": "assets/UiPhoneField-CdCayjrc.js",
     "name": "UiPhoneField",
     "imports": [
-      "_PopperContent-CA085Lqf.js",
+      "_PopperContent-BS2wMM-C.js",
       "_runtime-core.esm-bundler-Car86Ubo.js",
       "resources/js/app.js"
     ],
@@ -191,27 +191,27 @@
     "file": "assets/UiPhoneField-Dpre4D-Q.css",
     "src": "_UiPhoneField-Dpre4D-Q.css"
   },
-  "_UiSelect-BBQ-FGL2.js": {
-    "file": "assets/UiSelect-BBQ-FGL2.js",
+  "_UiSelect-BRh_x7NR.js": {
+    "file": "assets/UiSelect-BRh_x7NR.js",
     "name": "UiSelect",
     "imports": [
-      "_PopperContent-CA085Lqf.js",
+      "_PopperContent-BS2wMM-C.js",
       "_runtime-core.esm-bundler-Car86Ubo.js"
     ]
   },
-  "_UiStatCard-BRNJ_Fz8.js": {
-    "file": "assets/UiStatCard-BRNJ_Fz8.js",
+  "_UiStatCard-DCx7OxA3.js": {
+    "file": "assets/UiStatCard-DCx7OxA3.js",
     "name": "UiStatCard",
     "imports": [
-      "_PopperContent-CA085Lqf.js",
+      "_PopperContent-BS2wMM-C.js",
       "_runtime-core.esm-bundler-Car86Ubo.js"
     ]
   },
-  "_UiTurnstile-BBwgvMin.js": {
-    "file": "assets/UiTurnstile-BBwgvMin.js",
+  "_UiTurnstile-CtvkHBio.js": {
+    "file": "assets/UiTurnstile-CtvkHBio.js",
     "name": "UiTurnstile",
     "imports": [
-      "_PopperContent-CA085Lqf.js",
+      "_PopperContent-BS2wMM-C.js",
       "_runtime-core.esm-bundler-Car86Ubo.js"
     ]
   },
@@ -684,7 +684,7 @@
     "isDynamicEntry": true
   },
   "resources/css/app.css": {
-    "file": "assets/app-CJo-ZMOO.css",
+    "file": "assets/app-CfPsuk0N.css",
     "name": "app",
     "names": [
       "app.css"
@@ -693,7 +693,7 @@
     "isEntry": true
   },
   "resources/js/app.js": {
-    "file": "assets/app-ggWrPrCr.js",
+    "file": "assets/app-BtnGRZ40.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
@@ -723,19 +723,19 @@
       "resources/js/components/auth/AuthForm.vue",
       "resources/js/components/auth/AuthRoleChooser.vue",
       "resources/js/components/camera/CameraGuestPage.vue",
-      "_CardClosing-Dr6D-Uej.js",
-      "_CardContacts-D_KBBGle.js",
-      "_CardCountdown-0tSLRd0m.js",
-      "_CardGallery-Cr5z671r.js",
-      "_CardGift-BD-Wm02C.js",
-      "_CardItinerary-Dt663Cds.js",
-      "_CardLayer-CqtpWmfs.js",
-      "_CardLocation-CM4DDJvT.js",
-      "_CardRsvp-CTmiWPkQ.js",
-      "_CardScene-CSClrOmv.js",
-      "_CardSection-xBwJBGP_.js",
+      "_CardClosing-BRseJq5A.js",
+      "_CardContacts-ckF5l5K_.js",
+      "_CardCountdown-DQKO1toY.js",
+      "_CardGallery-DYS9GG27.js",
+      "_CardGift-CKOFYHVs.js",
+      "_CardItinerary-DwLkxVlV.js",
+      "_CardLayer-CKFuB1An.js",
+      "_CardLocation-Co2i9hvh.js",
+      "_CardRsvp-ByEgjTnA.js",
+      "_CardScene-CeYxeBdu.js",
+      "_CardSection-B32cC6nb.js",
       "resources/js/components/card/CardView.vue",
-      "_CardWishes-CdUYAJ4p.js",
+      "_CardWishes-DWxK01hn.js",
       "resources/js/components/customer/CameraPrintDesigner.vue",
       "resources/js/components/customer/CustomerBookingDetail.vue",
       "resources/js/components/customer/CustomerBookingsPage.vue",
@@ -753,6 +753,7 @@
       "resources/js/components/customer/CustomerWeddingForm.vue",
       "resources/js/components/public/BlogIndexPage.vue",
       "resources/js/components/public/BlogPostPage.vue",
+      "resources/js/components/public/ContractSignaturePad.vue",
       "resources/js/components/public/InvitationPage.vue",
       "resources/js/components/public/NotificationsPage.vue",
       "resources/js/components/public/PortfolioGallery.vue",
@@ -761,30 +762,32 @@
       "resources/js/components/ui/UiBadge.vue",
       "resources/js/components/ui/UiBarChart.vue",
       "resources/js/components/ui/UiCategoryTile.vue",
-      "_UiColumnToggle-AWRvWiD9.js",
-      "_UiConfirm-A70m-Ao8.js",
+      "_UiColumnToggle-dEgt63Fy.js",
+      "_UiConfirm-B4h9EiOC.js",
       "resources/js/components/ui/UiConfirmSubmit.vue",
-      "_UiDistrictSelect-wlm5fSd7.js",
+      "_UiDistrictSelect-QEls4M0W.js",
       "resources/js/components/ui/UiDonutChart.vue",
       "resources/js/components/ui/UiEmptyState.vue",
-      "_UiFacetedFilter-gfE6DWyn.js",
-      "_UiField-CwNP5-F2.js",
-      "_UiFlagSelect-OCKx4lOT.js",
+      "_UiFacetedFilter-NDAFJKkU.js",
+      "_UiField-DPwyOUNf.js",
+      "_UiFlagSelect-Bcl9m014.js",
       "resources/js/components/ui/UiLineChart.vue",
       "resources/js/components/ui/UiMultiSelect.vue",
-      "_UiPhoneField-BeUpEgS8.js",
+      "_UiPhoneField-CdCayjrc.js",
       "resources/js/components/ui/UiPhotoPicker.vue",
       "resources/js/components/ui/UiRichEditor.vue",
-      "_UiSelect-BBQ-FGL2.js",
-      "_UiStatCard-BRNJ_Fz8.js",
+      "_UiSelect-BRh_x7NR.js",
+      "_UiStatCard-DCx7OxA3.js",
       "resources/js/components/ui/UiTextarea.vue",
-      "_UiTurnstile-BBwgvMin.js",
+      "_UiTurnstile-CtvkHBio.js",
       "resources/js/components/ui/UiUploadProgress.vue",
       "resources/js/components/vendor/PortfolioManager.vue",
       "resources/js/components/vendor/VendorBookingDetail.vue",
       "resources/js/components/vendor/VendorBookingForm.vue",
       "resources/js/components/vendor/VendorBoostPage.vue",
       "resources/js/components/vendor/VendorCalendarPage.vue",
+      "resources/js/components/vendor/VendorContractDetail.vue",
+      "resources/js/components/vendor/VendorContractForm.vue",
       "resources/js/components/vendor/VendorDashboardPage.vue",
       "resources/js/components/vendor/VendorDatePicker.vue",
       "resources/js/components/vendor/VendorEnquiriesLocked.vue",
@@ -800,17 +803,17 @@
     ]
   },
   "resources/js/components/account/AccountSettingsPage.vue": {
-    "file": "assets/AccountSettingsPage-Dyxc2WGG.js",
+    "file": "assets/AccountSettingsPage-IXT7oHxL.js",
     "name": "AccountSettingsPage",
     "src": "resources/js/components/account/AccountSettingsPage.vue",
     "isDynamicEntry": true,
     "imports": [
       "_runtime-core.esm-bundler-Car86Ubo.js",
-      "_UiField-CwNP5-F2.js"
+      "_UiField-DPwyOUNf.js"
     ]
   },
   "resources/js/components/admin/AdminAnalyticsPage.vue": {
-    "file": "assets/AdminAnalyticsPage-DydfaPRq.js",
+    "file": "assets/AdminAnalyticsPage-DP4DDSrq.js",
     "name": "AdminAnalyticsPage",
     "src": "resources/js/components/admin/AdminAnalyticsPage.vue",
     "isDynamicEntry": true,
@@ -819,7 +822,7 @@
       "resources/js/components/ui/UiBarChart.vue",
       "resources/js/components/ui/UiDonutChart.vue",
       "resources/js/components/ui/UiLineChart.vue",
-      "_UiStatCard-BRNJ_Fz8.js"
+      "_UiStatCard-DCx7OxA3.js"
     ]
   },
   "resources/js/components/admin/AdminAnnouncementDetail.vue": {
@@ -833,14 +836,14 @@
     ]
   },
   "resources/js/components/admin/AdminAnnouncementsPage.vue": {
-    "file": "assets/AdminAnnouncementsPage-CITReBCB.js",
+    "file": "assets/AdminAnnouncementsPage-Bb3Yf4Q3.js",
     "name": "AdminAnnouncementsPage",
     "src": "resources/js/components/admin/AdminAnnouncementsPage.vue",
     "isDynamicEntry": true,
     "imports": [
       "_runtime-core.esm-bundler-Car86Ubo.js",
       "resources/js/app.js",
-      "_UiField-CwNP5-F2.js",
+      "_UiField-DPwyOUNf.js",
       "resources/js/components/ui/UiBadge.vue",
       "resources/js/components/ui/DataTable.vue",
       "resources/js/components/ui/UiConfirmSubmit.vue",
@@ -857,82 +860,82 @@
     ]
   },
   "resources/js/components/admin/AdminCameraPage.vue": {
-    "file": "assets/AdminCameraPage-BlGoqtgh.js",
+    "file": "assets/AdminCameraPage-DGG2vrja.js",
     "name": "AdminCameraPage",
     "src": "resources/js/components/admin/AdminCameraPage.vue",
     "isDynamicEntry": true,
     "imports": [
       "_runtime-core.esm-bundler-Car86Ubo.js",
-      "_UiStatCard-BRNJ_Fz8.js",
-      "_UiConfirm-A70m-Ao8.js",
+      "_UiStatCard-DCx7OxA3.js",
+      "_UiConfirm-B4h9EiOC.js",
       "resources/js/components/ui/DataTable.vue"
     ]
   },
   "resources/js/components/admin/AdminCardMusicPage.vue": {
-    "file": "assets/AdminCardMusicPage-BujeJNOg.js",
+    "file": "assets/AdminCardMusicPage-nc3LTro5.js",
     "name": "AdminCardMusicPage",
     "src": "resources/js/components/admin/AdminCardMusicPage.vue",
     "isDynamicEntry": true,
     "imports": [
       "_runtime-core.esm-bundler-Car86Ubo.js",
       "resources/js/app.js",
-      "_UiField-CwNP5-F2.js",
-      "_UiStatCard-BRNJ_Fz8.js",
-      "_UiConfirm-A70m-Ao8.js",
+      "_UiField-DPwyOUNf.js",
+      "_UiStatCard-DCx7OxA3.js",
+      "_UiConfirm-B4h9EiOC.js",
       "resources/js/components/ui/UiUploadProgress.vue",
       "_useUploadForm-DYH72pBu.js"
     ]
   },
   "resources/js/components/admin/AdminCardNfcPage.vue": {
-    "file": "assets/AdminCardNfcPage-Bl2HbB0u.js",
+    "file": "assets/AdminCardNfcPage-W8wDD6vm.js",
     "name": "AdminCardNfcPage",
     "src": "resources/js/components/admin/AdminCardNfcPage.vue",
     "isDynamicEntry": true,
     "imports": [
       "_runtime-core.esm-bundler-Car86Ubo.js",
       "resources/js/app.js",
-      "_UiStatCard-BRNJ_Fz8.js",
-      "_UiConfirm-A70m-Ao8.js"
+      "_UiStatCard-DCx7OxA3.js",
+      "_UiConfirm-B4h9EiOC.js"
     ]
   },
   "resources/js/components/admin/AdminCategoriesPage.vue": {
-    "file": "assets/AdminCategoriesPage-DSImBCoD.js",
+    "file": "assets/AdminCategoriesPage-C6Q9rS_f.js",
     "name": "AdminCategoriesPage",
     "src": "resources/js/components/admin/AdminCategoriesPage.vue",
     "isDynamicEntry": true,
     "imports": [
       "_runtime-core.esm-bundler-Car86Ubo.js",
       "resources/js/app.js",
-      "_UiField-CwNP5-F2.js",
-      "_UiConfirm-A70m-Ao8.js",
+      "_UiField-DPwyOUNf.js",
+      "_UiConfirm-B4h9EiOC.js",
       "resources/js/components/ui/UiUploadProgress.vue",
       "_useUploadForm-DYH72pBu.js",
       "resources/js/components/admin/AdminStatRow.vue"
     ]
   },
   "resources/js/components/admin/AdminChecklistPage.vue": {
-    "file": "assets/AdminChecklistPage-Ba1vI2j9.js",
+    "file": "assets/AdminChecklistPage-CrN4JMao.js",
     "name": "AdminChecklistPage",
     "src": "resources/js/components/admin/AdminChecklistPage.vue",
     "isDynamicEntry": true,
     "imports": [
       "_runtime-core.esm-bundler-Car86Ubo.js",
       "resources/js/app.js",
-      "_UiField-CwNP5-F2.js",
-      "_UiConfirm-A70m-Ao8.js",
+      "_UiField-DPwyOUNf.js",
+      "_UiConfirm-B4h9EiOC.js",
       "resources/js/components/ui/UiTextarea.vue"
     ]
   },
   "resources/js/components/admin/AdminDashboardPage.vue": {
-    "file": "assets/AdminDashboardPage-Cqv34nkb.js",
+    "file": "assets/AdminDashboardPage-DGuslpuR.js",
     "name": "AdminDashboardPage",
     "src": "resources/js/components/admin/AdminDashboardPage.vue",
     "isDynamicEntry": true,
     "imports": [
       "_runtime-core.esm-bundler-Car86Ubo.js",
-      "_UiStatCard-BRNJ_Fz8.js",
+      "_UiStatCard-DCx7OxA3.js",
       "resources/js/components/ui/UiBadge.vue",
-      "_UiConfirm-A70m-Ao8.js",
+      "_UiConfirm-B4h9EiOC.js",
       "resources/js/components/ui/DataTable.vue"
     ]
   },
@@ -946,14 +949,14 @@
     ]
   },
   "resources/js/components/admin/AdminPostForm.vue": {
-    "file": "assets/AdminPostForm-DH2FJvCy.js",
+    "file": "assets/AdminPostForm-Du1A84Aw.js",
     "name": "AdminPostForm",
     "src": "resources/js/components/admin/AdminPostForm.vue",
     "isDynamicEntry": true,
     "imports": [
       "_runtime-core.esm-bundler-Car86Ubo.js",
       "resources/js/app.js",
-      "_UiField-CwNP5-F2.js",
+      "_UiField-DPwyOUNf.js",
       "resources/js/components/ui/UiTextarea.vue",
       "resources/js/components/ui/UiUploadProgress.vue",
       "_useUploadForm-DYH72pBu.js",
@@ -961,60 +964,60 @@
     ]
   },
   "resources/js/components/admin/AdminPostsPage.vue": {
-    "file": "assets/AdminPostsPage-C1eKllEj.js",
+    "file": "assets/AdminPostsPage-BVl3ZV4y.js",
     "name": "AdminPostsPage",
     "src": "resources/js/components/admin/AdminPostsPage.vue",
     "isDynamicEntry": true,
     "imports": [
       "_runtime-core.esm-bundler-Car86Ubo.js",
-      "_UiConfirm-A70m-Ao8.js",
+      "_UiConfirm-B4h9EiOC.js",
       "resources/js/components/ui/DataTable.vue"
     ]
   },
   "resources/js/components/admin/AdminSettingsPage.vue": {
-    "file": "assets/AdminSettingsPage-DOLqkKSm.js",
+    "file": "assets/AdminSettingsPage-C5d2_H9Z.js",
     "name": "AdminSettingsPage",
     "src": "resources/js/components/admin/AdminSettingsPage.vue",
     "isDynamicEntry": true,
     "imports": [
       "_runtime-core.esm-bundler-Car86Ubo.js",
       "resources/js/app.js",
-      "_UiField-CwNP5-F2.js",
+      "_UiField-DPwyOUNf.js",
       "resources/js/components/ui/UiTextarea.vue",
-      "_UiSelect-BBQ-FGL2.js"
+      "_UiSelect-BRh_x7NR.js"
     ]
   },
   "resources/js/components/admin/AdminStatRow.vue": {
-    "file": "assets/AdminStatRow-OAR8vRfA.js",
+    "file": "assets/AdminStatRow-BQlnBm-i.js",
     "name": "AdminStatRow",
     "src": "resources/js/components/admin/AdminStatRow.vue",
     "isDynamicEntry": true,
     "imports": [
       "_runtime-core.esm-bundler-Car86Ubo.js",
-      "_UiStatCard-BRNJ_Fz8.js"
+      "_UiStatCard-DCx7OxA3.js"
     ]
   },
   "resources/js/components/admin/AdminUserDetail.vue": {
-    "file": "assets/AdminUserDetail-BDMtISxs.js",
+    "file": "assets/AdminUserDetail-DJ7GjpIh.js",
     "name": "AdminUserDetail",
     "src": "resources/js/components/admin/AdminUserDetail.vue",
     "isDynamicEntry": true,
     "imports": [
       "_runtime-core.esm-bundler-Car86Ubo.js",
-      "_UiConfirm-A70m-Ao8.js",
+      "_UiConfirm-B4h9EiOC.js",
       "resources/js/components/vendor/VendorRegisterForm.vue"
     ]
   },
   "resources/js/components/admin/AdminVendorDetail.vue": {
-    "file": "assets/AdminVendorDetail-CbdvXRL8.js",
+    "file": "assets/AdminVendorDetail-SZ8OGxsi.js",
     "name": "AdminVendorDetail",
     "src": "resources/js/components/admin/AdminVendorDetail.vue",
     "isDynamicEntry": true,
     "imports": [
       "_runtime-core.esm-bundler-Car86Ubo.js",
       "resources/js/app.js",
-      "_UiConfirm-A70m-Ao8.js",
-      "_UiSelect-BBQ-FGL2.js"
+      "_UiConfirm-B4h9EiOC.js",
+      "_UiSelect-BRh_x7NR.js"
     ]
   },
   "resources/js/components/admin/AdminViolationDetail.vue": {
@@ -1028,14 +1031,14 @@
     ]
   },
   "resources/js/components/auth/AuthForm.vue": {
-    "file": "assets/AuthForm-BjqvIkza.js",
+    "file": "assets/AuthForm-BeyYGeff.js",
     "name": "AuthForm",
     "src": "resources/js/components/auth/AuthForm.vue",
     "isDynamicEntry": true,
     "imports": [
       "_runtime-core.esm-bundler-Car86Ubo.js",
-      "_UiField-CwNP5-F2.js",
-      "_UiTurnstile-BBwgvMin.js"
+      "_UiField-DPwyOUNf.js",
+      "_UiTurnstile-CtvkHBio.js"
     ]
   },
   "resources/js/components/auth/AuthRoleChooser.vue": {
@@ -1048,7 +1051,7 @@
     ]
   },
   "resources/js/components/camera/CameraGuestPage.vue": {
-    "file": "assets/CameraGuestPage-D8IE4FzC.js",
+    "file": "assets/CameraGuestPage-AnC3cQPQ.js",
     "name": "CameraGuestPage",
     "src": "resources/js/components/camera/CameraGuestPage.vue",
     "isDynamicEntry": true,
@@ -1058,44 +1061,44 @@
     ]
   },
   "resources/js/components/card/CardView.vue": {
-    "file": "assets/CardView-B8XRlopV.js",
+    "file": "assets/CardView-BAUh17pu.js",
     "name": "CardView",
     "src": "resources/js/components/card/CardView.vue",
     "isDynamicEntry": true,
     "imports": [
       "_runtime-core.esm-bundler-Car86Ubo.js",
-      "_CardClosing-Dr6D-Uej.js",
-      "_CardContacts-D_KBBGle.js",
-      "_CardCountdown-0tSLRd0m.js",
-      "_CardGallery-Cr5z671r.js",
-      "_CardGift-BD-Wm02C.js",
-      "_CardItinerary-Dt663Cds.js",
-      "_CardLocation-CM4DDJvT.js",
-      "_CardRsvp-CTmiWPkQ.js",
-      "_CardScene-CSClrOmv.js",
-      "_CardWishes-CdUYAJ4p.js"
+      "_CardClosing-BRseJq5A.js",
+      "_CardContacts-ckF5l5K_.js",
+      "_CardCountdown-DQKO1toY.js",
+      "_CardGallery-DYS9GG27.js",
+      "_CardGift-CKOFYHVs.js",
+      "_CardItinerary-DwLkxVlV.js",
+      "_CardLocation-Co2i9hvh.js",
+      "_CardRsvp-ByEgjTnA.js",
+      "_CardScene-CeYxeBdu.js",
+      "_CardWishes-DWxK01hn.js"
     ]
   },
   "resources/js/components/customer/CameraPrintDesigner.vue": {
-    "file": "assets/CameraPrintDesigner-CNjujGdg.js",
+    "file": "assets/CameraPrintDesigner-BzPSk1kW.js",
     "name": "CameraPrintDesigner",
     "src": "resources/js/components/customer/CameraPrintDesigner.vue",
     "isDynamicEntry": true,
     "imports": [
-      "_PopperContent-CA085Lqf.js",
+      "_PopperContent-BS2wMM-C.js",
       "_runtime-core.esm-bundler-Car86Ubo.js",
       "resources/js/app.js"
     ]
   },
   "resources/js/components/customer/CustomerBookingDetail.vue": {
-    "file": "assets/CustomerBookingDetail-abq_kFjZ.js",
+    "file": "assets/CustomerBookingDetail-ClTw2cn4.js",
     "name": "CustomerBookingDetail",
     "src": "resources/js/components/customer/CustomerBookingDetail.vue",
     "isDynamicEntry": true,
     "imports": [
       "_runtime-core.esm-bundler-Car86Ubo.js",
       "resources/js/app.js",
-      "_UiConfirm-A70m-Ao8.js",
+      "_UiConfirm-B4h9EiOC.js",
       "resources/js/components/ui/UiConfirmSubmit.vue",
       "resources/js/components/ui/UiUploadProgress.vue",
       "_useUploadForm-DYH72pBu.js"
@@ -1114,7 +1117,7 @@
     ]
   },
   "resources/js/components/customer/CustomerBudgetPage.vue": {
-    "file": "assets/CustomerBudgetPage-Caf3COLK.js",
+    "file": "assets/CustomerBudgetPage-CCxFJXxf.js",
     "name": "CustomerBudgetPage",
     "src": "resources/js/components/customer/CustomerBudgetPage.vue",
     "isDynamicEntry": true,
@@ -1123,24 +1126,24 @@
       "resources/js/app.js",
       "resources/js/components/ui/UiBarChart.vue",
       "resources/js/components/ui/UiDonutChart.vue",
-      "_UiStatCard-BRNJ_Fz8.js",
+      "_UiStatCard-DCx7OxA3.js",
       "resources/js/components/ui/DataTable.vue"
     ]
   },
   "resources/js/components/customer/CustomerCameraAlbum.vue": {
-    "file": "assets/CustomerCameraAlbum-HK7lR5Ix.js",
+    "file": "assets/CustomerCameraAlbum-CAmKaCst.js",
     "name": "CustomerCameraAlbum",
     "src": "resources/js/components/customer/CustomerCameraAlbum.vue",
     "isDynamicEntry": true,
     "imports": [
       "_runtime-core.esm-bundler-Car86Ubo.js",
       "resources/js/app.js",
-      "_UiConfirm-A70m-Ao8.js",
+      "_UiConfirm-B4h9EiOC.js",
       "resources/js/components/customer/CameraPrintDesigner.vue"
     ]
   },
   "resources/js/components/customer/CustomerCameraPage.vue": {
-    "file": "assets/CustomerCameraPage-DwoYlojQ.js",
+    "file": "assets/CustomerCameraPage-CsupIXk6.js",
     "name": "CustomerCameraPage",
     "src": "resources/js/components/customer/CustomerCameraPage.vue",
     "isDynamicEntry": true,
@@ -1150,35 +1153,35 @@
     ]
   },
   "resources/js/components/customer/CustomerCardInsights.vue": {
-    "file": "assets/CustomerCardInsights-B7zHXYC3.js",
+    "file": "assets/CustomerCardInsights-335-iS0Y.js",
     "name": "CustomerCardInsights",
     "src": "resources/js/components/customer/CustomerCardInsights.vue",
     "isDynamicEntry": true,
     "imports": [
       "_runtime-core.esm-bundler-Car86Ubo.js",
       "resources/js/components/ui/UiLineChart.vue",
-      "_UiStatCard-BRNJ_Fz8.js"
+      "_UiStatCard-DCx7OxA3.js"
     ]
   },
   "resources/js/components/customer/CustomerChecklistPage.vue": {
-    "file": "assets/CustomerChecklistPage-BQStmUbr.js",
+    "file": "assets/CustomerChecklistPage-BE25lay2.js",
     "name": "CustomerChecklistPage",
     "src": "resources/js/components/customer/CustomerChecklistPage.vue",
     "isDynamicEntry": true,
     "imports": [
       "_runtime-core.esm-bundler-Car86Ubo.js",
-      "_UiStatCard-BRNJ_Fz8.js",
-      "_UiConfirm-A70m-Ao8.js"
+      "_UiStatCard-DCx7OxA3.js",
+      "_UiConfirm-B4h9EiOC.js"
     ]
   },
   "resources/js/components/customer/CustomerDashboardPage.vue": {
-    "file": "assets/CustomerDashboardPage-D4dDh-vq.js",
+    "file": "assets/CustomerDashboardPage-BmeNGI5f.js",
     "name": "CustomerDashboardPage",
     "src": "resources/js/components/customer/CustomerDashboardPage.vue",
     "isDynamicEntry": true,
     "imports": [
       "_runtime-core.esm-bundler-Car86Ubo.js",
-      "_UiStatCard-BRNJ_Fz8.js",
+      "_UiStatCard-DCx7OxA3.js",
       "resources/js/components/ui/UiBadge.vue",
       "resources/js/components/ui/UiCategoryTile.vue",
       "resources/js/components/ui/UiEmptyState.vue"
@@ -1205,27 +1208,27 @@
     ]
   },
   "resources/js/components/customer/CustomerGuestsPage.vue": {
-    "file": "assets/CustomerGuestsPage-D9FJPYdP.js",
+    "file": "assets/CustomerGuestsPage-Z_zrGmLz.js",
     "name": "CustomerGuestsPage",
     "src": "resources/js/components/customer/CustomerGuestsPage.vue",
     "isDynamicEntry": true,
     "imports": [
       "_runtime-core.esm-bundler-Car86Ubo.js",
-      "_UiStatCard-BRNJ_Fz8.js",
-      "_UiConfirm-A70m-Ao8.js",
+      "_UiStatCard-DCx7OxA3.js",
+      "_UiConfirm-B4h9EiOC.js",
       "resources/js/components/ui/UiEmptyState.vue"
     ]
   },
   "resources/js/components/customer/CustomerSitePage.vue": {
-    "file": "assets/CustomerSitePage-jXdAFfTB.js",
+    "file": "assets/CustomerSitePage-H13vSQ55.js",
     "name": "CustomerSitePage",
     "src": "resources/js/components/customer/CustomerSitePage.vue",
     "isDynamicEntry": true,
     "imports": [
       "_runtime-core.esm-bundler-Car86Ubo.js",
       "resources/js/app.js",
-      "_UiField-CwNP5-F2.js",
-      "_UiConfirm-A70m-Ao8.js",
+      "_UiField-DPwyOUNf.js",
+      "_UiConfirm-B4h9EiOC.js",
       "resources/js/components/ui/UiTextarea.vue",
       "resources/js/components/ui/UiUploadProgress.vue",
       "_useUploadForm-DYH72pBu.js",
@@ -1233,27 +1236,27 @@
     ]
   },
   "resources/js/components/customer/CustomerTimelinePage.vue": {
-    "file": "assets/CustomerTimelinePage-OMvKYrzZ.js",
+    "file": "assets/CustomerTimelinePage-Dl63fhTU.js",
     "name": "CustomerTimelinePage",
     "src": "resources/js/components/customer/CustomerTimelinePage.vue",
     "isDynamicEntry": true,
     "imports": [
       "_runtime-core.esm-bundler-Car86Ubo.js",
-      "_UiConfirm-A70m-Ao8.js",
+      "_UiConfirm-B4h9EiOC.js",
       "resources/js/components/ui/UiEmptyState.vue"
     ]
   },
   "resources/js/components/customer/CustomerWeddingForm.vue": {
-    "file": "assets/CustomerWeddingForm-CuBfI50R.js",
+    "file": "assets/CustomerWeddingForm-ufaNmGPe.js",
     "name": "CustomerWeddingForm",
     "src": "resources/js/components/customer/CustomerWeddingForm.vue",
     "isDynamicEntry": true,
     "imports": [
       "_runtime-core.esm-bundler-Car86Ubo.js",
       "resources/js/app.js",
-      "_UiField-CwNP5-F2.js",
+      "_UiField-DPwyOUNf.js",
       "resources/js/components/ui/UiTextarea.vue",
-      "_UiFlagSelect-OCKx4lOT.js"
+      "_UiFlagSelect-Bcl9m014.js"
     ]
   },
   "resources/js/components/public/BlogIndexPage.vue": {
@@ -1269,6 +1272,15 @@
     "file": "assets/BlogPostPage-CvRDcpeX.js",
     "name": "BlogPostPage",
     "src": "resources/js/components/public/BlogPostPage.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "_runtime-core.esm-bundler-Car86Ubo.js"
+    ]
+  },
+  "resources/js/components/public/ContractSignaturePad.vue": {
+    "file": "assets/ContractSignaturePad-B_EBps9l.js",
+    "name": "ContractSignaturePad",
+    "src": "resources/js/components/public/ContractSignaturePad.vue",
     "isDynamicEntry": true,
     "imports": [
       "_runtime-core.esm-bundler-Car86Ubo.js"
@@ -1303,27 +1315,27 @@
     ]
   },
   "resources/js/components/public/ReportVendorForm.vue": {
-    "file": "assets/ReportVendorForm-Bg1E66r9.js",
+    "file": "assets/ReportVendorForm-CworazdB.js",
     "name": "ReportVendorForm",
     "src": "resources/js/components/public/ReportVendorForm.vue",
     "isDynamicEntry": true,
     "imports": [
       "_runtime-core.esm-bundler-Car86Ubo.js",
       "resources/js/components/ui/UiTextarea.vue",
-      "_UiSelect-BBQ-FGL2.js"
+      "_UiSelect-BRh_x7NR.js"
     ]
   },
   "resources/js/components/ui/DataTable.vue": {
-    "file": "assets/DataTable-DaOZeFa1.js",
+    "file": "assets/DataTable-BXChlHAh.js",
     "name": "DataTable",
     "src": "resources/js/components/ui/DataTable.vue",
     "isDynamicEntry": true,
     "imports": [
       "_runtime-core.esm-bundler-Car86Ubo.js",
       "resources/js/app.js",
-      "_UiFacetedFilter-gfE6DWyn.js",
-      "_UiColumnToggle-AWRvWiD9.js",
-      "_UiConfirm-A70m-Ao8.js"
+      "_UiFacetedFilter-NDAFJKkU.js",
+      "_UiColumnToggle-dEgt63Fy.js",
+      "_UiConfirm-B4h9EiOC.js"
     ]
   },
   "resources/js/components/ui/UiBadge.vue": {
@@ -1354,7 +1366,7 @@
     ]
   },
   "resources/js/components/ui/UiConfirmSubmit.vue": {
-    "file": "assets/UiConfirmSubmit-BD85JZc0.js",
+    "file": "assets/UiConfirmSubmit-BgdD_4do.js",
     "name": "UiConfirmSubmit",
     "src": "resources/js/components/ui/UiConfirmSubmit.vue",
     "isDynamicEntry": true,
@@ -1391,7 +1403,7 @@
     ]
   },
   "resources/js/components/ui/UiMultiSelect.vue": {
-    "file": "assets/UiMultiSelect-BNqo_IWY.js",
+    "file": "assets/UiMultiSelect-DVmAbIjq.js",
     "name": "UiMultiSelect",
     "src": "resources/js/components/ui/UiMultiSelect.vue",
     "isDynamicEntry": true,
@@ -1402,7 +1414,7 @@
     ]
   },
   "resources/js/components/ui/UiPhotoPicker.vue": {
-    "file": "assets/UiPhotoPicker-COyHZ7CR.js",
+    "file": "assets/UiPhotoPicker-Bl_0xjOq.js",
     "name": "UiPhotoPicker",
     "src": "resources/js/components/ui/UiPhotoPicker.vue",
     "isDynamicEntry": true,
@@ -1412,7 +1424,7 @@
     ]
   },
   "resources/js/components/ui/UiRichEditor.vue": {
-    "file": "assets/UiRichEditor-DBzfbnBF.js",
+    "file": "assets/UiRichEditor-DSCRneZL.js",
     "name": "UiRichEditor",
     "src": "resources/js/components/ui/UiRichEditor.vue",
     "isDynamicEntry": true,
@@ -1446,54 +1458,54 @@
     ]
   },
   "resources/js/components/vendor/PortfolioManager.vue": {
-    "file": "assets/PortfolioManager-DebM21mM.js",
+    "file": "assets/PortfolioManager-Bzem0VvC.js",
     "name": "PortfolioManager",
     "src": "resources/js/components/vendor/PortfolioManager.vue",
     "isDynamicEntry": true,
     "imports": [
       "_runtime-core.esm-bundler-Car86Ubo.js",
       "resources/js/app.js",
-      "_UiField-CwNP5-F2.js",
-      "_UiConfirm-A70m-Ao8.js",
+      "_UiField-DPwyOUNf.js",
+      "_UiConfirm-B4h9EiOC.js",
       "resources/js/components/ui/UiUploadProgress.vue",
       "_useUploadForm-DYH72pBu.js"
     ]
   },
   "resources/js/components/vendor/VendorBookingDetail.vue": {
-    "file": "assets/VendorBookingDetail-DsSYguDc.js",
+    "file": "assets/VendorBookingDetail-BPKYvs5U.js",
     "name": "VendorBookingDetail",
     "src": "resources/js/components/vendor/VendorBookingDetail.vue",
     "isDynamicEntry": true,
     "imports": [
       "_runtime-core.esm-bundler-Car86Ubo.js",
-      "_UiConfirm-A70m-Ao8.js"
+      "_UiConfirm-B4h9EiOC.js"
     ]
   },
   "resources/js/components/vendor/VendorBookingForm.vue": {
-    "file": "assets/VendorBookingForm-Bn2AyJR9.js",
+    "file": "assets/VendorBookingForm-BK4kxZUD.js",
     "name": "VendorBookingForm",
     "src": "resources/js/components/vendor/VendorBookingForm.vue",
     "isDynamicEntry": true,
     "imports": [
       "_runtime-core.esm-bundler-Car86Ubo.js",
-      "_UiField-CwNP5-F2.js",
+      "_UiField-DPwyOUNf.js",
       "resources/js/components/ui/UiTextarea.vue",
-      "_UiSelect-BBQ-FGL2.js"
+      "_UiSelect-BRh_x7NR.js"
     ]
   },
   "resources/js/components/vendor/VendorBoostPage.vue": {
-    "file": "assets/VendorBoostPage-B88UKh2b.js",
+    "file": "assets/VendorBoostPage-o_jzcKOS.js",
     "name": "VendorBoostPage",
     "src": "resources/js/components/vendor/VendorBoostPage.vue",
     "isDynamicEntry": true,
     "imports": [
       "_runtime-core.esm-bundler-Car86Ubo.js",
       "resources/js/app.js",
-      "_UiStatCard-BRNJ_Fz8.js"
+      "_UiStatCard-DCx7OxA3.js"
     ]
   },
   "resources/js/components/vendor/VendorCalendarPage.vue": {
-    "file": "assets/VendorCalendarPage-DTuVxK9I.js",
+    "file": "assets/VendorCalendarPage-Cf0IEOX6.js",
     "name": "VendorCalendarPage",
     "src": "resources/js/components/vendor/VendorCalendarPage.vue",
     "isDynamicEntry": true,
@@ -1503,14 +1515,34 @@
       "resources/js/components/ui/UiBadge.vue"
     ]
   },
+  "resources/js/components/vendor/VendorContractDetail.vue": {
+    "file": "assets/VendorContractDetail-CdWLiNYB.js",
+    "name": "VendorContractDetail",
+    "src": "resources/js/components/vendor/VendorContractDetail.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "_runtime-core.esm-bundler-Car86Ubo.js",
+      "_UiConfirm-B4h9EiOC.js"
+    ]
+  },
+  "resources/js/components/vendor/VendorContractForm.vue": {
+    "file": "assets/VendorContractForm-DaBmRfTo.js",
+    "name": "VendorContractForm",
+    "src": "resources/js/components/vendor/VendorContractForm.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "_runtime-core.esm-bundler-Car86Ubo.js",
+      "resources/js/app.js"
+    ]
+  },
   "resources/js/components/vendor/VendorDashboardPage.vue": {
-    "file": "assets/VendorDashboardPage-Ns0oKrfD.js",
+    "file": "assets/VendorDashboardPage-Ba-HjQkI.js",
     "name": "VendorDashboardPage",
     "src": "resources/js/components/vendor/VendorDashboardPage.vue",
     "isDynamicEntry": true,
     "imports": [
       "_runtime-core.esm-bundler-Car86Ubo.js",
-      "_UiStatCard-BRNJ_Fz8.js",
+      "_UiStatCard-DCx7OxA3.js",
       "resources/js/components/ui/UiBadge.vue"
     ]
   },
@@ -1552,31 +1584,31 @@
     ]
   },
   "resources/js/components/vendor/VendorPackageForm.vue": {
-    "file": "assets/VendorPackageForm-D2qcovRK.js",
+    "file": "assets/VendorPackageForm-Bd8r8rDL.js",
     "name": "VendorPackageForm",
     "src": "resources/js/components/vendor/VendorPackageForm.vue",
     "isDynamicEntry": true,
     "imports": [
       "_runtime-core.esm-bundler-Car86Ubo.js",
       "resources/js/app.js",
-      "_UiField-CwNP5-F2.js",
+      "_UiField-DPwyOUNf.js",
       "resources/js/components/ui/UiTextarea.vue",
       "resources/js/components/ui/UiUploadProgress.vue",
       "_useUploadForm-DYH72pBu.js"
     ]
   },
   "resources/js/components/vendor/VendorPackagesPage.vue": {
-    "file": "assets/VendorPackagesPage-BUnm1tFo.js",
+    "file": "assets/VendorPackagesPage-BUdrKp0v.js",
     "name": "VendorPackagesPage",
     "src": "resources/js/components/vendor/VendorPackagesPage.vue",
     "isDynamicEntry": true,
     "imports": [
       "_runtime-core.esm-bundler-Car86Ubo.js",
-      "_UiConfirm-A70m-Ao8.js"
+      "_UiConfirm-B4h9EiOC.js"
     ]
   },
   "resources/js/components/vendor/VendorPointsPage.vue": {
-    "file": "assets/VendorPointsPage-BQrXleJ9.js",
+    "file": "assets/VendorPointsPage-GP4KtEwH.js",
     "name": "VendorPointsPage",
     "src": "resources/js/components/vendor/VendorPointsPage.vue",
     "isDynamicEntry": true,
@@ -1584,64 +1616,61 @@
       "_runtime-core.esm-bundler-Car86Ubo.js",
       "resources/js/components/ui/UiBarChart.vue",
       "resources/js/components/ui/UiLineChart.vue",
-      "_UiStatCard-BRNJ_Fz8.js",
+      "_UiStatCard-DCx7OxA3.js",
       "resources/js/components/ui/DataTable.vue"
     ]
   },
   "resources/js/components/vendor/VendorProfileForm.vue": {
-    "file": "assets/VendorProfileForm-Bfz4uo7W.js",
+    "file": "assets/VendorProfileForm-dVQ5RvBZ.js",
     "name": "VendorProfileForm",
     "src": "resources/js/components/vendor/VendorProfileForm.vue",
     "isDynamicEntry": true,
     "imports": [
       "_runtime-core.esm-bundler-Car86Ubo.js",
       "resources/js/app.js",
-      "_UiField-CwNP5-F2.js",
+      "_UiField-DPwyOUNf.js",
       "resources/js/components/ui/UiTextarea.vue",
       "resources/js/components/ui/UiUploadProgress.vue",
       "_useUploadForm-DYH72pBu.js",
-      "_UiSelect-BBQ-FGL2.js",
-      "_UiDistrictSelect-wlm5fSd7.js",
-      "_UiFlagSelect-OCKx4lOT.js",
+      "_UiSelect-BRh_x7NR.js",
+      "_UiDistrictSelect-QEls4M0W.js",
+      "_UiFlagSelect-Bcl9m014.js",
       "resources/js/components/ui/UiMultiSelect.vue"
     ]
   },
   "resources/js/components/vendor/VendorQuotationDetail.vue": {
-    "file": "assets/VendorQuotationDetail-Cul4JXUS.js",
+    "file": "assets/VendorQuotationDetail-DxP4NZtf.js",
     "name": "VendorQuotationDetail",
     "src": "resources/js/components/vendor/VendorQuotationDetail.vue",
     "isDynamicEntry": true,
     "imports": [
       "_runtime-core.esm-bundler-Car86Ubo.js",
-      "_UiConfirm-A70m-Ao8.js"
+      "_UiConfirm-B4h9EiOC.js"
     ]
   },
   "resources/js/components/vendor/VendorQuotationForm.vue": {
-    "file": "assets/VendorQuotationForm-IUVFkHNZ.js",
+    "file": "assets/VendorQuotationForm-kfqTihlt.js",
     "name": "VendorQuotationForm",
     "src": "resources/js/components/vendor/VendorQuotationForm.vue",
     "isDynamicEntry": true,
     "imports": [
       "_runtime-core.esm-bundler-Car86Ubo.js",
-      "resources/js/app.js",
-      "_UiField-CwNP5-F2.js",
-      "resources/js/components/ui/UiTextarea.vue",
-      "_UiSelect-BBQ-FGL2.js"
+      "resources/js/app.js"
     ]
   },
   "resources/js/components/vendor/VendorRegisterForm.vue": {
-    "file": "assets/VendorRegisterForm-BTwicGaR.js",
+    "file": "assets/VendorRegisterForm-Cl5_IaK1.js",
     "name": "VendorRegisterForm",
     "src": "resources/js/components/vendor/VendorRegisterForm.vue",
     "isDynamicEntry": true,
     "imports": [
       "_runtime-core.esm-bundler-Car86Ubo.js",
-      "_UiField-CwNP5-F2.js",
-      "_UiSelect-BBQ-FGL2.js",
-      "_UiDistrictSelect-wlm5fSd7.js",
-      "_UiFlagSelect-OCKx4lOT.js",
-      "_UiPhoneField-BeUpEgS8.js",
-      "_UiTurnstile-BBwgvMin.js"
+      "_UiField-DPwyOUNf.js",
+      "_UiSelect-BRh_x7NR.js",
+      "_UiDistrictSelect-QEls4M0W.js",
+      "_UiFlagSelect-Bcl9m014.js",
+      "_UiPhoneField-CdCayjrc.js",
+      "_UiTurnstile-CtvkHBio.js"
     ]
   }
 }

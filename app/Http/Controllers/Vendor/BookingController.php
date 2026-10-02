@@ -111,7 +111,7 @@ class BookingController extends Controller
     {
         $vendor = $request->user()->vendor;
         $quotation = $request->filled('quotation')
-            ? $vendor->quotations()->where('status', QuotationStatus::Accepted)->whereNull('booking_id')->with('items')->find($request->integer('quotation'))
+            ? $vendor->quotations()->where('status', QuotationStatus::Accepted)->whereNull('booking_id')->with('items')->firstWhere('token', $request->string('quotation')->toString())
             : null;
 
         return view('vendor.bookings.create', [
