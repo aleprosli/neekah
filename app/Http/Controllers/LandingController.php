@@ -12,6 +12,7 @@ use App\Support\CameraSettings;
 use App\Support\Card\SampleCard;
 use App\Support\ContactSettings;
 use App\Support\ProSettings;
+use App\Support\ProStory;
 use App\Support\Seo;
 use Illuminate\Contracts\View\View;
 
@@ -42,6 +43,13 @@ class LandingController extends Controller
             // page never advertises something nobody can buy yet.
             'kenangan' => $this->kenangan(),
             'plans' => $this->plans(),
+            // The same before-and-after story as the vendor's Pro page, once Pro is on sale.
+            'proStory' => app(ProSettings::class)->isEnabled() ? ProStory::props(null, [
+                'url' => '#pelan',
+                'title' => __('pages.pro.story.cta_guest_title'),
+                'body' => __('pages.pro.story.cta_guest_body', ['price' => 'RM'.number_format(app(ProSettings::class)->price(VendorPlan::Monthly))]),
+                'label' => __('pages.pro.story.cta_guest'),
+            ]) : null,
             'boost' => $this->boost(),
             'helpUrl' => $contact->whatsappUrl(__('pages.landing.whatsapp_message')),
         ]);

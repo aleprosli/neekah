@@ -83,8 +83,8 @@ it('puts the rank in the hero and keeps the traffic numbers off it', function ()
 
     preg_match('#<section data-vendor-hero.*?</section>#s', $response->getContent(), $hero);
 
-    expect($hero[0])->not->toContain(__('ui.vendor_home.views30'))
-        ->not->toContain(__('ui.vendor_home.score'));
+    expect($hero[0])->not->toContain(__('ui.vendor_home.score'))
+        ->and($response->viewData('props')['standing'])->not->toHaveKey('views30');
 });
 
 it('shows a Basic vendor what Basic does and how Boost works', function () {
