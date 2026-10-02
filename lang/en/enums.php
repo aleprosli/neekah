@@ -254,8 +254,8 @@ return [
     'review_filter_desc' => [
         'reported' => 'The vendor disputes this review and has asked an admin to look. It stays visible until you act.',
         'hidden' => 'Already taken off the vendor’s profile. The record stays, including why and who took it off.',
-        'open' => 'Written straight onto the profile, with no booking behind it. It does not touch the vendor’s rating, points or ranking.',
-        'verified' => 'It comes from a booking completed on Neekah. Only these move the rating and the ranking.',
+        'open' => 'Written straight onto the profile, with no booking behind it. It counts towards the vendor’s ranking (unless the vendor added it), but not their rating or points.',
+        'verified' => 'It comes from a booking completed on Neekah. Only these move the rating and points; the ranking counts both kinds.',
     ],
 
     'announcement_audience_desc' => [

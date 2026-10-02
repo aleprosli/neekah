@@ -18,3 +18,6 @@ An inline script in layouts/app.blade.php head reads sessionStorage "neekah:arri
 The invitation keeps its own curtain (.nkc-card) on every arrival. It carries the couple's names and is part of the card, not a loading state.
 
 The CSP allows inline script ('unsafe-inline'), so no nonce is needed today; adding one means covering this tag as well as the ld+json in seo/tags.blade.php.
+
+## A couple without a wedding sees no sidebar; a site page may ask for extra client strings
+Owner, 2 Oct 2026 ("hide sidebar, wajib isi wedding project dulu"): layouts/customer passes an empty nav when the couple has no wedding, so layouts/dashboard drops the sidebar (the same mechanism as a vendor awaiting approval). The dashboard is then one setup screen (CustomerDashboardPage, no wedding): why it matters, the 4 things needed, "kurang 2 minit", plus a link to bookings a vendor already recorded and the vendor switch — their only ways on. Separately: layouts/app takes `:client-groups="[...]"`, merged into Translations::forClient's shell groups. Use it when a site-shell page mounts an island whose ui group the shell leaves out on purpose (vendor/convert mounts VendorRegisterForm and asks for vendor_signup; it showed raw "vendor_signup.*" keys before). Do not add such groups to the shell itself. Covered by CoupleDashboardTest, ClientTranslationsTest.

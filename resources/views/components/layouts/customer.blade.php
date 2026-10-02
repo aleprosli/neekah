@@ -8,7 +8,10 @@
     $item = fn (string $label, string $icon, string $route, string|array $pattern, ?int $badge = null): array => [
         'label' => $label, 'icon' => $icon, 'href' => route($route), 'active' => App\Support\Locales::routeIs($pattern), 'badge' => $badge ?: null,
     ];
-    $nav = [
+    // A couple without a wedding sees no sidebar at all, only the page that
+    // asks for one: every planning tool needs the date, and an empty menu of
+    // them was where new couples got lost (owner, 2 Oct 2026).
+    $nav = ! $wedding ? [] : [
         ['label' => null, 'items' => [
             $item(__('pages.sidebar_couple.majlis_saya'), 'rings', 'dashboard', ['dashboard', 'weddings.*']),
         ]],
@@ -20,8 +23,9 @@
         ]],
         ['label' => __('pages.sidebar_couple.tetamu'), 'items' => [
             $item(__('pages.sidebar_couple.senarai_tetamu'), 'users', 'guests.index', 'guests.*'),
-            $item(__('pages.sidebar_couple.kad_jemputan'), 'mail', 'site.edit', 'site.*'),
-            $item(__('pages.sidebar_couple.kamera'), 'camera', 'camera.index', 'camera.*'),
+            // The two Neekah products a couple shows off: marked so they are found.
+            [...$item(__('pages.sidebar_couple.kad_jemputan'), 'mail', 'site.edit', 'site.*'), 'tag' => __('pages.sidebar_couple.premium')],
+            [...$item(__('pages.sidebar_couple.kamera'), 'camera', 'camera.index', 'camera.*'), 'tag' => __('pages.sidebar_couple.premium')],
         ]],
         ['label' => __('pages.sidebar_couple.vendor'), 'items' => [
             ['label' => __('pages.sidebar_couple.cari_vendor'), 'icon' => 'search', 'href' => route('vendors.index'), 'active' => false, 'badge' => null],
@@ -41,10 +45,16 @@
                 default => __('pages.sidebar_couple.selamat_pengantin_baru'),
             },
             'wedding' => true,
-            // Only while there is something to count down to.
-            'countdown' => $daysLeft >= 0 ? $wedding->startsAt()->toIso8601String() : null,
+            // Shown in every state: counting down, the day, days married after it.
+            'countdown' => ['target' => $wedding->startsAt()->toIso8601String(), 'progress' => $wedding->planningProgress()],
         ]
-        : ['title' => __('pages.sidebar_couple.perancang_majlis'), 'detail' => __('pages.sidebar_couple.cipta_majlis_anda_untuk'), 'wedding' => true];
+        : [
+            'title' => __('pages.sidebar_couple.perancang_majlis'),
+            'detail' => __('pages.sidebar_couple.cipta_majlis_anda_untuk'),
+            'wedding' => true,
+            // No wedding yet: the same spot asks for the date.
+            'countdown' => ['target' => null, 'createUrl' => route('weddings.create')],
+        ];
 @endphp
 
 <x-layouts.dashboard :title="$title" :nav="$nav" :context="$context" :heading="$heading" :subheading="$subheading">

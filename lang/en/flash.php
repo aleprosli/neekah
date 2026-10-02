@@ -79,6 +79,8 @@ return [
     ],
 
     'couple' => [
+        'timeline_template_applied' => 'Template applied. Adjust the times and assign your vendors.',
+        'timeline_not_empty' => 'The timeline already has activities. Templates are for an empty timeline.',
         'camera_saved' => 'Album settings saved.',
         'camera_link_rotated' => 'A new link is ready. The old link and QR no longer work.',
         'camera_export_queued' => 'The ZIP is being prepared. We will email you when it is ready.',

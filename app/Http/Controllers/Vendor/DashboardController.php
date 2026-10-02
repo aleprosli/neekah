@@ -68,8 +68,21 @@ class DashboardController extends Controller
                         default => 'need_pro',
                     } : null,
                 ],
-                'locked' => $isPro ? [] : collect([VendorFeature::Calendar, VendorFeature::Bookings, VendorFeature::Enquiries, VendorFeature::Points])
-                    ->map(fn (VendorFeature $feature): array => ['label' => $feature->label(), 'description' => $feature->description()])
+                // What Basic can do on its own, and Boost explained, so a vendor
+                // with nothing to fix still has somewhere to go.
+                'tools' => [
+                    ['key' => 'profile', 'url' => route('vendor.profile.edit')],
+                    ['key' => 'packages', 'url' => route('vendor.packages.index')],
+                    ['key' => 'portfolio', 'url' => route('vendor.portfolio.index')],
+                    ['key' => 'reviews', 'url' => route('vendor.reviews.index')],
+                ],
+                'boost' => [
+                    'tokens' => (int) $vendor->boost_tokens,
+                    'url' => route('vendor.boost.index'),
+                    'screenshot' => asset('img/boost/kad-dipromosi.jpg'),
+                ],
+                'locked' => $isPro ? [] : collect([VendorFeature::Calendar, VendorFeature::Bookings, VendorFeature::Enquiries, VendorFeature::Quotations, VendorFeature::Contracts, VendorFeature::Points])
+                    ->map(fn (VendorFeature $feature): array => ['key' => $feature->value, 'label' => $feature->label(), 'description' => $feature->description()])
                     ->all(),
             ]),
         ]);
@@ -143,7 +156,7 @@ class DashboardController extends Controller
             ['label' => __('props.vendor.bayaran_diterima'), 'value' => 'RM'.number_format((float) Payment::query()
                 ->where('status', PaymentStatus::Paid)
                 ->whereHas('booking', fn ($query) => $query->whereBelongsTo($vendor))
-                ->sum('amount'), 2), 'hint' => __('props.units.weddings_completed', ['count' => $vendor->completed_bookings_count])],
+                ->sum('amount')), 'hint' => __('props.units.weddings_completed', ['count' => $vendor->completed_bookings_count])],
         ];
     }
 

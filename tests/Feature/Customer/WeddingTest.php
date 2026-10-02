@@ -113,7 +113,7 @@ it('only lets the owner edit their wedding', function () {
     expect($wedding->fresh()->title)->toBe('Nama Baharu');
 });
 
-it('shows budget totals and booked categories on the dashboard', function () {
+it('shows what is left of the budget and the booked vendors on the dashboard', function () {
     $wedding = Wedding::factory()->for($this->customer)->create(['budget' => 30000]);
     $vendor = Vendor::factory()->for(Category::where('slug', 'photography')->first())->create();
     Booking::factory()->confirmed()->for($this->customer)->for($vendor)->create([
@@ -124,10 +124,12 @@ it('shows budget totals and booked categories on the dashboard', function () {
     $this->actingAs($this->customer)
         ->get(route('dashboard'))
         ->assertOk()
+        ->assertSee('RM27,500')
         ->assertSee('RM30,000')
         ->assertSee('RM2,500')
         ->assertSee($vendor->name)
-        ->assertSee('1 / 12');
+        // The category checklist and the stat cards are gone from the dashboard.
+        ->assertDontSee('1 / 12');
 });
 
 it('points the couple at their digital card from the dashboard, and stops asking once it is out', function () {
@@ -157,7 +159,7 @@ it('offers no card button before there is a wedding to make one for', function (
         ->assertDontSee('Kad digital saya');
 });
 
-it('puts the partner invitation right under the buttons, and the digital card first among them', function () {
+it('puts the partner invitation right after the next steps, and the digital card first in the countdown', function () {
     $couple = User::factory()->create();
     Wedding::factory()->for($couple)->create();
 
@@ -167,5 +169,7 @@ it('puts the partner invitation right under the buttons, and the digital card fi
     $this->actingAs($couple)
         ->get(route('dashboard'))
         ->assertOk()
-        ->assertSeeInOrder(['Buat kad digital', 'Edit majlis', 'Cari vendor', 'Uruskan majlis berdua', 'data-vue="customer-dashboard-page"'], false);
+        // Since 2 Oct 2026: the countdown card (with the card button first),
+        // then the next steps, then the partner card, then the shortcuts.
+        ->assertSeeInOrder(['Buat kad digital', 'Edit majlis', 'data-vue="customer-dashboard-page"', 'Uruskan majlis berdua', 'data-vue="customer-dashboard-page"'], false);
 });
