@@ -129,13 +129,11 @@ class QuotationController extends Controller
         ]);
     }
 
-    public function store(SaveQuotationRequest $request, SaveQuotation $save): RedirectResponse
+    public function store(SaveQuotationRequest $request, SaveQuotation $save, SendQuotation $send): RedirectResponse
     {
         $quotation = $save->handle($request->user()->vendor, $request->quotationData(), saveTermsAsDefault: $request->boolean('save_terms_as_default'));
 
-        return redirect()
-            ->route('vendor.quotations.show', $quotation)
-            ->with('status', __('flash.vendor.quotation_saved', ['number' => $quotation->number]));
+        return $this->afterSave($request, $quotation, $send);
     }
 
     public function show(Quotation $quotation): View
@@ -162,13 +160,28 @@ class QuotationController extends Controller
         ]);
     }
 
-    public function update(SaveQuotationRequest $request, Quotation $quotation, SaveQuotation $save): RedirectResponse
+    public function update(SaveQuotationRequest $request, Quotation $quotation, SaveQuotation $save, SendQuotation $send): RedirectResponse
     {
         $save->handle($request->user()->vendor, $request->quotationData(), $quotation, $request->boolean('save_terms_as_default'));
 
-        return redirect()
-            ->route('vendor.quotations.show', $quotation)
-            ->with('status', __('flash.vendor.quotation_saved', ['number' => $quotation->number]));
+        return $this->afterSave($request, $quotation, $send);
+    }
+
+    /**
+     * "Simpan & hantar" saves and opens the quotation to the client in one
+     * step; plain "Simpan" keeps a draft a draft.
+     */
+    private function afterSave(Request $request, Quotation $quotation, SendQuotation $send): RedirectResponse
+    {
+        $redirect = redirect()->route('vendor.quotations.show', $quotation);
+
+        if (! $request->boolean('send') || $quotation->status !== QuotationStatus::Draft) {
+            return $redirect->with('status', __('flash.vendor.quotation_saved', ['number' => $quotation->number]));
+        }
+
+        $send->handle($quotation);
+
+        return $redirect->with('status', __(filled($quotation->client_email) ? 'flash.vendor.quotation_emailed' : 'flash.vendor.quotation_sent', ['number' => $quotation->number]));
     }
 
     public function destroy(Quotation $quotation): RedirectResponse
@@ -250,6 +263,7 @@ class QuotationController extends Controller
             'action' => $action,
             'method' => $quotation ? 'PUT' : 'POST',
             'number' => $quotation?->number,
+            'canSend' => ! $quotation || $quotation->status === QuotationStatus::Draft,
             'vendor' => [
                 'name' => $vendor->name,
                 'logo' => $vendor->logoUrl(),
@@ -264,6 +278,7 @@ class QuotationController extends Controller
                 'id' => $package->id,
                 'name' => $package->name,
                 'price' => (float) $package->price,
+                'features' => array_values($package->features ?? []),
             ])->values(),
             'quotation' => [
                 'enquiry_id' => $quotation?->enquiry_id ?? $enquiry?->id,

@@ -1502,6 +1502,8 @@ return [
     ],
 
     'vendor_quotation_form' => [
+        'save_draft' => 'Simpan draf',
+        'save_and_send' => 'Simpan & hantar',
         'sheet_hint' => 'Isi terus di atas helaian ini. Inilah rupa sebut harga yang klien terima dan cetak.',
         'title' => 'Sebut Harga',
         'number_on_save' => 'Nombor diberi selepas simpan',
@@ -1512,7 +1514,6 @@ return [
         'qty' => 'Kuantiti',
         'unit_price_short' => 'Harga seunit',
         'amount' => 'Jumlah',
-        'package_hint' => 'Pakej anda: butiran dan senarai ciri disalin ke sebut harga.',
         'client' => 'Klien',
         'client_name' => 'Nama klien',
         'client_phone' => 'Telefon',
@@ -1547,7 +1548,7 @@ return [
         'balance' => 'Baki',
         'save' => 'Simpan',
         'cancel' => 'Batal',
-        'save_hint' => 'Disimpan sebagai draf. Anda hantar pautan kepada klien di langkah seterusnya.',
+        'save_hint' => 'Simpan draf untuk sambung kemudian, atau Simpan & hantar untuk terus buka pautan kepada klien.',
     ],
 
     'vendor_quotation' => [
@@ -1598,12 +1599,17 @@ return [
     ],
 
     'vendor_contract_form' => [
+        'step_quotation' => 'Sebut harga',
+        'step_write' => 'Tulis kontrak',
+        'step_send' => 'Hantar',
+        'quotation_attached' => 'Sebut harga :number',
+        'change' => 'Tukar',
+        'attach_quotation' => 'Lampirkan sebut harga',
+        'save_and_send' => 'Simpan & hantar',
         'sheet_hint' => 'Tulis terus di atas kontrak ini. Inilah rupa kontrak yang klien baca dan tandatangan.',
         'title' => 'Kontrak',
         'client' => 'Klien',
-        'quotation' => 'Sebut harga',
-        'no_quotation' => 'Tiada',
-        'quotation_hint' => 'Jika dilampirkan, klien menerima sebut harga itu apabila menandatangan.',
+        'quotation_hint' => 'Apabila klien menandatangan kontrak, sebut harga ini diterima sekali.',
         'section_title' => 'Tajuk bahagian',
         'section_body' => 'Isi bahagian ini',
         'placeholders' => [
@@ -1619,7 +1625,7 @@ return [
         'vendor_side_hint' => 'Nama anda dan masa kontrak dihantar menjadi persetujuan anda.',
         'client_side' => 'Bagi pihak klien',
         'client_side_hint' => 'Klien menandatangan di sini selepas anda menghantar pautan.',
-        'save_hint' => 'Disimpan sebagai draf. Selepas dihantar, kontrak tidak boleh diubah lagi.',
+        'save_hint' => 'Selepas dihantar, kontrak dikunci supaya klien menandatangan apa yang dibacanya.',
     ],
 
     'vendor_contract' => [

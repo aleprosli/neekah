@@ -1502,6 +1502,8 @@ return [
     ],
 
     'vendor_quotation_form' => [
+        'save_draft' => 'Save draft',
+        'save_and_send' => 'Save & send',
         'sheet_hint' => 'Fill it in right on this sheet. This is the quotation the client receives and prints.',
         'title' => 'Quotation',
         'number_on_save' => 'Numbered when saved',
@@ -1512,7 +1514,6 @@ return [
         'qty' => 'Qty',
         'unit_price_short' => 'Unit price',
         'amount' => 'Amount',
-        'package_hint' => 'Your package: its details and features are copied onto the quotation.',
         'client' => 'Client',
         'client_name' => 'Client name',
         'client_phone' => 'Phone',
@@ -1547,7 +1548,7 @@ return [
         'balance' => 'Balance',
         'save' => 'Save',
         'cancel' => 'Cancel',
-        'save_hint' => 'Saved as a draft. You send the link to the client in the next step.',
+        'save_hint' => 'Save a draft to finish later, or Save & send to open the link to the client right away.',
     ],
 
     'vendor_quotation' => [
@@ -1598,12 +1599,17 @@ return [
     ],
 
     'vendor_contract_form' => [
+        'step_quotation' => 'Quotation',
+        'step_write' => 'Write the contract',
+        'step_send' => 'Send',
+        'quotation_attached' => 'Quotation :number',
+        'change' => 'Change',
+        'attach_quotation' => 'Attach a quotation',
+        'save_and_send' => 'Save & send',
         'sheet_hint' => 'Write it right on this contract. This is the contract the client reads and signs.',
         'title' => 'Contract',
         'client' => 'Client',
-        'quotation' => 'Quotation',
-        'no_quotation' => 'None',
-        'quotation_hint' => 'If attached, the client accepts that quotation when they sign.',
+        'quotation_hint' => 'When the client signs the contract, this quotation is accepted with it.',
         'section_title' => 'Section title',
         'section_body' => 'What this section says',
         'placeholders' => [
@@ -1619,7 +1625,7 @@ return [
         'vendor_side_hint' => 'Your name and the time the contract is sent stand as your agreement.',
         'client_side' => 'For the client',
         'client_side_hint' => 'The client signs here after you send the link.',
-        'save_hint' => 'Saved as a draft. Once sent, the contract can no longer be changed.',
+        'save_hint' => 'Once sent, the contract is locked so the client signs exactly what they read.',
     ],
 
     'vendor_contract' => [

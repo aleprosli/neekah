@@ -18,10 +18,15 @@
             @else
                 <span></span>
             @endif
+            <div class="flex flex-wrap items-center justify-end gap-2">
+            @if ($contract->awaitsSignature() && ! $isOwner)
+                <a href="#tandatangan" class="inline-flex rounded-full border border-brand-600 bg-white px-4 py-2.5 text-sm font-semibold text-brand-700 transition hover:bg-brand-50">{{ __('pages.contract_doc.jump_to_sign') }}</a>
+            @endif
             <button type="button" data-print class="inline-flex items-center gap-2 rounded-full bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-700">
                 <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 9V3h10v6M7 17H4v-7h16v7h-3" /><path d="M7 14h10v7H7z" /></svg>
                 {{ __('pages.quotation_doc.download_pdf') }}
             </button>
+            </div>
             <p class="w-full text-right text-xs text-ink-muted">{{ __('pages.receipt.print_hint') }}</p>
 
             @if ($isOwner && $contract->status === ContractStatus::Draft)

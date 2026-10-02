@@ -1239,6 +1239,7 @@ return [
     ],
 
     'quotation_doc' => [
+        'jump_to_answer' => 'Terima / tolak ↓',
         'contract_title' => 'Kontrak untuk sebut harga ini',
         'contract_body' => ':vendor menyediakan kontrak. Menandatanganinya juga bermakna anda menerima sebut harga ini.',
         'contract_action' => 'Baca & tandatangan kontrak',
@@ -1279,6 +1280,20 @@ return [
     ],
 
     'contracts' => [
+        'pick_subheading' => 'Pilih sebut harga untuk kontrak ini. Klien, tarikh dan jumlahnya akan diisi sendiri.',
+        'step_quotation' => 'Sebut harga',
+        'step_write' => 'Tulis kontrak',
+        'step_send' => 'Hantar',
+        'has_contract' => 'Sudah ada kontrak',
+        'use_quotation' => 'Guna',
+        'start_blank' => 'Mula tanpa sebut harga',
+        'starter' => [
+            'scope' => 'Perkhidmatan yang disediakan adalah seperti dalam sebut harga yang dilampirkan, pada tarikh dan lokasi majlis yang dinyatakan.',
+            'cancellation_payment' => "Deposit perlu dibayar untuk mengunci tarikh dan tidak akan dikembalikan jika klien membatalkan.\nBaki perlu dijelaskan selewat-lewatnya 7 hari sebelum majlis.\nPembatalan oleh vendor: semua bayaran akan dikembalikan sepenuhnya.",
+            'overtime_delivery' => "Lebih masa dikenakan caj tambahan mengikut kadar vendor.\nHasil kerja akan diserahkan dalam tempoh yang dipersetujui selepas majlis.",
+            'copyright' => 'Hak cipta hasil kerja kekal milik vendor. Klien bebas menggunakannya untuk kegunaan peribadi, dan vendor boleh memaparkannya dalam portfolio kecuali klien meminta sebaliknya.',
+            'terms' => "Perubahan tarikh tertakluk kepada kekosongan vendor.\nKedua-dua pihak bersetuju menyelesaikan sebarang pertikaian secara baik.",
+        ],
         'title' => 'Kontrak Digital',
         'subheading' => 'Sediakan kontrak, hantar pautan, dan klien tandatangan secara online.',
         'new' => 'Kontrak baharu',
@@ -1310,6 +1325,7 @@ return [
     ],
 
     'contract_doc' => [
+        'jump_to_sign' => 'Tandatangan ↓',
         'contract' => 'Kontrak',
         'draft_preview' => 'Ini pratonton draf. Klien belum boleh membukanya sehingga anda menghantarnya.',
         'void_notice' => 'Kontrak ini telah dibatalkan oleh :vendor dan tidak boleh ditandatangan lagi.',

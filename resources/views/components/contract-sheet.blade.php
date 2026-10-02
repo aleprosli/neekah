@@ -15,17 +15,17 @@
     $badge = [$contract->status->label(), $contract->status->tone()];
 @endphp
 
-<article data-doc {{ $attributes->class('relative mx-auto max-w-[210mm] overflow-hidden rounded-2xl bg-white shadow-[0_1px_3px_rgb(0_0_0/0.08),0_12px_40px_-12px_rgb(0_0_0/0.15)] print:max-w-none print:rounded-none print:shadow-none') }}>
+<article data-doc {{ $attributes->class('@container relative mx-auto max-w-[210mm] overflow-hidden rounded-2xl bg-white shadow-[0_1px_3px_rgb(0_0_0/0.08),0_12px_40px_-12px_rgb(0_0_0/0.15)] print:max-w-none print:rounded-none print:shadow-none') }}>
     <div class="h-2 bg-gradient-to-r from-brand-700 via-brand-500 to-gold-400 print:[print-color-adjust:exact]"></div>
 
-    <div data-doc-body class="p-7 sm:p-12 print:p-0 print:pt-6">
-        <header class="flex flex-col-reverse gap-6 sm:flex-row sm:items-start sm:justify-between">
+    <div data-doc-body class="p-5 @lg:p-8 @2xl:p-12 print:p-0 print:pt-6">
+        <header class="flex flex-col-reverse gap-6 @xl:flex-row @xl:items-start @xl:justify-between">
             <div class="flex min-w-0 items-start gap-4">
                 @if ($vendor->logoUrl())
                     <img src="{{ $vendor->logoUrl() }}" alt="" class="size-16 shrink-0 rounded-2xl object-cover">
                 @endif
                 <div class="min-w-0">
-                    <p class="font-display text-2xl font-semibold break-words">{{ $vendor->name }}</p>
+                    <p class="font-display text-xl font-semibold break-words @xl:text-2xl">{{ $vendor->name }}</p>
                     <div class="mt-2 space-y-0.5 text-sm break-words text-ink-muted">
                         @foreach ($vendorLines as $line)
                             <p>{{ $line }}</p>
@@ -34,8 +34,8 @@
                 </div>
             </div>
 
-            <div class="sm:text-right">
-                <p class="font-display text-4xl font-semibold tracking-wide text-brand-700 uppercase">{{ __('pages.contract_doc.contract') }}</p>
+            <div class="@xl:text-right">
+                <p class="font-display text-3xl font-semibold tracking-wide text-brand-700 uppercase @2xl:text-4xl">{{ __('pages.contract_doc.contract') }}</p>
                 <p class="mt-1 font-mono text-sm font-semibold">{{ $contract->number }}</p>
                 <span @class([
                     'mt-3 inline-flex rounded-full border-2 px-3 py-1 text-xs font-bold tracking-[0.18em] uppercase print:[print-color-adjust:exact]',
@@ -47,7 +47,7 @@
             </div>
         </header>
 
-        <section class="mt-10 grid gap-6 border-y border-line py-6 sm:grid-cols-2">
+        <section class="mt-10 grid gap-6 border-y border-line py-6 @xl:grid-cols-2">
             <div class="min-w-0">
                 <p class="text-[11px] font-semibold tracking-[0.18em] text-gold-600 uppercase">{{ __('pages.contract_doc.between') }}</p>
                 <p class="mt-2 font-semibold break-words">{{ $vendor->name }}</p>
@@ -60,7 +60,7 @@
                 <p class="text-sm text-ink-muted">{{ __('pages.contract_doc.the_client') }}</p>
             </div>
             @if ($contract->event_date)
-                <p class="text-sm sm:col-span-2"><span class="text-ink-muted">{{ __('pages.contract_doc.event_date') }}:</span> <span class="font-medium">{{ $contract->event_date->translatedFormat('l, j F Y') }}</span></p>
+                <p class="text-sm @xl:col-span-2"><span class="text-ink-muted">{{ __('pages.contract_doc.event_date') }}:</span> <span class="font-medium">{{ $contract->event_date->translatedFormat('l, j F Y') }}</span></p>
             @endif
         </section>
 
@@ -94,7 +94,7 @@
             @endforeach
         </ol>
 
-        <section class="mt-10 grid gap-6 border-t border-line pt-6 text-sm sm:grid-cols-2 print:break-inside-avoid">
+        <section class="mt-10 grid gap-6 border-t border-line pt-6 text-sm @xl:grid-cols-2 print:break-inside-avoid">
             <div class="min-w-0">
                 <p class="text-[11px] font-semibold tracking-[0.18em] text-gold-600 uppercase">{{ __('pages.contract_doc.vendor_side') }}</p>
                 @if ($contract->sent_at)

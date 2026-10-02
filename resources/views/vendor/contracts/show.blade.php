@@ -3,14 +3,15 @@
         <x-booking-status :status="$contract->status" class="self-center" />
     </x-slot:actions>
 
-    {{-- The contract exactly as the client reads, signs and prints it, with
-         what the vendor can do beside it. --}}
-    <div class="grid gap-6 break-words xl:grid-cols-[minmax(0,1fr)_300px]">
-        <div class="min-w-0 overflow-x-auto rounded-2xl bg-ivory p-2 sm:p-4">
+    {{-- The contract exactly as the client reads, signs and prints it. What
+         the vendor can do sits above it, and beside it once the screen is
+         wide enough to keep the sheet at full A4 width. --}}
+    <div class="grid gap-6 break-words min-[1400px]:grid-cols-[minmax(0,1fr)_300px]">
+        <div class="min-w-0 rounded-2xl bg-ivory p-1 sm:p-4">
             <x-contract-sheet :contract="$contract" />
         </div>
 
         {{-- resources/js/components/vendor/VendorContractDetail.vue --}}
-        <div class="min-w-0" data-vue="vendor-contract-detail" data-props="@vueProps($props)"></div>
+        <div class="order-first min-w-0 min-[1400px]:order-none" data-vue="vendor-contract-detail" data-props="@vueProps($props)"></div>
     </div>
 </x-layouts.vendor>

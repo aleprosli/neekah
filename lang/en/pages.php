@@ -1239,6 +1239,7 @@ return [
     ],
 
     'quotation_doc' => [
+        'jump_to_answer' => 'Accept / decline ↓',
         'contract_title' => 'A contract for this quotation',
         'contract_body' => ':vendor has prepared a contract. Signing it also accepts this quotation.',
         'contract_action' => 'Read & sign the contract',
@@ -1279,6 +1280,20 @@ return [
     ],
 
     'contracts' => [
+        'pick_subheading' => 'Pick the quotation this contract is for. Its client, date and sums are filled in for you.',
+        'step_quotation' => 'Quotation',
+        'step_write' => 'Write the contract',
+        'step_send' => 'Send',
+        'has_contract' => 'Already has a contract',
+        'use_quotation' => 'Use',
+        'start_blank' => 'Start without a quotation',
+        'starter' => [
+            'scope' => 'The services provided are as listed in the attached quotation, on the event date and at the location stated.',
+            'cancellation_payment' => "The deposit secures the date and is non-refundable if the client cancels.\nThe balance is due no later than 7 days before the event.\nIf the vendor cancels, every payment is refunded in full.",
+            'overtime_delivery' => "Overtime is charged at the vendor's rate.\nThe work is delivered within the agreed period after the event.",
+            'copyright' => 'Copyright in the work stays with the vendor. The client may use it for personal use, and the vendor may show it in their portfolio unless the client asks otherwise.',
+            'terms' => "Date changes are subject to the vendor's availability.\nBoth parties agree to settle any dispute amicably.",
+        ],
         'title' => 'Digital Contracts',
         'subheading' => 'Prepare a contract, send the link, and let the client sign online.',
         'new' => 'New contract',
@@ -1310,6 +1325,7 @@ return [
     ],
 
     'contract_doc' => [
+        'jump_to_sign' => 'Sign ↓',
         'contract' => 'Contract',
         'draft_preview' => 'This is a draft preview. The client cannot open it until you send it.',
         'void_notice' => 'This contract was withdrawn by :vendor and can no longer be signed.',

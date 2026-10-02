@@ -47,13 +47,47 @@ it('sends a Basic vendor to the Pro page and refuses their writes', function () 
     $this->actingAs($basic->user)->post(route('vendor.contracts.store'), contractPayload())->assertForbidden();
 });
 
-it('starts a contract with the five standard sections', function () {
-    $sections = $this->actingAs($this->vendor->user)
+it('starts a contract with the five standard sections, filled with text to edit', function () {
+    $props = $this->actingAs($this->vendor->user)
         ->get(route('vendor.contracts.create'))
         ->assertOk()
-        ->viewData('props')['contract']['sections'];
+        ->viewData('props');
 
-    expect(array_column($sections, 'key'))->toBe(Contract::SECTION_KEYS);
+    expect(array_column($props['contract']['sections'], 'key'))->toBe(Contract::SECTION_KEYS)
+        ->and($props['contract']['sections'][0]['body'])->toBe(__('pages.contracts.starter.scope'))
+        // Nothing saved yet, so the first contract becomes the vendor's own default.
+        ->and($props['saveAsDefault'])->toBeTrue();
+});
+
+it('asks which quotation a new contract is for, and lets the vendor start without one', function () {
+    $quotation = Quotation::factory()->for($this->vendor)->sent()->create(['client_name' => 'Siti Nur']);
+    Quotation::factory()->for($this->vendor)->create(['status' => 'declined', 'client_name' => 'Ditolak Sahaja']);
+
+    $this->actingAs($this->vendor->user)
+        ->get(route('vendor.contracts.create'))
+        ->assertOk()
+        ->assertViewIs('vendor.contracts.pick')
+        ->assertSee('Siti Nur')
+        ->assertDontSee('Ditolak Sahaja')
+        ->assertSee(route('vendor.contracts.create', ['quotation' => $quotation->token]), false);
+
+    $this->actingAs($this->vendor->user)
+        ->get(route('vendor.contracts.create', ['kosong' => 1]))
+        ->assertOk()
+        ->assertViewIs('vendor.contracts.form')
+        ->assertViewHas('props', fn (array $props) => $props['quotation'] === null);
+});
+
+it('saves and sends in one step', function () {
+    Notification::fake();
+
+    $this->actingAs($this->vendor->user)
+        ->post(route('vendor.contracts.store'), contractPayload(['send' => '1']))
+        ->assertRedirect()
+        ->assertSessionHas('status', fn (string $status) => str_contains($status, 'KT-1001'));
+
+    expect(Contract::sole()->status)->toBe(ContractStatus::Sent);
+    Notification::assertSentOnDemand(ContractSent::class);
 });
 
 it('saves a draft contract, numbered per vendor, and keeps the text as the default when asked', function () {
@@ -91,7 +125,8 @@ it('attaches only the vendor\'s own quotation, and starts from one with its clie
         ->viewData('props');
 
     expect($props['contract']['client_name'])->toBe('Siti Nur')
-        ->and($props['contract']['quotation_id'])->toBe($ours->id);
+        ->and($props['quotation']['id'])->toBe($ours->id)
+        ->and($props['quotation']['total'])->toBe('RM3,000.00');
 });
 
 it('keeps a vendor out of another vendor\'s contracts, and addresses them by token', function () {

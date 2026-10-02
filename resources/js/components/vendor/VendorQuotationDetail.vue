@@ -4,7 +4,7 @@
  * by Blade, x-quotation-sheet): send the link, issue the invoice, record the
  * booking, attach a contract. Nothing here is shown to the client.
  */
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import UiConfirm from '../ui/UiConfirm.vue';
 
 const props = defineProps({
@@ -24,12 +24,17 @@ const copy = async () => {
     }
 };
 
+// Beside the sheet (≥1400px) the history stays open; above it, on a phone,
+// it folds away so the sheet is not pushed far down.
+const wide = ref(false);
+onMounted(() => (wide.value = window.matchMedia('(min-width: 1400px)').matches));
+
 const button = 'rounded-full border border-line px-4 py-2 text-center text-sm font-medium transition hover:border-brand-400';
 const primary = 'rounded-full bg-brand-600 px-4 py-2 text-center text-sm font-semibold text-white transition hover:bg-brand-700';
 </script>
 
 <template>
-    <aside class="flex min-w-0 flex-col gap-4">
+    <aside class="grid min-w-0 items-start gap-4 md:grid-cols-2 min-[1400px]:grid-cols-1">
         <section class="flex flex-col gap-3 rounded-2xl border border-line bg-surface-raised p-5">
             <p class="text-xs font-semibold tracking-wide text-ink-muted uppercase">{{ $t('vendor_quotation.share') }}</p>
 
@@ -62,8 +67,10 @@ const primary = 'rounded-full bg-brand-600 px-4 py-2 text-center text-sm font-se
                 >{{ $t('vendor_quotation.resend') }}</UiConfirm>
             </template>
 
-            <a :href="quotation.links.public" target="_blank" rel="noopener" :class="button">{{ quotation.is_draft ? $t('vendor_quotation.preview') : $t('vendor_quotation.open_public') }}</a>
-            <a :href="quotation.links.print" target="_blank" rel="noopener" :class="button">{{ $t('vendor_quotation.print') }}</a>
+            <div class="grid grid-cols-2 gap-2">
+                <a :href="quotation.links.public" target="_blank" rel="noopener" :class="button">{{ quotation.is_draft ? $t('vendor_quotation.preview') : $t('vendor_quotation.open_public') }}</a>
+                <a :href="quotation.links.print" target="_blank" rel="noopener" :class="button">{{ $t('vendor_quotation.print') }}</a>
+            </div>
         </section>
 
         <section v-if="quotation.links.invoice || quotation.invoice || quotation.links.record_booking || quotation.links.booking" class="flex flex-col gap-3 rounded-2xl border border-emerald-200 bg-emerald-50/50 p-5">
@@ -100,17 +107,22 @@ const primary = 'rounded-full bg-brand-600 px-4 py-2 text-center text-sm font-se
             <a v-if="quotation.links.contract" :href="quotation.links.contract" :class="button">{{ $t('vendor_quotation.prepare_contract') }}</a>
         </section>
 
-        <section class="flex flex-col gap-3 rounded-2xl border border-line p-5 text-sm">
-            <p class="text-xs font-semibold tracking-wide text-ink-muted uppercase">{{ $t('vendor_quotation.history') }}</p>
-            <ol class="flex flex-col gap-2">
-                <li v-for="entry in quotation.history" :key="entry.label" class="flex justify-between gap-3">
-                    <span>{{ entry.label }}</span>
-                    <span class="shrink-0 text-xs text-ink-muted">{{ entry.at }}</span>
-                </li>
-            </ol>
-            <p v-if="quotation.decline_reason" class="rounded-xl bg-surface-muted p-3 text-xs">“{{ quotation.decline_reason }}”</p>
-            <a v-if="quotation.links.enquiry" :href="quotation.links.enquiry" class="text-xs font-medium text-brand-700 underline underline-offset-4">{{ $t('vendor_quotation.view_enquiry') }}</a>
-        </section>
+        <details class="group rounded-2xl border border-line text-sm" :open="wide">
+            <summary class="flex cursor-pointer list-none items-center justify-between p-5 text-xs font-semibold tracking-wide text-ink-muted uppercase [&::-webkit-details-marker]:hidden">
+                {{ $t('vendor_quotation.history') }}
+                <svg class="size-4 transition group-open:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg>
+            </summary>
+            <div class="flex flex-col gap-3 px-5 pb-5">
+                <ol class="flex flex-col gap-2">
+                    <li v-for="entry in quotation.history" :key="entry.label" class="flex justify-between gap-3">
+                        <span>{{ entry.label }}</span>
+                        <span class="shrink-0 text-xs text-ink-muted">{{ entry.at }}</span>
+                    </li>
+                </ol>
+                <p v-if="quotation.decline_reason" class="rounded-xl bg-surface-muted p-3 text-xs">“{{ quotation.decline_reason }}”</p>
+                <a v-if="quotation.links.enquiry" :href="quotation.links.enquiry" class="text-xs font-medium text-brand-700 underline underline-offset-4">{{ $t('vendor_quotation.view_enquiry') }}</a>
+            </div>
+        </details>
 
         <div class="flex flex-wrap gap-2">
             <a v-if="quotation.links.edit" :href="quotation.links.edit" :class="button">{{ $t('vendor_quotation.edit') }}</a>

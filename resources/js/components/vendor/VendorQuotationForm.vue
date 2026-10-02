@@ -14,6 +14,7 @@ const props = defineProps({
     method: { type: String, default: 'POST' },
     cancelUrl: { type: String, required: true },
     number: { type: String, default: null },
+    canSend: { type: Boolean, default: true },
     vendor: { type: Object, required: true },
     packages: { type: Array, required: true },
     quotation: { type: Object, required: true },
@@ -54,7 +55,7 @@ const line = (item = {}) => ({
 const items = ref((hasOld ? Object.values(props.old.items ?? {}) : props.quotation.items).map(line));
 
 const packageToAdd = ref(props.packages[0]?.id ?? '');
-const packageName = (id) => props.packages.find((p) => String(p.id) === String(id))?.name;
+const packageOf = (id) => props.packages.find((p) => String(p.id) === String(id));
 
 const addPackage = () => {
     const chosen = props.packages.find((p) => String(p.id) === String(packageToAdd.value));
@@ -152,8 +153,11 @@ const toggle = (active) => ['px-2 py-0.5 text-xs font-semibold transition', acti
                             <div class="flex min-w-0 flex-col gap-0.5">
                                 <template v-if="item.package_id">
                                     <input type="hidden" :name="`items[${index}][package_id]`" :value="item.package_id">
-                                    <p class="px-1.5 py-1 font-semibold">{{ packageName(item.package_id) ?? item.name }}</p>
-                                    <p class="px-1.5 text-xs text-ink-muted">{{ $t('vendor_quotation_form.package_hint') }}</p>
+                                    <p class="flex flex-wrap items-center gap-2 px-1.5 py-1 font-semibold">
+                                        {{ packageOf(item.package_id)?.name ?? item.name }}
+                                        <span class="rounded-full bg-surface-muted px-2 py-0.5 text-[10px] font-medium tracking-wide text-ink-muted uppercase">{{ $t('vendor_quotation_form.package') }}</span>
+                                    </p>
+                                    <p v-if="packageOf(item.package_id)?.features?.length" class="px-1.5 text-xs text-ink-muted">{{ packageOf(item.package_id).features.join(' · ') }}</p>
                                 </template>
                                 <template v-else>
                                     <input v-model="item.name" :name="`items[${index}][name]`" required maxlength="150" :aria-label="$t('vendor_quotation_form.item_name')" :placeholder="$t('vendor_quotation_form.item_name_placeholder')" :class="[ink, 'font-semibold']">
@@ -199,7 +203,7 @@ const toggle = (active) => ['px-2 py-0.5 text-xs font-semibold transition', acti
                             <dt class="text-ink-muted">{{ $t('vendor_quotation_form.subtotal') }}</dt>
                             <dd class="tabular-nums">{{ money(sums.subtotal) }}</dd>
                         </div>
-                        <div class="flex items-center justify-between gap-3">
+                        <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
                             <dt class="flex items-center gap-2 text-ink-muted">
                                 {{ $t('vendor_quotation_form.discount') }}
                                 <span class="inline-flex overflow-hidden rounded-full border border-line">
@@ -207,9 +211,9 @@ const toggle = (active) => ['px-2 py-0.5 text-xs font-semibold transition', acti
                                     <button type="button" :class="toggle(form.discount_type === 'percent')" @click="form.discount_type = 'percent'">%</button>
                                 </span>
                             </dt>
-                            <dd class="flex items-center gap-2">
-                                <input v-model="form.discount_value" name="discount_value" type="number" min="0" step="0.01" :aria-label="$t('vendor_quotation_form.discount')" :class="[ink, 'w-24 text-right tabular-nums']">
-                                <span class="w-24 text-right tabular-nums">− {{ money(sums.discount) }}</span>
+                            <dd class="ml-auto flex items-center gap-2">
+                                <input v-model="form.discount_value" name="discount_value" type="number" min="0" step="0.01" :aria-label="$t('vendor_quotation_form.discount')" :class="[ink, 'w-20 text-right tabular-nums']">
+                                <span class="min-w-24 text-right whitespace-nowrap tabular-nums">− {{ money(sums.discount) }}</span>
                             </dd>
                         </div>
                         <p v-if="errors.discount_value" class="text-right text-xs text-red-700">{{ errors.discount_value }}</p>
@@ -217,7 +221,7 @@ const toggle = (active) => ['px-2 py-0.5 text-xs font-semibold transition', acti
                             <dt>{{ $t('vendor_quotation_form.total') }}</dt>
                             <dd class="tabular-nums">{{ money(sums.total) }}</dd>
                         </div>
-                        <div class="flex items-center justify-between gap-3">
+                        <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
                             <dt class="flex items-center gap-2 text-ink-muted">
                                 {{ $t('vendor_quotation_form.deposit') }}
                                 <span class="inline-flex overflow-hidden rounded-full border border-line">
@@ -225,9 +229,9 @@ const toggle = (active) => ['px-2 py-0.5 text-xs font-semibold transition', acti
                                     <button type="button" :class="toggle(form.deposit_type === 'percent')" @click="form.deposit_type = 'percent'">%</button>
                                 </span>
                             </dt>
-                            <dd class="flex items-center gap-2">
-                                <input v-model="form.deposit_value" name="deposit_value" type="number" min="0" step="0.01" :aria-label="$t('vendor_quotation_form.deposit')" :class="[ink, 'w-24 text-right tabular-nums']">
-                                <span class="w-24 text-right font-medium tabular-nums">{{ money(sums.deposit) }}</span>
+                            <dd class="ml-auto flex items-center gap-2">
+                                <input v-model="form.deposit_value" name="deposit_value" type="number" min="0" step="0.01" :aria-label="$t('vendor_quotation_form.deposit')" :class="[ink, 'w-20 text-right tabular-nums']">
+                                <span class="min-w-24 text-right font-medium whitespace-nowrap tabular-nums">{{ money(sums.deposit) }}</span>
                             </dd>
                         </div>
                         <p v-if="errors.deposit_value" class="text-right text-xs text-red-700">{{ errors.deposit_value }}</p>
@@ -259,9 +263,11 @@ const toggle = (active) => ['px-2 py-0.5 text-xs font-semibold transition', acti
 
         <div class="sticky bottom-3 z-10 mx-auto flex w-full max-w-[210mm] flex-wrap items-center justify-between gap-3 rounded-2xl border border-line bg-surface-raised/95 px-4 py-3 shadow-sm backdrop-blur">
             <p class="text-xs text-ink-muted">{{ $t('vendor_quotation_form.save_hint') }}</p>
-            <div class="flex gap-2">
-                <a :href="cancelUrl" class="rounded-full px-5 py-2.5 text-sm font-medium text-ink-muted transition hover:bg-surface-muted">{{ $t('vendor_quotation_form.cancel') }}</a>
-                <button type="submit" class="rounded-full bg-brand-600 px-8 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700">{{ $t('vendor_quotation_form.save') }}</button>
+            <div class="flex flex-wrap gap-2">
+                <a :href="cancelUrl" class="rounded-full px-4 py-2.5 text-sm font-medium text-ink-muted transition hover:bg-surface-muted">{{ $t('vendor_quotation_form.cancel') }}</a>
+                <button v-if="canSend" type="submit" class="rounded-full border border-line bg-white px-5 py-2.5 text-sm font-semibold transition hover:border-brand-400">{{ $t('vendor_quotation_form.save_draft') }}</button>
+                <button v-if="canSend" type="submit" name="send" value="1" class="rounded-full bg-brand-600 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700">{{ $t('vendor_quotation_form.save_and_send') }}</button>
+                <button v-else type="submit" class="rounded-full bg-brand-600 px-8 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700">{{ $t('vendor_quotation_form.save') }}</button>
             </div>
         </div>
     </form>

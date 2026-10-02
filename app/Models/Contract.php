@@ -66,7 +66,8 @@ class Contract extends Model
 
     /**
      * The five standard sections, titled in the current language and holding
-     * the text the vendor saved as their default, if any.
+     * the text the vendor saved as their default, or a starter text to edit
+     * until they have one: a blank page is the hardest thing to fill in.
      *
      * @return list<array{key: string, title: string, body: string}>
      */
@@ -77,7 +78,7 @@ class Contract extends Model
         return array_map(fn (string $key): array => [
             'key' => $key,
             'title' => __('pages.contracts.sections.'.$key),
-            'body' => (string) ($saved[$key] ?? ''),
+            'body' => (string) ($saved[$key] ?? __('pages.contracts.starter.'.$key)),
         ], self::SECTION_KEYS);
     }
 

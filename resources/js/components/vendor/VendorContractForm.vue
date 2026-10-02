@@ -2,8 +2,12 @@
 /**
  * Writing a contract on the document itself: the page looks like the
  * contract the client will read and sign (x-contract-sheet), and every part
- * the vendor can change is typed straight into it. Five standard sections
- * come first; the vendor may add their own or drop one.
+ * the vendor can change is typed straight into it.
+ *
+ * Step two of three: the quotation was picked first (its sums are shown
+ * here, read-only), the five standard sections arrive filled with the
+ * vendor's saved text or a starter text to edit, and "Simpan & hantar"
+ * finishes it in one go.
  */
 import { ref } from 'vue';
 
@@ -13,8 +17,13 @@ const props = defineProps({
     cancelUrl: { type: String, required: true },
     number: { type: String, default: null },
     vendor: { type: Object, required: true },
-    quotations: { type: Array, default: () => [] },
+    /** The attached quotation's summary, or null. */
+    quotation: { type: Object, default: null },
+    /** Back to step one, to pick another quotation; null when editing. */
+    changeQuotationUrl: { type: String, default: null },
     contract: { type: Object, required: true },
+    saveAsDefault: { type: Boolean, default: false },
+    canSend: { type: Boolean, default: true },
     standardKeys: { type: Array, default: () => [] },
     csrf: { type: String, required: true },
     errors: { type: Object, default: () => ({}) },
@@ -29,8 +38,7 @@ const form = ref({
     client_phone: pick('client_phone'),
     client_email: pick('client_email'),
     event_date: pick('event_date'),
-    quotation_id: pick('quotation_id'),
-    save_as_default: hasOld ? Boolean(Number(props.old.save_as_default)) : false,
+    save_as_default: hasOld ? Boolean(Number(props.old.save_as_default)) : props.saveAsDefault,
 });
 
 let nextKey = 0;
@@ -51,6 +59,16 @@ const label = 'text-[11px] font-semibold tracking-[0.18em] text-gold-600 upperca
     <form :action="action" method="POST" class="flex flex-col gap-4">
         <input type="hidden" name="_token" :value="csrf">
         <input v-if="method !== 'POST'" type="hidden" name="_method" :value="method">
+
+        <input v-if="quotation" type="hidden" name="quotation_id" :value="quotation.id">
+
+        <ol v-if="changeQuotationUrl" class="mx-auto flex w-full max-w-[210mm] flex-wrap items-center gap-3 text-xs font-medium text-ink-muted">
+            <li class="flex items-center gap-2"><span class="flex size-6 items-center justify-center rounded-full border border-brand-600 text-brand-700">✓</span>{{ $t('vendor_contract_form.step_quotation') }}</li>
+            <li aria-hidden="true" class="h-px w-6 bg-line"></li>
+            <li class="flex items-center gap-2 text-brand-700"><span class="flex size-6 items-center justify-center rounded-full bg-brand-600 text-white">2</span>{{ $t('vendor_contract_form.step_write') }}</li>
+            <li aria-hidden="true" class="h-px w-6 bg-line"></li>
+            <li class="flex items-center gap-2"><span class="flex size-6 items-center justify-center rounded-full border border-line">3</span>{{ $t('vendor_contract_form.step_send') }}</li>
+        </ol>
 
         <p class="mx-auto w-full max-w-[210mm] text-xs text-ink-muted">{{ $t('vendor_contract_form.sheet_hint') }}</p>
 
@@ -82,16 +100,30 @@ const label = 'text-[11px] font-semibold tracking-[0.18em] text-gold-600 upperca
                     <dl class="grid min-w-0 grid-cols-[auto_minmax(0,1fr)] items-center gap-x-4 gap-y-1.5 text-sm sm:justify-self-end">
                         <dt class="text-ink-muted">{{ $t('vendor_quotation_form.event_date') }}</dt>
                         <dd><input v-model="form.event_date" name="event_date" type="date" :aria-label="$t('vendor_quotation_form.event_date')" :class="[ink, 'font-medium sm:text-right']"></dd>
-                        <dt class="text-ink-muted">{{ $t('vendor_contract_form.quotation') }}</dt>
-                        <dd>
-                            <select v-model="form.quotation_id" name="quotation_id" :aria-label="$t('vendor_contract_form.quotation')" class="nk-select w-full rounded-md border-0 border-b border-dashed border-line bg-transparent py-1 pr-8 pl-1.5 text-sm font-medium focus:border-brand-400 focus:ring-0">
-                                <option value="">{{ $t('vendor_contract_form.no_quotation') }}</option>
-                                <option v-for="option in quotations" :key="option.value" :value="option.value">{{ option.label }}</option>
-                            </select>
-                        </dd>
-                        <dd class="col-span-2 text-xs text-ink-muted">{{ $t('vendor_contract_form.quotation_hint') }}</dd>
                     </dl>
                 </section>
+
+                <section v-if="quotation" class="mt-6 rounded-2xl border border-line p-4 sm:p-5">
+                    <div class="flex items-center justify-between gap-3">
+                        <p :class="label">{{ $t('vendor_contract_form.quotation_attached', { number: quotation.number }) }}</p>
+                        <a v-if="changeQuotationUrl" :href="changeQuotationUrl" class="text-xs font-medium text-brand-700 underline underline-offset-4">{{ $t('vendor_contract_form.change') }}</a>
+                    </div>
+                    <ul class="mt-3 flex flex-col gap-1.5 text-sm">
+                        <li v-for="(item, index) in quotation.items" :key="index" class="flex justify-between gap-4">
+                            <span class="min-w-0">{{ item.name }}<template v-if="item.quantity > 1"> × {{ item.quantity }}</template></span>
+                            <span class="shrink-0 tabular-nums">{{ item.line_total }}</span>
+                        </li>
+                    </ul>
+                    <dl class="mt-3 flex flex-col gap-1 border-t border-line pt-3 text-sm">
+                        <div class="flex justify-between gap-4 font-semibold"><dt>{{ $t('vendor_quotation_form.total') }}</dt><dd class="tabular-nums">{{ quotation.total }}</dd></div>
+                        <template v-if="quotation.deposit">
+                            <div class="flex justify-between gap-4 text-ink-muted"><dt>{{ $t('vendor_quotation_form.deposit') }}</dt><dd class="tabular-nums">{{ quotation.deposit }}</dd></div>
+                            <div class="flex justify-between gap-4 text-ink-muted"><dt>{{ $t('vendor_quotation_form.balance') }}</dt><dd class="tabular-nums">{{ quotation.balance }}</dd></div>
+                        </template>
+                    </dl>
+                    <p class="mt-3 text-xs text-ink-muted">{{ $t('vendor_contract_form.quotation_hint') }}</p>
+                </section>
+                <a v-else-if="changeQuotationUrl" :href="changeQuotationUrl" class="mt-6 block rounded-2xl border border-dashed border-line p-4 text-center text-sm font-medium text-ink-muted transition hover:border-brand-400 hover:text-ink">+ {{ $t('vendor_contract_form.attach_quotation') }}</a>
 
                 <p v-if="errors.sections" class="mt-4 text-sm text-red-700">{{ errors.sections }}</p>
 
@@ -135,9 +167,10 @@ const label = 'text-[11px] font-semibold tracking-[0.18em] text-gold-600 upperca
 
         <div class="sticky bottom-3 z-10 mx-auto flex w-full max-w-[210mm] flex-wrap items-center justify-between gap-3 rounded-2xl border border-line bg-surface-raised/95 px-4 py-3 shadow-sm backdrop-blur">
             <p class="text-xs text-ink-muted">{{ $t('vendor_contract_form.save_hint') }}</p>
-            <div class="flex gap-2">
-                <a :href="cancelUrl" class="rounded-full px-5 py-2.5 text-sm font-medium text-ink-muted transition hover:bg-surface-muted">{{ $t('vendor_quotation_form.cancel') }}</a>
-                <button type="submit" class="rounded-full bg-brand-600 px-8 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700">{{ $t('vendor_quotation_form.save') }}</button>
+            <div class="flex flex-wrap gap-2">
+                <a :href="cancelUrl" class="rounded-full px-4 py-2.5 text-sm font-medium text-ink-muted transition hover:bg-surface-muted">{{ $t('vendor_quotation_form.cancel') }}</a>
+                <button type="submit" class="rounded-full border border-line bg-white px-5 py-2.5 text-sm font-semibold transition hover:border-brand-400">{{ $t('vendor_quotation_form.save_draft') }}</button>
+                <button v-if="canSend" type="submit" name="send" value="1" class="rounded-full bg-brand-600 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700">{{ $t('vendor_contract_form.save_and_send') }}</button>
             </div>
         </div>
     </form>

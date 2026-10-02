@@ -30,17 +30,17 @@
     };
 @endphp
 
-<article data-doc {{ $attributes->class('relative mx-auto max-w-[210mm] overflow-hidden rounded-2xl bg-white shadow-[0_1px_3px_rgb(0_0_0/0.08),0_12px_40px_-12px_rgb(0_0_0/0.15)] print:max-w-none print:rounded-none print:shadow-none') }}>
+<article data-doc {{ $attributes->class('@container relative mx-auto max-w-[210mm] overflow-hidden rounded-2xl bg-white shadow-[0_1px_3px_rgb(0_0_0/0.08),0_12px_40px_-12px_rgb(0_0_0/0.15)] print:max-w-none print:rounded-none print:shadow-none') }}>
     <div class="h-2 bg-gradient-to-r from-brand-700 via-brand-500 to-gold-400 print:[print-color-adjust:exact]"></div>
 
-    <div data-doc-body class="p-7 sm:p-12 print:p-0 print:pt-6">
-        <header class="flex flex-col-reverse gap-6 sm:flex-row sm:items-start sm:justify-between">
+    <div data-doc-body class="p-5 @lg:p-8 @2xl:p-12 print:p-0 print:pt-6">
+        <header class="flex flex-col-reverse gap-6 @xl:flex-row @xl:items-start @xl:justify-between">
             <div class="flex min-w-0 items-start gap-4">
                 @if ($vendor->logoUrl())
                     <img src="{{ $vendor->logoUrl() }}" alt="" class="size-16 shrink-0 rounded-2xl object-cover">
                 @endif
                 <div class="min-w-0">
-                    <p class="font-display text-2xl font-semibold break-words">{{ $vendor->name }}</p>
+                    <p class="font-display text-xl font-semibold break-words @xl:text-2xl">{{ $vendor->name }}</p>
                     <div class="mt-2 space-y-0.5 text-sm break-words text-ink-muted">
                         @foreach ($vendorLines as $line)
                             <p>{{ $line }}</p>
@@ -49,8 +49,8 @@
                 </div>
             </div>
 
-            <div class="sm:text-right">
-                <p class="font-display text-4xl font-semibold tracking-wide text-brand-700 uppercase">{{ $title }}</p>
+            <div class="@xl:text-right">
+                <p class="font-display text-3xl font-semibold tracking-wide text-brand-700 uppercase @2xl:text-4xl">{{ $title }}</p>
                 <p class="mt-1 font-mono text-sm font-semibold">{{ $number }}</p>
                 <span @class([
                     'mt-3 inline-flex rounded-full border-2 px-3 py-1 text-xs font-bold tracking-[0.18em] uppercase print:[print-color-adjust:exact]',
@@ -62,7 +62,7 @@
             </div>
         </header>
 
-        <section class="mt-10 grid gap-6 border-y border-line py-6 sm:grid-cols-2">
+        <section class="mt-10 grid gap-6 border-y border-line py-6 @xl:grid-cols-2">
             <div class="min-w-0">
                 <p class="text-[11px] font-semibold tracking-[0.18em] text-gold-600 uppercase">{{ __('pages.quotation_doc.prepared_for') }}</p>
                 <p class="mt-2 font-semibold break-words">{{ $quotation->client_name }}</p>
@@ -72,15 +72,35 @@
                     @endforeach
                 </div>
             </div>
-            <dl class="grid min-w-0 grid-cols-[auto_1fr] gap-x-6 gap-y-1.5 text-sm sm:justify-self-end">
+            <dl class="grid min-w-0 grid-cols-[auto_1fr] gap-x-6 gap-y-1.5 text-sm @xl:justify-self-end">
                 @foreach ($facts as $label => $value)
                     <dt class="text-ink-muted">{{ $label }}</dt>
-                    <dd class="font-medium break-words sm:text-right">{{ $value }}</dd>
+                    <dd class="font-medium break-words @xl:text-right">{{ $value }}</dd>
                 @endforeach
             </dl>
         </section>
 
-        <div class="mt-8 overflow-x-auto">
+        {{-- Narrow (a phone): one line per item, stacked, so nothing runs off
+             the side. From a medium width, and always in print, the table. --}}
+        <ul class="mt-8 border-t-2 border-ink @xl:hidden">
+            @foreach ($quotation->items as $item)
+                <li class="border-b border-line py-3 text-sm">
+                    <div class="flex items-start justify-between gap-3">
+                        <p class="min-w-0 font-semibold break-words">{{ $item->name }}</p>
+                        <p class="shrink-0 font-medium whitespace-nowrap tabular-nums">{{ $money($item->line_total) }}</p>
+                    </div>
+                    @if ($item->description)
+                        <p class="mt-0.5 whitespace-pre-line text-ink-muted">{{ $item->description }}</p>
+                    @endif
+                    @if ($item->features)
+                        <p class="mt-0.5 text-xs text-ink-muted">{{ implode(' · ', $item->features) }}</p>
+                    @endif
+                    <p class="mt-1 text-xs text-ink-muted tabular-nums">{{ $item->quantity }} × {{ $money($item->unit_price) }}</p>
+                </li>
+            @endforeach
+        </ul>
+
+        <div class="mt-8 hidden overflow-x-auto @xl:block">
             <table class="w-full text-sm">
                 <thead>
                     <tr class="border-b-2 border-ink text-left">

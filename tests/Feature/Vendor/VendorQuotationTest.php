@@ -293,3 +293,12 @@ it('addresses a quotation by its token in the vendor area too, never by its id',
         ->assertSee('data-doc', false)
         ->assertSee($quotation->number);
 });
+
+it('saves and sends a new quotation in one step', function () {
+    $this->actingAs($this->vendor->user)
+        ->post(route('vendor.quotations.store'), quotationPayload(['client_email' => null, 'send' => '1']))
+        ->assertRedirect()
+        ->assertSessionHas('status', __('flash.vendor.quotation_sent', ['number' => 'QT-1001']));
+
+    expect(Quotation::sole()->status)->toBe(QuotationStatus::Sent);
+});

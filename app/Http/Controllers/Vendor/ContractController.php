@@ -7,11 +7,13 @@ use App\Actions\SaveContract;
 use App\Actions\SendContract;
 use App\Actions\VoidContract;
 use App\Enums\ContractStatus;
+use App\Enums\QuotationStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SaveContractRequest;
 use App\Http\Requests\VoidContractRequest;
 use App\Models\Contract;
 use App\Models\Quotation;
+use App\Models\QuotationItem;
 use App\Models\Vendor;
 use App\Support\PhoneNumber;
 use App\Support\TableFilter;
@@ -99,13 +101,28 @@ class ContractController extends Controller
     }
 
     /**
-     * A blank contract, or one for a quotation: its client and date are
-     * filled in and the quotation is attached.
+     * A contract usually follows a quotation, so the first step is choosing
+     * one: its client, date and sums come with it. A vendor with no
+     * quotations, or who chooses to start without one (?kosong=1), goes
+     * straight to the contract.
      */
     public function create(Request $request): View
     {
         $vendor = $request->user()->vendor;
-        $quotation = $request->filled('quotation') ? $vendor->quotations()->firstWhere('token', $request->string('quotation')->toString()) : null;
+        $quotation = $request->filled('quotation')
+            ? $vendor->quotations()->with('items')->firstWhere('token', $request->string('quotation')->toString())
+            : null;
+
+        if (! $quotation && ! $request->boolean('kosong') && $vendor->quotations()->where('status', '!=', QuotationStatus::Declined)->exists()) {
+            return view('vendor.contracts.pick', [
+                'quotations' => $vendor->quotations()
+                    ->where('status', '!=', QuotationStatus::Declined)
+                    ->withCount('contracts')
+                    ->latest('id')
+                    ->limit(30)
+                    ->get(),
+            ]);
+        }
 
         return view('vendor.contracts.form', [
             'heading' => __('pages.contracts.create_heading'),
@@ -113,13 +130,11 @@ class ContractController extends Controller
         ]);
     }
 
-    public function store(SaveContractRequest $request, SaveContract $save): RedirectResponse
+    public function store(SaveContractRequest $request, SaveContract $save, SendContract $send): RedirectResponse
     {
         $contract = $save->handle($request->user()->vendor, $request->contractData(), saveAsDefault: $request->boolean('save_as_default'));
 
-        return redirect()
-            ->route('vendor.contracts.show', $contract)
-            ->with('status', __('flash.vendor.contract_saved', ['number' => $contract->number]));
+        return $this->afterSave($request, $contract, $send);
     }
 
     public function show(Contract $contract): View
@@ -144,13 +159,28 @@ class ContractController extends Controller
         ]);
     }
 
-    public function update(SaveContractRequest $request, Contract $contract, SaveContract $save): RedirectResponse
+    public function update(SaveContractRequest $request, Contract $contract, SaveContract $save, SendContract $send): RedirectResponse
     {
         $save->handle($request->user()->vendor, $request->contractData(), $contract, $request->boolean('save_as_default'));
 
-        return redirect()
-            ->route('vendor.contracts.show', $contract)
-            ->with('status', __('flash.vendor.contract_saved', ['number' => $contract->number]));
+        return $this->afterSave($request, $contract, $send);
+    }
+
+    /**
+     * "Simpan & hantar" saves and opens the contract to the client in one
+     * step; plain "Simpan" keeps it a draft.
+     */
+    private function afterSave(Request $request, Contract $contract, SendContract $send): RedirectResponse
+    {
+        $redirect = redirect()->route('vendor.contracts.show', $contract);
+
+        if (! $request->boolean('send')) {
+            return $redirect->with('status', __('flash.vendor.contract_saved', ['number' => $contract->number]));
+        }
+
+        $send->handle($contract, $request->user()->name);
+
+        return $redirect->with('status', __(filled($contract->client_email) ? 'flash.vendor.contract_emailed' : 'flash.vendor.contract_sent', ['number' => $contract->number]));
     }
 
     public function destroy(Contract $contract): RedirectResponse
@@ -196,6 +226,9 @@ class ContractController extends Controller
      */
     private function formProps(Vendor $vendor, ?Contract $contract, ?Quotation $quotation, string $action): array
     {
+        $settings = $vendor->bookingSettingsOrDefault();
+        $attached = $contract ? $contract->quotation?->loadMissing('items') : $quotation;
+
         return VueProps::for([
             'action' => $action,
             'method' => $contract ? 'PUT' : 'POST',
@@ -205,17 +238,30 @@ class ContractController extends Controller
                 'logo' => $vendor->logoUrl(),
             ],
             'cancelUrl' => $contract ? route('vendor.contracts.show', $contract) : route('vendor.contracts.index'),
-            'quotations' => $vendor->quotations()->latest('id')->limit(50)->get(['id', 'number', 'client_name'])
-                ->map(fn (Quotation $quotation): array => ['value' => $quotation->id, 'label' => $quotation->number.' · '.$quotation->client_name])
-                ->values(),
+            'changeQuotationUrl' => $contract ? null : route('vendor.contracts.create'),
+            'quotation' => $attached ? [
+                'id' => $attached->id,
+                'number' => $attached->number,
+                'items' => $attached->items->map(fn (QuotationItem $item): array => [
+                    'name' => $item->name,
+                    'quantity' => $item->quantity,
+                    'line_total' => Quotation::money($item->line_total),
+                ])->values(),
+                'total' => Quotation::money($attached->total),
+                'deposit' => $attached->hasDeposit() ? Quotation::money($attached->deposit_amount) : null,
+                'balance' => Quotation::money($attached->balanceAmount()),
+            ] : null,
             'contract' => [
-                'quotation_id' => $contract?->quotation_id ?? $quotation?->id,
                 'client_name' => $contract?->client_name ?? $quotation?->client_name ?? '',
                 'client_phone' => $contract?->client_phone ?? $quotation?->client_phone ?? '',
                 'client_email' => $contract?->client_email ?? $quotation?->client_email ?? '',
                 'event_date' => ($contract?->event_date ?? $quotation?->event_date)?->toDateString() ?? '',
-                'sections' => $contract?->sections ?? Contract::defaultSections($vendor->bookingSettingsOrDefault()),
+                'sections' => $contract?->sections ?? Contract::defaultSections($settings),
             ],
+            // The first contract saves its text as the vendor's own, so the
+            // next one starts from it.
+            'saveAsDefault' => blank($settings->contract_defaults),
+            'canSend' => ! $contract || $contract->status === ContractStatus::Draft,
             'standardKeys' => Contract::SECTION_KEYS,
             'old' => old(),
         ]);
