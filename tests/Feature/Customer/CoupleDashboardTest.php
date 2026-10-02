@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Booking;
 use App\Models\User;
 use App\Models\Wedding;
 use App\Models\WeddingGuest;
@@ -58,11 +59,32 @@ it('keeps the dashboard to the countdown, the steps, four shortcuts and the part
         ->assertDontSee(__('customer.checklist_categories'));
 });
 
-it('asks a couple with no wedding to create one, and nothing else', function () {
-    $props = dashboardProps($this->actingAs($this->aina)->get(route('dashboard'))->assertOk());
+it('asks a couple with no wedding to create one, with no sidebar until they do', function () {
+    $response = $this->actingAs($this->aina)->get(route('dashboard'))->assertOk();
+    $props = dashboardProps($response);
 
     expect($props['hasWedding'])->toBeFalse()
+        ->and($props['createUrl'])->toBe(route('weddings.create'))
+        ->and($props)->toHaveKey('checklistCount')
         ->and($props)->not->toHaveKey('steps');
+
+    // No planning tool is offered before there is a date to plan around.
+    $response->assertDontSee(route('checklist.index'), false)
+        ->assertDontSee(route('guests.index'), false);
+
+    Wedding::factory()->for($this->aina)->create();
+
+    $this->actingAs($this->aina->fresh())->get(route('dashboard'))
+        ->assertSee(route('checklist.index'), false);
+});
+
+it('points a couple without a wedding at the bookings a vendor already recorded', function () {
+    Booking::factory()->for($this->aina)->create(['wedding_id' => null]);
+
+    $props = dashboardProps($this->actingAs($this->aina)->get(route('dashboard')));
+
+    expect($props['bookingsCount'])->toBe(1)
+        ->and($props['bookingsUrl'])->toBe(route('bookings.index'));
 });
 
 it('marks the invitation card and Neekah Kenangan as premium in the sidebar', function () {

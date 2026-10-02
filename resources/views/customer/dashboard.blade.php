@@ -1,7 +1,7 @@
-{{-- The couple's home, kept to what moves them forward. With a wedding the
-     page has no heading of its own: the names, the date and the countdown
-     are one card at the top. --}}
-<x-layouts.customer :title="__('pages.dash.majlis_saya')" :heading="$wedding ? null : __('pages.dash.majlis_saya')" :subheading="$wedding ? null : __('pages.dash.cipta_wedding_project_sub')">
+{{-- The couple's home, kept to what moves them forward. The page has no
+     heading of its own: with a wedding the names, the date and the countdown
+     are one card at the top; without one, the page is the card asking for it. --}}
+<x-layouts.customer :title="__('pages.dash.majlis_saya')">
     @if ($wedding)
         {{-- resources/js/components/customer/WeddingCountdown.vue; the names and
              the day count are what show before it mounts. --}}

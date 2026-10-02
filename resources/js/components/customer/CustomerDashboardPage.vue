@@ -17,6 +17,10 @@ defineProps({
     part: { type: String, default: 'steps' },
     hasWedding: { type: Boolean, required: true },
     createUrl: { type: String, required: true },
+    /** Without a wedding: what making one unlocks, and any booking already waiting. */
+    checklistCount: { type: Number, default: 0 },
+    bookingsCount: { type: Number, default: 0 },
+    bookingsUrl: { type: String, default: null },
     steps: { type: Array, default: () => [] },
     stepsDone: { type: Number, default: 0 },
     stepsTotal: { type: Number, default: 0 },
@@ -36,6 +40,14 @@ const icons = {
     wallet: ['M3 7h15a3 3 0 0 1 3 3v7a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3V7Z', 'M3 7a2 2 0 0 1 2-2h11', 'M17 13h.01'],
 };
 
+/** What making a wedding unlocks, for the page that asks for one. */
+const why = [
+    { key: 'why_countdown', icon: 'rings', tone: 'from-brand-50 to-gold-300/40 text-brand-700' },
+    { key: 'why_checklist', icon: 'check', tone: 'from-emerald-50 to-gold-300/30 text-emerald-800' },
+    { key: 'why_card', icon: 'mail', tone: 'from-sky-50 to-brand-50 text-sky-800' },
+    { key: 'why_budget', icon: 'wallet', tone: 'from-gold-300/40 to-brand-50 text-gold-600' },
+];
+
 const tones = {
     card: 'from-brand-50 to-gold-300/40 text-brand-700',
     guests: 'from-sky-50 to-brand-50 text-sky-800',
@@ -45,18 +57,62 @@ const tones = {
 </script>
 
 <template>
-    <!-- No wedding yet: one card, one button. -->
-    <section v-if="!hasWedding && part === 'steps'" class="relative overflow-hidden rounded-[1.75rem] bg-linear-to-br from-brand-700 via-brand-800 to-brand-900 px-6 py-12 text-center text-white shadow-lg shadow-brand-900/20 sm:px-10">
-        <div class="pointer-events-none absolute -top-24 -right-16 size-72 rounded-full bg-gold-300/20 blur-3xl" aria-hidden="true"></div>
-        <p class="relative font-script text-3xl text-gold-300 sm:text-4xl">{{ $t('countdown.bila_hari_bahagia') }}</p>
-        <h2 class="relative mt-2 font-display text-3xl font-semibold sm:text-4xl">{{ $t('customer.start_project_title') }}</h2>
-        <p class="relative mx-auto mt-3 max-w-md text-sm text-white/80">{{ $t('customer.tetapkan_tarikh_lokasi_dan_bajet') }}</p>
-        <a :href="createUrl" class="relative mt-6 inline-flex rounded-full bg-white px-6 py-3 text-sm font-semibold text-brand-800 shadow-sm transition hover:bg-gold-300">{{ $t('customer.start_project_action') }}</a>
-        <p v-if="convertUrl" class="relative mt-6 text-xs text-white/75">
-            {{ $t('dashboard_steps.vendor_question') }}
-            <a :href="convertUrl" class="font-semibold text-white underline underline-offset-4">{{ $t('dashboard_steps.vendor_switch') }}</a>
+    <!-- No wedding yet: the whole page asks for one. The sidebar is hidden
+         until it exists (layouts/customer), so this is the only way on. -->
+    <div v-if="!hasWedding && part === 'steps'" class="mx-auto flex max-w-4xl flex-col gap-6">
+        <section class="relative overflow-hidden rounded-[1.75rem] bg-linear-to-br from-brand-700 via-brand-800 to-brand-900 px-6 py-10 text-center text-white shadow-lg shadow-brand-900/20 sm:px-12 sm:py-14">
+            <div class="pointer-events-none absolute -top-24 -right-16 size-72 rounded-full bg-gold-300/20 blur-3xl" aria-hidden="true"></div>
+            <div class="pointer-events-none absolute -bottom-28 -left-20 size-72 rounded-full bg-brand-400/30 blur-3xl" aria-hidden="true"></div>
+
+            <p class="relative font-script text-3xl text-gold-300 sm:text-4xl">{{ $t('countdown.bila_hari_bahagia') }}</p>
+            <h1 class="relative mt-2 font-display text-3xl font-semibold sm:text-5xl">{{ $t('onboarding_couple.title') }}</h1>
+            <p class="relative mx-auto mt-4 max-w-lg text-sm text-white/85 sm:text-base">{{ $t('onboarding_couple.lead') }}</p>
+
+            <a :href="createUrl" class="relative mt-8 inline-flex items-center gap-2 rounded-full bg-white px-8 py-3.5 text-sm font-semibold text-brand-800 shadow-lg shadow-black/10 transition hover:-translate-y-0.5 hover:bg-gold-300">
+                {{ $t('onboarding_couple.cta') }}
+                <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+            </a>
+            <p class="relative mt-3 flex items-center justify-center gap-1.5 text-xs text-white/75">
+                <svg class="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></svg>
+                {{ $t('onboarding_couple.time') }}
+            </p>
+
+            <div class="relative mx-auto mt-8 max-w-xl border-t border-white/15 pt-6">
+                <p class="text-[11px] font-semibold tracking-[0.2em] text-gold-300 uppercase">{{ $t('onboarding_couple.need') }}</p>
+                <ul class="mt-3 flex flex-wrap justify-center gap-2">
+                    <li v-for="(item, index) in ['need_names', 'need_date', 'need_place', 'need_budget']" :key="item" class="flex items-center gap-2 rounded-full bg-white/10 px-3 py-1.5 text-xs ring-1 ring-white/20">
+                        <span class="flex size-5 items-center justify-center rounded-full bg-gold-300 text-[10px] font-bold text-brand-900">{{ index + 1 }}</span>
+                        {{ $t(`onboarding_couple.${item}`) }}
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <section>
+            <h2 class="text-center font-display text-2xl font-semibold">{{ $t('onboarding_couple.why') }}</h2>
+            <ul class="mt-4 grid gap-3 sm:grid-cols-2">
+                <li v-for="point in why" :key="point.key" class="flex gap-4 rounded-3xl bg-surface-raised p-5 ring-1 ring-line">
+                    <span :class="['flex size-11 shrink-0 items-center justify-center rounded-2xl bg-linear-to-br', point.tone]">
+                        <svg class="size-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path v-for="d in icons[point.icon]" :key="d" :d="d" /></svg>
+                    </span>
+                    <span class="min-w-0">
+                        <span class="block font-semibold">{{ $t(`onboarding_couple.${point.key}_title`, { count: checklistCount }) }}</span>
+                        <span class="mt-0.5 block text-sm text-ink-muted">{{ $t(`onboarding_couple.${point.key}_body`) }}</span>
+                    </span>
+                </li>
+            </ul>
+        </section>
+
+        <p v-if="bookingsCount" class="rounded-2xl bg-surface-raised px-5 py-4 text-center text-sm ring-1 ring-line">
+            {{ $t('onboarding_couple.bookings', { count: bookingsCount }) }}
+            <a :href="bookingsUrl" class="font-semibold text-brand-700 underline underline-offset-4">{{ $t('onboarding_couple.bookings_link') }}</a>
         </p>
-    </section>
+
+        <p v-if="convertUrl" class="text-center text-xs text-ink-muted">
+            {{ $t('dashboard_steps.vendor_question') }}
+            <a :href="convertUrl" class="font-medium text-brand-700 underline underline-offset-4">{{ $t('dashboard_steps.vendor_switch') }}</a>
+        </p>
+    </div>
 
     <!-- Next steps -->
     <section v-else-if="part === 'steps'" class="rounded-[1.75rem] border border-gold-300/60 bg-surface-raised p-5 shadow-sm shadow-brand-900/5 sm:p-6">

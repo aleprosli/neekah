@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Customer;
 use App\Enums\BookingStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
+use App\Models\ChecklistItem;
 use App\Models\Wedding;
 use App\Support\CoupleNextSteps;
 use App\Support\VueProps;
@@ -31,6 +32,11 @@ class DashboardController extends Controller
                 'props' => VueProps::for([
                     'hasWedding' => false,
                     'createUrl' => route('weddings.create'),
+                    'checklistCount' => ChecklistItem::query()->count(),
+                    // A vendor may have recorded a booking before the couple made
+                    // a wedding; with no sidebar, this is their way to it.
+                    'bookingsCount' => Booking::query()->forCustomer($user)->count(),
+                    'bookingsUrl' => route('bookings.index'),
                     // Someone who signed up as a couple but runs a business.
                     'convertUrl' => $user->canBecomeVendor() ? route('vendor.convert') : null,
                 ]),

@@ -8,7 +8,10 @@
     $item = fn (string $label, string $icon, string $route, string|array $pattern, ?int $badge = null): array => [
         'label' => $label, 'icon' => $icon, 'href' => route($route), 'active' => App\Support\Locales::routeIs($pattern), 'badge' => $badge ?: null,
     ];
-    $nav = [
+    // A couple without a wedding sees no sidebar at all, only the page that
+    // asks for one: every planning tool needs the date, and an empty menu of
+    // them was where new couples got lost (owner, 2 Oct 2026).
+    $nav = ! $wedding ? [] : [
         ['label' => null, 'items' => [
             $item(__('pages.sidebar_couple.majlis_saya'), 'rings', 'dashboard', ['dashboard', 'weddings.*']),
         ]],

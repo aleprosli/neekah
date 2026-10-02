@@ -36,13 +36,11 @@ it('keeps the countdown after the wedding, where it counts the days married', fu
     expect(substr_count($page->getContent(), 'data-vue="wedding-countdown"'))->toBe(2);
 });
 
-it('asks a couple without a wedding for their date, in the sidebar', function () {
-    $props = countdownProps($this->actingAs($this->aina)->get(route('dashboard'))->assertOk());
+it('shows a couple without a wedding no countdown, and no sidebar to hold one', function () {
+    // Since 2 Oct 2026 the sidebar waits for the wedding; the dashboard itself asks for it.
+    $response = $this->actingAs($this->aina)->get(route('dashboard'))->assertOk();
 
-    expect($props)->toHaveCount(1)
-        ->and($props[0]['target'])->toBeNull()
-        ->and($props[0]['createUrl'])->toBe(route('weddings.create'))
-        ->and($props[0]['variant'])->toBe('sidebar');
+    expect(countdownProps($response))->toBe([]);
 });
 
 it('fills the planning bar from the checklist, not from the calendar', function () {
