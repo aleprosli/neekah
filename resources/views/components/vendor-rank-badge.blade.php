@@ -24,7 +24,11 @@
         \App\Enums\VendorTier::Recommended->value => ['light' => '#f28aa0', 'mid' => '#b0233f', 'dark' => '#4f0b1b', 'frame' => '#fbe6a4', 'frameDark' => '#b8860f', 'ribbon' => '#7a1630', 'ribbonDark' => '#420817', 'ribbonText' => '#fbe29a'],
     ];
     $colour = $palettes[$tier->value];
-    $id = 'rb'.substr(md5(uniqid('', true)), 0, 8);
+    // Numbered per request, not random: unique on the page, and the same page
+    // renders the same ids every time, so a cached render matches a fresh one.
+    $badgeNumber = (int) request()->attributes->get('rank-badges', 0) + 1;
+    request()->attributes->set('rank-badges', $badgeNumber);
+    $id = 'rb'.$badgeNumber;
     $isElite = $tier === \App\Enums\VendorTier::Recommended;
 
     // Hexagon corners, clockwise from the top point; the face sits inside the frame.
