@@ -254,8 +254,8 @@ return [
     'review_filter_desc' => [
         'reported' => 'Vendor membantah review ini dan meminta admin melihatnya. Ia masih dipaparkan sehingga anda bertindak.',
         'hidden' => 'Sudah ditarik dari profil vendor. Rekodnya kekal, termasuk sebab dan siapa yang menariknya.',
-        'open' => 'Ditulis terus pada profil, tanpa tempahan. Tidak menyentuh rating, mata atau ranking vendor.',
-        'verified' => 'Datang daripada tempahan yang selesai di Neekah. Hanya yang ini menggerakkan rating dan ranking.',
+        'open' => 'Ditulis terus pada profil, tanpa tempahan. Dikira untuk ranking vendor (kecuali yang vendor tambah sendiri), tetapi tidak menyentuh rating atau mata.',
+        'verified' => 'Datang daripada tempahan yang selesai di Neekah. Hanya yang ini menggerakkan rating dan mata; ranking mengira kedua-duanya.',
     ],
 
     'announcement_audience_desc' => [

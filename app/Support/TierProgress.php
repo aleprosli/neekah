@@ -25,38 +25,67 @@ class TierProgress
     /**
      * What the vendor still needs for the tier above them.
      *
-     * @return array<int, array{label: string, current: string, target: string, met: bool}>
+     * @return array<int, array{key: string, label: string, current: string, target: string, met: bool}>
      */
     public static function requirements(Vendor $vendor): array
     {
-        $targets = match (self::next($vendor->tier)) {
-            VendorTier::Trusted => ['completed' => 5, 'rating' => 4.0, 'reviews' => 3, 'response' => 0, 'completion' => 0],
-            VendorTier::Top => ['completed' => 15, 'rating' => 4.5, 'reviews' => 8, 'response' => 90, 'completion' => 0],
-            VendorTier::Recommended => ['completed' => 30, 'rating' => 4.7, 'reviews' => 15, 'response' => 95, 'completion' => 90],
-            default => null,
-        };
+        $next = self::next($vendor->tier);
 
-        if (! $targets) {
+        return $next ? self::requirementsFor($vendor, $next) : [];
+    }
+
+    /**
+     * Each requirement of a tier (VendorTier::requirements) against where the
+     * vendor stands: a complete profile, reviews, their rating and, for the
+     * top rung, a clean record.
+     *
+     * @return array<int, array{key: string, label: string, current: string, target: string, met: bool}>
+     */
+    public static function requirementsFor(Vendor $vendor, VendorTier $tier): array
+    {
+        $needs = $tier->requirements();
+
+        if ($needs === null) {
             return [];
         }
 
+        $reviews = $vendor->tierReviewStats();
+        $complete = $vendor->hasCompleteSetup();
         $rows = [
-            ['label' => __('props.vendor.booking_selesai'), 'value' => $vendor->completed_bookings_count, 'target' => $targets['completed'], 'suffix' => ''],
-            ['label' => __('props.vendor.rating_purata'), 'value' => (float) $vendor->rating_avg, 'target' => $targets['rating'], 'suffix' => ''],
-            ['label' => __('props.vendor.jumlah_review'), 'value' => $vendor->reviews_count, 'target' => $targets['reviews'], 'suffix' => ''],
-            ['label' => __('props.vendor.response_rate_2'), 'value' => $vendor->response_rate ?? 0, 'target' => $targets['response'], 'suffix' => '%'],
-            ['label' => __('props.vendor.completion_rate_2'), 'value' => $vendor->completion_rate, 'target' => $targets['completion'], 'suffix' => '%'],
+            [
+                'key' => 'profile',
+                'label' => __('pages.ranking.req_profile'),
+                'current' => $complete ? __('pages.ranking.done') : __('pages.ranking.not_yet'),
+                'target' => __('pages.ranking.done'),
+                'met' => $complete,
+            ],
+            [
+                'key' => 'reviews',
+                'label' => __('pages.ranking.req_reviews'),
+                'current' => (string) $reviews['count'],
+                'target' => (string) $needs['reviews'],
+                'met' => $reviews['count'] >= $needs['reviews'],
+            ],
+            [
+                'key' => 'rating',
+                'label' => __('pages.ranking.req_rating'),
+                'current' => number_format($reviews['rating'], 1),
+                'target' => number_format($needs['rating'], 1),
+                'met' => $reviews['count'] > 0 && $reviews['rating'] >= $needs['rating'],
+            ],
         ];
 
-        return collect($rows)
-            ->reject(fn (array $row): bool => $row['target'] <= 0)
-            ->map(fn (array $row): array => [
-                'label' => $row['label'],
-                'current' => $row['value'].$row['suffix'],
-                'target' => $row['target'].$row['suffix'],
-                'met' => $row['value'] >= $row['target'],
-            ])
-            ->values()
-            ->all();
+        if ($needs['clean_record']) {
+            $clean = ! $vendor->violations()->upheld()->where('resolved_at', '>=', now()->subMonths(6))->exists();
+            $rows[] = [
+                'key' => 'record',
+                'label' => __('pages.ranking.req_record'),
+                'current' => $clean ? __('pages.ranking.done') : __('pages.ranking.not_yet'),
+                'target' => __('pages.ranking.done'),
+                'met' => $clean,
+            ];
+        }
+
+        return $rows;
     }
 }

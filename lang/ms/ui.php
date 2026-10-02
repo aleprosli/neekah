@@ -1508,7 +1508,7 @@ return [
         'upcoming' => 'Majlis akan datang',
         'upcoming_empty' => 'Tiada tempahan akan datang.',
         'pro_title' => 'Buka semua dengan Neekah Pro',
-        'pro_body' => 'Kalendar dengan tempahan online, tempahan, enquiry dan ranking.',
+        'pro_body' => 'Kalendar dengan tempahan online, tempahan, enquiry, sebut harga & invois, kontrak digital dan ranking.',
         'standing' => 'Kedudukan anda',
         'tier' => 'Tahap',
         'score' => 'Skor',

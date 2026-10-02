@@ -68,12 +68,15 @@ class ModerateReview
 
     /**
      * A booking review moving in or out of sight changes the rating, the
-     * points it earned and the tier built on them. An open review changes
-     * none of those, so nothing has to be recomputed for it.
+     * points it earned and the tier built on them. An open review earns no
+     * points and moves no rating, but the tier counts it (VendorTier::
+     * requirements), so it is recomputed too.
      */
     private function resettleVendor(Review $review): Review
     {
         if (! $review->isVerified()) {
+            $this->stats->refreshTier($review->vendor->refresh());
+
             return $review;
         }
 

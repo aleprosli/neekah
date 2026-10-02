@@ -1508,7 +1508,7 @@ return [
         'upcoming' => 'Upcoming weddings',
         'upcoming_empty' => 'No upcoming bookings.',
         'pro_title' => 'Open everything with Neekah Pro',
-        'pro_body' => 'Calendar with online booking, bookings, enquiries and ranking.',
+        'pro_body' => 'Calendar with online booking, bookings, enquiries, quotations & invoices, digital contracts and ranking.',
         'standing' => 'Your standing',
         'tier' => 'Tier',
         'score' => 'Score',

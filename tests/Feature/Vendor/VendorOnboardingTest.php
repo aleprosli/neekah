@@ -54,8 +54,9 @@ it('shows the vendor rank and points before onboarding', function () {
         ->assertSee('data-current-vendor-rank', false)
         ->assertSee('data-rank-message="Top"', false)
         ->assertSee('Rank 4 · Top')
-        ->assertSee('Achieved')
-        ->assertSee('30 lagi booking selesai')
+        ->assertSee(__('pages.dash.rank_achieved'))
+        // Since 2 Oct 2026 the ladder climbs on reviews, not on bookings nobody records.
+        ->assertSee(__('pages.ranking.target', ['reviews' => 15, 'rating' => '4.7']))
         ->assertSee('342')
         ->assertSee('data-rank-badge="new"', false)
         ->assertSee('data-rank-badge="verified"', false)

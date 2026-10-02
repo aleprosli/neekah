@@ -1,156 +1,132 @@
 @props(['vendor'])
 
+{{-- The vendor's rank at the top of their dashboard, dressed like the
+     couple's countdown card: where they stand, what the next rank still
+     needs (TierProgress, from VendorTier::requirements), and the ladder of
+     badges underneath. --}}
 @php
-    $rankGlows = [
-        \App\Enums\VendorTier::New->value => 'bg-orange-400/45',
-        \App\Enums\VendorTier::Verified->value => 'bg-emerald-400/45',
-        \App\Enums\VendorTier::Trusted->value => 'bg-blue-500/45',
-        \App\Enums\VendorTier::Top->value => 'bg-violet-500/45',
-        \App\Enums\VendorTier::Recommended->value => 'bg-rose-600/45',
-    ];
-    $rankBorders = [
-        \App\Enums\VendorTier::New->value => 'border-orange-300/70',
-        \App\Enums\VendorTier::Verified->value => 'border-emerald-300/70',
-        \App\Enums\VendorTier::Trusted->value => 'border-blue-300/70',
-        \App\Enums\VendorTier::Top->value => 'border-violet-300/70',
-        \App\Enums\VendorTier::Recommended->value => 'border-rose-300/70',
-    ];
-    $rankTargets = [
-        \App\Enums\VendorTier::Trusted->value => ['completed' => 5, 'rating' => 4.0, 'reviews' => 3, 'response' => 0, 'completion' => 0],
-        \App\Enums\VendorTier::Top->value => ['completed' => 15, 'rating' => 4.5, 'reviews' => 8, 'response' => 90, 'completion' => 0],
-        \App\Enums\VendorTier::Recommended->value => ['completed' => 30, 'rating' => 4.7, 'reviews' => 15, 'response' => 95, 'completion' => 90],
-    ];
-    $tiers = collect(\App\Enums\VendorTier::cases())->map(function (\App\Enums\VendorTier $tier) use ($vendor, $rankGlows, $rankBorders, $rankTargets): array {
-        $reached = $tier->rank() <= $vendor->tier->rank();
-        $missing = [];
+    use App\Enums\VendorTier;
+    use App\Support\TierProgress;
 
-        if (! $reached && $tier === \App\Enums\VendorTier::Verified) {
-            $missing[] = __('pages.dash.rank_needs_approval');
+    $current = $vendor->tier;
+    $next = TierProgress::next($current);
+    $awaitingApproval = $current === VendorTier::New;
+    $requirements = $next && ! $awaitingApproval ? TierProgress::requirementsFor($vendor, $next) : [];
+    $metCount = collect($requirements)->where('met', true)->count();
+    $glows = [
+        VendorTier::New->value => 'bg-orange-400/50',
+        VendorTier::Verified->value => 'bg-emerald-400/50',
+        VendorTier::Trusted->value => 'bg-blue-400/50',
+        VendorTier::Top->value => 'bg-violet-400/50',
+        VendorTier::Recommended->value => 'bg-rose-400/50',
+    ];
+    $target = function (VendorTier $tier): string {
+        $needs = $tier->requirements();
+
+        if ($needs === null) {
+            return $tier === VendorTier::New ? __('pages.ranking.target_new') : __('pages.ranking.target_verified');
         }
 
-        if (! $reached && isset($rankTargets[$tier->value])) {
-            $target = $rankTargets[$tier->value];
-            $completedRemaining = max(0, $target['completed'] - $vendor->completed_bookings_count);
-            $reviewsRemaining = max(0, $target['reviews'] - $vendor->reviews_count);
-            $responseRemaining = max(0, $target['response'] - ($vendor->response_rate ?? 0));
-            $completionRemaining = max(0, $target['completion'] - $vendor->completion_rate);
-
-            if ($completedRemaining > 0) {
-                $missing[] = __('pages.dash.rank_more_bookings', ['count' => $completedRemaining]);
-            }
-
-            if ($reviewsRemaining > 0) {
-                $missing[] = __('pages.dash.rank_more_reviews', ['count' => $reviewsRemaining]);
-            }
-
-            if ((float) $vendor->rating_avg < $target['rating']) {
-                $missing[] = __('pages.dash.rank_rating_target', [
-                    'current' => number_format((float) $vendor->rating_avg, 1),
-                    'target' => number_format($target['rating'], 1),
-                ]);
-            }
-
-            if ($responseRemaining > 0) {
-                $missing[] = __('pages.dash.rank_more_response', ['count' => $responseRemaining]);
-            }
-
-            if ($completionRemaining > 0) {
-                $missing[] = __('pages.dash.rank_more_completion', ['count' => $completionRemaining]);
-            }
-
-            if ($missing === []) {
-                $missing[] = __('pages.dash.rank_needs_clean_record');
-            }
-        }
-
-        return [
-            'label' => $tier->label(),
-            'rank' => $tier->rank() + 1,
-            'tier' => $tier,
-            'glow' => $rankGlows[$tier->value],
-            'border' => $rankBorders[$tier->value],
-            'reached' => $reached,
-            'current' => $tier === $vendor->tier,
-            'message' => $reached ? __('pages.dash.rank_achieved') : implode(' · ', $missing),
-        ];
-    });
-    $currentTier = $tiers->firstWhere('current', true);
-    $progressWidth = [
-        1 => 'w-0',
-        2 => 'w-1/4',
-        3 => 'w-1/2',
-        4 => 'w-3/4',
-        5 => 'w-full',
-    ][$currentTier['rank']];
+        return __('pages.ranking.target', ['reviews' => $needs['reviews'], 'rating' => number_format($needs['rating'], 1)])
+            .($needs['clean_record'] ? ' · '.__('pages.ranking.target_clean') : '');
+    };
+    $tiers = collect(VendorTier::cases())->map(fn (VendorTier $tier): array => [
+        'tier' => $tier,
+        'rank' => $tier->rank() + 1,
+        'label' => $tier->label(),
+        'reached' => $tier->rank() <= $current->rank(),
+        'current' => $tier === $current,
+        'message' => $tier->rank() <= $current->rank() ? __('pages.dash.rank_achieved') : $target($tier),
+    ]);
+    $percent = (int) round($current->rank() / (count(VendorTier::cases()) - 1) * 100);
 @endphp
 
-<section data-vendor-ranking class="mb-8 overflow-hidden rounded-3xl border border-line bg-surface-raised shadow-sm">
-    <div class="grid gap-5 p-5 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center sm:p-6">
-        <div class="flex min-w-0 items-center gap-4">
-            <div class="group relative grid size-20 shrink-0 place-items-center sm:size-24">
-                <span class="absolute inset-2 scale-75 rounded-full blur-2xl transition duration-300 group-hover:scale-110 group-hover:opacity-100 {{ $currentTier['glow'] }}" aria-hidden="true"></span>
+<section data-vendor-ranking class="relative mb-8 overflow-hidden rounded-[1.75rem] bg-linear-to-br from-brand-700 via-brand-800 to-brand-900 text-white shadow-lg shadow-brand-900/20">
+    <div class="pointer-events-none absolute -top-24 -right-16 size-72 rounded-full bg-gold-300/20 blur-3xl" aria-hidden="true"></div>
+    <div class="pointer-events-none absolute -bottom-28 -left-20 size-72 rounded-full bg-brand-400/30 blur-3xl" aria-hidden="true"></div>
+
+    <div class="relative grid gap-6 p-6 sm:p-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,24rem)] lg:items-center lg:gap-10">
+        {{-- Where they stand --}}
+        <div class="flex min-w-0 flex-col items-center gap-5 text-center sm:flex-row sm:text-left">
+            <div class="group relative grid size-28 shrink-0 place-items-center sm:size-32">
+                <span class="absolute inset-3 rounded-full blur-2xl {{ $glows[$current->value] }}" aria-hidden="true"></span>
                 <x-vendor-rank-badge
-                    :tier="$currentTier['tier']"
-                    :label="__('pages.dash.logo_rank', ['rank' => $currentTier['rank'], 'tier' => $currentTier['label']])"
+                    :tier="$current"
+                    :label="__('pages.dash.logo_rank', ['rank' => $current->rank() + 1, 'tier' => $current->label()])"
                     class="relative size-full transition duration-300 ease-out group-hover:scale-105 motion-reduce:transform-none"
                 />
             </div>
             <div class="min-w-0">
-                <p class="text-xs font-semibold tracking-[0.16em] text-brand-700 uppercase">{{ __('pages.dash.ranking_vendor') }}</p>
-                <h2 class="mt-1 truncate font-display text-2xl font-semibold sm:text-3xl">
-                    {{ __('pages.dash.rank_tier', ['rank' => $currentTier['rank'], 'tier' => $currentTier['label']]) }}
-                </h2>
-                <a href="{{ route('vendor.points.index') }}" class="mt-2 inline-flex text-sm font-medium text-brand-700 underline decoration-brand-300 underline-offset-4 transition hover:text-brand-900">
-                    {{ __('pages.dash.lihat_point_ranking') }}
-                </a>
+                <p class="font-script text-2xl leading-none text-gold-300">{{ __('pages.ranking.eyebrow') }}</p>
+                <h2 class="mt-2 font-display text-3xl font-semibold sm:text-4xl">{{ __('pages.dash.rank_tier', ['rank' => $current->rank() + 1, 'tier' => $current->label()]) }}</h2>
+                <div class="mt-3 flex flex-wrap items-center justify-center gap-2 sm:justify-start">
+                    <span class="rounded-full bg-white/10 px-3 py-1 text-xs font-semibold ring-1 ring-white/20">{{ __('pages.ranking.points', ['points' => number_format($vendor->points_total)]) }}</span>
+                    <a href="{{ route('vendor.points.index') }}" class="text-xs font-semibold text-gold-300 underline decoration-gold-300/50 underline-offset-4 hover:text-white">{{ __('pages.dash.lihat_point_ranking') }} →</a>
+                </div>
             </div>
         </div>
 
-        <div class="rounded-2xl border border-brand-200 bg-brand-50 px-5 py-4 sm:min-w-40 sm:text-right">
-            <p class="text-xs font-semibold tracking-[0.14em] text-brand-700 uppercase">{{ __('pages.dash.point_prestasi') }}</p>
-            <p class="mt-1 font-display text-3xl font-semibold text-brand-900">{{ number_format($vendor->points_total) }}</p>
-            <p class="text-xs text-brand-700">{{ __('pages.dash.point') }}</p>
+        {{-- What the next rank needs --}}
+        <div class="rounded-2xl bg-white/10 p-4 ring-1 ring-white/15 backdrop-blur-sm sm:p-5">
+            @if ($awaitingApproval)
+                <p class="font-semibold">{{ __('pages.dash.rank_needs_approval') }}</p>
+                <p class="mt-1 text-sm text-white/75">{{ __('pages.ranking.approval_body') }}</p>
+            @elseif ($next === null)
+                <p class="font-semibold">{{ __('pages.ranking.top_reached') }}</p>
+                <p class="mt-1 text-sm text-white/75">{{ __('pages.ranking.top_reached_body') }}</p>
+            @else
+                <div class="flex items-baseline justify-between gap-3">
+                    <p class="font-semibold">{{ __('pages.ranking.next', ['rank' => $next->rank() + 1, 'tier' => $next->label()]) }}</p>
+                    <p class="shrink-0 text-xs text-gold-300">{{ __('pages.ranking.met', ['met' => $metCount, 'total' => count($requirements)]) }}</p>
+                </div>
+                <ul class="mt-3 flex flex-col gap-2.5 text-sm">
+                    @foreach ($requirements as $row)
+                        <li>
+                            <div class="flex items-center gap-2.5">
+                                <span @class([
+                                    'flex size-5 shrink-0 items-center justify-center rounded-full text-[10px] font-bold',
+                                    'bg-emerald-400 text-emerald-950' => $row['met'],
+                                    'ring-1 ring-white/40' => ! $row['met'],
+                                ]) aria-hidden="true">{{ $row['met'] ? '✓' : '' }}</span>
+                                <span class="min-w-0 flex-1">{{ $row['label'] }}</span>
+                                <span class="shrink-0 text-xs text-white/75 tabular-nums">{{ in_array($row['key'], ['reviews', 'rating'], true) ? $row['current'].' / '.$row['target'] : $row['current'] }}</span>
+                            </div>
+                            @if (in_array($row['key'], ['reviews', 'rating'], true))
+                                <div class="mt-1.5 ml-7.5 h-1 overflow-hidden rounded-full bg-white/15">
+                                    <div class="h-full rounded-full bg-linear-to-r from-gold-300 to-gold-400" style="width: {{ min(100, (float) $row['target'] > 0 ? round((float) $row['current'] / (float) $row['target'] * 100) : 0) }}%"></div>
+                                </div>
+                            @endif
+                        </li>
+                    @endforeach
+                </ul>
+                <p class="mt-3 border-t border-white/10 pt-3 text-xs text-white/70">{{ __('pages.ranking.how') }}</p>
+            @endif
         </div>
     </div>
 
-    <div class="border-t border-line bg-surface-muted/50 px-4 py-5 sm:px-6">
-        <p class="mb-4 text-xs font-semibold tracking-[0.14em] text-ink-muted uppercase">{{ __('pages.dash.tahap_ranking') }}</p>
-
-        <div data-vendor-rank-track class="no-scrollbar snap-x snap-mandatory overflow-x-auto px-1 pb-2 sm:snap-none">
-            <ol class="relative grid min-w-[42rem] grid-cols-5 gap-2 px-4 pt-5 pb-4" aria-label="{{ __('pages.dash.tahap_ranking') }}">
-                <li class="pointer-events-none absolute inset-0 z-0" aria-hidden="true">
-                    <span class="absolute top-[5.25rem] right-[12%] left-[12%] h-2 -translate-y-1/2 overflow-hidden rounded-full bg-line">
-                        <span class="block h-full rounded-full bg-brand-600/80 {{ $progressWidth }}"></span>
+    {{-- The ladder --}}
+    <div data-vendor-rank-track class="relative border-t border-white/10 bg-black/15 px-3 pt-5 pb-4 sm:px-8">
+        <p class="sr-only">{{ __('pages.dash.tahap_ranking') }}</p>
+        <ol class="relative grid grid-cols-5 gap-1 sm:gap-3" aria-label="{{ __('pages.dash.tahap_ranking') }}">
+            <li class="pointer-events-none absolute top-6 right-[10%] left-[10%] z-0 h-1 -translate-y-1/2 overflow-hidden rounded-full bg-white/15 sm:top-8" aria-hidden="true">
+                <span class="block h-full rounded-full bg-linear-to-r from-gold-300 to-gold-400" style="width: {{ $percent }}%"></span>
+            </li>
+            @foreach ($tiers as $tier)
+                <li class="relative z-10 flex min-w-0 flex-col items-center text-center" @if ($tier['current']) aria-current="step" data-current-vendor-rank @endif>
+                    <span @class(['relative grid place-items-center rounded-full', 'ring-2 ring-gold-300 ring-offset-2 ring-offset-brand-900' => $tier['current']])>
+                        <x-vendor-rank-badge
+                            :tier="$tier['tier']"
+                            :label="__('pages.dash.logo_rank', ['rank' => $tier['rank'], 'tier' => $tier['label']])"
+                            :class="Arr::toCssClasses(['size-12 sm:size-16', 'opacity-50 grayscale' => ! $tier['reached']])"
+                        />
                     </span>
+                    <p @class(['mt-2 text-[10px] font-semibold sm:text-xs', 'text-gold-300' => $tier['current'], 'text-white' => ! $tier['current']])>{{ $tier['label'] }}</p>
+                    <p class="mt-0.5 hidden text-[10px] leading-snug text-white/65 sm:block" data-rank-message="{{ $tier['label'] }}">
+                        @if ($tier['reached'])<span aria-hidden="true">✓</span>@endif
+                        {{ $tier['message'] }}
+                    </p>
                 </li>
-
-                @foreach ($tiers as $tier)
-                    <li
-                        class="group relative z-10 flex min-w-0 snap-center flex-col items-center outline-none"
-                        tabindex="0"
-                        @if ($tier['current']) aria-current="step" data-current-vendor-rank @endif
-                    >
-                        <div class="relative grid size-32 place-items-center">
-                            <span class="absolute inset-5 scale-50 rounded-full opacity-0 blur-xl transition duration-300 group-hover:scale-105 group-hover:opacity-100 group-focus-visible:scale-105 group-focus-visible:opacity-100 {{ $tier['glow'] }}" aria-hidden="true"></span>
-                            <x-vendor-rank-badge
-                                :tier="$tier['tier']"
-                                :label="__('pages.dash.logo_rank', ['rank' => $tier['rank'], 'tier' => $tier['label']])"
-                                :class="Arr::toCssClasses(['relative z-10 size-24 transition duration-300 ease-out group-hover:scale-105 group-focus-visible:scale-105 motion-reduce:transform-none sm:size-28', 'opacity-80 grayscale brightness-75 contrast-75' => ! $tier['reached']])"
-                            />
-                        </div>
-
-                        <div class="mt-2 w-full rounded-xl border bg-surface-raised/95 px-3 py-2 text-center shadow-sm transition duration-300 group-hover:-translate-y-0.5 group-hover:shadow-md group-focus-visible:-translate-y-0.5 group-focus-visible:shadow-md {{ $tier['border'] }}">
-                            <p class="text-[11px] font-semibold text-ink">{{ __('pages.dash.rank_tier', ['rank' => $tier['rank'], 'tier' => $tier['label']]) }}</p>
-                            <p class="mt-1 text-[10px] leading-4 {{ $tier['reached'] ? 'font-semibold text-emerald-700' : 'text-ink-muted' }}" data-rank-message="{{ $tier['label'] }}">
-                                @if ($tier['reached'])
-                                    <span aria-hidden="true">✓</span>
-                                @endif
-                                {{ $tier['message'] }}
-                            </p>
-                        </div>
-                    </li>
-                @endforeach
-            </ol>
-        </div>
+            @endforeach
+        </ol>
     </div>
 </section>
