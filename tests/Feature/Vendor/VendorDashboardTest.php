@@ -49,7 +49,7 @@ it('shows Basic the enquiries waiting behind Pro, unused boost tokens, and what 
 
     expect(collect($props['actions'])->pluck('key')->all())->toBe(['enquiries_locked', 'boost'])
         ->and($props['business'])->toBeNull()
-        ->and($props['locked'])->toHaveCount(4);
+        ->and(collect($props['locked'])->pluck('key')->all())->toBe(['calendar', 'bookings', 'enquiries', 'quotations', 'contracts', 'points']);
 });
 
 it('leaves the week\'s views and taps off the dashboard, so a quiet week after a boost does not read as a failed one', function () {
@@ -70,4 +70,27 @@ it('puts a Pro vendor receipt to check and enquiries to answer first, with the b
         ->and($props['business'])->toHaveCount(4)
         ->and($props['upcoming'])->toHaveCount(1)
         ->and($props['locked'])->toBe([]);
+});
+
+it('puts the rank in the hero and keeps the traffic numbers off it', function () {
+    $vendor = completeVendor();
+
+    $response = $this->actingAs($vendor->user)->get(route('vendor.dashboard'))->assertOk();
+
+    // Owner, 2 Oct 2026: the rank is the first thing a vendor sees; a "0" view
+    // count or an empty rating while traffic is low only turns them away.
+    $response->assertSeeInOrder(['data-vendor-hero', 'data-rank-badge="'.$vendor->tier->value.'"', $vendor->name], false);
+
+    preg_match('#<section data-vendor-hero.*?</section>#s', $response->getContent(), $hero);
+
+    expect($hero[0])->not->toContain(__('ui.vendor_home.views30'))
+        ->not->toContain(__('ui.vendor_home.score'));
+});
+
+it('shows a Basic vendor what Basic does and how Boost works', function () {
+    $props = $this->actingAs(completeVendor()->user)->get(route('vendor.dashboard'))->viewData('props');
+
+    expect(array_column($props['tools'], 'key'))->toBe(['profile', 'packages', 'portfolio', 'reviews'])
+        ->and($props['boost']['url'])->toBe(route('vendor.boost.index'))
+        ->and($props['boost']['screenshot'])->toEndWith('img/boost/kad-dipromosi.jpg');
 });

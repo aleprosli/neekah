@@ -1471,6 +1471,7 @@ return [
     ],
 
     'ranking' => [
+        'see_how' => 'See how to climb',
         'eyebrow' => 'Your ranking',
         'points' => ':points performance points',
         'next' => 'To Rank :rank · :tier',

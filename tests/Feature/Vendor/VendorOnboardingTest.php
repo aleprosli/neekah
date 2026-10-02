@@ -49,7 +49,7 @@ it('shows the vendor rank and points before onboarding', function () {
         ->get(route('vendor.dashboard'))
         ->assertOk()
         ->assertSeeInOrder(['data-vendor-ranking-sidebar', __('pages.sidebar_vendor.ringkasan')], false)
-        ->assertSeeInOrder(['data-vendor-ranking', 'data-vue="vendor-dashboard-page"'], false)
+        ->assertSeeInOrder(['data-vue="vendor-dashboard-page"', 'data-vendor-ranking'], false)
         ->assertSee('data-vendor-rank-track', false)
         ->assertSee('data-current-vendor-rank', false)
         ->assertSee('data-rank-message="Top"', false)

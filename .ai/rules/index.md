@@ -42,4 +42,5 @@ Before planning or editing, find the row whose globs match the file's path and r
 | app/Http/Controllers/Vendor/ReviewController.php, app/Http/Controllers/Vendor/** | .ai/rules/vendor.md |
 | resources/views/vendors/** | .ai/rules/vendors.md |
 | resources/views/components/analytics.blade.php, resources/views/components/** | .ai/rules/views-components.md |
+| resources/views/vendor/** | .ai/rules/views-vendor.md |
 | app/**, resources/views/**, lang/** | .ai/rules/views.md |

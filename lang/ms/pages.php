@@ -1471,6 +1471,7 @@ return [
     ],
 
     'ranking' => [
+        'see_how' => 'Lihat cara naik',
         'eyebrow' => 'Ranking anda',
         'points' => ':points point prestasi',
         'next' => 'Ke Rank :rank · :tier',

@@ -130,7 +130,7 @@ const tones = {
 
             <template v-else>
                 <!-- The one to do now -->
-                <a :href="steps[0].url" class="group mt-4 flex flex-col gap-4 rounded-2xl bg-linear-to-br from-brand-50 via-surface to-gold-300/20 p-4 ring-1 ring-brand-100 transition hover:ring-brand-300 sm:flex-row sm:items-center sm:p-5">
+                <a :href="steps[0].url" class="group mt-4 grid grid-cols-[auto_minmax(0,1fr)] items-start gap-x-4 gap-y-4 rounded-2xl bg-linear-to-br from-brand-50 via-surface to-gold-300/20 p-4 ring-1 ring-brand-100 transition hover:ring-brand-300 sm:flex sm:flex-row sm:items-center sm:p-5">
                     <span class="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-brand-600 text-white shadow-sm shadow-brand-600/30">
                         <svg class="size-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path v-for="d in icons[steps[0].icon]" :key="d" :d="d" /></svg>
                     </span>
@@ -139,7 +139,7 @@ const tones = {
                         <span class="mt-0.5 block font-semibold">{{ steps[0].title }}</span>
                         <span class="mt-0.5 block text-sm text-ink-muted">{{ steps[0].hint }}</span>
                     </span>
-                    <span class="inline-flex w-full shrink-0 items-center justify-center gap-2 rounded-full bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white transition group-hover:bg-brand-700 sm:w-auto">
+                    <span class="col-span-2 inline-flex w-full shrink-0 items-center justify-center gap-2 rounded-full bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white transition group-hover:bg-brand-700 sm:w-auto">
                         {{ steps[0].action }}
                         <svg class="size-4 transition group-hover:translate-x-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
                     </span>
