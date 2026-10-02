@@ -31,7 +31,7 @@
 
         {{-- Read once by resources/js/i18n.js. Data, not a script that runs,
              so the CSP has nothing to object to. --}}
-        <script type="application/json" id="translations">@json(App\Support\Translations::forClient($shell ?? 'site'))</script>
+        <script type="application/json" id="translations">@json(App\Support\Translations::forClient($shell ?? 'site', extra: $clientGroups ?? []))</script>
 
         <x-analytics />
     </head>

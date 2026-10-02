@@ -48,9 +48,14 @@ class Translations
     private const ALL = ['*'];
 
     /**
+     * The groups a page's shell ships, plus any the page asks for itself:
+     * the couple-to-vendor switch is a site page that mounts the vendor
+     * sign-up form, whose strings no other site page should carry.
+     *
+     * @param  list<string>  $extra
      * @return array<string, mixed>
      */
-    public static function forClient(?string $shell = null, ?string $locale = null): array
+    public static function forClient(?string $shell = null, ?string $locale = null, array $extra = []): array
     {
         $locale ??= Locales::current();
 
@@ -68,6 +73,6 @@ class Translations
             return $strings;
         }
 
-        return array_intersect_key($strings, array_flip($wanted));
+        return array_intersect_key($strings, array_flip([...$wanted, ...$extra]));
     }
 }
