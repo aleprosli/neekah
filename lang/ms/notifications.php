@@ -260,4 +260,43 @@ return [
         'body' => 'Boost anda tamat pada :date. Tambah hari jika mahu kekal di atas.',
         'action' => 'Sambung boost',
     ],
+
+    'quotation_sent' => [
+        'subject' => 'Sebut harga :number daripada :vendor',
+        'intro' => ':vendor menghantar sebut harga kepada anda.',
+        'total' => 'Jumlah: :total',
+        'valid_until' => 'Sah sehingga :date.',
+        'action' => 'Lihat sebut harga',
+    ],
+
+    'quotation_accepted' => [
+        'title' => ':name menerima sebut harga :number',
+        'intro' => ':name menerima sebut harga :number berjumlah :total.',
+        'body' => 'Hubungi klien tentang deposit, kemudian keluarkan invois atau rekod tempahan.',
+        'action' => 'Buka sebut harga',
+    ],
+
+    'quotation_declined' => [
+        'title' => ':name menolak sebut harga :number',
+        'intro' => ':name menolak sebut harga :number.',
+        'body' => 'Anda boleh menyalinnya sebagai sebut harga baharu dengan tawaran lain.',
+        'action' => 'Buka sebut harga',
+    ],
+
+    'contract_sent' => [
+        'subject' => 'Kontrak :number daripada :vendor',
+        'intro' => ':vendor menghantar kontrak untuk anda baca dan tandatangan.',
+        'body' => 'Anda tidak perlu log masuk. Buka pautan, baca, dan tandatangan dengan jari atau tetikus.',
+        'action' => 'Baca & tandatangan',
+    ],
+
+    'contract_signed' => [
+        'title' => ':name menandatangan kontrak :number',
+        'intro' => ':name telah menandatangan kontrak :number.',
+        'body' => 'Salinan bertandatangan ada di halaman kontrak, sedia untuk dicetak.',
+        'action' => 'Buka kontrak',
+        'client_subject' => 'Salinan kontrak :number bersama :vendor',
+        'client_intro' => 'Terima kasih kerana menandatangan kontrak :number bersama :vendor. Simpan pautan ini untuk salinan anda.',
+        'client_action' => 'Lihat kontrak',
+    ],
 ];

@@ -12,6 +12,7 @@ Before planning or editing, find the row whose globs match the file's path and r
 | app/Console/Commands/UpdateVendorPopularity.php | .ai/rules/commands.md |
 | resources/js/components/card/** | .ai/rules/components-card.md |
 | resources/js/components/customer/CameraPrintDesigner.vue | .ai/rules/components-customer.md |
+| resources/js/components/vendor/** | .ai/rules/components-vendor.md |
 | resources/js/components/** | .ai/rules/components.md |
 | config/filesystems.php | .ai/rules/config.md |
 | app/Http/Controllers/**, app/Http/Controllers/SitemapController.php, app/Http/Controllers/SiteTemplatePreviewController.php, app/Http/Controllers/CameraGuestController.php | .ai/rules/controllers.md |
@@ -40,5 +41,5 @@ Before planning or editing, find the row whose globs match the file's path and r
 | resources/js/components/ui/DataTable.vue, resources/js/components/ui/UiFlagSelect.vue, resources/js/components/ui/** | .ai/rules/ui.md |
 | app/Http/Controllers/Vendor/ReviewController.php, app/Http/Controllers/Vendor/** | .ai/rules/vendor.md |
 | resources/views/vendors/** | .ai/rules/vendors.md |
-| resources/views/components/analytics.blade.php | .ai/rules/views-components.md |
+| resources/views/components/analytics.blade.php, resources/views/components/** | .ai/rules/views-components.md |
 | app/**, resources/views/**, lang/** | .ai/rules/views.md |

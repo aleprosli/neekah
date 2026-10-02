@@ -1,4 +1,4 @@
-@props(['title', 'nav', 'context' => [], 'heading' => null, 'subheading' => null])
+@props(['title', 'nav', 'context' => [], 'heading' => null, 'subheading' => null, 'back' => null])
 
 @php
     app(App\Support\Seo::class)->noindex();
@@ -184,6 +184,13 @@
                 @if ($heading)
                     <div class="mb-8 flex flex-col gap-4 break-words sm:flex-row sm:items-end sm:justify-between">
                         <div class="min-w-0">
+                            {{-- A page one level down says where up is: ['url' => ..., 'label' => ...]. --}}
+                            @if ($back)
+                                <a href="{{ $back['url'] }}" class="mb-3 inline-flex items-center gap-1.5 rounded-full py-1 pr-2 text-sm font-medium text-ink-muted transition hover:text-ink">
+                                    <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6" /></svg>
+                                    {{ $back['label'] }}
+                                </a>
+                            @endif
                             <h1 class="font-display text-3xl font-semibold tracking-tight">{{ $heading }}</h1>
                             @if ($subheading)
                                 <p class="mt-1.5 text-sm text-ink-muted">{{ $subheading }}</p>
