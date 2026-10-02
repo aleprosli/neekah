@@ -18,7 +18,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 #[Fillable([
     'vendor_id', 'enabled', 'deposit_type', 'deposit_value', 'max_per_day', 'available_weekdays',
-    'min_lead_days', 'max_advance_months', 'deposit_terms', 'manual_instructions',
+    'min_lead_days', 'max_advance_months', 'deposit_terms', 'quotation_terms', 'manual_instructions',
     'herepay_secret_key', 'herepay_private_key', 'herepay_api_key', 'herepay_connected_at', 'herepay_verified_at',
     'calendar_confirmed_at', 'ical_url', 'ical_synced_at', 'ical_error', 'ical_failures',
 ])]

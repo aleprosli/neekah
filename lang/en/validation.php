@@ -182,6 +182,9 @@ return [
     */
 
     'custom' => [
+        'quotation_locked' => 'The client has already answered this quotation, so it can no longer be changed. Copy it as a new one.',
+        'quotation_closed' => 'This quotation is no longer waiting for an answer.',
+        'quotation_not_accepted' => 'An invoice can only be issued after the client accepts the quotation.',
         'camera_album_closed' => 'This album is not taking photos right now.',
         'camera_video_not_allowed' => 'Videos are for Neekah Moments Pro only.',
         'camera_wish_limit' => 'You have already sent many wishes to this album. Thank you!',

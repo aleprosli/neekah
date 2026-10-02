@@ -44,6 +44,7 @@
                 $feature(App\Enums\VendorFeature::Calendar, __('pages.sidebar_vendor.kalendar_tempahan')),
                 $feature(App\Enums\VendorFeature::Bookings, __('pages.sidebar_vendor.tempahan')),
                 $feature(App\Enums\VendorFeature::Enquiries, __('pages.sidebar_vendor.enquiry'), $isPro ? $openEnquiries : null),
+                $feature(App\Enums\VendorFeature::Quotations, __('pages.sidebar_vendor.sebut_harga')),
                 $feature(App\Enums\VendorFeature::Points, __('pages.dash.point_ranking')),
                 ...($isPro ? [$item(__('pages.sidebar_vendor.langganan_pro'), 'crown', 'vendor.pro.index', 'vendor.pro.*')] : []),
             ],

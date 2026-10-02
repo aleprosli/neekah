@@ -7,6 +7,7 @@ const props = defineProps({
     enquiry: { type: Object, required: true },
     action: { type: String, required: true },
     recordBookingUrl: { type: String, required: true },
+    quotationUrl: { type: String, default: null },
     csrf: { type: String, required: true },
     errors: { type: Object, default: () => ({}) },
 });
@@ -68,7 +69,8 @@ const reply = ref(props.enquiry.reply ?? '');
                 <p class="text-ink-muted">{{ enquiry.wedding.summary }}</p>
             </div>
 
-            <a :href="recordBookingUrl" class="mt-2 rounded-full border border-line px-4 py-2 text-center font-medium transition hover:border-brand-400">{{ $t('vendor_enquiry.rekod_booking_untuk_pelanggan_ini') }}</a>
+            <a v-if="quotationUrl" :href="quotationUrl" class="mt-2 rounded-full bg-brand-600 px-4 py-2 text-center font-semibold text-white transition hover:bg-brand-700">{{ $t('vendor_enquiry.buat_sebut_harga') }}</a>
+            <a :href="recordBookingUrl" class="rounded-full border border-line px-4 py-2 text-center font-medium transition hover:border-brand-400">{{ $t('vendor_enquiry.rekod_booking_untuk_pelanggan_ini') }}</a>
         </aside>
     </div>
 </template>

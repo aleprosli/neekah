@@ -209,6 +209,12 @@ class Vendor extends Model
         return $this->hasMany(Booking::class);
     }
 
+    /** Neekah Pro: what this vendor has quoted. */
+    public function quotations(): HasMany
+    {
+        return $this->hasMany(Quotation::class);
+    }
+
     public function reviews(): HasMany
     {
         return $this->hasMany(Review::class);

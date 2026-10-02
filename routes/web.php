@@ -23,6 +23,7 @@ use App\Http\Controllers\Payments\PaymentController as PaymentPageController;
 use App\Http\Controllers\Payments\ReturnController as PaymentReturnController;
 use App\Http\Controllers\Payments\WebhookController as PaymentWebhookController;
 use App\Http\Controllers\PublicSiteController;
+use App\Http\Controllers\QuotationPublicController;
 use App\Http\Controllers\ReportVendorController;
 use App\Http\Controllers\RsvpController;
 use App\Http\Controllers\SitemapController;
@@ -89,6 +90,11 @@ $site = function (): void {
     Route::delete('/k/{album}/media/{media}', [CameraGuestController::class, 'destroy'])->middleware('throttle:60,1')->name('camera.media.destroy');
     Route::post('/k/{album}/media/{media}/lapor', [CameraGuestController::class, 'report'])->middleware('throttle:10,60')->name('camera.media.report');
     Route::post('/k/{album}/ucapan', [CameraGuestController::class, 'wish'])->middleware('throttle:10,10')->name('camera.guest.wish');
+    // A vendor's quotation or invoice (Neekah Pro), opened by the client with
+    // no account. The random token is the key, never the running number.
+    Route::get('/q/{quotation:token}', [QuotationPublicController::class, 'show'])->middleware('throttle:60,1')->name('quotations.public.show');
+    Route::post('/q/{quotation:token}/terima', [QuotationPublicController::class, 'accept'])->middleware('throttle:10,1')->name('quotations.public.accept');
+    Route::post('/q/{quotation:token}/tolak', [QuotationPublicController::class, 'decline'])->middleware('throttle:10,1')->name('quotations.public.decline');
     Route::get('/vendors/{vendor}/ketersediaan', VendorAvailabilityController::class)->middleware('throttle:60,1')->name('vendors.availability');
     // Open to everyone, signed in or not, so the throttle is what stands between
     // a profile and someone with a script.
@@ -208,6 +214,20 @@ $site = function (): void {
                 Route::put('/tempahan-online/ical', [VendorArea\BookingSettingsController::class, 'connectIcal'])->middleware('throttle:10,1')->name('booking-settings.ical.connect');
                 Route::post('/tempahan-online/ical/segerak', [VendorArea\BookingSettingsController::class, 'syncIcal'])->middleware('throttle:10,1')->name('booking-settings.ical.sync');
                 Route::delete('/tempahan-online/ical', [VendorArea\BookingSettingsController::class, 'disconnectIcal'])->name('booking-settings.ical.disconnect');
+            });
+            Route::middleware('vendor.feature:quotations')->group(function (): void {
+                Route::get('/sebut-harga', [VendorArea\QuotationController::class, 'index'])->name('quotations.index');
+                Route::get('/sebut-harga/data', [VendorArea\QuotationController::class, 'data'])->name('quotations.data');
+                Route::get('/sebut-harga/baru', [VendorArea\QuotationController::class, 'create'])->name('quotations.create');
+                Route::post('/sebut-harga', [VendorArea\QuotationController::class, 'store'])->name('quotations.store');
+                Route::get('/sebut-harga/{quotation}', [VendorArea\QuotationController::class, 'show'])->name('quotations.show');
+                Route::get('/sebut-harga/{quotation}/ubah', [VendorArea\QuotationController::class, 'edit'])->name('quotations.edit');
+                Route::put('/sebut-harga/{quotation}', [VendorArea\QuotationController::class, 'update'])->name('quotations.update');
+                Route::delete('/sebut-harga/{quotation}', [VendorArea\QuotationController::class, 'destroy'])->name('quotations.destroy');
+                Route::post('/sebut-harga/{quotation}/hantar', [VendorArea\QuotationController::class, 'send'])->middleware('throttle:20,1')->name('quotations.send');
+                Route::post('/sebut-harga/{quotation}/salin', [VendorArea\QuotationController::class, 'duplicate'])->name('quotations.duplicate');
+                Route::post('/sebut-harga/{quotation}/invois', [VendorArea\QuotationController::class, 'invoice'])->name('quotations.invoice');
+                Route::put('/sebut-harga/{quotation}/invois/status', [VendorArea\QuotationController::class, 'invoiceStatus'])->name('quotations.invoice-status');
             });
             // Open to Basic too: it shows how many enquiries are waiting,
             // locked, as the reason to take Pro.

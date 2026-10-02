@@ -8,6 +8,7 @@ use App\Enums\DepositChannel;
 use App\Enums\PointReason;
 use App\Models\Booking;
 use App\Models\Package;
+use App\Models\Quotation;
 use App\Models\User;
 use App\Models\Vendor;
 use App\Notifications\BookingCreatedForCustomer;
@@ -31,11 +32,14 @@ class CreateBooking
      * early answer.
      *
      * A booking the vendor records carries no deposit: they dealt with the
-     * customer themselves. An online booking stamps the vendor's own deposit
-     * rule and holds the date until it is paid; its points are awarded when
-     * the deposit is confirmed, so a hold that lapses earns nothing.
+     * customer themselves. Recorded from an accepted quotation, it takes that
+     * quotation's total and deposit instead of the package price, and the
+     * quotation is linked to it. An online booking stamps the vendor's own
+     * deposit rule and holds the date until it is paid; its points are
+     * awarded when the deposit is confirmed, so a hold that lapses earns
+     * nothing.
      *
-     * @param  array{event_date: \DateTimeInterface|string, wedding_id?: int|null, notes?: string|null}  $attributes
+     * @param  array{event_date: \DateTimeInterface|string, wedding_id?: int|null, notes?: string|null, quotation?: Quotation|null}  $attributes
      */
     public function handle(User $customer, Vendor $vendor, Package $package, array $attributes, bool $online = false): Booking
     {
@@ -45,7 +49,8 @@ class CreateBooking
 
             $this->ensureBookable($availability, $attributes['event_date'], $online);
 
-            $total = (float) $package->price;
+            $quotation = $online ? null : ($attributes['quotation'] ?? null);
+            $total = $quotation ? (float) $quotation->total : (float) $package->price;
             $channel = $online ? $availability->paymentChannel() : null;
 
             $booking = Booking::create([
@@ -57,7 +62,11 @@ class CreateBooking
                 'package_name' => $package->name,
                 'event_date' => $attributes['event_date'],
                 'total_amount' => $total,
-                'deposit_amount' => $online ? $availability->settings()->depositFor($total) : null,
+                'deposit_amount' => match (true) {
+                    $online => $availability->settings()->depositFor($total),
+                    $quotation?->hasDeposit() => (float) $quotation->deposit_amount,
+                    default => null,
+                },
                 'commission_rate' => Booking::COMMISSION_RATE,
                 'commission_amount' => round($total * Booking::COMMISSION_RATE / 100, 2),
                 'status' => BookingStatus::PendingPayment,
@@ -69,6 +78,8 @@ class CreateBooking
 
             $booking->setRelation('vendor', $vendor);
             $booking->setRelation('user', $customer);
+
+            $quotation?->update(['booking_id' => $booking->id]);
 
             if ($online) {
                 $customer->notify(new BookingHeldForCustomer($booking));

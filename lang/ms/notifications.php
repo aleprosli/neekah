@@ -260,4 +260,26 @@ return [
         'body' => 'Boost anda tamat pada :date. Tambah hari jika mahu kekal di atas.',
         'action' => 'Sambung boost',
     ],
+
+    'quotation_sent' => [
+        'subject' => 'Sebut harga :number daripada :vendor',
+        'intro' => ':vendor menghantar sebut harga kepada anda.',
+        'total' => 'Jumlah: :total',
+        'valid_until' => 'Sah sehingga :date.',
+        'action' => 'Lihat sebut harga',
+    ],
+
+    'quotation_accepted' => [
+        'title' => ':name menerima sebut harga :number',
+        'intro' => ':name menerima sebut harga :number berjumlah :total.',
+        'body' => 'Hubungi klien tentang deposit, kemudian keluarkan invois atau rekod tempahan.',
+        'action' => 'Buka sebut harga',
+    ],
+
+    'quotation_declined' => [
+        'title' => ':name menolak sebut harga :number',
+        'intro' => ':name menolak sebut harga :number.',
+        'body' => 'Anda boleh menyalinnya sebagai sebut harga baharu dengan tawaran lain.',
+        'action' => 'Buka sebut harga',
+    ],
 ];

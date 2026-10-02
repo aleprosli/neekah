@@ -2,8 +2,10 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\QuotationStatus;
 use App\Enums\UserRole;
 use App\Models\Package;
+use App\Models\Quotation;
 use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -29,6 +31,10 @@ class StoreVendorBookingRequest extends FormRequest
             'package_id' => ['required', Rule::exists(Package::class, 'id')->where('vendor_id', $this->user()->vendor->id)->where('is_active', true)],
             'event_date' => ['required', 'date', 'after:today'],
             'notes' => ['nullable', 'string', 'max:500'],
+            'quotation_id' => ['nullable', 'integer', Rule::exists(Quotation::class, 'id')
+                ->where('vendor_id', $this->user()->vendor->id)
+                ->where('status', QuotationStatus::Accepted->value)
+                ->whereNull('booking_id')],
         ];
     }
 
@@ -53,6 +59,12 @@ class StoreVendorBookingRequest extends FormRequest
     public function customer(): User
     {
         return User::where('email', $this->string('customer_email'))->sole();
+    }
+
+    /** The accepted quotation this booking is made from, if any. */
+    public function quotation(): ?Quotation
+    {
+        return $this->filled('quotation_id') ? Quotation::find($this->integer('quotation_id')) : null;
     }
 
     /**

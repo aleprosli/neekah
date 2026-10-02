@@ -182,6 +182,9 @@ return [
     */
 
     'custom' => [
+        'quotation_locked' => 'Sebut harga ini sudah dijawab klien dan tidak boleh diubah lagi. Salin sebagai baharu.',
+        'quotation_closed' => 'Sebut harga ini tidak lagi menunggu jawapan.',
+        'quotation_not_accepted' => 'Invois hanya boleh dikeluarkan selepas klien menerima sebut harga.',
         'camera_album_closed' => 'Album ini tidak menerima gambar sekarang.',
         'camera_video_not_allowed' => 'Video hanya untuk Neekah Kenangan Pro.',
         'camera_wish_limit' => 'Anda sudah menghantar banyak ucapan untuk album ini. Terima kasih!',

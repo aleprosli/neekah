@@ -260,4 +260,26 @@ return [
         'body' => 'Your boost ends on :date. Add days to stay at the top.',
         'action' => 'Extend the boost',
     ],
+
+    'quotation_sent' => [
+        'subject' => 'Quotation :number from :vendor',
+        'intro' => ':vendor sent you a quotation.',
+        'total' => 'Total: :total',
+        'valid_until' => 'Valid until :date.',
+        'action' => 'View quotation',
+    ],
+
+    'quotation_accepted' => [
+        'title' => ':name accepted quotation :number',
+        'intro' => ':name accepted quotation :number for :total.',
+        'body' => 'Contact the client about the deposit, then issue the invoice or record the booking.',
+        'action' => 'Open quotation',
+    ],
+
+    'quotation_declined' => [
+        'title' => ':name declined quotation :number',
+        'intro' => ':name declined quotation :number.',
+        'body' => 'You can copy it as a new quotation with a different offer.',
+        'action' => 'Open quotation',
+    ],
 ];

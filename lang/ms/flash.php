@@ -131,6 +131,13 @@ return [
     ],
 
     'vendor' => [
+        'quotation_saved' => 'Sebut harga :number disimpan.',
+        'quotation_deleted' => 'Draf :number dipadam.',
+        'quotation_sent' => 'Sebut harga :number dihantar. Kongsi pautannya dengan klien.',
+        'quotation_emailed' => 'Sebut harga :number dihantar dan diemelkan kepada klien.',
+        'quotation_duplicated' => ':number disalin daripada :from. Semak dan simpan.',
+        'invoice_issued' => 'Invois :number dikeluarkan. Klien melihatnya di pautan yang sama.',
+        'invoice_status_saved' => 'Status invois dikemas kini.',
         'online_needs_payment' => 'Sambung Herepay atau isi butiran bank dahulu, supaya pengantin ada cara untuk membayar deposit.',
         'online_on' => 'Tempahan online dihidupkan.',
         'online_off' => 'Tempahan online dimatikan.',
@@ -196,4 +203,8 @@ return [
         'delete_review_label' => 'Padam review yang anda tambah ini',
     ],
 
+    'quotation' => [
+        'accepted' => 'Terima kasih. Vendor telah dimaklumkan dan akan menghubungi anda.',
+        'declined' => 'Jawapan anda telah dihantar kepada vendor.',
+    ],
 ];
