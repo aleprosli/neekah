@@ -199,6 +199,21 @@ it('shows a vendor profile with packages, reviews and related vendors', function
         ->assertDontSee('Log masuk untuk tempah');
 });
 
+it('shows a price with sen as the vendor saved it, not rounded up', function () {
+    $vendor = Vendor::factory()->for($this->photography)->create(['name' => 'Kuning Corn', 'price_from' => 2.50, 'price_unit' => 'pax']);
+    Package::factory()->for($vendor)->create(['price' => 2.50]);
+    Package::factory()->for($vendor)->create(['price' => 1500]);
+
+    $this->get(route('vendors.show', $vendor))
+        ->assertOk()
+        ->assertSee('RM2.50')
+        ->assertSee('RM1,500')
+        ->assertDontSee('RM3 ')
+        ->assertDontSee('RM1,500.00');
+
+    $this->get(route('vendors.index'))->assertSee('RM2.50');
+});
+
 it('offers no booking form while booking through the platform is off', function () {
     $vendor = Vendor::factory()->for($this->photography)->create();
     $package = Package::factory()->for($vendor)->create();

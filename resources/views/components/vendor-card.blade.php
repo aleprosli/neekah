@@ -1,7 +1,7 @@
 {{-- onDark: drawn on the Elite picks row's dark band, so its text is light. --}}
 @props(['vendor', 'comparable' => false, 'promoted' => false, 'onDark' => false])
 
-@php use App\Actions\StoreOptimizedImage; @endphp
+@php use App\Actions\StoreOptimizedImage; use App\Support\Ringgit; @endphp
 
 <div class="group relative flex flex-col gap-1">
     <a href="{{ route('vendors.show', $vendor) }}" class="flex flex-col gap-1">
@@ -38,7 +38,7 @@
             </span>
         </div>
         <p @class(['truncate text-sm', 'text-surface/70' => $onDark, 'text-ink-muted' => ! $onDark])>{{ $vendor->tagline }}</p>
-        <p @class(['mt-1 text-sm', 'text-surface/70' => $onDark, 'text-ink-muted' => ! $onDark])>{{ __('marketplace.card.from') }} <span @class(['font-semibold', 'text-gold-300' => $onDark, 'text-ink' => ! $onDark])>RM{{ number_format($vendor->price_from) }}</span> / {{ $vendor->price_unit->label() }}</p>
+        <p @class(['mt-1 text-sm', 'text-surface/70' => $onDark, 'text-ink-muted' => ! $onDark])>{{ __('marketplace.card.from') }} <span @class(['font-semibold', 'text-gold-300' => $onDark, 'text-ink' => ! $onDark])>{{ Ringgit::format($vendor->price_from) }}</span> / {{ $vendor->price_unit->label() }}</p>
     </a>
 
     @if ($comparable)

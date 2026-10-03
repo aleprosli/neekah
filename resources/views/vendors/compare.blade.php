@@ -107,7 +107,7 @@
                                     @forelse ($vendor->packages as $package)
                                         <div class="mb-2 last:mb-0">
                                             <p class="font-medium">{{ $package->name }}</p>
-                                            <p class="text-[11px] text-ink-muted">RM{{ number_format((float) $package->price) }} · {{ $package->duration }}</p>
+                                            <p class="text-[11px] text-ink-muted">{{ App\Support\Ringgit::format($package->price) }} · {{ $package->duration }}</p>
                                         </div>
                                     @empty
                                         <span class="text-ink-muted">{{ __('pages.compare.tiada_pakej') }}</span>

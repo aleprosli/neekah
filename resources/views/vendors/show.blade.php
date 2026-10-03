@@ -1,4 +1,4 @@
-@php use App\Enums\PriceUnit; use App\Enums\VendorTier; @endphp
+@php use App\Enums\PriceUnit; use App\Enums\VendorTier; use App\Support\Ringgit; @endphp
 
 <x-layouts.app :title="$vendor->name" :description="$vendor->tagline">
     <x-site.header />
@@ -149,7 +149,7 @@
                                             <h3 class="font-semibold">{{ $package->name }}</h3>
                                             <p class="text-sm text-ink-muted">{{ $package->duration }}</p>
                                         </div>
-                                        <p class="text-right font-semibold">RM{{ number_format($package->price) }}@if ($vendor->price_unit === PriceUnit::Pax)<span class="block text-xs font-normal text-ink-muted">/ pax</span>@endif</p>
+                                        <p class="text-right font-semibold">{{ Ringgit::format($package->price) }}@if ($vendor->price_unit === PriceUnit::Pax)<span class="block text-xs font-normal text-ink-muted">/ pax</span>@endif</p>
                                     </div>
                                     @if ($package->description)
                                         <p class="text-sm text-ink-muted">{{ $package->description }}</p>
@@ -242,7 +242,7 @@
                     <form method="POST" action="{{ route('vendors.bookings.store', $vendor) }}" class="flex flex-col gap-4 rounded-2xl border border-line bg-surface-raised p-6 shadow-xl shadow-brand-900/10">
                         @csrf
                         <div class="flex items-center justify-between gap-2">
-                            <p class="text-sm text-ink-muted">{{ __('pages.profile.dari') }} <span class="font-display text-2xl font-semibold text-ink">RM{{ number_format($vendor->price_from) }}</span> / {{ $vendor->price_unit->label() }}</p>
+                            <p class="text-sm text-ink-muted">{{ __('pages.profile.dari') }} <span class="font-display text-2xl font-semibold text-ink">{{ Ringgit::format($vendor->price_from) }}</span> / {{ $vendor->price_unit->label() }}</p>
                             <span class="shrink-0 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-800">{{ __('pages.online_booking.badge') }}</span>
                         </div>
 
@@ -270,7 +270,7 @@
                             <span class="text-[10px] font-semibold tracking-wide uppercase">{{ __('pages.profile.pakej') }}</span>
                             <select name="package_id" class="nk-select w-full rounded-xl border border-line bg-surface px-4 py-2.5 pr-10 text-sm focus:border-brand-400 focus:outline-none" required>
                                 @foreach ($onlineBooking['packages'] as $package)
-                                    <option value="{{ $package['id'] }}" @selected((int) old('package_id') === $package['id'])>{{ $package['name'] }} · RM{{ number_format($package['price']) }} · {{ __('pages.online_booking.deposit_short', ['amount' => 'RM'.number_format($package['deposit'], 2)]) }}</option>
+                                    <option value="{{ $package['id'] }}" @selected((int) old('package_id') === $package['id'])>{{ $package['name'] }} · {{ Ringgit::format($package['price']) }} · {{ __('pages.online_booking.deposit_short', ['amount' => 'RM'.number_format($package['deposit'], 2)]) }}</option>
                                 @endforeach
                             </select>
                         </label>
@@ -325,7 +325,7 @@
                     </form>
                 @else
                     <div class="flex flex-col gap-4 rounded-2xl border border-line bg-surface-raised p-6 shadow-xl shadow-brand-900/10">
-                        <p class="text-sm text-ink-muted">{{ __('pages.profile.dari_2') }} <span class="font-display text-2xl font-semibold text-ink">RM{{ number_format($vendor->price_from) }}</span> / {{ $vendor->price_unit->label() }}</p>
+                        <p class="text-sm text-ink-muted">{{ __('pages.profile.dari_2') }} <span class="font-display text-2xl font-semibold text-ink">{{ Ringgit::format($vendor->price_from) }}</span> / {{ $vendor->price_unit->label() }}</p>
 
                         @auth
                             {{-- The vendor's own number is only ever rendered for a signed-in
@@ -392,7 +392,7 @@
     <div class="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-surface/95 px-4 py-3 backdrop-blur lg:hidden">
         <div class="flex items-center justify-between gap-3">
             <div class="text-sm">
-                <p><span class="font-semibold">RM{{ number_format($vendor->price_from) }}</span> <span class="text-ink-muted">/ {{ $vendor->price_unit->label() }}</span></p>
+                <p><span class="font-semibold">{{ Ringgit::format($vendor->price_from) }}</span> <span class="text-ink-muted">/ {{ $vendor->price_unit->label() }}</span></p>
                 <p class="text-xs"><span class="text-gold-500">★</span> {{ $vendor->reviews_count ? number_format($vendor->rating_avg, 1) : 'Baru' }} <span class="text-ink-muted">· {{ $publishedReviewsCount }} review</span></p>
             </div>
             <a href="#hubungi" class="rounded-full bg-brand-600 px-6 py-3 text-sm font-semibold text-white">{{ $onlineBooking ? __('pages.online_booking.book_date') : __('pages.profile.hubungi_vendor') }}</a>
