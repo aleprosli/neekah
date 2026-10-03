@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Vendor;
+use App\Support\Ringgit;
 use App\Support\Seo;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
@@ -62,8 +63,8 @@ class VendorComparisonController extends Controller
             $this->row(__('pages.compare.kawasan_dicover'), $vendors->map(fn (Vendor $v): string => implode(', ', $v->serviceStates()))->all()),
             $this->row(__('pages.compare.tahap'), $vendors->map(fn (Vendor $v): string => $v->tier->label())->all(), $this->bestIndex($vendors, fn (Vendor $v): float => $v->tier->rank())),
             $this->row(__('pages.compare.rating'), $vendors->map(fn (Vendor $v): string => $v->reviews_count ? '★ '.number_format($v->rating_avg, 1).' ('.$v->reviews_count.')' : __('pages.compare.baru'))->all(), $this->bestIndex($vendors, fn (Vendor $v): float => (float) $v->rating_avg)),
-            $this->row(__('pages.compare.harga_bermula'), $vendors->map(fn (Vendor $v): string => 'RM'.number_format($v->price_from).' / '.$v->price_unit->label())->all(), $this->bestIndex($vendors, fn (Vendor $v): float => -(float) $v->price_from)),
-            $this->row(__('pages.compare.pakej_termurah'), $vendors->map(fn (Vendor $v): string => $v->packages->isEmpty() ? '—' : 'RM'.number_format($v->packages->min('price')))->all()),
+            $this->row(__('pages.compare.harga_bermula'), $vendors->map(fn (Vendor $v): string => Ringgit::format($v->price_from).' / '.$v->price_unit->label())->all(), $this->bestIndex($vendors, fn (Vendor $v): float => -(float) $v->price_from)),
+            $this->row(__('pages.compare.pakej_termurah'), $vendors->map(fn (Vendor $v): string => $v->packages->isEmpty() ? '—' : Ringgit::format($v->packages->min('price')))->all()),
             $this->row(__('pages.compare.bilangan_pakej'), $vendors->map(fn (Vendor $v): string => (string) $v->packages->count())->all(), $this->bestIndex($vendors, fn (Vendor $v): float => $v->packages->count())),
             // Completed bookings and completion rate are counted from bookings made
             // through Neekah, and couples deal with vendors directly now, so every
