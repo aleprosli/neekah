@@ -13,6 +13,7 @@ use App\Models\Vendor;
 use App\Support\ContactSettings;
 use App\Support\ContentVersion;
 use App\Support\ProSettings;
+use App\Support\Ringgit;
 use App\Support\Seo;
 use App\Support\SeoSettings;
 use App\Support\States;
@@ -300,7 +301,7 @@ class VendorController extends Controller
                 'image' => $vendor->portfolioItems->take(3)->map(fn ($item): string => $item->url())->values()->all(),
                 'address' => ['@type' => 'PostalAddress', 'addressLocality' => $vendor->city, 'addressRegion' => $vendor->state, 'addressCountry' => 'MY'],
                 'areaServed' => array_map(fn (string $state): array => ['@type' => 'AdministrativeArea', 'name' => $state], $vendor->serviceStates()),
-                'priceRange' => 'Dari RM'.number_format((float) $vendor->price_from),
+                'priceRange' => 'Dari '.Ringgit::format($vendor->price_from),
                 // Stars in results are only claimed once real reviews exist.
                 'aggregateRating' => $vendor->reviews_count > 0 ? [
                     '@type' => 'AggregateRating',

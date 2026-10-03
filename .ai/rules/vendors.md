@@ -22,3 +22,6 @@ The completed-bookings stat ("0 majlis selesai") is gone from the summary line a
 
 ## Vendor contact taps go through counting routes
 The WhatsApp button links to vendors.contact.whatsapp (auth-only, counts whatsapp_clicks, then redirects to Vendor::whatsappUrl), so the page still never contains wa.me. The tel: link keeps its href and carries data-track-phone + data-track-token; resources/js/contact-beacon.js sends a beacon to vendors.contact.phone. Taps and profile views by the vendor themselves, admins and bots are not counted.
+
+## Vendor and package prices go through Ringgit::format
+Owner, 3 Oct 2026: prices shown to couples (vendor price_from, package price) use App\Support\Ringgit::format — "RM1,500" for whole ringgit, "RM2.50" when there are sen. Never `'RM'.number_format($price)` with no decimals: it rounds, and kuning.corn's RM2.50/pax showed as RM3 on the profile, card, compare and JSON-LD priceRange. Covered by VendorMarketplaceTest.
