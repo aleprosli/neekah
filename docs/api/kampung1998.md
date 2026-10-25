@@ -1,8 +1,8 @@
-# Neekah Partner API — Kampung1998 (Pasar Tani)
+# Neekah Partner API — Kampung1998 (Kenduri Rewang)
 
 Versi: **v1** · Dikemaskini: 25 Oktober 2026
 
-API ini membolehkan Kampung1998 memaparkan direktori vendor perkahwinan Neekah dalam leaderboard Pasar Tani: senarai kategori, vendor dalam setiap kategori (ikut ranking), detail penuh vendor (gambar, pakej, review), menghantar review, dan menghubungi vendor melalui WhatsApp.
+API ini membolehkan Kampung1998 memaparkan direktori vendor perkahwinan Neekah dalam leaderboard Kenduri Rewang: senarai kategori, vendor dalam setiap kategori (ikut ranking), detail penuh vendor (gambar, pakej, review), menghantar review, dan menghubungi vendor melalui WhatsApp.
 
 ---
 
