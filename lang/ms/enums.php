@@ -242,6 +242,7 @@ return [
         'vendor_added' => 'Ditambah oleh vendor',
         'platform_added' => 'Ditambah oleh Neekah',
         'open' => 'Review terbuka',
+        'partner' => 'Melalui :partner',
     ],
 
     'payment_method_desc' => [

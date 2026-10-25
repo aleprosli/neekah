@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Http\Middleware\EnsurePartnerKey;
 use App\Support\ContentVersion;
 use Database\Factories\ReviewFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -16,7 +17,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
     'booking_id', 'user_id', 'vendor_id', 'author_name', 'author_email',
     'rating', 'quality', 'service', 'communication', 'value', 'punctuality', 'comment',
     'hidden_at', 'hidden_by', 'hidden_reason', 'reported_at', 'reported_reason',
-    'reply', 'replied_at', 'added_by',
+    'reply', 'replied_at', 'added_by', 'source',
 ])]
 class Review extends Model
 {
@@ -149,6 +150,7 @@ class Review extends Model
             $this->isVerified() => __('enums.review_source.verified'),
             $this->isVendorAdded() => __('enums.review_source.vendor_added'),
             $this->isPlatformAdded() => __('enums.review_source.platform_added'),
+            $this->source !== null => __('enums.review_source.partner', ['partner' => EnsurePartnerKey::nameOf($this->source)]),
             default => __('enums.review_source.open'),
         };
     }

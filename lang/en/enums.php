@@ -242,6 +242,7 @@ return [
         'vendor_added' => 'Added by the vendor',
         'platform_added' => 'Added by Neekah',
         'open' => 'Open review',
+        'partner' => 'Via :partner',
     ],
 
     'payment_method_desc' => [

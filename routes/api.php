@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\Partner;
 use App\Http\Controllers\Api\V1;
 use Illuminate\Support\Facades\Route;
 
@@ -46,4 +47,22 @@ Route::prefix('v1')->name('api.v1.')->middleware('api.locale')->group(function (
             Route::post('/notifications/read', [V1\NotificationController::class, 'read'])->name('notifications.read');
         });
     });
+});
+
+/*
+ * Partners (config services.partners) reading the vendor directory for their
+ * own sites, server to server with the key in X-Neekah-Key. Documented for
+ * them in docs/api/kampung1998.md.
+ */
+Route::prefix('partner/v1')->name('api.partner.v1.')->middleware('api.locale')->group(function (): void {
+    Route::middleware(['api.partner', 'throttle:partner'])->group(function (): void {
+        Route::get('/leaderboard', Partner\LeaderboardController::class)->name('leaderboard');
+        Route::get('/vendors/{vendor}', [Partner\VendorController::class, 'show'])->name('vendors.show');
+        Route::post('/vendors/{vendor}/reviews', [Partner\VendorReviewController::class, 'store'])->middleware('throttle:partner-reviews')->name('vendors.reviews.store');
+    });
+
+    // Opened by the player's browser, so it is signed rather than keyed.
+    Route::get('/vendors/{vendor}/whatsapp', [Partner\VendorContactController::class, 'whatsapp'])
+        ->middleware(['signed', 'throttle:30,1'])
+        ->name('vendors.whatsapp');
 });

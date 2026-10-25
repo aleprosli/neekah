@@ -413,6 +413,7 @@ return [
         'laman_web' => 'Laman web',
         'to_send_enquiry' => 'untuk menghantar enquiry kepada vendor ini.',
         'whatsapp_greeting' => 'Hai :name, saya jumpa anda di Neekah. Boleh saya tanya tentang pakej untuk majlis saya?',
+        'partner_whatsapp_greeting' => 'Hai :name, saya jumpa anda di :partner melalui Neekah. Boleh saya tanya tentang pakej untuk majlis saya?',
         'highlight_contact' => 'Berhubung terus dengan vendor',
         'highlight_contact_detail' => 'Hantar enquiry atau WhatsApp mereka sendiri. Neekah tidak mengambil komisen dan tidak memegang bayaran anda.',
         'highlight_response' => 'Response rate :rate',

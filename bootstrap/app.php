@@ -3,6 +3,7 @@
 use App\Http\Middleware\BeginPageMetadata;
 use App\Http\Middleware\EnsureAccountIsActive;
 use App\Http\Middleware\EnsureApiProVendor;
+use App\Http\Middleware\EnsurePartnerKey;
 use App\Http\Middleware\EnsurePhoneNumber;
 use App\Http\Middleware\EnsureUserHasRole;
 use App\Http\Middleware\EnsureUserHasWedding;
@@ -43,6 +44,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'locale' => SetLocale::class,
             'api.locale' => SetApiLocale::class,
             'api.pro' => EnsureApiProVendor::class,
+            'api.partner' => EnsurePartnerKey::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

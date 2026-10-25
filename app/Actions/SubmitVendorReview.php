@@ -23,7 +23,7 @@ class SubmitVendorReview
     public function __construct(private StoreOptimizedImage $images, private RecalculateVendorStats $stats) {}
 
     /**
-     * @param  array{rating: int, comment: string, author_name?: string|null, author_email?: string|null}  $attributes
+     * @param  array{rating: int, comment: string, author_name?: string|null, author_email?: string|null, source?: string|null}  $attributes
      * @param  array<int, UploadedFile>  $photos
      * @param  User|null  $author  The signed-in writer, if there is one.
      * @param  User|null  $addedBy  The admin typing in a review someone else wrote.
