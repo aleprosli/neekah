@@ -6,11 +6,13 @@ use App\Models\User;
 use App\Routing\LocalisedUrlGenerator;
 use App\Support\Seo;
 use Illuminate\Auth\Middleware\RedirectIfAuthenticated;
+use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Routing\UrlGenerator;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -55,5 +57,13 @@ class AppServiceProvider extends ServiceProvider
 
         // Only admins may read the application log.
         Gate::define('viewLogViewer', fn (?User $user) => $user?->isAdmin() ?? false);
+
+        // Partner API calls all come from the partner's server, so they are
+        // counted per partner, and reviews per player as well.
+        RateLimiter::for('partner', fn (Request $request): Limit => Limit::perMinute(120)->by('partner:'.$request->attributes->get('partner')));
+        RateLimiter::for('partner-reviews', fn (Request $request): array => [
+            Limit::perHour(5)->by('partner-review:'.$request->attributes->get('partner').':'.$request->input('player_id')),
+            Limit::perHour(100)->by('partner-reviews:'.$request->attributes->get('partner')),
+        ]);
     }
 }

@@ -413,6 +413,7 @@ return [
         'laman_web' => 'Website',
         'to_send_enquiry' => 'to send this vendor an enquiry.',
         'whatsapp_greeting' => 'Hi :name, I found you on Neekah. Could I ask about your packages for my wedding?',
+        'partner_whatsapp_greeting' => 'Hi :name, I found you on :partner through Neekah. Could I ask about your packages for my wedding?',
         'highlight_contact' => 'Deal with the vendor directly',
         'highlight_contact_detail' => 'Send an enquiry or WhatsApp them yourself. Neekah takes no commission and holds none of your money.',
         'highlight_response' => 'Response rate :rate',

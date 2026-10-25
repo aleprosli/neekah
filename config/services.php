@@ -66,6 +66,16 @@ return [
         'keys_guide_url' => env('HEREPAY_KEYS_GUIDE_URL', 'https://herepay.readme.io/reference/how-to-get-your-api-key'),
     ],
 
+    // Partners that read the vendor directory through /api/partner/v1. Each
+    // sends its key in the X-Neekah-Key header; a partner whose key is empty
+    // is switched off. Keys live here, never in the database.
+    'partners' => [
+        'kampung1998' => [
+            'name' => 'Kampung1998',
+            'key' => env('KAMPUNG1998_API_KEY'),
+        ],
+    ],
+
     // Optional. When set, Kamera Majlis strips the metadata (a phone's GPS
     // location included) from guests' videos before keeping them.
     'cloudflare' => [
