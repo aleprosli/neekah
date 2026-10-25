@@ -525,4 +525,11 @@ return [
         'boost_body' => 'Naikkan profil anda ke atas senarai Disyorkan dalam kategori anda.',
         'boost_cta' => 'Boost sekarang',
     ],
+
+    'threads' => [
+        'stat_scheduled' => 'Dalam jadual',
+        'stat_published_week' => 'Diterbitkan 7 hari',
+        'stat_failed_week' => 'Gagal / terlepas 7 hari',
+        'used_times' => 'Digunakan :count kali',
+    ],
 ];

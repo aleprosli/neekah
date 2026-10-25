@@ -225,6 +225,9 @@ return [
     ],
 
     'dash' => [
+        'threads' => 'Threads',
+        'threads_auto_post' => 'Threads auto-post',
+        'threads_subheading' => 'Jadual post harian Neekah di Threads: listing vendor, engagement, tips, blog dan promo.',
         'violation_reported' => ':type · dilaporkan :date',
         'statistik_kad' => 'Statistik kad',
         'statistik_kad_jemputan' => 'Statistik kad jemputan',
@@ -806,6 +809,7 @@ return [
     ],
 
     'sidebar_admin' => [
+        'threads' => 'Threads',
         'kamera' => 'Neekah Kenangan',
         'muzik_kad' => 'Muzik kad',
         'kad_nfc' => 'Kad NFC',

@@ -46,15 +46,18 @@ class StoreOptimizedImage
      * original. Both are encoded at $previewQuality, so a Pro album's
      * near-lossless originals do not make its grid heavy.
      *
+     * $format ('jpeg' or 'webp') overrides the admin's format, for a copy
+     * that leaves the site: Threads takes JPEG and PNG only.
+     *
      * @return string The stored path on the public disk.
      */
-    public function storeContents(string $contents, string $directory, bool $lossless = false, ?int $maxDimension = null, ?int $quality = null, ?string $cacheControl = null, ?int $thumbnailWidth = null, ?int $displayDimension = null, ?int $previewQuality = null): string
+    public function storeContents(string $contents, string $directory, bool $lossless = false, ?int $maxDimension = null, ?int $quality = null, ?string $cacheControl = null, ?int $thumbnailWidth = null, ?int $displayDimension = null, ?int $previewQuality = null, ?string $format = null): string
     {
         $this->allowMemoryForDecoding();
         $this->quality = $quality;
 
         $image = $this->decode($contents);
-        $extension = $lossless ? 'png' : ($this->settings->format() === 'jpeg' ? 'jpg' : 'webp');
+        $extension = $lossless ? 'png' : (($format ?? $this->settings->format()) === 'jpeg' ? 'jpg' : 'webp');
         $path = trim($directory, '/').'/'.Str::random(40).'.'.$extension;
         $disk = Storage::disk('public');
 

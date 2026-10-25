@@ -343,4 +343,29 @@ return [
         'signed' => 'Ditandatangan',
         'void' => 'Dibatalkan',
     ],
+
+    'threads_post_type' => [
+        'listing' => 'Listing vendor',
+        'engagement' => 'Engagement',
+        'tip' => 'Tips majlis',
+        'blog' => 'Blog',
+        'promo' => 'Promo Neekah',
+    ],
+
+    'threads_post_type_desc' => [
+        'listing' => 'Seorang vendor diluluskan, bergilir, dengan gambar cover dan pautan ke profilnya.',
+        'engagement' => 'Soalan atau undian untuk dapatkan balasan.',
+        'tip' => 'Tips praktikal untuk pasangan yang merancang majlis.',
+        'blog' => 'Artikel blog terbaru yang belum dikongsi, dengan kad pautan.',
+        'promo' => 'Ciri Neekah: checklist, kad digital, Kenangan, Pro.',
+    ],
+
+    'threads_post_status' => [
+        'scheduled' => 'Dijadualkan',
+        'processing' => 'Sedang diproses',
+        'published' => 'Diterbitkan',
+        'failed' => 'Gagal',
+        'missed' => 'Terlepas',
+        'cancelled' => 'Dibatalkan',
+    ],
 ];

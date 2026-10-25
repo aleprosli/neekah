@@ -197,4 +197,11 @@ return [
     'tajuk_bahagian' => 'section title',
     'isi_bahagian' => 'section text',
     'tandatangan' => 'signature',
+    'teks_post' => 'post text',
+    'masa_post' => 'post time',
+    'topik' => 'topic',
+    'pilihan_undian' => 'poll option',
+    'hari_ke_depan' => 'days ahead',
+    'tempoh_rehat_vendor' => 'vendor rest period',
+    'slot_harian' => 'daily slots',
 ];

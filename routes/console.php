@@ -17,3 +17,6 @@ Schedule::command('neekah:camera-retention')->dailyAt('09:00')->withoutOverlappi
 Schedule::command('neekah:vendor-popularity')->dailyAt('03:00')->withoutOverlapping();
 Schedule::command('neekah:vendor-ranks')->dailyAt('03:30')->withoutOverlapping();
 Schedule::command('neekah:boost-grants')->dailyAt('09:00')->withoutOverlapping();
+Schedule::command('neekah:threads-publish')->everyMinute()->withoutOverlapping();
+Schedule::command('neekah:threads-plan')->dailyAt('00:10')->withoutOverlapping();
+Schedule::command('neekah:threads-token')->dailyAt('04:00')->withoutOverlapping();

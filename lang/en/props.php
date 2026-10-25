@@ -525,4 +525,11 @@ return [
         'boost_body' => 'Lift your profile to the top of the Recommended list in your category.',
         'boost_cta' => 'Boost now',
     ],
+
+    'threads' => [
+        'stat_scheduled' => 'Scheduled',
+        'stat_published_week' => 'Published, 7 days',
+        'stat_failed_week' => 'Failed / missed, 7 days',
+        'used_times' => 'Used :count times',
+    ],
 ];
