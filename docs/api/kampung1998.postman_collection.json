@@ -1,0 +1,157 @@
+{
+  "info": {
+    "name": "Neekah Partner API — Kampung1998 (v1)",
+    "description": "Partner API untuk leaderboard Kenduri Rewang Kampung1998. Rujuk docs/api/kampung1998.md.\n\nSet pemboleh ubah `apiKey` pada collection (atau environment) sebelum mula. `vendorSlug` dan `whatsappUrl` diisi secara automatik oleh skrip selepas anda jalankan **Leaderboard** dan **Vendor detail**.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "apikey",
+    "apikey": [
+      { "key": "key", "value": "X-Neekah-Key", "type": "string" },
+      { "key": "value", "value": "{{apiKey}}", "type": "string" },
+      { "key": "in", "value": "header", "type": "string" }
+    ]
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "https://neekah.my/api/partner/v1", "type": "string" },
+    { "key": "apiKey", "value": "", "type": "string" },
+    { "key": "lang", "value": "ms", "type": "string" },
+    { "key": "vendorSlug", "value": "laguna-studio-enterprise", "type": "string" },
+    { "key": "playerId", "value": "k98-12345", "type": "string" },
+    { "key": "whatsappUrl", "value": "", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "Leaderboard",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status 200', () => pm.response.to.have.status(200));",
+              "",
+              "const categories = pm.response.json().data || [];",
+              "const firstWithVendors = categories.find(c => c.vendors && c.vendors.length);",
+              "if (firstWithVendors) {",
+              "    pm.collectionVariables.set('vendorSlug', firstWithVendors.vendors[0].slug);",
+              "}"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Accept", "value": "application/json" },
+          { "key": "Accept-Language", "value": "{{lang}}" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/leaderboard",
+          "host": ["{{baseUrl}}"],
+          "path": ["leaderboard"]
+        },
+        "description": "Semua kategori aktif, setiap satu dengan vendor yang diluluskan, disusun ikut ranking. Cache sekurang-kurangnya 5 minit.\n\nSkrip test menyimpan slug vendor pertama ke `vendorSlug`."
+      },
+      "response": []
+    },
+    {
+      "name": "Vendor detail",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status 200', () => pm.response.to.have.status(200));",
+              "",
+              "const vendor = pm.response.json().data;",
+              "if (vendor && vendor.contact && vendor.contact.whatsapp_url) {",
+              "    pm.collectionVariables.set('whatsappUrl', vendor.contact.whatsapp_url);",
+              "}"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Accept", "value": "application/json" },
+          { "key": "Accept-Language", "value": "{{lang}}" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/vendors/{{vendorSlug}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["vendors", "{{vendorSlug}}"]
+        },
+        "description": "Detail penuh vendor: gambar, pakej, review, pautan sosial dan `contact.whatsapp_url`. `404` jika slug tiada atau vendor belum diluluskan/digantung.\n\nSkrip test menyimpan `contact.whatsapp_url` ke `whatsappUrl`."
+      },
+      "response": []
+    },
+    {
+      "name": "Submit review (JSON)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Accept", "value": "application/json" },
+          { "key": "Accept-Language", "value": "{{lang}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"rating\": 5,\n    \"comment\": \"Gambar cantik dan sampai tepat pada masa.\",\n    \"author_name\": \"Anak Kampung\",\n    \"player_id\": \"{{playerId}}\",\n    \"author_email\": \"pemain@contoh.my\"\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/vendors/{{vendorSlug}}/reviews",
+          "host": ["{{baseUrl}}"],
+          "path": ["vendors", "{{vendorSlug}}", "reviews"]
+        },
+        "description": "Hantar review bagi pihak pemain. Diterbitkan serta-merta dengan label \"Melalui Kampung1998\".\n\n- `rating` (wajib): integer 1–5\n- `comment` (wajib): 10–1000 aksara\n- `author_name` (wajib): 2–80 aksara\n- `player_id` (wajib): ≤100 aksara, untuk had kadar\n- `author_email` (pilihan): tidak dipaparkan\n\nHad: 5 review / jam bagi setiap `player_id`."
+      },
+      "response": []
+    },
+    {
+      "name": "Submit review with photos (multipart)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Accept", "value": "application/json" },
+          { "key": "Accept-Language", "value": "{{lang}}" }
+        ],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            { "key": "rating", "value": "5", "type": "text" },
+            { "key": "comment", "value": "Gambar cantik dan sampai tepat pada masa.", "type": "text" },
+            { "key": "author_name", "value": "Anak Kampung", "type": "text" },
+            { "key": "player_id", "value": "{{playerId}}", "type": "text" },
+            { "key": "author_email", "value": "pemain@contoh.my", "type": "text", "disabled": true },
+            { "key": "photos[]", "type": "file", "src": [], "description": "JPG/PNG/WebP, sehingga 6 gambar. Tambah baris photos[] lain untuk lebih banyak gambar." }
+          ]
+        },
+        "url": {
+          "raw": "{{baseUrl}}/vendors/{{vendorSlug}}/reviews",
+          "host": ["{{baseUrl}}"],
+          "path": ["vendors", "{{vendorSlug}}", "reviews"]
+        },
+        "description": "Sama seperti Submit review (JSON), tetapi sebagai `multipart/form-data` supaya boleh lampirkan sehingga 6 gambar dalam `photos[]`. Pilih fail pada baris `photos[]` sebelum hantar."
+      },
+      "response": []
+    },
+    {
+      "name": "WhatsApp redirect (signed link)",
+      "request": {
+        "auth": { "type": "noauth" },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{whatsappUrl}}",
+          "host": ["{{whatsappUrl}}"]
+        },
+        "description": "Pautan `contact.whatsapp_url` dari Vendor detail. Bukan untuk dipanggil oleh server partner — buka dalam browser pemain. Tidak memerlukan key. Disertakan di sini untuk semak redirect sahaja (matikan \"Automatically follow redirects\" untuk lihat respons redirect). `403` jika pautan diubah."
+      },
+      "response": []
+    }
+  ]
+}
