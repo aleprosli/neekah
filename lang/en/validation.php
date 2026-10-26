@@ -182,6 +182,7 @@ return [
     */
 
     'custom' => [
+        'threads_text_too_long' => 'The text is over the Threads limit of :max bytes (an emoji counts as 4).',
         'contract_locked' => 'This contract has been sent and can no longer be changed. Withdraw it and copy it as a new one.',
         'contract_closed' => 'This contract is no longer waiting for a signature.',
         'contract_not_voidable' => 'Only a contract awaiting signature can be withdrawn.',

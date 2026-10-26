@@ -5,6 +5,7 @@
     $openViolations = \App\Models\VendorViolation::where('status', \App\Enums\ViolationStatus::Open)->count();
     $reportedReviews = \App\Models\Review::whereNotNull('reported_at')->whereNull('hidden_at')->count();
     $reportedCamera = \App\Models\CameraMedia::whereNotNull('reported_at')->count();
+    $failedThreads = \App\Models\ThreadsPost::where('status', \App\Enums\ThreadsPostStatus::Failed)->where('scheduled_at', '>=', now()->subDays(7))->count();
     $item = fn (string $label, string $icon, string $route, string $pattern, ?int $badge = null): array => [
         'label' => $label, 'icon' => $icon, 'href' => route($route), 'active' => App\Support\Locales::routeIs($pattern), 'badge' => $badge ?: null,
     ];
@@ -29,6 +30,7 @@
         ['label' => __('pages.sidebar_admin.kandungan'), 'items' => [
             $item(__('pages.sidebar_admin.checklist_induk'), 'check', 'admin.checklist.index', 'admin.checklist.*'),
             $item(__('pages.sidebar_admin.blog'), 'pencil', 'admin.posts.index', 'admin.posts.*'),
+            $item(__('pages.sidebar_admin.threads'), 'chat', 'admin.threads.index', 'admin.threads.*', $failedThreads),
             $item(__('pages.sidebar_admin.muzik_kad'), 'music', 'admin.card-music.index', 'admin.card-music.*'),
             $item(__('pages.sidebar_admin.kad_nfc'), 'tag', 'admin.card-nfc.index', 'admin.card-nfc.*'),
         ]],

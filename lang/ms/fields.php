@@ -197,4 +197,11 @@ return [
     'tajuk_bahagian' => 'tajuk bahagian',
     'isi_bahagian' => 'isi bahagian',
     'tandatangan' => 'tandatangan',
+    'teks_post' => 'teks post',
+    'masa_post' => 'masa post',
+    'topik' => 'topik',
+    'pilihan_undian' => 'pilihan undian',
+    'hari_ke_depan' => 'hari ke depan',
+    'tempoh_rehat_vendor' => 'tempoh rehat vendor',
+    'slot_harian' => 'slot harian',
 ];

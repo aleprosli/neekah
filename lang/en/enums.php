@@ -343,4 +343,29 @@ return [
         'signed' => 'Signed',
         'void' => 'Withdrawn',
     ],
+
+    'threads_post_type' => [
+        'listing' => 'Vendor listing',
+        'engagement' => 'Engagement',
+        'tip' => 'Wedding tip',
+        'blog' => 'Blog',
+        'promo' => 'Neekah promo',
+    ],
+
+    'threads_post_type_desc' => [
+        'listing' => 'One approved vendor in turn, with their cover image and a link to their profile.',
+        'engagement' => 'A question or a poll to get replies.',
+        'tip' => 'Practical advice for couples planning their majlis.',
+        'blog' => 'The newest blog article not yet shared, with its link card.',
+        'promo' => 'Neekah features: checklist, digital card, Kenangan, Pro.',
+    ],
+
+    'threads_post_status' => [
+        'scheduled' => 'Scheduled',
+        'processing' => 'Processing',
+        'published' => 'Published',
+        'failed' => 'Failed',
+        'missed' => 'Missed',
+        'cancelled' => 'Cancelled',
+    ],
 ];

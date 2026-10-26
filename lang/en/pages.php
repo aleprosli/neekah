@@ -225,6 +225,9 @@ return [
     ],
 
     'dash' => [
+        'threads' => 'Threads',
+        'threads_auto_post' => 'Threads auto-post',
+        'threads_subheading' => 'Neekah\'s daily posts on Threads: vendor listings, engagement, tips, blog and promos.',
         'violation_reported' => ':type · reported :date',
         'statistik_kad' => 'Card insights',
         'statistik_kad_jemputan' => 'Invitation card insights',
@@ -806,6 +809,7 @@ return [
     ],
 
     'sidebar_admin' => [
+        'threads' => 'Threads',
         'kamera' => 'Neekah Moments',
         'muzik_kad' => 'Card music',
         'kad_nfc' => 'NFC cards',

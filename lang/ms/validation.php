@@ -182,6 +182,7 @@ return [
     */
 
     'custom' => [
+        'threads_text_too_long' => 'Teks melebihi had Threads, :max bait (emoji dikira 4).',
         'contract_locked' => 'Kontrak ini sudah dihantar dan tidak boleh diubah lagi. Batalkan dan salin sebagai baharu.',
         'contract_closed' => 'Kontrak ini tidak lagi menunggu tandatangan.',
         'contract_not_voidable' => 'Hanya kontrak yang menunggu tandatangan boleh dibatalkan.',

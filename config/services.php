@@ -66,6 +66,18 @@ return [
         'keys_guide_url' => env('HEREPAY_KEYS_GUIDE_URL', 'https://herepay.readme.io/reference/how-to-get-your-api-key'),
     ],
 
+    // Neekah's own Threads account, posted to by neekah:threads-publish. The
+    // id and secret come from the Meta app (use case "Access the Threads
+    // API"); the account itself is connected under Admin → Threads, which
+    // keeps its token. Hosts are the API's own and rarely change.
+    'threads' => [
+        'app_id' => env('THREADS_APP_ID'),
+        'app_secret' => env('THREADS_APP_SECRET'),
+        'authorize_url' => 'https://threads.com/oauth/authorize',
+        'graph_url' => 'https://graph.threads.com',
+        'version' => 'v1.0',
+    ],
+
     // Partners that read the vendor directory through /api/partner/v1. Each
     // sends its key in the X-Neekah-Key header; a partner whose key is empty
     // is switched off. Keys live here, never in the database.

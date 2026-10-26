@@ -436,6 +436,22 @@ $site = function (): void {
         Route::post('/announcements/test', [AdminArea\AnnouncementController::class, 'test'])->name('announcements.test');
         Route::get('/announcements/recipients', [AdminArea\AnnouncementController::class, 'recipients'])->name('announcements.recipients');
         Route::get('/announcements/{announcement}', [AdminArea\AnnouncementController::class, 'show'])->name('announcements.show');
+        // Threads: Neekah's own account, posted to by neekah:threads-publish.
+        Route::get('/threads', [AdminArea\ThreadsController::class, 'index'])->name('threads.index');
+        Route::get('/threads/data', [AdminArea\ThreadsController::class, 'data'])->name('threads.data');
+        Route::get('/threads/sambung', [AdminArea\ThreadsController::class, 'connect'])->name('threads.connect');
+        Route::get('/threads/callback', [AdminArea\ThreadsController::class, 'callback'])->name('threads.callback');
+        Route::delete('/threads/sambungan', [AdminArea\ThreadsController::class, 'disconnect'])->name('threads.disconnect');
+        Route::put('/threads/tetapan', [AdminArea\ThreadsController::class, 'updateSettings'])->name('threads.settings');
+        Route::post('/threads/jana', [AdminArea\ThreadsController::class, 'plan'])->name('threads.plan');
+        Route::post('/threads/posts', [AdminArea\ThreadsPostController::class, 'store'])->name('threads.posts.store');
+        Route::put('/threads/posts/{post}', [AdminArea\ThreadsPostController::class, 'update'])->name('threads.posts.update');
+        Route::delete('/threads/posts/{post}', [AdminArea\ThreadsPostController::class, 'destroy'])->name('threads.posts.destroy');
+        Route::post('/threads/posts/{post}/terbit', [AdminArea\ThreadsPostController::class, 'publish'])->name('threads.posts.publish');
+        Route::post('/threads/posts/{post}/tulis-semula', [AdminArea\ThreadsPostController::class, 'rewrite'])->name('threads.posts.rewrite');
+        Route::post('/threads/templat', [AdminArea\ThreadsTemplateController::class, 'store'])->name('threads.templates.store');
+        Route::put('/threads/templat/{template}', [AdminArea\ThreadsTemplateController::class, 'update'])->name('threads.templates.update');
+        Route::delete('/threads/templat/{template}', [AdminArea\ThreadsTemplateController::class, 'destroy'])->name('threads.templates.destroy');
         Route::get('/bookings', [AdminArea\BookingController::class, 'index'])->name('bookings.index');
         Route::get('/bookings/data', [AdminArea\BookingController::class, 'data'])->name('bookings.data');
         Route::get('/bookings/{booking}', [AdminArea\BookingController::class, 'show'])->name('bookings.show');

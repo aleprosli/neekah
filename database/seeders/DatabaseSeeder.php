@@ -12,6 +12,7 @@ class DatabaseSeeder extends Seeder
             CategorySeeder::class,
             ChecklistSeeder::class,
             SiteTemplateSeeder::class,
+            ThreadsTemplateSeeder::class,
             DemoSeeder::class,
         ]);
     }
