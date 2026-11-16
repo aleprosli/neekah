@@ -205,7 +205,7 @@
                             <h2 id="pilihan-elite" class="mt-1 font-display text-2xl font-semibold">{{ __('marketplace.elite.title') }}</h2>
                             <p class="mt-1 max-w-xl text-sm text-surface/75">{{ __('marketplace.elite.body') }}</p>
                         </div>
-                        <a href="{{ route('landing') }}#elite" class="shrink-0 text-sm font-medium text-gold-300 underline underline-offset-4">{{ __('marketplace.elite.what') }}</a>
+                        <a href="{{ route('features.pro') }}#elite" class="shrink-0 text-sm font-medium text-gold-300 underline underline-offset-4">{{ __('marketplace.elite.what') }}</a>
                     </div>
                     <ul class="no-scrollbar relative -mx-5 flex gap-4 overflow-x-auto px-5 pb-1 sm:-mx-7 sm:px-7">
                         @foreach ($elite as $vendor)

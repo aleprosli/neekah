@@ -15,6 +15,7 @@ use App\Http\Controllers\ContractPublicController;
 use App\Http\Controllers\Customer as CustomerArea;
 use App\Http\Controllers\Customer\BookingController;
 use App\Http\Controllers\Customer\PaymentController;
+use App\Http\Controllers\FeaturePageController;
 use App\Http\Controllers\InvitationAcceptanceController;
 use App\Http\Controllers\InvitationPreviewController;
 use App\Http\Controllers\LandingController;
@@ -109,6 +110,14 @@ $site = function (): void {
         ->name('vendors.reviews.store');
 
     Route::get('/about', LandingController::class)->name('landing');
+    // What Neekah offers, one page each, linked from the About dropdown.
+    // Every page but the marketplace answers 404 until its feature is on sale.
+    Route::controller(FeaturePageController::class)->prefix('ciri')->name('features.')->group(function (): void {
+        Route::get('/marketplace', 'marketplace')->name('marketplace');
+        Route::get('/kenangan', 'kenangan')->name('kenangan');
+        Route::get('/pro', 'pro')->name('pro');
+        Route::get('/boost', 'boost')->name('boost');
+    });
 
     Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
     Route::get('/blog/{post:slug}', [BlogController::class, 'show'])->name('blog.show');

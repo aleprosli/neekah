@@ -30,7 +30,7 @@ The homepage (`/`, `vendors.index`) **is the marketplace**, not a marketing page
 - Vendor cards, paginated.
 - **Empty result → "WhatsApp Neekah"**, a prefilled message saying what they were looking for, so the team can pass the request on to vendors (`ContactSettings`).
 
-Other public pages: `/about` (the pitch, "Yuran platform: Percuma"), `/blog`, `/kad-jemputan` (gallery of the 50 card designs with live previews), `/compare` (vendors side by side). Everything exists in Malay at `/` and English at `/en`.
+Other public pages: `/about` (the pitch, "Yuran platform: Percuma"), the feature pages `/ciri/marketplace`, `/ciri/kenangan`, `/ciri/pro` and `/ciri/boost` (reached from the "Tentang" dropdown or the phone bottom bar; see `docs/features/about-feature-pages.md`), `/blog`, `/kad-jemputan` (gallery of the 50 card designs with live previews), `/compare` (vendors side by side). Everything exists in Malay at `/` and English at `/en`.
 
 ---
 

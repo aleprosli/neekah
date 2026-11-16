@@ -19,8 +19,8 @@
                     <p class="max-w-xl text-lg text-ink-muted text-pretty">{{ __('pages.landing.neekah_bantu_anda_cari_vendor') }}</p>
 
                     <div class="flex flex-col gap-3 sm:flex-row">
-                        <a href="{{ route('vendors.index') }}" class="inline-flex items-center justify-center rounded-full bg-brand-600 px-6 py-3 text-base font-semibold text-white shadow-lg shadow-brand-600/20 transition hover:bg-brand-700">{{ __('pages.landing.cari_vendor_sekarang') }}</a>
-                        <a href="#vendor" class="inline-flex items-center justify-center rounded-full border border-gold-400 bg-surface-raised px-6 py-3 text-base font-semibold transition hover:border-gold-500 hover:text-brand-700">{{ __('pages.landing.sertai_sebagai_vendor') }}</a>
+                        <x-site.button :href="route('vendors.index')">{{ __('pages.landing.cari_vendor_sekarang') }}</x-site.button>
+                        <x-site.button href="#vendor" variant="secondary">{{ __('pages.landing.sertai_sebagai_vendor') }}</x-site.button>
                     </div>
 
                     <p class="text-sm text-ink-muted">{{ __('pages.landing.hero_note') }}</p>
@@ -28,7 +28,7 @@
                     <dl class="grid grid-cols-3 gap-4 border-t border-gold-300 pt-6 text-sm">
                         <div>
                             <dt class="text-ink-muted">{{ __('pages.landing.kategori_vendor') }}</dt>
-                            <dd class="font-display text-2xl font-semibold">{{ $categories->count() }}</dd>
+                            <dd class="font-display text-2xl font-semibold">{{ $categoryCount }}</dd>
                         </div>
                         <div>
                             <dt class="text-ink-muted">{{ __('pages.landing.yuran_platform') }}</dt>
@@ -130,118 +130,9 @@
             </div>
         </section>
 
-        {{-- Neekah Kenangan: shown once an admin opens it (LandingController). --}}
-        @if ($kenangan)
-            <section id="kenangan" class="relative overflow-hidden border-y border-gold-300/60 bg-surface-raised">
-                <img src="{{ asset('img/decor/botanical-corner.svg') }}" alt="" class="pointer-events-none absolute -top-24 -right-28 w-72 rotate-180 opacity-20 sm:w-96" loading="lazy" decoding="async">
-                <img src="{{ asset('img/decor/botanical-corner.svg') }}" alt="" class="pointer-events-none absolute -bottom-24 -left-28 w-72 opacity-20 sm:w-96" loading="lazy" decoding="async">
-
-                <div class="relative mx-auto grid max-w-7xl gap-12 px-4 py-20 sm:px-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:px-8">
-                    <div class="flex min-w-0 flex-col gap-5">
-                        <p class="text-sm font-semibold tracking-[0.2em] text-gold-600 uppercase">{{ __('pages.landing.kenangan.eyebrow') }}</p>
-                        <h2 class="font-display text-3xl font-semibold tracking-tight text-balance sm:text-4xl">{{ __('pages.landing.kenangan.title') }}</h2>
-                        <p class="text-lg text-ink-muted">{{ __('pages.landing.kenangan.body') }}</p>
-                        <div class="mt-2" data-vue="kenangan-phone-demo" data-props="@vueProps(['steps' => $kenangan['steps']])">
-                            <ol class="flex flex-col">
-                                @foreach ($kenangan['steps'] as $step)
-                                    <li class="relative flex min-w-0 items-start gap-4 pb-6 last:pb-0">
-                                        @unless ($loop->last)
-                                            <span class="absolute top-16 bottom-0 left-8 border-l-2 border-dashed border-gold-300" aria-hidden="true"></span>
-                                        @endunless
-                                        <span class="relative">
-                                            <x-site.kenangan-step :name="$step['key']" class="size-16" />
-                                            <span class="absolute -top-1 -right-1 flex size-6 items-center justify-center rounded-full bg-brand-600 font-display text-xs font-semibold text-white ring-2 ring-surface-raised">{{ $loop->iteration }}</span>
-                                        </span>
-                                        <span class="min-w-0 pt-2 text-sm"><span class="block font-semibold">{{ $step['title'] }}</span> <span class="text-ink-muted">{{ $step['body'] }}</span></span>
-                                    </li>
-                                @endforeach
-                            </ol>
-                        </div>
-                    </div>
-
-                    <div class="grid min-w-0 content-center gap-5 sm:grid-cols-2">
-                        @foreach ($kenangan['tiers'] as $tier)
-                            <article @class([
-                                'relative flex min-w-0 flex-col gap-4 overflow-hidden rounded-3xl border p-6',
-                                'border-brand-300 bg-linear-to-b from-brand-50 to-surface-raised shadow-lg shadow-brand-900/5' => $tier['pro'],
-                                'border-line bg-ivory' => ! $tier['pro'],
-                            ])>
-                                <div>
-                                    <h3 class="font-display text-xl font-semibold">{{ $tier['label'] }}</h3>
-                                    <p class="mt-1 font-display text-3xl font-semibold">RM{{ rtrim(rtrim(number_format($tier['price'], 2), '0'), '.') }}</p>
-                                    <p class="text-xs text-ink-muted">{{ __('pages.landing.kenangan.per_album') }}</p>
-                                </div>
-                                <ul class="flex flex-col gap-2 text-sm">
-                                    @foreach ($tier['features'] as $feature)
-                                        <li class="flex items-start gap-2"><x-nav-icon name="check" class="mt-0.5 size-4 shrink-0 text-gold-600" /><span>{{ $feature }}</span></li>
-                                    @endforeach
-                                </ul>
-                            </article>
-                        @endforeach
-                        <a href="{{ route('camera.index') }}" class="inline-flex w-fit items-center rounded-full bg-brand-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-brand-700 sm:col-span-2">{{ __('pages.landing.kenangan.cta') }}</a>
-                    </div>
-                </div>
-            </section>
-        @endif
-
-        {{-- Marketplace preview --}}
-        <section id="marketplace" class="relative overflow-hidden bg-ivory-deep">
-            <img src="{{ asset('img/decor/botanical-corner.svg') }}" alt="" class="absolute -top-28 left-1/2 w-80 -translate-x-1/2 rotate-45 opacity-[0.06]" loading="lazy" decoding="async">
-
-            <div class="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
-                <div class="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-                    <div class="max-w-2xl">
-                        <p class="text-sm font-semibold tracking-[0.2em] text-gold-600 uppercase">{{ __('pages.landing.marketplace') }}</p>
-                        <h2 class="mt-2 font-display text-3xl font-semibold tracking-tight sm:text-4xl">{{ __('pages.landing.cari_vendor_ikut_kategori_lokasi') }}</h2>
-                        <p class="mt-4 text-lg text-ink-muted">{{ __('pages.landing.bandingkan_pakej_dan_portfolio_kemudian') }}</p>
-                    </div>
-
-                    {{-- Search --}}
-                    <form class="flex w-full flex-col gap-2 rounded-2xl border border-line bg-surface-raised p-2 shadow-sm sm:flex-row lg:w-auto" method="GET" action="{{ route('vendors.index') }}">
-                        <label class="sr-only" for="search-category">{{ __('pages.landing.kategori') }}</label>
-                        <select id="search-category" name="category" class="nk-select rounded-xl border-0 bg-transparent px-3 py-2 pr-8 text-sm font-medium focus:ring-2 focus:ring-brand-400 focus:outline-none">
-                            <option value="">{{ __('pages.landing.semua_kategori') }}</option>
-                            @foreach ($categories as $category)
-                                <option value="{{ $category->slug }}">{{ $category->name }}</option>
-                            @endforeach
-                        </select>
-                        <label class="sr-only" for="search-q">{{ __('pages.landing.cari') }}</label>
-                        <input id="search-q" name="q" type="search" :placeholder="__('pages.landing.bandar_atau_nama_vendor')" class="rounded-xl border-0 bg-transparent px-3 py-2 text-sm focus:ring-2 focus:ring-brand-400 focus:outline-none">
-                        <button type="submit" class="rounded-xl bg-brand-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-700">{{ __('pages.landing.cari_2') }}</button>
-                    </form>
-                </div>
-
-                <ul class="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-                    @foreach ($categories as $category)
-                        <li>
-                            <a href="{{ route('vendors.index', ['category' => $category->slug]) }}" class="flex h-full flex-col gap-1 rounded-2xl border border-line bg-surface-raised p-4 transition hover:border-gold-400 hover:shadow-md">
-                                <x-category-icon class="size-9" :category="$category" />
-                                <span class="font-semibold">{{ $category->name }}</span>
-                                <span class="text-xs text-ink-muted">{{ $category->examples }}</span>
-                            </a>
-                        </li>
-                    @endforeach
-                </ul>
-
-                <div class="mt-14 flex items-center gap-4">
-                    <h3 class="font-display text-2xl font-semibold">{{ __('pages.landing.vendor_pilihan') }}</h3>
-                    <span class="h-px flex-1 bg-gold-300" aria-hidden="true"></span>
-                </div>
-
-                <ul class="mt-6 grid gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
-                    @foreach ($vendors as $vendor)
-                        <li><x-vendor-card :vendor="$vendor" /></li>
-                    @endforeach
-                </ul>
-
-                <div class="mt-8 flex flex-col items-center gap-3 text-center">
-                    <a href="{{ route('vendors.index') }}" class="inline-flex items-center justify-center rounded-full border border-gold-400 bg-surface-raised px-6 py-3 text-sm font-semibold transition hover:border-gold-500 hover:text-brand-700">{{ __('pages.landing.lihat_semua_vendor') }}</a>
-                    @if ($helpUrl)
-                        <p class="text-sm text-ink-muted">{{ __('pages.landing.tak_jumpa_vendor_yang_anda') }} <a href="{{ $helpUrl }}" target="_blank" rel="noopener" class="font-semibold text-brand-600 hover:underline">{{ __('pages.landing.whatsapp_kami') }}</a>{{ __('pages.landing.kami_bantu_kongsikan') }}</p>
-                    @endif
-                </div>
-            </div>
-        </section>
+        {{-- Marketplace, Kenangan, Pro and Boost each have a page of their own
+             (/ciri/*); here only a card for each one on sale. --}}
+        <x-site.feature-explore id="terokai" :pages="$explore" :eyebrow="__('pages.features.explore.eyebrow')" :title="__('pages.features.explore.title')" />
 
         {{-- Direct dealing: a printed card sheet, double gold rule and rose corners --}}
         <section class="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
@@ -315,8 +206,8 @@
                         @endforeach
                     </ul>
                     <p class="text-xs text-brand-200">{{ __('pages.landing.tier_note') }}</p>
-                    @if ($plans && $plans['elite'] !== null)
-                        <a href="#elite" class="inline-flex w-fit items-center gap-2 rounded-full border border-gold-300 bg-linear-to-r from-ink to-brand-800 px-3 py-1 text-sm font-semibold text-gold-300">✦ Pro Elite <span class="text-xs font-normal text-brand-100">{{ __('pages.landing.elite.chip') }}</span></a>
+                    @if ($eliteUrl)
+                        <a href="{{ $eliteUrl }}" class="inline-flex w-fit items-center gap-2 rounded-full border border-gold-300 bg-linear-to-r from-ink to-brand-800 px-3 py-1 text-sm font-semibold text-gold-300">✦ Pro Elite <span class="text-xs font-normal text-brand-100">{{ __('pages.landing.elite.chip') }}</span></a>
                     @endif
 
                     <a href="{{ route('vendor.register') }}" class="mt-4 inline-flex w-fit items-center rounded-full bg-gold-400 px-6 py-3 font-semibold text-brand-900 transition hover:bg-gold-300">{{ __('pages.landing.daftar_sebagai_vendor') }}</a>
@@ -337,112 +228,10 @@
             </div>
         </section>
 
-        {{-- Neekah Pro told as before and after (with Pro Elite inside it), then
-             Basic against Pro and boost: what a vendor can buy, and what stays
-             earned. Shown once Pro (and boost) are on sale. --}}
-        @if ($plans || $boost)
-            <section id="pro" class="relative overflow-hidden bg-ivory-deep">
-                <img src="{{ asset('img/decor/botanical-corner.svg') }}" alt="" class="pointer-events-none absolute -top-24 -left-28 w-72 scale-y-[-1] opacity-20 sm:w-96" loading="lazy" decoding="async">
-                <img src="{{ asset('img/decor/botanical-corner.svg') }}" alt="" class="pointer-events-none absolute -right-28 -bottom-24 w-72 scale-x-[-1] opacity-20 sm:w-96" loading="lazy" decoding="async">
-
-                <div class="relative mx-auto flex max-w-7xl flex-col gap-16 px-4 py-20 sm:px-6 lg:px-8">
-                    @if ($proStory)
-                        {{-- resources/js/components/vendor/VendorProShowcase.vue: the same story as /vendor/pro. --}}
-                        <div data-vue="vendor-pro-showcase" data-props="@vueProps($proStory)">
-                            <ul class="grid gap-4 sm:grid-cols-2">
-                                @foreach ($proStory['benefits'] as $benefit)
-                                    <li class="rounded-2xl border border-line bg-surface-raised p-5">
-                                        <p class="font-semibold">{{ $benefit['title'] }}</p>
-                                        <p class="mt-1 text-sm text-ink-muted">{{ $benefit['body'] }}</p>
-                                    </li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    @endif
-
-                    <div id="pelan" class="flex scroll-mt-24 flex-col gap-8">
-                        <div class="mx-auto max-w-2xl text-center">
-                            <p class="text-sm font-semibold tracking-[0.2em] text-gold-600 uppercase">{{ __('pages.landing.plans.eyebrow') }}</p>
-                            <h2 class="mt-2 font-display text-3xl font-semibold tracking-tight sm:text-4xl">{{ __('pages.landing.plans.title') }}</h2>
-                            <p class="mt-4 text-lg text-ink-muted">{{ __('pages.landing.plans.body') }}</p>
-                        </div>
-
-                        @if ($plans)
-                            <div class="grid min-w-0 gap-6 lg:grid-cols-2">
-                                <article class="flex min-w-0 flex-col gap-4 rounded-3xl border border-line bg-surface-raised p-6 sm:p-8">
-                                    <div>
-                                        <h3 class="font-display text-2xl font-semibold">Basic</h3>
-                                        <p class="mt-1 font-display text-3xl font-semibold">{{ __('pages.landing.plans.free') }}</p>
-                                        <p class="text-sm text-ink-muted">{{ __('pages.landing.plans.basic_body') }}</p>
-                                    </div>
-                                    <ul class="flex flex-col gap-3 text-sm">
-                                        @foreach ($plans['basic'] as $feature)
-                                            <li class="flex items-start gap-2"><x-nav-icon name="check" class="mt-0.5 size-4 shrink-0 text-gold-600" /><span><span class="font-semibold">{{ $feature['label'] }}</span> <span class="text-ink-muted">· {{ $feature['description'] }}</span></span></li>
-                                        @endforeach
-                                    </ul>
-                                </article>
-
-                                {{-- What each Pro feature does is told in the story above; here it is the price and the list. --}}
-                                <article class="relative flex min-w-0 flex-col gap-4 overflow-hidden rounded-3xl bg-linear-to-br from-ink via-brand-900 to-ink p-6 text-surface ring-1 ring-gold-300/60 sm:p-8">
-                                    <span class="pointer-events-none absolute -top-20 -right-16 size-64 rounded-full bg-gold-300/15 blur-3xl" aria-hidden="true"></span>
-                                    <div class="relative">
-                                        <h3 class="flex items-center gap-2 font-display text-2xl font-semibold">Neekah Pro <x-vendors.pro-badge /></h3>
-                                        <p class="mt-1 font-display text-3xl font-semibold">RM{{ rtrim(rtrim(number_format($plans['monthly'], 2), '0'), '.') }}<span class="text-base font-normal text-surface/70"> {{ __('pages.landing.plans.per_month') }}</span></p>
-                                        <p class="text-sm text-surface/70">{{ __('pages.landing.plans.pro_yearly', ['price' => 'RM'.rtrim(rtrim(number_format($plans['yearly'], 2), '0'), '.')]) }}</p>
-                                    </div>
-                                    <p class="relative text-sm font-medium text-gold-300">{{ __('pages.landing.plans.pro_includes') }}</p>
-                                    <ul class="relative grid gap-x-4 gap-y-2.5 text-sm sm:grid-cols-2">
-                                        @foreach ($proStory['benefits'] ?? [] as $benefit)
-                                            <li class="flex items-start gap-2"><x-nav-icon name="check" class="mt-0.5 size-4 shrink-0 text-gold-300" /><span>{{ $benefit['title'] }}</span></li>
-                                        @endforeach
-                                        @if ($plans['elite'] !== null)
-                                            <li class="flex items-start gap-2"><span class="mt-px w-4 shrink-0 text-center text-gold-300" aria-hidden="true">✦</span><a href="#elite" class="underline decoration-gold-300/50 underline-offset-4 hover:text-gold-300">{{ __('pages.landing.plans.pro_elite') }}</a></li>
-                                        @endif
-                                    </ul>
-                                    <p class="relative mt-auto text-xs text-surface/60">{{ __('pages.landing.plans.deposit_note') }}</p>
-                                </article>
-                            </div>
-                        @endif
-
-                        @if ($boost)
-                            <article id="boost" class="grid min-w-0 scroll-mt-24 gap-6 rounded-3xl border border-gold-300 bg-surface-raised p-6 sm:p-8 lg:grid-cols-2 lg:items-center">
-                                <div class="flex flex-col gap-3">
-                                    <p class="text-sm font-semibold tracking-[0.2em] text-gold-600 uppercase">🚀 {{ __('pages.landing.boost.eyebrow') }}</p>
-                                    <h3 class="font-display text-2xl font-semibold">{{ __('pages.landing.boost.title') }}</h3>
-                                    <p class="text-sm text-ink-muted">{{ __('pages.landing.boost.body') }}</p>
-                                    <p class="text-xs text-ink-muted">{{ __('pages.landing.boost.fair') }}</p>
-                                </div>
-                                <ul class="flex flex-col gap-2.5 rounded-2xl bg-ivory p-5 text-sm">
-                                    <li class="flex items-start gap-2"><x-nav-icon name="check" class="mt-0.5 size-4 shrink-0 text-gold-600" /><span>{{ __('pages.landing.boost.welcome', ['count' => $boost['welcome']]) }}</span></li>
-                                    <li class="flex items-start gap-2"><x-nav-icon name="check" class="mt-0.5 size-4 shrink-0 text-gold-600" /><span>{{ __('pages.landing.boost.pro', ['count' => $boost['pro_monthly']]) }}</span></li>
-                                    @foreach ($boost['packs'] as $pack)
-                                        <li class="flex items-start gap-2"><x-nav-icon name="check" class="mt-0.5 size-4 shrink-0 text-gold-600" /><span>{{ __('pages.landing.boost.pack', ['count' => $pack['tokens'], 'price' => rtrim(rtrim(number_format($pack['price'], 2), '0'), '.')]) }}</span></li>
-                                    @endforeach
-                                </ul>
-                            </article>
-                        @endif
-                    </div>
-                </div>
-            </section>
-        @endif
-
-        {{-- CTA --}}
-        <section id="cta" class="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
-            <div class="relative overflow-hidden rounded-3xl border border-gold-300 bg-surface-raised px-6 py-16 text-center sm:px-12">
-                <img src="{{ asset('img/decor/botanical-corner.svg') }}" alt="" class="absolute -bottom-28 -left-24 w-80 opacity-15 sm:w-96" loading="lazy" decoding="async">
-                <img src="{{ asset('img/decor/botanical-corner.svg') }}" alt="" class="absolute -top-28 -right-24 w-80 scale-x-[-1] opacity-10 sm:w-96" loading="lazy" decoding="async">
-
-                <div class="relative">
-                    <x-site.ornament name="divider-floral" class="mx-auto h-6 w-44" color="var(--color-gold-500)" color2="var(--color-gold-300)" />
-                    <h2 class="mt-5 font-display text-3xl font-semibold tracking-tight text-balance sm:text-4xl">{{ __('pages.landing.majlis_impian_bermula_dengan_vendor') }}</h2>
-                    <p class="mx-auto mt-4 max-w-xl text-lg text-ink-muted">{{ __('pages.landing.daftar_percuma_untuk_lihat_nombor') }}</p>
-                    <div class="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-                        <a href="{{ route('register') }}" class="inline-flex items-center justify-center rounded-full bg-brand-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-brand-600/20 transition hover:bg-brand-700">{{ __('pages.landing.daftar_percuma') }}</a>
-                        <a href="{{ route('vendors.index') }}" class="inline-flex items-center justify-center rounded-full border border-gold-400 bg-surface-raised px-6 py-3 text-sm font-semibold transition hover:border-gold-500 hover:text-brand-700">{{ __('pages.landing.cari_vendor') }}</a>
-                    </div>
-                </div>
-            </div>
-        </section>
+        <x-site.feature-cta id="cta" :title="__('pages.landing.majlis_impian_bermula_dengan_vendor')" :body="__('pages.landing.daftar_percuma_untuk_lihat_nombor')">
+            <x-site.button :href="route('register')">{{ __('pages.landing.daftar_percuma') }}</x-site.button>
+            <x-site.button :href="route('vendors.index')" variant="secondary">{{ __('pages.landing.cari_vendor') }}</x-site.button>
+        </x-site.feature-cta>
     </main>
 
     <x-site.footer />

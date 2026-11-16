@@ -6,6 +6,7 @@ use App\Models\Category;
 use App\Models\Post;
 use App\Models\SiteTemplate;
 use App\Models\Vendor;
+use App\Support\FeaturePages;
 use App\Support\Locales;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -40,7 +41,7 @@ class SitemapController extends Controller
         ]);
     }
 
-    public function pages(Request $request): Response
+    public function pages(Request $request, FeaturePages $features): Response
     {
         $this->refuseOnCardHost($request);
 
@@ -50,6 +51,8 @@ class SitemapController extends Controller
             ...$this->inEveryLanguage('sites.templates', [], ['priority' => '0.8', 'changefreq' => 'weekly']),
             ...$this->inEveryLanguage('blog.index', [], ['priority' => '0.8', 'changefreq' => 'weekly']),
             ...$this->inEveryLanguage('vendor.register', [], ['priority' => '0.6', 'changefreq' => 'monthly']),
+            // Only the feature pages on sale: the others answer 404.
+            ...collect($features->available())->flatMap(fn (array $page): array => $this->inEveryLanguage($page['route'], [], ['priority' => '0.7', 'changefreq' => 'monthly'])),
         ]);
 
         // Category listings are real pages: each one is the canonical address

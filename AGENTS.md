@@ -167,3 +167,56 @@ This project has domain-specific skills available in `**/skills/**`. You MUST ac
 - After the feature tests pass, ask the user to run the complete suite with `php artisan test --compact`.
 
 </laravel-boost-guidelines>
+
+# Neekah project workflow
+
+These sections live outside the Laravel Boost block on purpose, so `boost:update` leaves them alone. Keep `CLAUDE.md` and `AGENTS.md` identical here.
+
+## Change docs (mandatory)
+
+Every code change leaves a doc in the same branch: bug fixes in `docs/bugs/`, new features in
+`docs/features/` (one living file per feature), improvements in `docs/enhancements/`, each listed
+in that folder's `README.md`. Read the related doc before changing an area. Follow
+`.claude/skills/neekah-change-docs/SKILL.md` (skill `neekah-change-docs`) for folder choice, file
+naming and templates. A branch without its doc is not ready for `#OpenPR`.
+
+## `#OpenPR`
+
+When the user includes the exact token `#OpenPR`, open a pull request from the current working
+branch into `main`. The token is explicit authorization to commit the branch's own work, push the
+branch and create the pull request without asking a second time. It does NOT authorize merging
+or deploying: `main` is what production runs (deployed with `ssh ubuntu@43.159.61.13
+'~/bin/deploy-neekah'`, and automatically on every push to `main` once the auto-deploy workflow
+in PR #23 is merged), so merging and deploying stay separate requests from the user.
+
+Before creating the pull request:
+
+1. Verify that the current branch is not `main`, that `origin/main` exists, and that the branch
+   has changes to propose. Fetch remote refs and inspect the commits and the full diff between
+   `origin/main` and `HEAD`.
+2. Make sure the change doc exists (see Change docs). If it is missing, write it first.
+3. Run `vendor/bin/pint --dirty --format agent`, and `npm run build` when Blade/Vue/CSS changed
+   (`public/build` is committed and is what production serves). Commit the build output with the change.
+4. Commit only the files that belong to this change. Leave unrelated local edits (for example
+   `.claude/worktrees/`) uncommitted, and say plainly that they were left out.
+5. Check whether an open pull request already exists for the same head branch and base. Never
+   create a duplicate; return the existing link instead.
+6. Verify GitHub CLI authentication with `gh auth status` and `gh api user`, and create the pull
+   request only as the user's own personal account (`aleprosli`), never a bot or app identity.
+
+Write a concise, outcome-focused title and a description supported strictly by the commits and
+diff:
+
+- A short plain paragraph: the problem, why it mattered, and the overall result.
+- A compact bullet summary of the main outcomes.
+- The root causes or previous behaviour as a numbered list, when several contributed.
+- A file-by-file or component-by-component breakdown of the meaningful behaviour changes.
+- Verification actually observed in this work (test runs, screenshots). Never claim a check
+  passed without having seen its output; if nothing was run, say so.
+- A short manual-check list, plus deploy notes that genuinely apply: migrations, `route:cache` /
+  `config:cache` (production caches both), settings to switch on, cache, behaviour changes.
+- A link to the change doc.
+
+No AI attribution anywhere: no `Co-Authored-By` trailers, no "Generated with" lines, in the
+title, description, commits or metadata. Push the branch to `origin`, create the pull request
+with `main` as base, and return the link.

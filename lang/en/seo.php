@@ -19,6 +19,25 @@ return [
         'description' => 'Search wedding vendors by category, location and budget, and deal with them directly. Checklist, budget and digital invitations, free.',
     ],
 
+    'features' => [
+        'marketplace' => [
+            'title' => 'Wedding vendor marketplace',
+            'description' => 'Find wedding vendors by category, location and budget. Compare packages and portfolios, then contact vendors directly with no middleman.',
+        ],
+        'kenangan' => [
+            'title' => 'Neekah Kenangan: a QR album for wedding guests',
+            'description' => 'Guests scan the QR on their table and share photos and videos of your wedding into one album. No app, no sign-in.',
+        ],
+        'pro' => [
+            'title' => 'Neekah Pro for wedding vendors',
+            'description' => 'Enquiries, quotations & invoices, digital contracts and online booking in one place. Basic stays free; Pro is for vendors who want more.',
+        ],
+        'boost' => [
+            'title' => 'Neekah Boost: rise to the top of your category',
+            'description' => 'One boost token lifts a vendor to the top of the Recommended order in its category for a day. Boosts never change tier or score.',
+        ],
+    ],
+
     'blog' => [
         'title' => 'Wedding blog',
         'title_page' => 'Wedding blog — page :page',

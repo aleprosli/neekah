@@ -19,6 +19,25 @@ return [
         'description' => 'Cari vendor kahwin ikut kategori, lokasi dan bajet, dan berurusan terus dengan mereka. Checklist, bajet dan kad jemputan digital percuma.',
     ],
 
+    'features' => [
+        'marketplace' => [
+            'title' => 'Marketplace vendor kahwin',
+            'description' => 'Cari vendor kahwin ikut kategori, lokasi dan bajet. Bandingkan pakej dan portfolio, kemudian hubungi vendor terus tanpa orang tengah.',
+        ],
+        'kenangan' => [
+            'title' => 'Neekah Kenangan: album QR untuk tetamu majlis',
+            'description' => 'Tetamu imbas QR di meja dan kongsi gambar serta video majlis anda ke satu album. Tiada aplikasi, tiada log masuk.',
+        ],
+        'pro' => [
+            'title' => 'Neekah Pro untuk vendor kahwin',
+            'description' => 'Enquiry, sebut harga & invois, kontrak digital dan tempahan online di satu tempat. Basic kekal percuma; Pro untuk vendor yang mahu lebih.',
+        ],
+        'boost' => [
+            'title' => 'Neekah Boost: naik ke atas kategori anda',
+            'description' => 'Satu token boost menaikkan profil vendor ke atas susunan Disyorkan dalam kategorinya selama sehari. Boost tidak mengubah tier atau skor.',
+        ],
+    ],
+
     'blog' => [
         'title' => 'Blog perkahwinan',
         'title_page' => 'Blog perkahwinan — halaman :page',
