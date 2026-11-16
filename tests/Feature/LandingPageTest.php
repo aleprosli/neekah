@@ -89,18 +89,18 @@ it('promises nothing the platform does not do while it takes no payment', functi
 });
 
 it('offers a WhatsApp to Neekah for a vendor that is not listed, once a number is set', function () {
-    $this->get(route('landing'))->assertOk()->assertDontSee('wa.me/', false);
+    $this->get(route('features.marketplace'))->assertOk()->assertDontSee('wa.me/', false);
 
     app(ContactSettings::class)->save(['whatsapp' => '012-345 6789']);
 
-    $this->get(route('landing'))
+    $this->get(route('features.marketplace'))
         ->assertOk()
         ->assertSee('Tak jumpa vendor yang anda cari?')
         ->assertSee('https://wa.me/60123456789?text=', false);
 });
 
-it('shows every active vendor category in the marketplace preview', function () {
-    $response = $this->get(route('landing'));
+it('shows every active vendor category on the marketplace page', function () {
+    $response = $this->get(route('features.marketplace'));
 
     foreach (Category::active()->get() as $category) {
         $response->assertSee($category->name);
@@ -114,9 +114,11 @@ it('shows approved featured vendors and what listing gives a vendor', function (
     $approved = Vendor::factory()->for(Category::first())->create(['name' => 'ABC Wedding Photography']);
     Vendor::factory()->pending()->for(Category::first())->create(['name' => 'Vendor Belum Lulus']);
 
-    $this->get(route('landing'))
+    $this->get(route('features.marketplace'))
         ->assertSee($approved->name)
-        ->assertDontSee('Vendor Belum Lulus')
+        ->assertDontSee('Vendor Belum Lulus');
+
+    $this->get(route('landing'))
         ->assertSee('Senarai percuma. Pengantin hubungi anda terus.')
         ->assertSee('Pengantin WhatsApp anda terus');
 });
@@ -129,25 +131,35 @@ it('tells visitors the platform is free rather than quoting a commission', funct
         ->assertDontSee('8%');
 });
 
-it('explains Neekah Kenangan, Basic and Pro, boost and Pro Elite only once each is on sale, at the admin prices', function () {
-    $this->get(route('landing'))
-        ->assertOk()
-        ->assertDontSee('id="kenangan"', false)
-        ->assertDontSee('id="pro"', false)
-        ->assertDontSee('id="elite"', false);
+it('explains Neekah Kenangan, Basic and Pro, boost and Pro Elite on their own pages only once each is on sale, at the admin prices', function () {
+    $this->get(route('features.kenangan'))->assertNotFound();
+    $this->get(route('features.pro'))->assertNotFound();
+    $this->get(route('features.boost'))->assertNotFound();
 
     app(CameraSettings::class)->save(['enabled' => true, 'pro_price' => 109]);
     app(ProSettings::class)->save(['enabled' => true, 'monthly_price' => 59]);
     app(BoostSettings::class)->save(['enabled' => true]);
 
-    $response = $this->get(route('landing'))
+    // About only points at them; the products are told on their own pages.
+    $this->get(route('landing'))
         ->assertOk()
-        ->assertSee('id="kenangan"', false)
+        ->assertSee(route('features.kenangan'))
+        ->assertSee(route('features.pro'))
+        ->assertSee(route('features.boost'))
+        ->assertDontSee('id="kenangan"', false)
+        ->assertDontSee('data-vue="vendor-pro-showcase"', false);
+
+    $this->get(route('features.kenangan'))
+        ->assertOk()
         ->assertSee(__('pages.landing.kenangan.steps.scan.title'))
         ->assertSee(__('pages.landing.kenangan.steps.keep.title'))
-        ->assertSee('RM109')
+        ->assertSee('RM109');
+
+    $this->get(route('features.boost'))->assertOk()->assertSee(__('pages.features.boost.how_title'));
+
+    $response = $this->get(route('features.pro'))
+        ->assertOk()
         ->assertSee('RM59')
-        ->assertSee('id="boost"', false)
         ->assertSee(__('pages.landing.plans.deposit_note'))
         // Still a network: nothing promises payment through Neekah.
         ->assertDontSee('Tempah & bayar di Neekah')

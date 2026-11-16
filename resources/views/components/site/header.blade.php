@@ -1,5 +1,5 @@
 <div class="sticky top-3 z-40 h-0 px-3 sm:px-6">
-    <header class="mx-auto flex max-w-6xl items-center justify-between gap-2 rounded-full sm:gap-4 border border-line/70 bg-surface/85 py-2 pr-2 pl-3 shadow-lg sm:pl-4 shadow-black/5 backdrop-blur-md">
+    <header class="relative mx-auto flex max-w-6xl items-center justify-between gap-2 rounded-full sm:gap-4 border border-line/70 bg-surface/85 py-2 pr-2 pl-3 shadow-lg sm:pl-4 shadow-black/5 backdrop-blur-md">
         {{-- The lockup is the one thing here that may give ground: max-w-full
              inside a shrinking flex item means the header cannot overflow on a
              narrow phone however wide the buttons beside it turn out to be, in
@@ -8,11 +8,19 @@
             <x-brand.lockup class="h-7 max-w-full object-contain sm:h-8" />
         </a>
 
-        <nav data-nav-region class="hidden items-center gap-1 text-sm font-medium md:flex" aria-label="{{ __('nav.main') }}">
-            <a href="{{ route('vendors.index') }}" @class(['rounded-full px-4 py-2 transition hover:bg-surface-muted', 'bg-surface-muted text-brand-700' => App\Support\Locales::routeIs('vendors.*')])>{{ __('nav.find_vendors') }}</a>
-            <a href="{{ route('landing') }}#cara" class="rounded-full px-4 py-2 transition hover:bg-surface-muted">{{ __('nav.how_it_works') }}</a>
-            <a href="{{ route('vendor.register') }}" class="rounded-full px-4 py-2 transition hover:bg-surface-muted">{{ __('nav.for_vendors') }}</a>
-            <a href="{{ route('blog.index') }}" @class(['rounded-full px-4 py-2 transition hover:bg-surface-muted', 'bg-surface-muted text-brand-700' => App\Support\Locales::routeIs('blog.*')])>{{ __('nav.blog') }}</a>
+        <nav data-nav-region class="hidden items-center gap-0.5 text-sm font-medium whitespace-nowrap md:flex lg:gap-1" aria-label="{{ __('nav.main') }}">
+            <a href="{{ route('vendors.index') }}" @class(['rounded-full px-3 py-2 transition hover:bg-surface-muted lg:px-4', 'bg-surface-muted text-brand-700' => App\Support\Locales::routeIs('vendors.*')])>{{ __('nav.find_vendors') }}</a>
+            {{-- About and the feature pages (/ciri/*); the phone gets the same
+                 menu from the bottom bar (site/mobile-nav). --}}
+            <details data-popover class="group">
+                <summary @class(['flex cursor-pointer list-none items-center gap-1 rounded-full px-3 py-2 transition lg:px-4 select-none hover:bg-surface-muted [&::-webkit-details-marker]:hidden', 'bg-surface-muted text-brand-700' => App\Support\Locales::routeIs('landing', 'features.*')])>
+                    {{ __('nav.about') }}
+                    <svg class="size-3.5 transition group-open:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+                </summary>
+                <x-site.about-menu class="absolute inset-x-0 top-full z-20 mx-auto mt-2 max-w-2xl rounded-3xl border border-line bg-surface-raised p-3 whitespace-normal shadow-xl shadow-brand-900/10" />
+            </details>
+            <a href="{{ route('vendor.register') }}" class="rounded-full px-3 py-2 transition hover:bg-surface-muted lg:px-4">{{ __('nav.for_vendors') }}</a>
+            <a href="{{ route('blog.index') }}" @class(['hidden rounded-full px-3 py-2 transition hover:bg-surface-muted lg:inline lg:px-4', 'bg-surface-muted text-brand-700' => App\Support\Locales::routeIs('blog.*')])>{{ __('nav.blog') }}</a>
         </nav>
 
         <div class="flex shrink-0 items-center gap-1">

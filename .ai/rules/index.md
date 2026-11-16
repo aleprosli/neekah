@@ -20,6 +20,7 @@ Before planning or editing, find the row whose globs match the file's path and r
 | app/Http/Controllers/Customer/**, app/Http/Controllers/Customer/WeddingTaskController.php, app/Http/Controllers/Customer/WeddingTimelineController.php | .ai/rules/customer.md |
 | app/Enums/UserSegment.php, app/Enums/VendorFeature.php | .ai/rules/enums.md |
 | resources/views/errors/** | .ai/rules/errors.md |
+| resources/views/features/** | .ai/rules/features.md |
 | ** | .ai/rules/general.md |
 | app/Support/Herepay/**, app/Support/Payments/**, app/Actions/SettlePayment.php, app/Actions/StartPayment.php, app/Actions/RequeryPayment.php, app/Http/Controllers/Payments/**, app/Models/Payment.php, app/Models/PaymentEvent.php | .ai/rules/herepay.md |
 | app/Jobs/**, app/Jobs/ProcessCameraMedia.php | .ai/rules/jobs.md |

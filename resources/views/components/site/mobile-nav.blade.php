@@ -6,11 +6,19 @@
                 {{ __('nav.search') }}
             </a>
         </li>
+        {{-- The phone has no header menu, so "Tentang" opens the same menu as
+             the header dropdown in a sheet above the bar. --}}
         <li>
-            <a href="{{ route('landing') }}" @class(['flex flex-col items-center gap-1 py-2', 'text-brand-600' => App\Support\Locales::routeIs('landing'), 'text-ink-muted' => ! App\Support\Locales::routeIs('landing')])>
-                <svg class="size-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 21-7.5-7.5a5 5 0 0 1 7.5-6.6 5 5 0 0 1 7.5 6.6Z"/></svg>
-                {{ __('nav.about') }}
-            </a>
+            <details data-popover class="group">
+                <summary @class(['flex cursor-pointer list-none flex-col items-center gap-1 py-2 select-none [&::-webkit-details-marker]:hidden group-open:text-brand-600', 'text-brand-600' => App\Support\Locales::routeIs('landing', 'features.*', 'blog.*'), 'text-ink-muted' => ! App\Support\Locales::routeIs('landing', 'features.*', 'blog.*')])>
+                    <svg class="size-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 21-7.5-7.5a5 5 0 0 1 7.5-6.6 5 5 0 0 1 7.5 6.6Z"/></svg>
+                    <span class="flex items-center gap-0.5">
+                        {{ __('nav.about') }}
+                        <svg class="size-3 rotate-180 transition group-open:rotate-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+                    </span>
+                </summary>
+                <x-site.about-menu compact class="absolute inset-x-3 bottom-full mb-3 max-h-[calc(100dvh-7rem)] overflow-y-auto rounded-3xl border border-line bg-surface-raised p-3 text-sm shadow-2xl shadow-brand-900/20" />
+            </details>
         </li>
         <li>
             @auth

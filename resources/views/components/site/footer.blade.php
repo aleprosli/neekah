@@ -16,6 +16,9 @@
                 <a href="{{ route('vendors.index') }}" class="transition hover:text-ink">{{ __('pages.footer.cari_vendor') }}</a>
                 <a href="{{ route('vendor.register') }}" class="transition hover:text-ink">{{ __('pages.footer.jadi_vendor') }}</a>
                 <a href="{{ route('blog.index') }}" class="transition hover:text-ink">{{ __('pages.footer.blog') }}</a>
+                @foreach (app(App\Support\FeaturePages::class)->available() as $page)
+                    <a href="{{ $page['url'] }}" class="transition hover:text-ink">{{ $page['title'] }}</a>
+                @endforeach
             </nav>
 
             @if ($contact->phone() || $contact->email() || $contact->whatsappUrl())
