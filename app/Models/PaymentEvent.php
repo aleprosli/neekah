@@ -17,6 +17,10 @@ class PaymentEvent extends Model
 
     public const LINK_FAILED = 'link_failed';
 
+    public const INITIATED = 'initiated';
+
+    public const INITIATE_FAILED = 'initiate_failed';
+
     public const CALLBACK = 'callback';
 
     public const RETURN = 'return';

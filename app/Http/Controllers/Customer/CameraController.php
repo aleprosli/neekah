@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Customer;
 use App\Actions\ActivateCameraAlbum;
 use App\Actions\DeleteCameraMedia;
 use App\Actions\DeleteCameraWish;
-use App\Actions\StartPayment;
 use App\Enums\CameraMediaType;
 use App\Enums\CameraTier;
 use App\Enums\PaymentPurpose;
@@ -32,7 +31,6 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
-use RuntimeException;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use ZipArchive;
 
@@ -123,12 +121,12 @@ class CameraController extends Controller
     }
 
     /**
-     * Start a purchase and send the couple to pay: a new album for another
+     * Start a purchase and send the couple to confirm it and pick a bank: a new album for another
      * majlis, or Pro for one of their Basic albums. The price is stamped now;
      * an upgrade costs the difference, and a tier an album already has is
      * not sold twice.
      */
-    public function checkout(Request $request, Wedding $wedding, CameraSettings $settings, HerepayGateway $gateway, StartPayment $start): RedirectResponse
+    public function checkout(Request $request, Wedding $wedding, CameraSettings $settings, HerepayGateway $gateway): RedirectResponse
     {
         Gate::authorize('update', $wedding);
         abort_unless($settings->isEnabled() && $gateway->isConfigured(), 404);
@@ -170,15 +168,10 @@ class CameraController extends Controller
                 'album_title' => $album ? null : (trim(strip_tags((string) ($validated['title'] ?? ''))) ?: null),
                 'album_event_date' => $album ? null : ($validated['event_date'] ?? null),
             ], fn (?string $value): bool => $value !== null),
+            'expires_at' => now()->addDay(),
         ]);
 
-        try {
-            return redirect()->away($start->handle($payment, $request->user()));
-        } catch (RuntimeException $exception) {
-            report($exception);
-
-            return back()->withInput()->withErrors(['tier' => __('flash.couple.camera_checkout_failed')]);
-        }
+        return redirect()->route('payments.checkout', $payment);
     }
 
     /**

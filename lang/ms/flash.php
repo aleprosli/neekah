@@ -84,9 +84,8 @@ return [
         'camera_saved' => 'Tetapan album disimpan.',
         'camera_link_rotated' => 'Pautan baharu sedia. Pautan dan QR lama tidak lagi berfungsi.',
         'camera_export_queued' => 'ZIP sedang disediakan. Kami akan emel anda bila siap.',
-        'camera_checkout_failed' => 'Pautan bayaran tidak dapat dibuat sekarang. Sila cuba sebentar lagi.',
         'camera_already_owned' => 'Album anda sudah ada pakej ini.',
-        'deposit_link_failed' => 'Pautan bayaran tidak dapat dibuat sekarang. Tarikh anda masih dipegang; cuba bayar semula sebentar lagi.',
+        'deposit_link_failed' => 'Bayaran deposit tidak dapat dibuka sekarang. Tarikh anda masih dipegang; cuba bayar semula sebentar lagi.',
         'booking_held' => 'Tarikh dipegang untuk tempahan :reference. Bayar deposit untuk mengesahkannya.',
         'nfc_card_not_ready' => 'Kad ini belum dihubungkan dengan mana-mana jemputan.',
         'wedding_created' => 'Wedding project dicipta, lengkap dengan checklist dan cadangan bajet. Langkah seterusnya: cipta kad kahwin digital anda.',
@@ -153,7 +152,6 @@ return [
         'online_off' => 'Tempahan online dimatikan.',
         'bank_details_saved' => 'Butiran bank disimpan.',
         'boost_started' => 'Boost :category aktif sehingga :date.',
-        'boost_checkout_failed' => 'Pautan bayaran tidak dapat dibuka. Cuba sebentar lagi.',
         'ical_connected' => 'Google Calendar disambung. :count tarikh sibuk diimport.',
         'ical_synced' => 'Disegerakkan. :count tarikh sibuk daripada Google Calendar.',
         'ical_disconnected' => 'Google Calendar diputuskan. Tarikh yang diimport telah dibuka semula.',
@@ -169,7 +167,6 @@ return [
         'package_added' => 'Pakej ditambah.',
         'package_updated' => 'Pakej dikemas kini.',
         'feature_needs_pro' => ':feature dibuka untuk vendor Neekah Pro. Naik taraf untuk menggunakannya.',
-        'pro_checkout_failed' => 'Pautan bayaran tidak dapat dibuat sekarang. Sila cuba sebentar lagi.',
         'registered' => 'Pendaftaran diterima. Lengkapkan profil anda sementara admin menyemak permohonan.',
         'converted' => 'Akaun anda kini akaun vendor. Lengkapkan profil anda sementara admin menyemak permohonan.',
         'convert_has_activity' => 'Akaun ini sudah ada majlis, tempahan atau enquiry, jadi tidak boleh ditukar sendiri. Sila hubungi admin Neekah.',
@@ -211,6 +208,10 @@ return [
         'delete_review_title' => 'Padam review oleh :author?',
         'delete_review_message' => 'Review ini dan gambarnya dipadam kekal. Tindakan ini tidak boleh diundur.',
         'delete_review_label' => 'Padam review yang anda tambah ini',
+    ],
+
+    'payment' => [
+        'initiate_failed' => 'Bank yang dipilih tidak dapat dihubungi sekarang. Tiada wang ditolak; cuba sekali lagi atau pilih bank lain.',
     ],
 
     'quotation' => [

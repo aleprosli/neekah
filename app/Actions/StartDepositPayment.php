@@ -12,23 +12,23 @@ use App\Support\Payments\PaymentGateways;
 use RuntimeException;
 
 /**
- * Send a couple to pay the deposit on an online booking, on the vendor's own
- * Herepay account. A link still open is reused, so paying again never opens a
- * second one for the same hold.
+ * The payment a couple confirms to pay the deposit on an online booking, on
+ * the vendor's own Herepay account. One still open is reused, so paying again
+ * never opens a second one for the same hold.
  */
 class StartDepositPayment
 {
     /** The gateway a deposit payment is taken through. */
     public const GATEWAY = Payment::GATEWAY_HEREPAY;
 
-    public function __construct(private StartPayment $start, private PaymentGateways $gateways) {}
+    public function __construct(private PaymentGateways $gateways) {}
 
     /**
-     * The URL to send the couple to.
+     * The payment to send the couple to confirm (payments.checkout).
      *
-     * @throws RuntimeException when the booking cannot take a payment now, or the gateway refused the link
+     * @throws RuntimeException when the booking cannot take a payment now, or the vendor has no Herepay account connected
      */
-    public function handle(Booking $booking, User $payer): string
+    public function handle(Booking $booking, User $payer): Payment
     {
         if (! $booking->isHeld() || $booking->payment_mode !== DepositChannel::Herepay) {
             throw new RuntimeException("Booking {$booking->reference} is not waiting for an online deposit.");
@@ -38,12 +38,11 @@ class StartDepositPayment
             ->where('gateway', self::GATEWAY)
             ->where('status', PaymentStatus::Pending)
             ->where('expires_at', '>', now())
-            ->whereNotNull('payment_url')
             ->latest('id')
             ->first();
 
         if ($open) {
-            return $open->payment_url;
+            return $open;
         }
 
         $payment = $booking->payments()->make([
@@ -62,6 +61,6 @@ class StartDepositPayment
 
         $payment->save();
 
-        return $this->start->handle($payment, $payer);
+        return $payment;
     }
 }

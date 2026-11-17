@@ -40,6 +40,8 @@ class Translations
         'camera' => ['common', 'copy', 'camera'],
         // A printable invoice or receipt: no islands at all.
         'document' => [],
+        // The order confirmation before the bank: the bank picker only.
+        'checkout' => ['common', 'payment_checkout'],
     ];
 
     /**

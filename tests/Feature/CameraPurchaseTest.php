@@ -21,7 +21,7 @@ beforeEach(function () {
 
     $this->couple = User::factory()->create();
     $this->wedding = Wedding::factory()->for($this->couple)->create(['event_date' => now()->addMonths(2)->toDateString()]);
-    fakeHerepayLink('https://uat.herepay.org/herepay/pay/CAM');
+    fakeHerepayDirect();
 });
 
 it('offers both tiers at the admin prices before anything is bought', function () {
@@ -36,18 +36,19 @@ it('offers both tiers at the admin prices before anything is bought', function (
         ->and(collect($props['buy']['tiers'])->pluck('voice', 'value')->all())->toBe(['basic' => false, 'pro' => true]);
 });
 
-it('sends the couple to pay on Neekah own Herepay account at todays price', function () {
-    $this->actingAs($this->couple)
-        ->post(route('camera.checkout', $this->wedding), ['tier' => 'pro'])
-        ->assertRedirect('https://uat.herepay.org/herepay/pay/CAM');
+it('sends the couple to confirm and pay on Neekah own Herepay account at todays price', function () {
+    $response = $this->actingAs($this->couple)->post(route('camera.checkout', $this->wedding), ['tier' => 'pro']);
 
     $payment = Payment::sole();
+    $response->assertRedirect(route('payments.checkout', $payment));
 
     expect($payment->status)->toBe(PaymentStatus::Pending)
         ->and($payment->purpose)->toBe(PaymentPurpose::Kenangan)
         ->and($payment->merchant)->toBe('neekah')
         ->and($payment->detail('tier'))->toBe('pro')
         ->and((float) $payment->amount)->toBe(99.0);
+
+    $this->actingAs($this->couple)->post(route('payments.pay', $payment), ['payment_method' => 'Online Banking', 'bank_code' => 'MB2U0227'])->assertOk();
 
     Http::assertSent(fn (ClientRequest $request): bool => $request->hasHeader('SecretKey', 'test-secret')
         && $request['redirect_url'] === route('payments.return', $payment)
@@ -95,11 +96,11 @@ it('opens another album for another majlis, with its own name, date and QR', fun
     $first = CameraAlbum::factory()->for($this->wedding)->create();
     $date = now()->addMonths(3)->toDateString();
 
-    $this->actingAs($this->couple)
-        ->post(route('camera.checkout', $this->wedding), ['tier' => 'basic', 'title' => 'Majlis Bertandang', 'event_date' => $date])
-        ->assertRedirect('https://uat.herepay.org/herepay/pay/CAM');
+    $response = $this->actingAs($this->couple)
+        ->post(route('camera.checkout', $this->wedding), ['tier' => 'basic', 'title' => 'Majlis Bertandang', 'event_date' => $date]);
 
     $payment = Payment::sole();
+    $response->assertRedirect(route('payments.checkout', $payment));
     expect($payment->detail('kind'))->toBe('new')
         ->and($payment->detail('album_title'))->toBe('Majlis Bertandang')
         ->and((float) $payment->amount)->toBe(29.0)

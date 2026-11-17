@@ -1433,8 +1433,8 @@ return [
         'how_paste' => 'Tampal kedua-dua kunci di bawah dan tekan Sambung Herepay.',
         'herepay_secret' => 'Secret Key',
         'herepay_private' => 'Private Key',
-        'herepay_api_key' => 'API Key (pilihan)',
-        'herepay_api_key_help' => 'Untuk semak semula deposit yang tiada callback. Herepay → Settings → Personal → API Token.',
+        'herepay_api_key' => 'API Key',
+        'herepay_api_key_help' => 'Diperlukan untuk senarai bank dan memulakan setiap deposit. Herepay → Settings → API.',
         'herepay_test_note' => 'Kami uji kunci anda dengan satu pautan bayaran RM1 yang tamat dalam 10 minit (tidak perlu dibayar). Kunci mesti dari persekitaran :environment. Kunci disimpan secara tersulit dan tidak dipaparkan semula.',
         'herepay_connect' => 'Sambung Herepay',
         'manual_title' => 'Belum ada Herepay? Terima deposit melalui pindahan bank',
@@ -1761,5 +1761,14 @@ return [
         'why_budget_body' => 'Tahu berapa yang sudah dibelanja dan bakinya, setiap kali anda tempah vendor.',
         'bookings' => 'Anda sudah ada :count tempahan.',
         'bookings_link' => 'Lihat tempahan',
+    ],
+
+    'payment_checkout' => [
+        'online_banking' => 'Akaun peribadi',
+        'corporate_banking' => 'Akaun syarikat',
+        'search' => 'Cari bank',
+        'none' => 'Tiada bank sepadan.',
+        'choose_bank' => 'Pilih bank dahulu',
+        'selected' => 'Dipilih',
     ],
 ];

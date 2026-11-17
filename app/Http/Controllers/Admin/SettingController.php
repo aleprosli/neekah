@@ -489,8 +489,6 @@ class SettingController extends Controller
         $live = $client->isConfigured();
         $keys = collect(HerepayGateway::KEYS)
             ->map(fn (string $env): string => (in_array($env, $missing, true) ? '✗ ' : '✓ ').'<code>'.e($env).'</code>')
-            // Optional: only asking Herepay about a payment again needs it.
-            ->push(($client->canRequeryNeekah() ? '✓ ' : '– ').'<code>HEREPAY_API_KEY</code> '.e(__('props.admin.herepay_api_key_hint')))
             ->join('<br>');
 
         return [

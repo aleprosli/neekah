@@ -16,17 +16,26 @@ interface PaymentGateway
     /** The name stored on payments.gateway and used in the webhook address. */
     public function name(): string;
 
-    /** Whether a link can be made for this payment: switched on, and the account's keys in place. */
+    /** Whether a payment can be started: switched on, and the account's keys in place. */
     public function isConfiguredFor(Payment $payment): bool;
 
     /**
-     * Create a one-off payment link and return where to send the payer.
+     * The banks the payer may pick from right now, grouped by kind of
+     * account. Banks that are offline are left out.
      *
-     * @return array{url: string, response: array<string, mixed>}
+     * @return list<array{method: string, channels: list<array{code: string, name: string, logo: ?string}>}>
+     *
+     * @throws \Throwable when the gateway cannot be reached or refuses
+     */
+    public function channels(Payment $payment): array;
+
+    /**
+     * Start the payment with the bank the payer picked, and return the form
+     * that takes them to it.
      *
      * @throws \Throwable when the gateway refuses
      */
-    public function createLink(Payment $payment, PaymentLink $link): array;
+    public function initiate(Payment $payment, PaymentRequest $request): PaymentRedirect;
 
     /** Read and verify the gateway's server-to-server callback. */
     public function readCallback(Request $request, Payment $payment): GatewayResult;

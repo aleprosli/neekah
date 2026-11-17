@@ -103,10 +103,47 @@ function fakeHerepayKeys(bool $enabled = true, ?string $apiKey = 'test-api-key')
     app(HerepaySettings::class)->save(['enabled' => $enabled]);
 }
 
-/** Herepay making a link: every create-payment-link call answers with this pay_url. */
-function fakeHerepayLink(string $payUrl = 'https://uat.herepay.org/herepay/pay/ABC'): void
+/**
+ * Herepay's direct API: the channel list (one bank offline), and an initiate
+ * answering with the page that posts the payer on to FPX.
+ */
+function fakeHerepayDirect(): void
 {
-    Http::fake(['uat.herepay.org/*' => Http::response(['status' => 200, 'data' => ['pay_url' => $payUrl]])]);
+    Http::fake([
+        'uat.herepay.org/api/v1/herepay/payment/channels' => Http::response(herepayChannels()),
+        'uat.herepay.org/api/v1/herepay/initiate' => Http::response(herepayInitiatePage(), 200, ['Content-Type' => 'text/html']),
+    ]);
+}
+
+/**
+ * Herepay's channel list, as GET /api/v1/herepay/payment/channels answers.
+ *
+ * @return array<string, mixed>
+ */
+function herepayChannels(): array
+{
+    return [
+        'status' => 'success',
+        'message' => 'Payment channels and methods retrieved successfully.',
+        'data' => [
+            ['payment_method' => 'Online Banking', 'charges' => ['currency' => 'MYR', 'fixed' => '1.00', 'percentage' => 0], 'channels' => [
+                ['prefix' => 'MB2U0227', 'active' => 'Active', 'name' => 'Maybank2U', 'img_url' => 'https://app.herepay.org/storage/payment_method/maybank.png'],
+                ['prefix' => 'ABB0233', 'active' => 'Active', 'name' => 'Affin Bank', 'img_url' => 'https://app.herepay.org/storage/payment_method/affin-bank.png'],
+                ['prefix' => 'OCBC0229', 'active' => 'Inactive', 'name' => 'OCBC Bank', 'img_url' => null],
+            ]],
+            ['payment_method' => 'Corporate Banking', 'charges' => ['currency' => 'MYR', 'fixed' => '2.00', 'percentage' => 0], 'channels' => [
+                ['prefix' => 'MBB0228', 'active' => 'Active', 'name' => 'Maybank2E', 'img_url' => null],
+            ]],
+        ],
+    ];
+}
+
+/** What Herepay answers an initiate with: a page whose form auto-posts to FPX. */
+function herepayInitiatePage(): string
+{
+    return '<html><body><form action="https://uat.mepsfpx.com.my/FPXMain/seller2DReceiver.jsp" method="post" id="redirect">'
+        .'<input type="hidden" name="fpx_msgType" value="AR"><input type="hidden" name="fpx_checkSum" value="ABC123">'
+        .'</form><script>document.getElementById("redirect").submit();</script></body></html>';
 }
 
 /**

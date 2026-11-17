@@ -7,8 +7,6 @@ use App\Models\Vendor;
 use App\Models\VendorBoostEntry;
 use App\Notifications\BoostTokensReceived;
 use App\Support\BoostSettings;
-use Illuminate\Http\Client\Request as ClientRequest;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Notification;
 
 beforeEach(function () {
@@ -16,20 +14,19 @@ beforeEach(function () {
     app(BoostSettings::class)->save(['enabled' => true]);
 
     $this->vendor = Vendor::factory()->create();
-    fakeHerepayLink('https://uat.herepay.org/herepay/pay/BST');
+    fakeHerepayDirect();
 });
 
-it('sends the vendor to pay for a pack on Neekah own Herepay account', function () {
-    $this->actingAs($this->vendor->user)
-        ->post(route('vendor.boost.checkout'), ['pack' => 'large'])
-        ->assertRedirect('https://uat.herepay.org/herepay/pay/BST');
+it('sends the vendor to confirm a pack on Neekah own Herepay account', function () {
+    $response = $this->actingAs($this->vendor->user)->post(route('vendor.boost.checkout'), ['pack' => 'large']);
 
     $payment = Payment::sole();
+    $response->assertRedirect(route('payments.checkout', $payment));
     expect($payment->purpose)->toBe(PaymentPurpose::BoostTokens)
         ->and($payment->merchant)->toBe('neekah')
         ->and($payment->detail('tokens'))->toBe(30)
-        ->and((float) $payment->amount)->toBe(50.0);
-    Http::assertSent(fn (ClientRequest $request): bool => str_contains($request['callback_url'], '/webhooks/herepay?ref='.$payment->reference));
+        ->and((float) $payment->amount)->toBe(50.0)
+        ->and($payment->expires_at->isFuture())->toBeTrue();
 });
 
 it('keeps buying closed until an admin opens it', function () {

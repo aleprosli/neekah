@@ -125,6 +125,8 @@ return [
     'payment_event' => [
         'link_created' => 'Link bayaran dicipta',
         'link_failed' => 'Link bayaran gagal dicipta',
+        'initiated' => 'Bayaran dimulakan (bank dipilih)',
+        'initiate_failed' => 'Bayaran gagal dimulakan',
         'callback' => 'Callback gateway',
         'return' => 'Pembayar kembali',
         'requery' => 'Semakan semula',

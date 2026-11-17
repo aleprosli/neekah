@@ -3,15 +3,17 @@
 namespace App\Support\Herepay;
 
 use App\Support\Payments\GatewayResult;
+use App\Support\Payments\PaymentRedirect;
+use DOMDocument;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
 use RuntimeException;
 
 /**
- * The calls Neekah makes to Herepay, on whichever account: create a
- * single-use payment link, check what Herepay sends back, and ask about a
- * transaction again. See .ai/rules/herepay.md.
+ * The calls Neekah makes to Herepay's direct API, on whichever account: list
+ * the banks, start a payment with the one the payer picked, check what
+ * Herepay sends back, and ask about a transaction again. See .ai/rules/herepay.md.
  *
  * Herepay signs what it sends (the callback body, and the query it puts on
  * the payer's way back) with the account's private key: every field but the
@@ -21,25 +23,97 @@ use RuntimeException;
 class HerepayTransport
 {
     /**
-     * @param  array<string, mixed>  $payload
-     * @return array{url: string, response: array<string, mixed>}
+     * The banks on this account, as Herepay lists them: groups by kind of
+     * account ("Online Banking", "Corporate Banking"), each bank with its
+     * prefix, name, logo and whether it is up ("Active"/"Inactive").
+     *
+     * @return list<array<string, mixed>>
      */
-    public function createLink(HerepayCredentials $credentials, array $payload): array
+    public function channels(HerepayCredentials $credentials): array
     {
         $response = $this->client()
-            ->withHeaders(['SecretKey' => $credentials->secretKey])
-            ->asJson()
+            ->withHeaders(['SecretKey' => $credentials->secretKey, 'XApiKey' => $credentials->apiKey])
             ->timeout(15)
-            ->post('/api/integration/create-payment-link', array_filter($payload, fn (mixed $value): bool => $value !== null && $value !== ''))
+            ->get('/api/v1/herepay/payment/channels')
             ->throw();
 
-        $url = $response->json('data.pay_url');
+        $groups = $response->json('data');
 
-        if (! is_string($url) || ! str_starts_with($url, 'https://')) {
-            throw new RuntimeException('Herepay answered without a pay_url.');
+        if (! is_array($groups)) {
+            throw new RuntimeException('Herepay answered the channel list without data.');
         }
 
-        return ['url' => $url, 'response' => (array) $response->json()];
+        return array_values(array_filter($groups, 'is_array'));
+    }
+
+    /**
+     * Start a payment with the bank the payer picked. Herepay takes the
+     * fields form-encoded and signed, and answers with an HTML page whose
+     * form posts the payer on to FPX; that form is what comes back.
+     *
+     * @param  array<string, string>  $fields
+     */
+    public function initiate(HerepayCredentials $credentials, array $fields): PaymentRedirect
+    {
+        $fields['checksum'] = self::checksum($fields, $credentials->privateKey);
+
+        $response = $this->client()
+            ->withHeaders(['SecretKey' => $credentials->secretKey, 'XApiKey' => $credentials->apiKey])
+            ->asForm()
+            ->timeout(20)
+            ->post('/api/v1/herepay/initiate', $fields)
+            ->throw();
+
+        return self::formFrom($response->body());
+    }
+
+    /**
+     * Herepay's signature over a set of fields: every field but the checksum,
+     * sorted by key, values joined with a comma (arrays JSON-encoded first),
+     * HMAC-SHA256 with the account's private key, lowercase hex.
+     *
+     * @param  array<string, mixed>  $fields
+     */
+    public static function checksum(array $fields, string $privateKey): string
+    {
+        unset($fields['checksum']);
+        ksort($fields);
+
+        return hash_hmac('sha256', implode(',', array_map(
+            fn (mixed $value): string => is_array($value) ? (string) json_encode($value) : (string) $value,
+            $fields,
+        )), $privateKey);
+    }
+
+    /**
+     * The form in the page Herepay answers an initiate with: where it posts
+     * and every named field in it. Only an https address is accepted, so a
+     * broken answer never sends the payer somewhere odd.
+     */
+    public static function formFrom(string $html): PaymentRedirect
+    {
+        $document = new DOMDocument;
+
+        if (trim($html) === '' || ! @$document->loadHTML($html, LIBXML_NONET | LIBXML_NOERROR | LIBXML_NOWARNING)) {
+            throw new RuntimeException('Herepay answered the initiate with an empty page.');
+        }
+
+        $form = $document->getElementsByTagName('form')->item(0);
+        $action = $form?->getAttribute('action') ?? '';
+
+        if (! $form || ! str_starts_with($action, 'https://')) {
+            throw new RuntimeException('Herepay answered the initiate without a form to the bank.');
+        }
+
+        $fields = [];
+
+        foreach ($form->getElementsByTagName('input') as $input) {
+            if ($input->getAttribute('name') !== '') {
+                $fields[$input->getAttribute('name')] = $input->getAttribute('value');
+            }
+        }
+
+        return new PaymentRedirect($action, $fields, strtolower($form->getAttribute('method') ?: 'post'));
     }
 
     /**
@@ -126,6 +200,9 @@ class HerepayTransport
     /**
      * @param  array<string, mixed>  $fields
      */
+    /**
+     * @param  array<string, mixed>  $fields
+     */
     private function hasValidChecksum(array $fields, HerepayCredentials $credentials): bool
     {
         $checksum = $fields['checksum'] ?? null;
@@ -134,15 +211,7 @@ class HerepayTransport
             return false;
         }
 
-        unset($fields['checksum']);
-        ksort($fields);
-
-        $signed = implode(',', array_map(
-            fn (mixed $value): string => is_array($value) ? (string) json_encode($value) : (string) $value,
-            $fields,
-        ));
-
-        return hash_equals(hash_hmac('sha256', $signed, $credentials->privateKey), $checksum);
+        return hash_equals(self::checksum($fields, $credentials->privateKey), $checksum);
     }
 
     private function client(): PendingRequest

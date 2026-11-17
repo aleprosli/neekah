@@ -63,8 +63,8 @@ class BookingController extends Controller
      * (VendorAvailability); every other vendor page offers WhatsApp and an
      * enquiry instead, and this endpoint is a 404 for them.
      *
-     * The booking holds the date first, then the couple is sent to pay the
-     * deposit on the vendor's Herepay account, or shown the vendor's bank
+     * The booking holds the date first, then the couple is sent to confirm and
+     * pay the deposit on the vendor's Herepay account, or shown the vendor's bank
      * details to transfer it.
      */
     public function store(StoreBookingRequest $request, Vendor $vendor, CreateBooking $createBooking, StartDepositPayment $startDeposit): RedirectResponse
@@ -83,7 +83,7 @@ class BookingController extends Controller
 
         if ($booking->payment_mode === DepositChannel::Herepay) {
             try {
-                return redirect()->away($startDeposit->handle($booking, $request->user()));
+                return redirect()->route('payments.checkout', $startDeposit->handle($booking, $request->user()));
             } catch (RuntimeException $exception) {
                 report($exception);
 
@@ -97,13 +97,13 @@ class BookingController extends Controller
             ->with('status', __('flash.couple.booking_held', ['reference' => $booking->reference]));
     }
 
-    /** Pay the deposit again while the hold lasts: an open link is reused. */
+    /** Pay the deposit again while the hold lasts: a payment still open is reused. */
     public function payDeposit(Request $request, Booking $booking, StartDepositPayment $startDeposit): RedirectResponse
     {
         Gate::authorize('recordPayment', $booking);
 
         try {
-            return redirect()->away($startDeposit->handle($booking, $request->user()));
+            return redirect()->route('payments.checkout', $startDeposit->handle($booking, $request->user()));
         } catch (RuntimeException $exception) {
             report($exception);
 

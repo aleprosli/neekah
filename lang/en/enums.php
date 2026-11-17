@@ -125,6 +125,8 @@ return [
     'payment_event' => [
         'link_created' => 'Payment link created',
         'link_failed' => 'Payment link failed',
+        'initiated' => 'Payment started (bank chosen)',
+        'initiate_failed' => 'Payment failed to start',
         'callback' => 'Gateway callback',
         'return' => 'Payer returned',
         'requery' => 'Requery',

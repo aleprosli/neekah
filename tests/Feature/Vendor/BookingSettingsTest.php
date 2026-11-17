@@ -6,6 +6,7 @@ use App\Models\Vendor;
 use App\Models\VendorBookingSetting;
 use App\Notifications\CalendarReminder;
 use Database\Seeders\CategorySeeder;
+use Illuminate\Http\Client\Request as ClientRequest;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Notification;
@@ -57,15 +58,20 @@ it('makes a per-pax vendor take a fixed deposit', function () {
 
 it('keeps Herepay keys only once Herepay accepts them, encrypted and never shown again', function () {
     Http::fake(['uat.herepay.org/*' => Http::sequence()
-        ->push(['status' => 'Unauthorized'], 401)
-        ->push(['status' => 200, 'data' => ['pay_url' => 'https://uat.herepay.org/herepay/pay/T']])]);
+        ->push(['status' => 'Unauthorized', 'status_code' => '41'], 401)
+        ->push(herepayChannels())]);
 
-    $keys = ['herepay_secret_key' => 'sk_live_vendor_123', 'herepay_private_key' => 'pk_live_vendor_456'];
+    $keys = ['herepay_secret_key' => 'sk_live_vendor_123', 'herepay_private_key' => 'pk_live_vendor_456', 'herepay_api_key' => 'ak_live_vendor_789'];
 
+    $this->actingAs($this->vendor->user)->put(route('vendor.booking-settings.herepay.connect'), [...$keys, 'herepay_api_key' => ''])->assertSessionHasErrors('herepay_api_key');
     $this->actingAs($this->vendor->user)->put(route('vendor.booking-settings.herepay.connect'), $keys)->assertSessionHasErrors('herepay_secret_key');
     expect(VendorBookingSetting::count())->toBe(0);
 
     $this->actingAs($this->vendor->user)->put(route('vendor.booking-settings.herepay.connect'), $keys)->assertSessionHasNoErrors();
+
+    Http::assertSent(fn (ClientRequest $request): bool => $request->url() === 'https://uat.herepay.org/api/v1/herepay/payment/channels'
+        && $request->hasHeader('SecretKey', 'sk_live_vendor_123')
+        && $request->hasHeader('XApiKey', 'ak_live_vendor_789'));
 
     $settings = $this->vendor->bookingSettings()->sole();
     expect($settings->hasHerepay())->toBeTrue()
@@ -73,7 +79,8 @@ it('keeps Herepay keys only once Herepay accepts them, encrypted and never shown
 
     $this->actingAs($this->vendor->user)->get(route('vendor.availability.index'))
         ->assertDontSee('sk_live_vendor_123')
-        ->assertDontSee('pk_live_vendor_456');
+        ->assertDontSee('pk_live_vendor_456')
+        ->assertDontSee('ak_live_vendor_789');
 
     $this->actingAs($this->vendor->user)->delete(route('vendor.booking-settings.herepay.disconnect'));
     expect($settings->fresh()->hasHerepay())->toBeFalse();

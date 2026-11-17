@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Vendor;
 
-use App\Actions\StartPayment;
 use App\Enums\PaymentPurpose;
 use App\Enums\PaymentStatus;
 use App\Enums\VendorPlan;
@@ -17,7 +16,6 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
-use RuntimeException;
 
 /**
  * Neekah Pro from the vendor's side: what it gives, what it costs, whether it
@@ -67,10 +65,11 @@ class ProController extends Controller
     }
 
     /**
-     * Start a purchase and send the vendor to pay, on Neekah's account. The
-     * price is stamped now, so the amount charged is the one they saw.
+     * Start a purchase and send the vendor to confirm it and pick a bank, on
+     * Neekah's account. The price is stamped now, so the amount charged is the
+     * one they saw.
      */
-    public function checkout(Request $request, ProSettings $settings, HerepayGateway $gateway, StartPayment $start): RedirectResponse
+    public function checkout(Request $request, ProSettings $settings, HerepayGateway $gateway): RedirectResponse
     {
         $validated = $request->validate([
             'plan' => ['required', Rule::enum(VendorPlan::class)],
@@ -89,15 +88,10 @@ class ProController extends Controller
             'status' => PaymentStatus::Pending,
             'gateway' => $gateway->name(),
             'details' => ['plan' => $plan->value],
+            'expires_at' => now()->addDay(),
         ]);
 
-        try {
-            return redirect()->away($start->handle($payment, $request->user()));
-        } catch (RuntimeException $exception) {
-            report($exception);
-
-            return back()->withErrors(['plan' => __('flash.vendor.pro_checkout_failed')]);
-        }
+        return redirect()->route('payments.checkout', $payment);
     }
 
     /**

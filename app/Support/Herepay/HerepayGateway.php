@@ -7,7 +7,8 @@ use App\Models\Payment;
 use App\Support\HerepaySettings;
 use App\Support\Payments\GatewayResult;
 use App\Support\Payments\PaymentGateway;
-use App\Support\Payments\PaymentLink;
+use App\Support\Payments\PaymentRedirect;
+use App\Support\Payments\PaymentRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Throwable;
@@ -16,10 +17,12 @@ use Throwable;
  * Herepay, for every payment Neekah takes: Pro, boost packs and Neekah
  * Kenangan on Neekah's own account, booking deposits on the vendor's.
  *
- * A payment link carries its own callback and return addresses. Herepay signs
- * both what it posts to the callback and what it puts on the payer's return,
- * so either can settle a payment; a requery asks Herepay by the invoice
- * (reference_code) the other two told us.
+ * Direct API: the payer picks a bank on our confirmation page from Herepay's
+ * channel list, and the initiate (signed, with its own callback and return
+ * addresses, payment_code = our reference) answers with the form that takes
+ * them to FPX. Herepay signs both what it posts to the callback and what it
+ * sends on the payer's return, so either can settle a payment; a requery
+ * asks Herepay by our reference.
  */
 class HerepayGateway implements PaymentGateway
 {
@@ -30,7 +33,11 @@ class HerepayGateway implements PaymentGateway
         'base_url' => 'HEREPAY_BASE_URL',
         'secret_key' => 'HEREPAY_SECRET_KEY',
         'private_key' => 'HEREPAY_PRIVATE_KEY',
+        'api_key' => 'HEREPAY_API_KEY',
     ];
+
+    /** The kinds of bank account Herepay takes, exactly as its API names them. */
+    public const METHODS = ['Online Banking', 'Corporate Banking'];
 
     /** Query keys of our own on the return address, not part of what Herepay signed. */
     private const OWN_QUERY_KEYS = ['ref', 'signature', 'expires', 'cuba'];
@@ -62,12 +69,6 @@ class HerepayGateway implements PaymentGateway
         ));
     }
 
-    /** Whether Neekah's payments can be asked about again (HEREPAY_API_KEY set). */
-    public function canRequeryNeekah(): bool
-    {
-        return HerepayCredentials::neekah()->canRequery();
-    }
-
     /** "UAT" or "Production", read off the base URL, for the admin to see which one is live. */
     public function environment(): ?string
     {
@@ -89,20 +90,57 @@ class HerepayGateway implements PaymentGateway
         return filled(config('services.herepay.base_url')) && $this->credentialsFor($payment) !== null;
     }
 
-    public function createLink(Payment $payment, PaymentLink $link): array
+    public function channels(Payment $payment): array
     {
-        return $this->transport->createLink($this->credentialsOrFail($payment), [
-            'title' => Str::limit($link->title, 250),
-            'amount' => round($link->amount, 2),
-            'description' => e($link->description),
-            'usage_type' => 'single',
-            'expires_at' => $link->expiresAt->format('Y-m-d H:i:s'),
-            'redirect_url' => $link->returnUrl,
-            'callback_url' => $link->callbackUrl,
-            'payer_name' => $link->payerName ? Str::limit($link->payerName, 250, '') : null,
-            'payer_email' => $link->payerEmail,
-            'payer_phone' => $link->payerPhone ? Str::limit($link->payerPhone, 32, '') : null,
-        ]);
+        return collect($this->transport->channels($this->credentialsOrFail($payment)))
+            ->filter(fn (array $group): bool => in_array($group['payment_method'] ?? null, self::METHODS, true))
+            ->map(fn (array $group): array => [
+                'method' => $group['payment_method'],
+                'channels' => collect($group['channels'] ?? [])
+                    ->filter(fn (mixed $bank): bool => is_array($bank) && filled($bank['prefix'] ?? null) && strcasecmp((string) ($bank['active'] ?? ''), 'Active') === 0)
+                    ->map(fn (array $bank): array => [
+                        'code' => (string) $bank['prefix'],
+                        'name' => (string) ($bank['name'] ?? $bank['prefix']),
+                        'logo' => str_starts_with((string) ($bank['img_url'] ?? ''), 'https://') ? $bank['img_url'] : null,
+                    ])
+                    ->sortBy('name', SORT_NATURAL | SORT_FLAG_CASE)
+                    ->values()
+                    ->all(),
+            ])
+            ->filter(fn (array $group): bool => $group['channels'] !== [])
+            ->values()
+            ->all();
+    }
+
+    /**
+     * payment_code is our own reference, so a requery can ask by it before
+     * Herepay has told us anything. The amount is signed as the exact text
+     * sent ("10.00").
+     */
+    public function initiate(Payment $payment, PaymentRequest $request): PaymentRedirect
+    {
+        return $this->transport->initiate($this->credentialsOrFail($payment), self::initiateFields($payment, $request));
+    }
+
+    /**
+     * What an initiate sends, before the checksum.
+     *
+     * @return array<string, string>
+     */
+    public static function initiateFields(Payment $payment, PaymentRequest $request): array
+    {
+        return [
+            'name' => Str::limit($request->payerName, 250, ''),
+            'email' => $request->payerEmail,
+            'phone' => Str::limit($request->payerPhone, 32, ''),
+            'amount' => number_format($request->amount, 2, '.', ''),
+            'description' => Str::limit($request->description, 250, ''),
+            'payment_code' => $payment->reference,
+            'payment_method' => $request->paymentMethod,
+            'bank_prefix' => $request->bankCode,
+            'callback_url' => $request->callbackUrl,
+            'redirect_url' => $request->returnUrl,
+        ];
     }
 
     /**
@@ -128,7 +166,10 @@ class HerepayGateway implements PaymentGateway
             return GatewayResult::unverified('The account this payment was made on is no longer connected.');
         }
 
-        return $this->proveVendorKey($payment, $this->transport->read(collect($request->query())->except(self::OWN_QUERY_KEYS)->all(), $credentials));
+        // Herepay may send the payer back with a GET query or a posted form.
+        $fields = $request->isMethod('post') ? $request->request->all() : $request->query();
+
+        return $this->proveVendorKey($payment, $this->transport->read(collect($fields)->except(self::OWN_QUERY_KEYS)->all(), $credentials));
     }
 
     public function canRequery(Payment $payment): bool
@@ -148,10 +189,10 @@ class HerepayGateway implements PaymentGateway
     }
 
     /**
-     * What Herepay's transaction lookup finds a payment by. Its documentation
-     * says the invoice (reference_code, HP-INV-…), but UAT answers 404 for
-     * that and finds the payment by its payment_code (HP-PAY-…), so that
-     * comes first and the invoice is only a fallback.
+     * What Herepay's transaction lookup finds a payment by: its payment_code.
+     * A direct-API payment's code is our own reference, stamped on
+     * gateway_reference when it is initiated; a payment made through the old
+     * links has Herepay's HP-PAY-… there. The invoice is only a fallback.
      */
     public static function lookupCode(Payment $payment): ?string
     {
@@ -159,20 +200,14 @@ class HerepayGateway implements PaymentGateway
     }
 
     /**
-     * Herepay offers no "who am I" call, so the test is a real link: RM1,
-     * single use, gone in ten minutes, never paid. A link coming back proves
-     * the secret key; the private key is proved by the first real callback.
+     * Herepay offers no "who am I" call, so the test is the channel list,
+     * which needs both the secret key and the API key. The private key is
+     * proved by the first real callback.
      */
     public function testConnection(HerepayCredentials $credentials): bool
     {
         try {
-            $this->transport->createLink($credentials, [
-                'title' => __('pages.online_booking.herepay_test_title'),
-                'amount' => 1.00,
-                'usage_type' => 'single',
-                'expires_at' => now()->addMinutes(10)->format('Y-m-d H:i:s'),
-                'collect_phone' => false,
-            ]);
+            $this->transport->channels($credentials);
 
             return true;
         } catch (Throwable $exception) {

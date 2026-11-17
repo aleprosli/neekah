@@ -25,4 +25,13 @@ class PaymentPolicy
             PaymentPurpose::Booking => $payment->booking !== null && $user->can('view', $payment->booking),
         };
     }
+
+    /**
+     * Only whoever started the payment confirms it and picks the bank: the
+     * gateway is sent their name, email and phone.
+     */
+    public function pay(User $user, Payment $payment): bool
+    {
+        return $payment->recorded_by === $user->id;
+    }
 }

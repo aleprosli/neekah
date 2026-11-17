@@ -73,6 +73,17 @@ class PaymentController extends Controller
         };
     }
 
+    /** The page the purchase was started from, to go back to. */
+    public static function originOf(Payment $payment): string
+    {
+        return match ($payment->purpose) {
+            PaymentPurpose::VendorPro => route('vendor.pro.index'),
+            PaymentPurpose::BoostTokens => route('vendor.boost.index'),
+            PaymentPurpose::Kenangan => route('camera.index'),
+            PaymentPurpose::Booking => route('bookings.show', $payment->booking),
+        };
+    }
+
     /** One sentence on what this outcome means for what they bought. */
     private function message(Payment $payment, string $state): string
     {
@@ -114,12 +125,9 @@ class PaymentController extends Controller
             return ['label' => __('pages.payment_page.cta_admin'), 'url' => route('admin.payments.show', $payment)];
         }
 
-        $url = match ($payment->purpose) {
-            PaymentPurpose::VendorPro => route('vendor.pro.index'),
-            PaymentPurpose::BoostTokens => route('vendor.boost.index'),
-            PaymentPurpose::Kenangan => $payment->album && $state === 'paid' ? route('camera.album', $payment->album) : route('camera.index'),
-            PaymentPurpose::Booking => route('bookings.show', $payment->booking),
-        };
+        $url = $payment->purpose === PaymentPurpose::Kenangan && $payment->album && $state === 'paid'
+            ? route('camera.album', $payment->album)
+            : self::originOf($payment);
 
         $label = $state === 'failed' && $payment->purpose !== PaymentPurpose::Booking
             ? __('pages.payment_page.retry')

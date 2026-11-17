@@ -1433,8 +1433,8 @@ return [
         'how_paste' => 'Paste both keys below and press Connect Herepay.',
         'herepay_secret' => 'Secret Key',
         'herepay_private' => 'Private Key',
-        'herepay_api_key' => 'API Key (optional)',
-        'herepay_api_key_help' => 'To requery a deposit whose callback never came. Herepay → Settings → Personal → API Token.',
+        'herepay_api_key' => 'API Key',
+        'herepay_api_key_help' => 'Needed to list banks and start each deposit. Herepay → Settings → API.',
         'herepay_test_note' => 'We test your keys with one RM1 payment link that expires in 10 minutes (no need to pay it). The keys must be from the :environment environment. They are stored encrypted and never shown again.',
         'herepay_connect' => 'Connect Herepay',
         'manual_title' => 'No Herepay yet? Take deposits by bank transfer',
@@ -1761,5 +1761,14 @@ return [
         'why_budget_body' => 'Know what is spent and what is left, every time you book a vendor.',
         'bookings' => 'You already have :count bookings.',
         'bookings_link' => 'View bookings',
+    ],
+
+    'payment_checkout' => [
+        'online_banking' => 'Personal account',
+        'corporate_banking' => 'Business account',
+        'search' => 'Search banks',
+        'none' => 'No bank matches.',
+        'choose_bank' => 'Choose a bank first',
+        'selected' => 'Selected',
     ],
 ];

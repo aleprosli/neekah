@@ -84,9 +84,8 @@ return [
         'camera_saved' => 'Album settings saved.',
         'camera_link_rotated' => 'A new link is ready. The old link and QR no longer work.',
         'camera_export_queued' => 'The ZIP is being prepared. We will email you when it is ready.',
-        'camera_checkout_failed' => 'The payment link could not be created right now. Please try again shortly.',
         'camera_already_owned' => 'Your album already has this plan.',
-        'deposit_link_failed' => 'The payment link could not be created right now. Your date is still on hold; try paying again in a moment.',
+        'deposit_link_failed' => 'The deposit payment could not be opened right now. Your date is still on hold; try paying again in a moment.',
         'booking_held' => 'Date held for booking :reference. Pay the deposit to confirm it.',
         'nfc_card_not_ready' => 'This card is not linked to an invitation yet.',
         'wedding_created' => 'Your wedding project is ready, with a checklist and a suggested budget. Next: create your digital wedding card.',
@@ -153,7 +152,6 @@ return [
         'online_off' => 'Online booking is off.',
         'bank_details_saved' => 'Bank details saved.',
         'boost_started' => 'Your :category boost runs until :date.',
-        'boost_checkout_failed' => 'The payment link could not be opened. Please try again shortly.',
         'ical_connected' => 'Google Calendar connected. :count busy dates imported.',
         'ical_synced' => 'Synced. :count busy dates from Google Calendar.',
         'ical_disconnected' => 'Google Calendar disconnected. Imported dates have been reopened.',
@@ -169,7 +167,6 @@ return [
         'package_added' => 'Package added.',
         'package_updated' => 'Package updated.',
         'feature_needs_pro' => ':feature is open to Neekah Pro vendors. Upgrade to use it.',
-        'pro_checkout_failed' => 'We could not create a payment link just now. Please try again shortly.',
         'registered' => 'Your registration has been received. Complete your profile while an admin reviews it.',
         'converted' => 'Your account is now a vendor account. Complete your profile while an admin reviews it.',
         'convert_has_activity' => 'This account already has a wedding, bookings or enquiries, so it cannot be converted on its own. Please contact a Neekah admin.',
@@ -211,6 +208,10 @@ return [
         'delete_review_title' => 'Delete the review by :author?',
         'delete_review_message' => 'This review and its photos are deleted for good. This cannot be undone.',
         'delete_review_label' => 'Delete this review you added',
+    ],
+
+    'payment' => [
+        'initiate_failed' => 'The bank you chose could not be reached just now. Nothing was charged; try again or pick another bank.',
     ],
 
     'quotation' => [

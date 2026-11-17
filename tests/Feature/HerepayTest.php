@@ -31,43 +31,62 @@ beforeEach(function () {
     $this->payment = fn (array $attributes = []): Payment => Payment::factory()->pro()->create(['vendor_id' => $this->vendor->id, 'amount' => 49, ...$attributes]);
 });
 
-it('creates a single-use payment link, sends the vendor to it and keeps what was asked and answered', function () {
-    Http::fake(['uat.herepay.org/*' => Http::response(['status' => 200, 'data' => ['pay_url' => 'https://uat.herepay.org/herepay/pay/ABC']])]);
+it('starts the payment with the chosen bank, signed, and posts the vendor on to FPX', function () {
+    fakeHerepayDirect();
+
+    $response = $this->actingAs($this->owner)->post(route('vendor.pro.checkout'), ['plan' => 'monthly']);
+    $payment = Payment::sole();
+    $response->assertRedirect(route('payments.checkout', $payment));
 
     $this->actingAs($this->owner)
-        ->post(route('vendor.pro.checkout'), ['plan' => 'monthly'])
-        ->assertRedirect('https://uat.herepay.org/herepay/pay/ABC');
+        ->post(route('payments.pay', $payment), ['payment_method' => 'Online Banking', 'bank_code' => 'MB2U0227'])
+        ->assertOk()
+        ->assertSee('action="https://uat.mepsfpx.com.my/FPXMain/seller2DReceiver.jsp"', false)
+        ->assertSee('name="fpx_checkSum" value="ABC123"', false);
 
-    $payment = Payment::sole();
+    Http::assertSent(function (ClientRequest $request) use ($payment): bool {
+        $fields = $request->data();
 
-    Http::assertSent(fn (ClientRequest $request): bool => $request->url() === 'https://uat.herepay.org/api/integration/create-payment-link'
-        && $request->hasHeader('SecretKey', 'test-secret')
-        && $request['amount'] === 49.0
-        && $request['usage_type'] === 'single'
-        && $request['payer_email'] === 'studio@example.com'
-        && $request['redirect_url'] === route('payments.return', $payment)
-        && str_contains($request['callback_url'], '/webhooks/herepay?ref='.$payment->reference)
-        && str_contains($request['callback_url'], 'signature='));
+        return $request->url() === 'https://uat.herepay.org/api/v1/herepay/initiate'
+            && $request->isForm()
+            && $request->hasHeader('SecretKey', 'test-secret')
+            && $request->hasHeader('XApiKey', 'test-api-key')
+            && $fields['amount'] === '49.00'
+            && $fields['payment_code'] === $payment->reference
+            && $fields['payment_method'] === 'Online Banking'
+            && $fields['bank_prefix'] === 'MB2U0227'
+            && $fields['email'] === 'studio@example.com'
+            && $fields['phone'] === '+60123456789'
+            && $fields['redirect_url'] === route('payments.return', $payment)
+            && str_contains($fields['callback_url'], '/webhooks/herepay?ref='.$payment->reference)
+            && str_contains($fields['callback_url'], 'signature=')
+            && $fields['checksum'] === hash_hmac('sha256', collect($fields)->except('checksum')->sortKeys()->implode(','), 'test-private');
+    });
 
-    expect($payment->payment_url)->toBe('https://uat.herepay.org/herepay/pay/ABC')
-        ->and($payment->merchant)->toBe('neekah')
+    $payment->refresh();
+    expect($payment->merchant)->toBe('neekah')
         ->and($payment->gateway)->toBe('herepay')
-        ->and($payment->events()->sole()->type)->toBe(PaymentEvent::LINK_CREATED)
-        ->and($payment->events()->sole()->payload['response']['data']['pay_url'])->toBe('https://uat.herepay.org/herepay/pay/ABC');
+        ->and($payment->status)->toBe(PaymentStatus::Pending)
+        ->and($payment->gateway_reference)->toBe($payment->reference)
+        ->and($payment->events()->sole()->type)->toBe(PaymentEvent::INITIATED)
+        ->and($payment->events()->sole()->payload['request']['bank'])->toBe('MB2U0227');
 });
 
-it('marks the payment failed and keeps the refusal when Herepay will not make the link', function () {
-    Http::fake(['uat.herepay.org/*' => Http::response(['status' => 'Unauthorized', 'status_code' => '41'], 401)]);
+it('keeps the payment open and the refusal when Herepay will not start it', function () {
+    Http::fake(['uat.herepay.org/*' => Http::response(['status' => 'Unauthorized', 'status_code' => '41', 'error' => 'Checksum verification failed.'], 401)]);
+    $payment = ($this->payment)(['recorded_by' => $this->owner->id]);
 
     $this->actingAs($this->owner)
-        ->from(route('vendor.pro.index'))
-        ->post(route('vendor.pro.checkout'), ['plan' => 'monthly'])
-        ->assertRedirect(route('vendor.pro.index'))
-        ->assertSessionHasErrors('plan');
+        ->from(route('payments.checkout', $payment))
+        ->post(route('payments.pay', $payment), ['payment_method' => 'Online Banking', 'bank_code' => 'MB2U0227'])
+        ->assertRedirect(route('payments.checkout', $payment))
+        ->assertSessionHasErrors(['bank_code' => __('flash.payment.initiate_failed')]);
 
-    $payment = Payment::sole();
-    expect($payment->status)->toBe(PaymentStatus::Failed)
-        ->and($payment->events()->sole()->type)->toBe(PaymentEvent::LINK_FAILED);
+    $payment->refresh();
+    expect($payment->status)->toBe(PaymentStatus::Pending)
+        ->and($payment->gateway_reference)->toBeNull()
+        ->and($payment->events()->sole()->type)->toBe(PaymentEvent::INITIATE_FAILED)
+        ->and($payment->events()->sole()->outcome)->toBe('failed');
 });
 
 it('settles on a callback whose checksum matches, and keeps the callback as it came', function () {

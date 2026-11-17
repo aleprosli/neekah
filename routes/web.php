@@ -20,6 +20,7 @@ use App\Http\Controllers\InvitationPreviewController;
 use App\Http\Controllers\LandingController;
 use App\Http\Controllers\NfcCardController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\Payments\CheckoutController as PaymentCheckoutController;
 use App\Http\Controllers\Payments\PaymentController as PaymentPageController;
 use App\Http\Controllers\Payments\ReturnController as PaymentReturnController;
 use App\Http\Controllers\Payments\WebhookController as PaymentWebhookController;
@@ -276,6 +277,10 @@ $site = function (): void {
         Route::get('/bayaran/{payment}', [PaymentPageController::class, 'show'])->name('payments.show');
         Route::get('/bayaran/{payment}/resit', [PaymentPageController::class, 'document'])->name('payments.document');
 
+        // The order confirmation before the bank: whoever started the payment picks a bank and confirms.
+        Route::get('/bayaran/{payment}/sahkan', [PaymentCheckoutController::class, 'show'])->name('payments.checkout');
+        Route::post('/bayaran/{payment}/sahkan', [PaymentCheckoutController::class, 'store'])->middleware('throttle:10,1')->name('payments.pay');
+
         // Shared: a vendor opening a booking link is sent on to their own view of it.
         Route::get('/bookings/{booking}', [BookingController::class, 'show'])->name('bookings.show');
 
@@ -497,9 +502,10 @@ foreach (['kamera', 'boost', 'tempahan'] as $legacy) {
         ->middleware('throttle:120,1');
 }
 
-// Where a gateway sends the payer back; its signed answer can settle the
-// payment when the callback is late. Not signed by us: see ReturnController.
-Route::get('/bayaran/{payment}/kembali', PaymentReturnController::class)
+// Where a gateway sends the payer back, as a GET query or a posted form; its
+// signed answer can settle the payment when the callback is late. Not signed
+// by us, and outside CSRF (bootstrap/app.php): see ReturnController.
+Route::match(['get', 'post'], '/bayaran/{payment}/kembali', PaymentReturnController::class)
     ->middleware('throttle:30,1')
     ->name('payments.return');
 

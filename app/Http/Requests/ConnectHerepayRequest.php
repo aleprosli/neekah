@@ -19,8 +19,8 @@ class ConnectHerepayRequest extends FormRequest
         return [
             'herepay_secret_key' => ['required', 'string', 'min:8', 'max:255'],
             'herepay_private_key' => ['required', 'string', 'min:8', 'max:255'],
-            // Optional: only asking Herepay about a deposit again needs it.
-            'herepay_api_key' => ['nullable', 'string', 'min:8', 'max:255'],
+            // The direct API sends it with every call (bank list, initiate, requery).
+            'herepay_api_key' => ['required', 'string', 'min:8', 'max:255'],
         ];
     }
 
@@ -32,6 +32,7 @@ class ConnectHerepayRequest extends FormRequest
         return [
             'herepay_secret_key' => __('fields.herepay_secret_key'),
             'herepay_private_key' => __('fields.herepay_private_key'),
+            'herepay_api_key' => __('fields.herepay_api_key'),
         ];
     }
 }

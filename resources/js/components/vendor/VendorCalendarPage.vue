@@ -419,7 +419,7 @@ const stepSummary = computed(() => ({
                                     </label>
                                     <label class="flex min-w-0 flex-col gap-1.5 sm:col-span-2">
                                         <span class="text-xs font-medium">{{ $t('calendar.herepay_api_key') }}</span>
-                                        <input type="password" name="herepay_api_key" autocomplete="off" :class="input">
+                                        <input type="password" name="herepay_api_key" autocomplete="off" required :class="input">
                                         <span class="text-xs text-ink-muted">{{ $t('calendar.herepay_api_key_help') }}</span>
                                     </label>
                                 </div>

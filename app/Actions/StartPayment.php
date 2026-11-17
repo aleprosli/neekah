@@ -3,58 +3,66 @@
 namespace App\Actions;
 
 use App\Enums\PaymentPurpose;
-use App\Enums\PaymentStatus;
 use App\Models\Payment;
 use App\Models\PaymentEvent;
 use App\Models\User;
 use App\Support\Payments\PaymentGateways;
-use App\Support\Payments\PaymentLink;
+use App\Support\Payments\PaymentRedirect;
+use App\Support\Payments\PaymentRequest;
 use Illuminate\Support\Facades\URL;
 use RuntimeException;
 use Throwable;
 
 /**
- * Ask the payment's gateway for a link and return where to send the payer.
- * The same for every purpose: the callback comes back to one webhook per
- * gateway, the payer to one return address, and both what we asked for and
- * what the gateway answered are kept in the payment's events.
+ * Start a payment with the bank the payer picked on the confirmation page,
+ * and return the form that takes them to it. The same for every purpose: the
+ * callback comes back to one webhook per gateway, the payer to one return
+ * address, and both what we asked for and what the gateway answered are kept
+ * in the payment's events.
  */
 class StartPayment
 {
     public function __construct(private PaymentGateways $gateways) {}
 
     /**
-     * @throws RuntimeException when the gateway refused; the payment is then marked failed
+     * @throws RuntimeException when the gateway refused; the payment stays pending, so another bank can be tried
      */
-    public function handle(Payment $payment, User $payer): string
+    public function handle(Payment $payment, User $payer, string $paymentMethod, string $bankCode): PaymentRedirect
     {
         $gateway = $this->gateways->for($payment->gateway);
-        $link = new PaymentLink(
-            title: $this->title($payment),
-            description: __('pages.payments.link_description', ['reference' => $payment->reference]),
+        $request = new PaymentRequest(
+            description: $this->title($payment).' · '.__('pages.payments.link_description', ['reference' => $payment->reference]),
             amount: (float) $payment->amount,
-            expiresAt: $payment->expires_at ?? now()->addDay(),
             callbackUrl: url(URL::signedRoute('payments.webhook', ['gateway' => $gateway->name(), 'ref' => $payment->reference], absolute: false)),
             returnUrl: route('payments.return', $payment),
+            paymentMethod: $paymentMethod,
+            bankCode: $bankCode,
             payerName: $payer->name,
             payerEmail: $payer->email,
-            payerPhone: $payer->phone,
+            payerPhone: (string) $payer->phone,
         );
-        $request = ['title' => $link->title, 'amount' => $link->amount, 'expires_at' => $link->expiresAt->toIso8601String(), 'callback_url' => $link->callbackUrl, 'return_url' => $link->returnUrl];
+        $asked = [
+            'amount' => $request->amount,
+            'payment_method' => $paymentMethod,
+            'bank' => $bankCode,
+            'callback_url' => $request->callbackUrl,
+            'return_url' => $request->returnUrl,
+        ];
 
         try {
-            $created = $gateway->createLink($payment, $link);
+            $redirect = $gateway->initiate($payment, $request);
         } catch (Throwable $exception) {
-            $payment->update(['status' => PaymentStatus::Failed]);
-            PaymentEvent::record($payment, $gateway->name(), PaymentEvent::LINK_FAILED, ['request' => $request], ['error' => $exception->getMessage()], outcome: 'failed');
+            PaymentEvent::record($payment, $gateway->name(), PaymentEvent::INITIATE_FAILED, ['request' => $asked], ['error' => $exception->getMessage()], outcome: 'failed');
 
-            throw new RuntimeException("The gateway refused a link for {$payment->reference}.", previous: $exception);
+            throw new RuntimeException("The gateway refused to start {$payment->reference}.", previous: $exception);
         }
 
-        $payment->update(['payment_url' => $created['url'], 'expires_at' => $link->expiresAt]);
-        PaymentEvent::record($payment, $gateway->name(), PaymentEvent::LINK_CREATED, ['request' => $request, 'response' => $created['response']]);
+        // Our reference is the gateway's payment_code, so a requery can ask by
+        // it before the callback or the return has told us anything.
+        $payment->update(['gateway_reference' => $payment->gateway_reference ?? $payment->reference]);
+        PaymentEvent::record($payment, $gateway->name(), PaymentEvent::INITIATED, ['request' => $asked, 'response' => ['action' => $redirect->action]]);
 
-        return $created['url'];
+        return $redirect;
     }
 
     private function title(Payment $payment): string

@@ -34,13 +34,11 @@ beforeEach(function () {
     fakeHerepayKeys();
 });
 
-it('sends the vendor to a payment link for the plan they picked, at todays price', function () {
-    fakeHerepayLink('https://uat.herepay.org/herepay/pay/PRO');
-
-    $this->actingAs($this->owner)->post(route('vendor.pro.checkout'), ['plan' => 'yearly'])
-        ->assertRedirect('https://uat.herepay.org/herepay/pay/PRO');
+it('sends the vendor to confirm the plan they picked, at todays price', function () {
+    $response = $this->actingAs($this->owner)->post(route('vendor.pro.checkout'), ['plan' => 'yearly']);
 
     $payment = $this->vendor->proPayments()->sole();
+    $response->assertRedirect(route('payments.checkout', $payment));
 
     expect($payment->status)->toBe(PaymentStatus::Pending)
         ->and($payment->purpose)->toBe(PaymentPurpose::VendorPro)

@@ -91,9 +91,10 @@ class VendorBookingSetting extends Model
         return $this->deposit_type->amountFor($price, (float) $this->deposit_value);
     }
 
+    /** All three keys: the direct API needs the API key to list banks and start a payment. */
     public function hasHerepay(): bool
     {
-        return filled($this->herepay_secret_key) && filled($this->herepay_private_key);
+        return filled($this->herepay_secret_key) && filled($this->herepay_private_key) && filled($this->herepay_api_key);
     }
 
     public function hasManualInstructions(): bool

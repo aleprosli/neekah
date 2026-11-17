@@ -38,6 +38,7 @@ class VendorBookingSettingFactory extends Factory
         return $this->state(fn (): array => [
             'herepay_secret_key' => 'vendor-secret',
             'herepay_private_key' => 'vendor-private',
+            'herepay_api_key' => 'vendor-api',
             'herepay_connected_at' => now(),
         ]);
     }

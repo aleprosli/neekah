@@ -30,9 +30,12 @@ beforeEach(function () {
     Wedding::factory()->for($this->couple)->create();
 
     $this->herepayRefuses = false;
-    Http::fake(['uat.herepay.org/*' => fn () => $this->herepayRefuses
-        ? Http::response(['status' => 'Unauthorized'], 401)
-        : Http::response(['status' => 200, 'data' => ['pay_url' => 'https://uat.herepay.org/herepay/pay/DEP']])]);
+    Http::fake([
+        'uat.herepay.org/api/v1/herepay/payment/channels' => Http::response(herepayChannels()),
+        'uat.herepay.org/api/v1/herepay/initiate' => fn () => $this->herepayRefuses
+            ? Http::response(['status' => 'Unauthorized', 'status_code' => '41'], 401)
+            : Http::response(herepayInitiatePage()),
+    ]);
 });
 
 function bookOnline(): TestResponse
@@ -60,24 +63,31 @@ function depositCallback(Payment $payment, array $fields = [], string $key = 've
     ]);
 }
 
-it('sends the couple to pay the deposit on the vendor own Herepay account', function () {
-    bookOnline()->assertRedirect('https://uat.herepay.org/herepay/pay/DEP');
-
-    $booking = Booking::sole();
+it('sends the couple to confirm and pay the deposit on the vendor own Herepay account', function () {
+    $response = bookOnline();
     $payment = Payment::sole();
+    $response->assertRedirect(route('payments.checkout', $payment));
 
     expect((float) $payment->amount)->toBe(900.0)
         ->and($payment->status)->toBe(PaymentStatus::Pending)
         ->and($payment->merchant)->toBe('vendor')
         ->and($payment->vendor_id)->toBe($this->vendor->id)
-        ->and($payment->payment_url)->toBe('https://uat.herepay.org/herepay/pay/DEP');
+        ->and($payment->expires_at->equalTo(Booking::sole()->hold_expires_at))->toBeTrue();
 
-    Http::assertSent(fn (ClientRequest $request): bool => $request->hasHeader('SecretKey', 'vendor-secret')
-        && $request['amount'] === 900.0
-        && $request['usage_type'] === 'single'
+    $this->actingAs($this->couple)->get(route('payments.checkout', $payment))->assertOk()->assertSee($this->vendor->name);
+    $this->actingAs($this->couple)->post(route('payments.pay', $payment), ['payment_method' => 'Online Banking', 'bank_code' => 'ABB0233'])->assertOk();
+
+    Http::assertSent(fn (ClientRequest $request): bool => $request->url() === 'https://uat.herepay.org/api/v1/herepay/payment/channels'
+        && $request->hasHeader('SecretKey', 'vendor-secret')
+        && $request->hasHeader('XApiKey', 'vendor-api'));
+    Http::assertSent(fn (ClientRequest $request): bool => $request->url() === 'https://uat.herepay.org/api/v1/herepay/initiate'
+        && $request->hasHeader('SecretKey', 'vendor-secret')
+        && $request->hasHeader('XApiKey', 'vendor-api')
+        && $request['amount'] === '900.00'
+        && $request['bank_prefix'] === 'ABB0233'
+        && $request['checksum'] === hash_hmac('sha256', collect($request->data())->except('checksum')->sortKeys()->implode(','), 'vendor-private')
         && $request['redirect_url'] === route('payments.return', $payment)
-        && str_contains($request['callback_url'], '/webhooks/herepay?ref='.$payment->reference)
-        && str_contains($request['callback_url'], 'signature='));
+        && str_contains($request['callback_url'], '/webhooks/herepay?ref='.$payment->reference));
 });
 
 it('confirms the booking on a callback signed with the vendor key, once however often it comes', function () {
@@ -150,23 +160,29 @@ it('tells both sides the vendor owes a refund when a late deposit finds the date
     Notification::assertSentTo($this->vendor->user, DepositNeedsRefund::class);
 });
 
-it('keeps the hold and offers to pay again when Herepay refuses the link', function () {
+it('keeps the hold and lets the couple try again when Herepay refuses to start the payment', function () {
     $this->herepayRefuses = true;
+    bookOnline();
+    $payment = Payment::sole();
 
-    bookOnline()->assertRedirect(route('bookings.show', Booking::sole()));
+    $this->actingAs($this->couple)
+        ->from(route('payments.checkout', $payment))
+        ->post(route('payments.pay', $payment), ['payment_method' => 'Online Banking', 'bank_code' => 'ABB0233'])
+        ->assertRedirect(route('payments.checkout', $payment))
+        ->assertSessionHasErrors('bank_code');
 
     expect(Booking::sole()->isHeld())->toBeTrue()
-        ->and(Payment::sole()->status)->toBe(PaymentStatus::Failed);
+        ->and($payment->fresh()->status)->toBe(PaymentStatus::Pending);
 });
 
-it('reuses the open link when the couple pays again', function () {
+it('reuses the open payment when the couple pays again', function () {
     bookOnline();
     $booking = Booking::sole();
 
-    $this->actingAs($this->couple)->post(route('bookings.deposit.pay', $booking))->assertRedirect('https://uat.herepay.org/herepay/pay/DEP');
+    $this->actingAs($this->couple)->post(route('bookings.deposit.pay', $booking))->assertRedirect(route('payments.checkout', Payment::sole()));
 
     expect(Payment::count())->toBe(1);
-    Http::assertSentCount(1);
+    Http::assertNothingSent();
 });
 
 it('shows the couple what is known when Herepay sends them back', function () {

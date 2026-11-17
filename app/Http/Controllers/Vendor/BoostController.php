@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Vendor;
 
-use App\Actions\StartPayment;
 use App\Actions\StartVendorBoost;
 use App\Enums\PaymentPurpose;
 use App\Enums\PaymentStatus;
@@ -19,7 +18,6 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
-use RuntimeException;
 
 /**
  * A vendor's boost tokens: the balance, lifting a category, the history,
@@ -94,7 +92,7 @@ class BoostController extends Controller
         ]));
     }
 
-    public function checkout(Request $request, BoostSettings $settings, HerepayGateway $gateway, StartPayment $start): RedirectResponse
+    public function checkout(Request $request, BoostSettings $settings, HerepayGateway $gateway): RedirectResponse
     {
         abort_unless($settings->isEnabled() && $gateway->isConfigured(), 404);
 
@@ -109,15 +107,10 @@ class BoostController extends Controller
             'status' => PaymentStatus::Pending,
             'gateway' => $gateway->name(),
             'details' => ['pack' => $packName, 'tokens' => $pack['tokens']],
+            'expires_at' => now()->addDay(),
         ]);
 
-        try {
-            return redirect()->away($start->handle($payment, $request->user()));
-        } catch (RuntimeException $exception) {
-            report($exception);
-
-            return back()->withErrors(['pack' => __('flash.vendor.boost_checkout_failed')]);
-        }
+        return redirect()->route('payments.checkout', $payment);
     }
 
     /**
