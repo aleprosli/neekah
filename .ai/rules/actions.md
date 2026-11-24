@@ -5,6 +5,7 @@ paths:
   - app/Actions/ImportVendorIcal.php
   - app/Actions/ActivateCameraAlbum.php
   - app/Actions/PurgeCameraAlbum.php
+  - app/Actions/SettlePayment.php
 ---
 
 # Actions
@@ -45,3 +46,6 @@ Owner, 26 Sep 2026: couples buy Neekah Kenangan (Basic RM29: 500 HD photos, no v
 
 ## Kamera Majlis files live under camera/{id}/ and are purged, never the album row
 Every album file (photos, thumbnails, video posters, incoming uploads, ZIP exports) is stored under camera/{album id}/ on the public disk, so PurgeCameraAlbum deletes that directory. It removes the media rows, zeroes the counters and sets purged_at, but keeps the album and its purchases as the record. Buying again clears purged_at. It is called by neekah:camera-retention (daily 09:00, when expires_at passes), by the admin takedown, and by DeleteUserAccount. A new camera file kind must go under camera/{id}/ or it outlives the album. Album files are stored with CameraAlbum::CACHE_CONTROL (one day), not the disk's immutable year, and deletes queue PurgeCdnUrls. That job does nothing unless CLOUDFLARE_ZONE_ID and CLOUDFLARE_PURGE_TOKEN are set. Covered by CameraRetentionTest.
+
+## Every paid payment tells the admin Telegram chat once
+Owner, 24 Nov 2026: every payment that becomes paid (Kenangan, Pro, boost, booking) posts to the admin Telegram chat through AlertPaymentReceived::handle(). It is called only where a payment turns paid: SettlePayment::markPaid() after commit when it returned true (never on ALREADY_PAID, so Herepay retries do not alert twice), and VerifyManualPayment::handle(). A new path that marks a payment paid must call it too. The message is built from PaymentDocument and always in Malay. Covered by PaymentAlertsTest.

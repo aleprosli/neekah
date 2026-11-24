@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\DB;
 
 class VerifyManualPayment
 {
-    public function __construct(private AwardVendorPoints $awardPoints, private IssueReceipt $receipt) {}
+    public function __construct(private AwardVendorPoints $awardPoints, private IssueReceipt $receipt, private AlertPaymentReceived $alert) {}
 
     /**
      * The vendor has found the money in their account.
@@ -64,6 +64,7 @@ class VerifyManualPayment
         });
 
         $this->receipt->send($payment);
+        $this->alert->handle($payment);
 
         return $payment;
     }

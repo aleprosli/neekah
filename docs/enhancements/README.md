@@ -7,3 +7,4 @@ Newest first.
 
 | Date | Doc | Summary | Branch |
 | --- | --- | --- | --- |
+| 2026-11-24 | [Admin Telegram chat hears about every payment](2026-11-24-telegram-payment-alerts.md) | Paid Kenangan, Pro, boost and booking payments post to the admin Telegram chat | `feature/telegram-payment-alerts` |

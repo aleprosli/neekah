@@ -41,6 +41,7 @@ class SettlePayment
         private ActivateCameraAlbum $kenangan,
         private ConfirmOnlineDeposit $deposit,
         private IssueReceipt $receipt,
+        private AlertPaymentReceived $alert,
     ) {}
 
     /**
@@ -85,9 +86,9 @@ class SettlePayment
     }
 
     /**
-     * Mark it paid, give the payer what it bought and send them the receipt.
-     * False when it already was: the second caller changes nothing and sends
-     * nothing.
+     * Mark it paid, give the payer what it bought, send them the receipt and
+     * tell the admin Telegram chat. False when it already was: the second
+     * caller changes nothing and sends nothing.
      *
      * @param  array<string, mixed>  $attributes
      */
@@ -117,6 +118,7 @@ class SettlePayment
 
         if ($settled) {
             $this->receipt->send($payment);
+            $this->alert->handle($payment);
         }
 
         return $settled;
