@@ -156,9 +156,11 @@ class CameraController extends Controller
             throw ValidationException::withMessages(['email' => __('validation.custom.camera_no_wedding')]);
         }
 
-        $purchase = $activate->recordManually(
+        $tier = CameraTier::from($validated['tier']);
+
+        $activate->recordManually(
             $wedding,
-            CameraTier::from($validated['tier']),
+            $tier,
             $request->user(),
             isset($validated['amount']) ? (float) $validated['amount'] : null,
             $validated['note'] ?? null,
@@ -166,7 +168,7 @@ class CameraController extends Controller
 
         return back()->with('status', __('flash.admin.camera_activated', [
             'wedding' => $wedding->title,
-            'tier' => $purchase->tier->label(),
+            'tier' => $tier->label(),
         ]));
     }
 

@@ -40,8 +40,11 @@ it('records a purchase paid outside Herepay for the couple of an email', functio
     $couple = User::factory()->create();
     $wedding = Wedding::factory()->for($couple)->create();
 
-    $this->actingAs($this->admin)->post(route('admin.camera.store'), ['email' => $couple->email, 'tier' => 'pro', 'amount' => '0', 'note' => 'Hadiah'])
-        ->assertSessionHasNoErrors();
+    $this->actingAs($this->admin)->from(route('admin.camera.index'))
+        ->post(route('admin.camera.store'), ['email' => $couple->email, 'tier' => 'pro', 'amount' => '0', 'note' => 'Hadiah'])
+        ->assertRedirect(route('admin.camera.index'))
+        ->assertSessionHasNoErrors()
+        ->assertSessionHas('status', __('flash.admin.camera_activated', ['wedding' => $wedding->title, 'tier' => CameraTier::Pro->label()]));
 
     $purchase = $wedding->kenanganPayments()->sole();
     expect($purchase->status)->toBe(PaymentStatus::Paid)
